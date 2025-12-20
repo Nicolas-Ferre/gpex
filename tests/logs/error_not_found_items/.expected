@@ -1,0 +1,3 @@
+error: `not_found` value not found (at tests/logs/error_not_found_items/values.gpex:1:14)
+error: `_itself` value not found (at tests/logs/error_not_found_items/values.gpex:2:15)
+error: `_after_value` value not found (at tests/logs/error_not_found_items/values.gpex:3:14)

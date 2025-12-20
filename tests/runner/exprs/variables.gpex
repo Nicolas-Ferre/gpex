@@ -1,0 +1,7 @@
+var value = 42; // ignore
+
+var _i32_lit_min = -2_147_483_648; // expected: -2147483648
+var _i32_lit_max = 2_147_483_647; // expected: 2147483647
+var _i32_zero = 0; // expected: 0
+
+var _ident_var = value; // expected: 42
