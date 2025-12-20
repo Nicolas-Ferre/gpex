@@ -64,6 +64,6 @@ fn load_invalid_file() {
     assert_eq!(errors.as_ref().map(|e| e[0].inner.len()), Some(0));
     assert_eq!(
         errors.as_ref().map(|e| e[0].msg.as_str()),
-        Some("invalid compilated program \"tests/lib/main.rs\"")
+        Some("invalid compiled program \"tests/lib/main.rs\"")
     );
 }

@@ -19,7 +19,7 @@ pub fn load_compiled(path: &Path) -> Result<Program, Vec<Log>> {
         Ok(content) => Ok(serde_json::from_str(&content).map_err(|_| {
             vec![Log {
                 level: LogLevel::Error,
-                msg: format!("invalid compilated program \"{}\"", path.display()),
+                msg: format!("invalid compiled program \"{}\"", path.display()),
                 loc: None,
                 inner: vec![],
             }]

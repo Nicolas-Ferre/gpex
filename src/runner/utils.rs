@@ -81,7 +81,7 @@ pub(crate) fn create_bind_group_layout(
     storage_count: u32,
 ) -> BindGroupLayout {
     device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-        label: Some("gpex:bing_group_layout"),
+        label: Some("gpex:bind_group_layout"),
         entries: &(0..storage_count)
             .map(|binding| BindGroupLayoutEntry {
                 binding,

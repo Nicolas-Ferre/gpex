@@ -25,5 +25,5 @@ Before you consider using this language, please keep in mind that:
 
 - 🔥 Maximize execution on GPU side
 - 💪 Strongly typed
-- 🔀 Data race free
+- 🔀 Data-race-free
 - 🔄 Hot reloadable

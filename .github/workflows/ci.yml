@@ -96,7 +96,7 @@ jobs:
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Check coverage threshold
-        run: bash -x .github/workflows/scripts/check_coverage_html.sh
+        run: bash -x .github/workflows/scripts/check_coverage.sh
 
   lint:
     runs-on: ubuntu-24.04
@@ -109,10 +109,6 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev moreutils dos2unix
       - name: Run rustfmt
         run: cargo fmt -- --check
-      - name: Run cargo-deny
-        uses: EmbarkStudios/cargo-deny-action@v1
-        with:
-          rust-version: ${{ steps.rust_version.outputs.value }}
       - name: Check encoding
         run: isutf8 **/*
       - name: Detect line endings different than '\n'

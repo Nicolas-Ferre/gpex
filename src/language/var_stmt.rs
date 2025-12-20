@@ -58,6 +58,7 @@ impl<'a> VarStmt {
 
     pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &mut Indexes<'_>) {
         let var_name = &self.ident.slice;
+        // TODO: add validator module at root of the crate to encourage reuse of errors
         if let Some(duplicated_item) = indexes.values.search(var_name, self) {
             ctx.logs.push(Log {
                 level: LogLevel::Error,
