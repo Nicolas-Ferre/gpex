@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Retrieve rust version
         id: rust_version
-        run: bash -x .github/workflows/scripts/extract_rust_version.sh
+        run: bash -x .github/scripts/extract_rust_version.sh
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -67,7 +67,7 @@ jobs:
           fetch-depth: 2
       - name: Retrieve rust version
         id: rust_version
-        run: bash -x .github/workflows/scripts/extract_rust_version.sh
+        run: bash -x .github/scripts/extract_rust_version.sh
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -126,7 +126,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Retrieve rust version
         id: rust_version
-        run: bash -x .github/workflows/scripts/extract_rust_version.sh
+        run: bash -x .github/scripts/extract_rust_version.sh
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
