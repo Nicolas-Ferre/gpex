@@ -72,7 +72,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ steps.rust_version.outputs.value }}
-          target: ${{ matrix.target }}
+          target: x86_64-unknown-linux-gnu
           components: llvm-tools-preview
       - name: Setup cache
         uses: Swatinem/rust-cache@v2
@@ -81,10 +81,10 @@ jobs:
       - name: Install general dependencies
         run: sudo apt-get update && sudo apt-get install libudev-dev xvfb
       - name: Install Vulkan SDK
-        uses: humbletim/install-vulkan-sdk@v1.2
+        uses: jakoch/install-vulkan-sdk-action@v1
         with:
-          version: latest
           cache: true
+          stripdown: true
       - name: Install grcov
         run: cargo install grcov --debug --force
       - name: Run unit tests
@@ -134,7 +134,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ steps.rust_version.outputs.value }}
-          target: ${{ matrix.target }}
+          target: x86_64-unknown-linux-gnu
           components: rustfmt
       - name: Run cargo-deny
         uses: EmbarkStudios/cargo-deny-action@v2
