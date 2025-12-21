@@ -1,5 +1,9 @@
 on:
-  workflow_call: { }
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
 
 jobs:
   setup:
@@ -12,7 +16,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ steps.rust_version.outputs.value }}
-          target: ${{ matrix.target }}
+          target: ${{ intputs.target }}
           components: clippy, rustfmt, llvm-tools-preview
       - name: Run cargo-deny
         uses: EmbarkStudios/cargo-deny-action@v1

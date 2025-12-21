@@ -41,7 +41,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup Rust toolchain
-        uses: ./.github/actions/rust-setup.yml
+        uses: ./.github/actions/rust-setup
+        with:
+          target: ${{ matrix.target }}
       - name: Install Linux general dependencies
         run: sudo apt-get update && sudo apt-get install libudev-dev
         if: matrix.target == 'x86_64-unknown-linux-gnu'
@@ -56,7 +58,9 @@ jobs:
         with:
           fetch-depth: 2
       - name: Setup Rust toolchain
-        uses: ./.github/actions/rust-setup.yml
+        uses: ./.github/actions/rust-setup
+        with:
+          target: x86_64-unknown-linux-gnu
       - name: Install general dependencies
         run: sudo apt-get update && sudo apt-get install libudev-dev xvfb
       - name: Install graphics dependencies
@@ -104,7 +108,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Setup Rust toolchain
-        uses: ./.github/actions/rust-setup.yml
+        uses: ./.github/actions/rust-setup
+        with:
+          target: x86_64-unknown-linux-gnu
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install libudev-dev moreutils dos2unix
       - name: Run rustfmt
