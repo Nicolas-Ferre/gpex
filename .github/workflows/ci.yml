@@ -85,6 +85,8 @@ jobs:
         with:
           cache: true
           stripdown: true
+          install_swiftshader: true
+          install_lavapipe: true
       - name: Install grcov
         run: cargo install grcov --debug --force
       - name: Run unit tests
