@@ -1,5 +1,7 @@
 [advisories]
-ignore = []
+ignore = [
+    { id = "RUSTSEC-2024-0436", reason = "wgpu depends on paste" }
+]
 
 [bans]
 multiple-versions = "allow"
@@ -14,7 +16,6 @@ allow = [
     "Apache-2.0",
     "Apache-2.0 WITH LLVM-exception",
     "BSD-2-Clause",
-    "BSD-3-Clause",
     "CC0-1.0",
     "ISC",
     "MIT",

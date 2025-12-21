@@ -17,7 +17,6 @@ env:
   XDG_RUNTIME_DIR: "~"
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
-  COV_THRESHOLD: 100.0
   CODECOV_UPLOAD: true
 
 jobs:
@@ -27,7 +26,7 @@ jobs:
       matrix:
         include:
           - name: Windows
-            os: windows-2025
+            os: windows-2022
             target: x86_64-pc-windows-msvc
           - name: Linux
             os: ubuntu-24.04
@@ -82,7 +81,7 @@ jobs:
       - name: Install general dependencies
         run: sudo apt-get update && sudo apt-get install libudev-dev xvfb
       - name: Install graphics dependencies
-        run: bash -x .github/workflows/scripts/install_graphic_dependencies_linux.sh
+        run: bash -x .github/scripts/install_graphic_dependencies_linux.sh
       - name: Install grcov
         run: cargo install grcov --debug --force
       - name: Run unit tests
@@ -102,7 +101,7 @@ jobs:
               --excl-line '(#\[|^[^ ]+!\(|struct |impl( |<)|unreachable!|^\/\/\/|no-coverage|[a-z0-9_]: .+,)' \
               --excl-start 'coverage: off' \
               --excl-stop 'coverage: on' \
-              --keep-only "**/src/**/*"
+              --keep-only "src/**/*"
       - name: Upload coverage report to GitHub
         uses: actions/upload-artifact@v4
         with:
@@ -118,7 +117,7 @@ jobs:
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Check coverage threshold
-        run: bash -x .github/workflows/scripts/check_coverage.sh
+        run: bash -x .github/scripts/check_coverage.sh
 
   lint:
     runs-on: ubuntu-24.04
