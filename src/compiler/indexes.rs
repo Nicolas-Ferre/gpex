@@ -1,7 +1,7 @@
 use crate::compiletools::indexing::NodeIndex;
+use crate::compiletools::parsing::Span;
 use crate::language::var_stmt::VarStmt;
 use std::collections::HashMap;
-use crate::compiletools::parsing::Span;
 
 #[derive(Debug)]
 pub(crate) struct Indexes<'a> {

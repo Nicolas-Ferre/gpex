@@ -30,7 +30,6 @@ pub(crate) fn read(path: &Path, root_path: &Path, ext: &str) -> Result<Vec<ReadF
     }
 }
 
-
 fn read_entry(entry: DirEntry, root_path: &Path, ext: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
     let path = entry.path();
     let file_type = entry.file_type().map_err(|err| to_log(err, &path))?;

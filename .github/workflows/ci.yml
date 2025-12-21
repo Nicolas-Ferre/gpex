@@ -26,7 +26,7 @@ jobs:
       matrix:
         include:
           - name: Windows
-            os: windows-2022
+            os: windows-2025
             target: x86_64-pc-windows-msvc
           - name: Linux
             os: ubuntu-24.04
@@ -39,9 +39,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Retrieve minimal supported rust version
+      - name: Retrieve rust version
         id: rust_version
-        run: echo "value=$(grep -i rust-version Cargo.toml | cut -d '"' -f2 | tr -d '\n')" >> $GITHUB_OUTPUT
+        run: bash -x .github/workflows/scripts/extract_rust_version.sh
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -65,9 +65,9 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 2
-      - name: Retrieve minimal supported rust version
+      - name: Retrieve rust version
         id: rust_version
-        run: echo "value=$(grep -i rust-version Cargo.toml | cut -d '"' -f2 | tr -d '\n')" >> $GITHUB_OUTPUT
+        run: bash -x .github/workflows/scripts/extract_rust_version.sh
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -124,9 +124,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Retrieve minimal supported rust version
+      - name: Retrieve rust version
         id: rust_version
-        run: echo "value=$(grep -i rust-version Cargo.toml | cut -d '"' -f2 | tr -d '\n')" >> $GITHUB_OUTPUT
+        run: bash -x .github/workflows/scripts/extract_rust_version.sh
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:

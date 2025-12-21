@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xeu
 
-coverage=$(grep "<coverage" coverage.xml | grep -oP 'line-rate="\K[0-9.]+')
+coverage=$(grep "<coverage" coverage.xml | grep -oP 'line-rate="\K[0-9.]+' | head -1)
 failure=$(awk 'BEGIN{ print '"$coverage"'<'"1.0"' }')
 if [ "$failure" -eq "1" ]; then
     echo "Coverage rate has failed with $coverage (expected: 1.0)."
