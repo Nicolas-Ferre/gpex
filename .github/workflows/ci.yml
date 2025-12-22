@@ -52,9 +52,6 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
-      - name: Install Linux general dependencies
-        run: sudo apt-get update && sudo apt-get install libudev-dev
-        if: matrix.target == 'x86_64-unknown-linux-gnu'
       - name: Run clippy
         run: cargo clippy --all-targets --no-deps --target ${{ matrix.target }} -- -D warnings
 
@@ -81,16 +78,12 @@ jobs:
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
           tool: grcov
-      - name: Install general dependencies
-        run: sudo apt-get update && sudo apt-get install libudev-dev xvfb
       - name: Install Vulkan SDK
         uses: gfx-rs/wgpu/.github/actions/install-vulkan-sdk@v28
       - name: Install Mesa
         uses: gfx-rs/wgpu/.github/actions/install-mesa@v28
-      - name: Install grcov
-        run: cargo install grcov --debug --force
       - name: Run unit tests
-        run: xvfb-run --server-args="-screen 0 1920x1080x24" cargo test --no-fail-fast
+        run: cargo test --no-fail-fast
         env:
           RUSTFLAGS: -Cinstrument-coverage -Clink-dead-code
           LLVM_PROFILE_FILE: "%m.profraw"
@@ -147,7 +140,7 @@ jobs:
         with:
           cache-on-failure: true
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install libudev-dev moreutils dos2unix
+        run: sudo apt-get update && sudo apt-get install moreutils
       - name: Run rustfmt
         run: cargo fmt -- --check
       - name: Check encoding
