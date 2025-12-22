@@ -48,7 +48,7 @@ jobs:
           toolchain: ${{ steps.rust_version.outputs.value }}
           target: ${{ matrix.target }}
           components: clippy
-      - name: Setup cache
+      - name: Setup cache for Rust dependencies
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
@@ -74,16 +74,21 @@ jobs:
           toolchain: ${{ steps.rust_version.outputs.value }}
           target: x86_64-unknown-linux-gnu
           components: llvm-tools-preview
-      - name: Setup cache
+      - name: Setup cache for Rust dependencies
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+      - uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: grcov
       - name: Install general dependencies
         run: sudo apt-get update && sudo apt-get install libudev-dev xvfb
       - name: Install Vulkan SDK
         uses: gfx-rs/wgpu/.github/actions/install-vulkan-sdk@v28
       - name: Install Mesa
         uses: gfx-rs/wgpu/.github/actions/install-mesa@v28
+      - name: Install grcov
+        run: cargo install grcov --debug --force
       - name: Run unit tests
         run: xvfb-run --server-args="-screen 0 1920x1080x24" cargo test --no-fail-fast
         env:
@@ -91,7 +96,7 @@ jobs:
           LLVM_PROFILE_FILE: "%m.profraw"
       - name: Generate coverage report
         run: |
-          cargo run grcov . \
+          grcov . \
               --binary-path ./target/debug/ \
               --source-dir . \
               --output-type cobertura \
@@ -137,7 +142,7 @@ jobs:
         uses: EmbarkStudios/cargo-deny-action@v2
         with:
           rust-version: ${{ steps.rust_version.outputs.value }}
-      - name: Setup cache
+      - name: Setup cache for Rust dependencies
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
