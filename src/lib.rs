@@ -1,7 +1,5 @@
 //! `GPEx` CLI library.
 
-// TODO: speed up test CI job
-
 mod compiler;
 mod compiletools;
 mod language;
