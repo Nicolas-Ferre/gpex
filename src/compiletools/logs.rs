@@ -89,7 +89,7 @@ impl Display for LogLocation {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut line = 1;
         let mut column = 1;
-        for (offset, char) in self.code.chars().enumerate() {
+        for (offset, char) in self.code.char_indices() {
             if offset == self.span.start {
                 break;
             } else if char == '\n' {
