@@ -10,8 +10,6 @@ reviews:
   related_prs: false
   suggested_reviewers: false
   in_progress_fortune: false
-  auto_review:
-    drafts: true
   finishing_touches:
     docstrings:
       enabled: false

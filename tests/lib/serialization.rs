@@ -15,49 +15,51 @@ fn save_and_load_program() -> Result<(), Vec<Log>> {
     Ok(())
 }
 
-// TODO: simplify these tests
 #[test]
+#[expect(clippy::expect_used)]
 fn save_in_non_existing_folder() -> Result<(), Vec<Log>> {
     let (program, _) = gpex::compile(Path::new("tests/lib/valid"), false)?;
     let result = gpex::save_compiled(&program, Path::new("tests/missing/out.json"));
-    let errors = result.err();
-    assert_eq!(errors.as_ref().map(Vec::len), Some(1));
-    assert_eq!(errors.as_ref().map(|e| e[0].level), Some(LogLevel::Error));
-    assert!(errors.as_ref().is_some_and(|e| e[0].loc.is_none()));
-    assert_eq!(errors.as_ref().map(|e| e[0].inner.len()), Some(0));
-    assert!(errors.as_ref().is_some_and(|e| {
-        e[0].msg
-            .as_str()
-            .starts_with("cannot write \"tests/missing/out.json\": ")
-    }));
+    let errors = result.expect_err("saving should generate errors");
+    assert_eq!(errors.len(), 1);
+    assert_eq!(errors[0].level, LogLevel::Error);
+    assert!(errors[0].loc.is_none());
+    assert_eq!(errors[0].inner.len(), 0);
+    assert!(
+        errors[0]
+            .to_string()
+            .starts_with("error: cannot write \"tests/missing/out.json\": ")
+    );
     Ok(())
 }
 
 #[test]
+#[expect(clippy::expect_used)]
 fn load_non_existing_file() {
     let result = gpex::load_compiled(Path::new("tests/missing/out.json"));
-    let errors = result.err();
-    assert_eq!(errors.as_ref().map(Vec::len), Some(1));
-    assert_eq!(errors.as_ref().map(|e| e[0].level), Some(LogLevel::Error));
-    assert!(errors.as_ref().is_some_and(|e| e[0].loc.is_none()));
-    assert_eq!(errors.as_ref().map(|e| e[0].inner.len()), Some(0));
-    assert!(errors.as_ref().is_some_and(|e| {
-        e[0].msg
-            .as_str()
-            .starts_with("cannot read \"tests/missing/out.json\": ")
-    }));
+    let errors = result.expect_err("loading should generate errors");
+    assert_eq!(errors.len(), 1);
+    assert_eq!(errors[0].level, LogLevel::Error);
+    assert!(errors[0].loc.is_none());
+    assert_eq!(errors[0].inner.len(), 0);
+    assert!(
+        errors[0]
+            .to_string()
+            .starts_with("error: cannot read \"tests/missing/out.json\": ")
+    );
 }
 
 #[test]
+#[expect(clippy::expect_used)]
 fn load_invalid_file() {
     let result = gpex::load_compiled(Path::new("tests/lib/main.rs"));
-    let errors = result.err();
-    assert_eq!(errors.as_ref().map(Vec::len), Some(1));
-    assert_eq!(errors.as_ref().map(|e| e[0].level), Some(LogLevel::Error));
-    assert!(errors.as_ref().is_some_and(|e| e[0].loc.is_none()));
-    assert_eq!(errors.as_ref().map(|e| e[0].inner.len()), Some(0));
+    let errors = result.expect_err("loading should generate errors");
+    assert_eq!(errors.len(), 1);
+    assert_eq!(errors[0].level, LogLevel::Error);
+    assert!(errors[0].loc.is_none());
+    assert_eq!(errors[0].inner.len(), 0);
     assert_eq!(
-        errors.as_ref().map(|e| e[0].msg.as_str()),
-        Some("invalid compiled program \"tests/lib/main.rs\"")
+        errors[0].to_string(),
+        "error: invalid compiled program \"tests/lib/main.rs\"\n"
     );
 }

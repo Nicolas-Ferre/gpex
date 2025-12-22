@@ -1,10 +1,13 @@
 //! `GPEx` CLI library.
 
+// TODO: speed up test CI job
+
 mod compiler;
 mod compiletools;
 mod language;
 mod runner;
 mod utils;
+mod validators;
 
 pub use compiler::compile;
 pub use compiler::save_compiled;

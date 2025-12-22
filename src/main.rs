@@ -1,6 +1,8 @@
 //! CLI of `GPEx` language.
 #![allow(clippy::print_stdout)] // needed to display messages
 
+// coverage: off (difficult to test)
+
 use clap::Parser;
 use gpex::{Log, Program, Runner};
 use std::path::{Path, PathBuf};

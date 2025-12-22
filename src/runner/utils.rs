@@ -28,12 +28,14 @@ pub(crate) async fn create_adapter(instance: &Instance) -> Result<Adapter, Vec<L
         .request_adapter(&adapter_request)
         .await
         .map_err(|err| {
+            // coverage: off (difficult to test)
             vec![Log {
                 level: LogLevel::Error,
                 msg: format!("no supported graphic adapter found: {err}"),
                 loc: None,
                 inner: vec![],
             }]
+            // coverage: on
         })
 }
 
@@ -50,12 +52,14 @@ pub(crate) async fn create_device(adapter: &Adapter) -> Result<(Device, Queue), 
         .request_device(&device_descriptor)
         .await
         .map_err(|err| {
+            // coverage: off (difficult to test)
             vec![Log {
                 level: LogLevel::Error,
                 msg: format!("cannot retrieve graphic device: {err}"),
                 loc: None,
                 inner: vec![],
             }]
+            // coverage: on
         })
 }
 

@@ -60,7 +60,7 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
         .collect::<HashMap<_, _>>();
     Program {
         buffer: Buffer {
-            size: fields.values().map(|field| field.size).sum(),
+            size: offset,
             fields,
         },
         init_shader,

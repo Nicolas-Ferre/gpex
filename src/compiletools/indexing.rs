@@ -22,12 +22,12 @@ impl<'a, Item: Node, const SEARCH_BEFORE: bool> NodeIndex<'a, Item, SEARCH_BEFOR
 }
 
 impl<'a, Item: Node> NodeIndex<'a, Item, false> {
-    pub(crate) fn search(&self, key: &str, searched: &impl Node) -> Option<&'a Item> {
-        self.items[searched.file_index()]
+    pub(crate) fn search(&self, key: &str, loc: &impl Node) -> Option<&'a Item> {
+        self.items[loc.file_index()]
             .get(key)?
             .iter()
             .rev()
-            .find(|item| item.id() < searched.id() && item.scope() != searched.scope())
+            .find(|item| item.id() < loc.id() && item.scope() != loc.scope())
             .copied()
     }
 }

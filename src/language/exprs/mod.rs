@@ -40,10 +40,9 @@ impl Expr {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
-            Self::Ident(node) => node.validate(ctx, indexes)?,
+            Self::Ident(node) => node.validate(ctx, indexes),
             Self::I32Lit(node) => node.validate(ctx),
         }
-        Ok(())
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {

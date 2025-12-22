@@ -1,19 +1,19 @@
 use crate::compiler::indexes::Indexes;
 use crate::compiler::transpilation::MAIN_BUFFER_NAME;
 use crate::compiletools::indexing::Node;
-use crate::compiletools::logs::{Log, LogInner, LogLevel};
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
-use crate::compiletools::validation::ValidateCtx;
+use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::exprs::Expr;
 use crate::language::patterns::IDENT_PAT;
 use crate::language::symbols::{EQ_SYM, SEMI_SYM, VAR_SYM};
+use crate::validators;
 use std::fmt::Write;
 
 #[derive(Debug)]
 pub(crate) struct VarStmt {
     id: u64,
     scope: Vec<u64>,
-    ident: Span,
+    pub(crate) ident: Span,
     expr: Expr,
 }
 
@@ -56,60 +56,17 @@ impl<'a> VarStmt {
         self.expr.pre_validate(indexes);
     }
 
-    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &Indexes<'_>) {
-        let var_name = &self.ident.slice;
-        // TODO: add validator module at root of the crate to encourage reuse of errors
-        if let Some(duplicated_item) = indexes.values.search(var_name, self) {
-            ctx.logs.push(Log {
-                level: LogLevel::Error,
-                msg: format!("`{var_name}` item defined multiple times"),
-                loc: Some(ctx.loc(&self.ident)),
-                inner: vec![LogInner {
-                    level: LogLevel::Info,
-                    msg: "item also defined here".into(),
-                    loc: Some(ctx.loc(&duplicated_item.ident)),
-                }],
-            });
-        } else {
-            let ref_span = indexes.item_first_ref.get(&self.id);
-            if ref_span.is_none() && !var_name.starts_with('_') {
-                ctx.logs.push(Log {
-                    level: LogLevel::Warning,
-                    msg: format!("`{var_name}` variable unused"),
-                    loc: Some(ctx.loc(&self.ident)),
-                    inner: vec![],
-                });
-            } else if let Some(ref_span) = ref_span
-                && var_name.starts_with('_')
-            {
-                ctx.logs.push(Log {
-                    level: LogLevel::Warning,
-                    msg: format!("`{var_name}` variable used but name starting with `_`"),
-                    loc: Some(ctx.loc(&self.ident)),
-                    inner: vec![LogInner {
-                        level: LogLevel::Info,
-                        msg: "variable used here".into(),
-                        loc: Some(ctx.loc(ref_span)),
-                    }],
-                });
-            }
-            if var_name.len() == 1 && var_name != "_" {
-                ctx.logs.push(Log {
-                    level: LogLevel::Warning,
-                    msg: format!("`{var_name}` variable name is single letter"),
-                    loc: Some(ctx.loc(&self.ident)),
-                    inner: vec![],
-                });
-            } else if !is_snake_case(var_name) {
-                ctx.logs.push(Log {
-                    level: LogLevel::Warning,
-                    msg: format!("`{var_name}` variable name not in snake_case"),
-                    loc: Some(ctx.loc(&self.ident)),
-                    inner: vec![],
-                });
-            }
-        }
-        let _ = self.expr.validate(ctx, indexes);
+    pub(crate) fn validate(
+        &self,
+        ctx: &mut ValidateCtx<'_>,
+        indexes: &Indexes<'_>,
+    ) -> Result<(), ValidateError> {
+        validators::value::check_unique_def(self, &self.ident, ctx, indexes)?;
+        validators::value::check_usage(self, &self.ident, ctx, indexes);
+        validators::ident::check_letter_count(&self.ident, ctx);
+        validators::ident::check_snake_case(&self.ident, ctx);
+        self.expr.validate(ctx, indexes)?;
+        Ok(())
     }
 
     pub(crate) fn transpile_buffer_field(&self, shader: &mut String) {
@@ -131,10 +88,4 @@ impl<'a> VarStmt {
     pub(crate) fn name(&self) -> &str {
         &self.ident.slice
     }
-}
-
-fn is_snake_case(ident: &str) -> bool {
-    ident
-        .chars()
-        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
 }

@@ -22,32 +22,35 @@ fn compile_with_warning() -> Result<(), Vec<Log>> {
 }
 
 #[test]
+#[expect(clippy::expect_used)]
 fn compile_with_warning_as_error() {
     let result = gpex::compile(Path::new("tests/lib/warning"), true);
-    let errors = result.err();
-    assert_eq!(errors.as_ref().map(Vec::len), Some(1));
-    assert_eq!(errors.as_ref().map(|e| e[0].level), Some(LogLevel::Warning));
+    let errors = result.expect_err("compilation should generate logs");
+    assert_eq!(errors.len(), 1);
+    assert_eq!(errors[0].level, LogLevel::Warning);
 }
 
 #[test]
+#[expect(clippy::expect_used)]
 fn compile_with_error() {
     let result = gpex::compile(Path::new("tests/lib/error"), false);
-    let errors = result.err();
-    assert_eq!(errors.as_ref().map(Vec::len), Some(1));
-    assert_eq!(errors.as_ref().map(|e| e[0].level), Some(LogLevel::Error));
+    let errors = result.expect_err("compilation should generate logs");
+    assert_eq!(errors.len(), 1);
+    assert_eq!(errors[0].level, LogLevel::Error);
 }
 
 #[test]
+#[expect(clippy::expect_used)]
 fn compile_missing_folder() {
     let result = gpex::compile(Path::new("tests/lib/missing"), false);
-    let errors = result.err();
-    assert_eq!(errors.as_ref().map(Vec::len), Some(1));
-    assert_eq!(errors.as_ref().map(|e| e[0].level), Some(LogLevel::Error));
-    assert!(errors.as_ref().is_some_and(|e| e[0].loc.is_none()));
-    assert_eq!(errors.as_ref().map(|e| e[0].inner.len()), Some(0));
+    let errors = result.expect_err("compilation should generate logs");
+    assert_eq!(errors.len(), 1);
+    assert_eq!(errors[0].level, LogLevel::Error);
+    assert!(errors[0].loc.is_none());
+    assert_eq!(errors[0].inner.len(), 0);
     assert!(
-        errors
-            .as_ref()
-            .is_some_and(|e| e[0].msg.starts_with("cannot read \"tests/lib/missing\": "))
+        errors[0]
+            .to_string()
+            .starts_with("error: cannot read \"tests/lib/missing\": ")
     );
 }

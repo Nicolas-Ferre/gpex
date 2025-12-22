@@ -1,7 +1,7 @@
-use crate::compiletools::logs::{Log, LogLevel};
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
-use crate::compiletools::validation::ValidateCtx;
+use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::patterns::I32_LIT_PAT;
+use crate::validators;
 
 #[derive(Debug)]
 pub(crate) struct I32Lit {
@@ -15,15 +15,9 @@ impl I32Lit {
         })
     }
 
-    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>) {
-        if self.cleaned_slice().parse::<i32>().is_err() {
-            ctx.logs.push(Log {
-                level: LogLevel::Error,
-                msg: "`i32` literal out of bounds".into(),
-                loc: Some(ctx.loc(&self.span)),
-                inner: vec![],
-            });
-        }
+    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>) -> Result<(), ValidateError> {
+        validators::literal::check_i32_bounds(&self.cleaned_slice(), &self.span, ctx)?;
+        Ok(())
     }
 
     pub(crate) fn transpile(&self, shader: &mut String) {

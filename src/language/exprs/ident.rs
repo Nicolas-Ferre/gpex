@@ -1,9 +1,9 @@
 use crate::compiler::indexes::Indexes;
 use crate::compiletools::indexing::Node;
-use crate::compiletools::logs::{Log, LogLevel};
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::patterns::IDENT_PAT;
+use crate::validators;
 
 #[derive(Debug)]
 pub(crate) struct IdentExpr {
@@ -40,7 +40,8 @@ impl IdentExpr {
             indexes.value_sources.insert(self.id, source);
             indexes
                 .item_first_ref
-                .insert(source.id(), self.ident.clone());
+                .entry(source.id())
+                .or_insert_with(|| self.ident.clone());
         }
     }
 
@@ -49,17 +50,8 @@ impl IdentExpr {
         ctx: &mut ValidateCtx<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        if indexes.value_sources.contains_key(&self.id) {
-            Ok(())
-        } else {
-            ctx.logs.push(Log {
-                level: LogLevel::Error,
-                msg: format!("`{}` value not found", self.ident.slice),
-                loc: Some(ctx.loc(&self.ident)),
-                inner: vec![],
-            });
-            Err(ValidateError)
-        }
+        validators::value::check_found(self, &self.ident, ctx, indexes)?;
+        Ok(())
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {

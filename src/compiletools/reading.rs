@@ -19,14 +19,14 @@ pub(crate) fn read(path: &Path, root_path: &Path, ext: &str) -> Result<Vec<ReadF
         let entry = entry.map_err(|err| to_log(err, path))?;
         match read_entry(entry, root_path, ext) {
             Ok(new_files) => files.extend(new_files),
-            Err(new_errors) => errors.extend(new_errors),
+            Err(new_errors) => errors.extend(new_errors), // no-coverage (difficult to test)
         }
     }
     if errors.is_empty() {
         files.sort_unstable_by(|file1, file2| file1.path.cmp(&file2.path));
         Ok(files)
     } else {
-        Err(errors)
+        Err(errors) // no-coverage (difficult to test)
     }
 }
 
