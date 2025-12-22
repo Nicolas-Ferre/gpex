@@ -84,8 +84,6 @@ jobs:
         uses: gfx-rs/wgpu/.github/actions/install-vulkan-sdk@v28
       - name: Install Mesa
         uses: gfx-rs/wgpu/.github/actions/install-mesa@v28
-      - name: Install grcov
-        run: cargo install grcov --debug --force
       - name: Run unit tests
         run: xvfb-run --server-args="-screen 0 1920x1080x24" cargo test --no-fail-fast
         env:
@@ -93,7 +91,7 @@ jobs:
           LLVM_PROFILE_FILE: "%m.profraw"
       - name: Generate coverage report
         run: |
-          grcov . \
+          cargo run grcov . \
               --binary-path ./target/debug/ \
               --source-dir . \
               --output-type cobertura \

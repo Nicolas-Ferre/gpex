@@ -22,6 +22,7 @@ tokio = { version = "1", features = ["full"] }
 wgpu = "28"
 
 [dev-dependencies]
+grcov = "0.10"
 regex = "1"
 
 [lints.rust]
