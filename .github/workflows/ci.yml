@@ -79,7 +79,10 @@ jobs:
         with:
           tool: grcov
       - name: Install Vulkan SDK
-        uses: gfx-rs/wgpu/.github/actions/install-vulkan-sdk@v28
+        uses: humbletim/install-vulkan-sdk@v1.2
+        with:
+          version: 1.4.335.0
+          cache: true
       - name: Install Mesa
         uses: gfx-rs/wgpu/.github/actions/install-mesa@v28
       - name: Run unit tests
