@@ -148,7 +148,7 @@ jobs:
       - name: Run rustfmt
         run: cargo fmt -- --check
       - name: Check encoding
-        run: isutf8 **/*
+        run: isutf8 -- **/*
       - name: Detect line endings different than '\n'
         run: find ./ -type f -name "*.rs" ! -path "./target/*" -exec grep -U -l $'\r' {} + | tee /dev/stderr | grep -q . && exit 1 || exit 0
       - name: Detect TODOs

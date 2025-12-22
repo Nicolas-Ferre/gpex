@@ -70,7 +70,7 @@ fn to_dot_path(file_path: &Path, root_path: &Path) -> String {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)] // variant data is useful for debugging tests
+#[expect(dead_code)] // variant data is useful for debugging tests
 enum Error {
     Io(io::Error),
     Regex(regex::Error),

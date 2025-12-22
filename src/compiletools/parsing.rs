@@ -30,7 +30,7 @@ impl<'a> ParseCtx<'a> {
         }
     }
 
-    pub(crate) fn scope(&self) -> &Vec<u64> {
+    pub(crate) fn scope(&self) -> &[u64] {
         &self.scope
     }
 
@@ -100,7 +100,7 @@ pub(crate) struct ParseError<'a> {
 impl ParseError<'_> {
     pub(crate) fn merge<const N: usize>(errors: impl NonEmptyArray<Self, N>) -> Self {
         let errors = errors.into_array();
-        #[allow(clippy::unwrap_used)] // array length checked at compile time
+        #[expect(clippy::unwrap_used)] // array length checked at compile time
         let max_offset = errors.iter().map(|err| err.offset).max().unwrap();
         Self {
             file: errors[0].file,
@@ -114,7 +114,6 @@ impl ParseError<'_> {
         }
     }
 
-    #[allow(clippy::range_plus_one)] // required by `ErrorLocation.span` type
     pub(crate) fn to_error(&self) -> Log {
         Log {
             level: LogLevel::Error,

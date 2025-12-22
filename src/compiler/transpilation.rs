@@ -39,7 +39,6 @@ pub struct BufferField {
     pub offset: u32,
 }
 
-#[allow(clippy::cast_possible_truncation)] // buffer count shouldn't be higher than `u32::MAX`
 pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexes<'_>) -> Program {
     let mut init_shader = String::with_capacity(100);
     transpile_init(&mut init_shader, modules, indexes);

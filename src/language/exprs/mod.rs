@@ -37,7 +37,7 @@ impl Expr {
     pub(crate) fn validate(
         &self,
         ctx: &mut ValidateCtx<'_>,
-        indexes: &mut Indexes<'_>,
+        indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
             Self::Ident(node) => node.validate(ctx, indexes)?,

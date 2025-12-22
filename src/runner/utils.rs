@@ -151,7 +151,7 @@ pub(crate) fn read_buffer(
     let submission_index = queue.submit(Some(encoder.finish()));
     let slice = read_buffer.slice(..);
     slice.map_async(MapMode::Read, |_| ());
-    #[allow(clippy::expect_used)] // should never happen
+    #[expect(clippy::expect_used)] // should never happen
     device
         .poll(PollType::Wait {
             submission_index: Some(submission_index),

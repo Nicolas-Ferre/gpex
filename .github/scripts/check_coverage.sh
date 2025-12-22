@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xeu
+set -xeuo pipefail
 
 coverage=$(grep "<coverage" coverage.xml | grep -oP 'line-rate="\K[0-9.]+' | head -1)
 failure=$(awk 'BEGIN{ print '"$coverage"'<'"1.0"' }')

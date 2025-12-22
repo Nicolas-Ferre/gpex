@@ -29,7 +29,7 @@ impl Module {
         }
     }
 
-    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &mut Indexes<'_>) {
+    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &Indexes<'_>) {
         for item in &self.items {
             item.validate(ctx, indexes);
         }

@@ -15,6 +15,7 @@ fn save_and_load_program() -> Result<(), Vec<Log>> {
     Ok(())
 }
 
+// TODO: simplify these tests
 #[test]
 fn save_in_non_existing_folder() -> Result<(), Vec<Log>> {
     let (program, _) = gpex::compile(Path::new("tests/lib/valid"), false)?;
@@ -33,14 +34,8 @@ fn save_in_non_existing_folder() -> Result<(), Vec<Log>> {
 }
 
 #[test]
-fn load_non_existing_file() -> Result<(), Vec<Log>> {
-    let (program, _) = gpex::compile(Path::new("tests/lib/valid"), false)?;
-    let out_path = Path::new("tests/lib/out2.json");
-    gpex::save_compiled(&program, out_path)?;
+fn load_non_existing_file() {
     let result = gpex::load_compiled(Path::new("tests/missing/out.json"));
-    if out_path.is_file() {
-        let _ = fs::remove_file(out_path);
-    }
     let errors = result.err();
     assert_eq!(errors.as_ref().map(Vec::len), Some(1));
     assert_eq!(errors.as_ref().map(|e| e[0].level), Some(LogLevel::Error));
@@ -51,7 +46,6 @@ fn load_non_existing_file() -> Result<(), Vec<Log>> {
             .as_str()
             .starts_with("cannot read \"tests/missing/out.json\": ")
     }));
-    Ok(())
 }
 
 #[test]

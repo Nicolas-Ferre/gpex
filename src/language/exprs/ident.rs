@@ -30,7 +30,7 @@ impl IdentExpr {
     pub(crate) fn parse<'a>(ctx: &mut ParseCtx<'a>) -> Result<Self, ParseError<'a>> {
         Ok(Self {
             id: ctx.next_id(),
-            scope: ctx.scope().clone(),
+            scope: ctx.scope().to_vec(),
             ident: Span::parse_pattern(ctx, IDENT_PAT)?,
         })
     }
@@ -47,10 +47,9 @@ impl IdentExpr {
     pub(crate) fn validate(
         &self,
         ctx: &mut ValidateCtx<'_>,
-        indexes: &mut Indexes<'_>,
+        indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        if let Some(source) = indexes.value_sources.get(&self.id) {
-            indexes.value_sources.insert(self.id, source);
+        if indexes.value_sources.contains_key(&self.id) {
             Ok(())
         } else {
             ctx.logs.push(Log {

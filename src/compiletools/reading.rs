@@ -23,7 +23,7 @@ pub(crate) fn read(path: &Path, root_path: &Path, ext: &str) -> Result<Vec<ReadF
         }
     }
     if errors.is_empty() {
-        files.sort_unstable_by_key(|f| f.path.clone());
+        files.sort_unstable_by(|file1, file2| file1.path.cmp(&file2.path));
         Ok(files)
     } else {
         Err(errors)
@@ -48,7 +48,7 @@ fn read_entry(entry: DirEntry, root_path: &Path, ext: &str) -> Result<Vec<ReadFi
 }
 
 fn dot_path(path: &Path, root_path: &Path) -> String {
-    #[allow(clippy::unwrap_used)] // path is always obtained from root_path
+    #[expect(clippy::unwrap_used)] // path is always obtained from root_path
     path.with_extension("")
         .strip_prefix(root_path)
         .unwrap()

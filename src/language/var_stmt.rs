@@ -41,7 +41,7 @@ impl<'a> VarStmt {
             let _ = Span::parse_symbol(ctx, SEMI_SYM)?;
             Ok(Self {
                 id,
-                scope: ctx.scope().clone(),
+                scope: ctx.scope().to_vec(),
                 ident,
                 expr,
             })
@@ -56,7 +56,7 @@ impl<'a> VarStmt {
         self.expr.pre_validate(indexes);
     }
 
-    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &mut Indexes<'_>) {
+    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &Indexes<'_>) {
         let var_name = &self.ident.slice;
         // TODO: add validator module at root of the crate to encourage reuse of errors
         if let Some(duplicated_item) = indexes.values.search(var_name, self) {
@@ -136,5 +136,5 @@ impl<'a> VarStmt {
 fn is_snake_case(ident: &str) -> bool {
     ident
         .chars()
-        .all(|c| c.is_ascii_lowercase() || c.is_numeric() || c == '_')
+        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_')
 }
