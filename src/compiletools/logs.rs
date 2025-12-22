@@ -28,7 +28,7 @@ impl Display for Log {
             } else {
                 String::new()
             }
-        )?;
+        )?; // no-coverage (difficult to test)
         for inner in &self.inner {
             write!(f, "{inner}")?;
         }
