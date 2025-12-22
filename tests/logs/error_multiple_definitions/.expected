@@ -1,0 +1,2 @@
+error: `_value` item defined multiple times (at tests/logs/error_multiple_definitions/variables.gpex:3:5)
+  --> info: item also defined here (at tests/logs/error_multiple_definitions/variables.gpex:1:5)

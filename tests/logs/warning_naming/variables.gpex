@@ -1,0 +1,3 @@
+var _used = 0;
+var _NOT_SNAKE_CASE = _used;
+var i = 0;

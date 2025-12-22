@@ -1,0 +1,158 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+  workflow_dispatch: { }
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  XDG_RUNTIME_DIR: "~"
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+  CODECOV_UPLOAD: true
+
+jobs:
+  clippy:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-2025
+            target: x86_64-pc-windows-msvc
+          - name: Linux
+            os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+          - name: macOS
+            os: macos-15
+            target: x86_64-apple-darwin
+    name: Clippy - ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Retrieve rust version
+        id: rust_version
+        run: bash -x .github/scripts/extract_rust_version.sh
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ steps.rust_version.outputs.value }}
+          target: ${{ matrix.target }}
+          components: clippy
+      - name: Setup cache for Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - name: Run clippy
+        run: cargo clippy --all-targets --no-deps --target ${{ matrix.target }} -- -D warnings
+
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+      - name: Retrieve rust version
+        id: rust_version
+        run: bash -x .github/scripts/extract_rust_version.sh
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ steps.rust_version.outputs.value }}
+          target: x86_64-unknown-linux-gnu
+          components: llvm-tools-preview
+      - name: Setup cache for Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: grcov
+      - name: Install Vulkan SDK
+        uses: humbletim/install-vulkan-sdk@v1.2
+        with:
+          version: 1.4.335.0
+          cache: true
+      - name: Install Mesa
+        uses: gfx-rs/wgpu/.github/actions/install-mesa@v28
+      - name: Run unit tests
+        run: cargo test --no-fail-fast
+        env:
+          RUSTFLAGS: -Cinstrument-coverage -Clink-dead-code
+          LLVM_PROFILE_FILE: "%m.profraw"
+      - name: Generate coverage report
+        run: |
+          grcov . \
+              --binary-path ./target/debug/ \
+              --source-dir . \
+              --output-type cobertura \
+              --branch \
+              --ignore-not-existing \
+              --output-path ./coverage.xml \
+              --excl-line '(#\[|^[^ ]+!\(|struct |impl( |<)|unreachable!|^\/\/\/|no-coverage|[a-z0-9_]: .+,)' \
+              --excl-start 'coverage: off' \
+              --excl-stop 'coverage: on' \
+              --keep-only "src/**/*"
+      - name: Upload coverage report to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: ./coverage.xml
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload coverage report to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: true
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Check coverage threshold
+        run: bash -x .github/scripts/check_coverage.sh
+
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Retrieve rust version
+        id: rust_version
+        run: bash -x .github/scripts/extract_rust_version.sh
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ steps.rust_version.outputs.value }}
+          target: x86_64-unknown-linux-gnu
+          components: rustfmt
+      - name: Run cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          rust-version: ${{ steps.rust_version.outputs.value }}
+      - name: Setup cache for Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install moreutils
+      - name: Run rustfmt
+        run: cargo fmt -- --check
+      - name: Check encoding
+        run: isutf8 -- **/*
+      - name: Detect line endings different than '\n'
+        run: find ./ -type f -name "*.rs" ! -path "./target/*" -exec grep -U -l $'\r' {} + | tee /dev/stderr | grep -q . && exit 1 || exit 0
+      - name: Detect TODOs
+        run: find ./ -type f -name "*.rs" ! -path "./target/*" ! -path "./.github/*" -exec grep -U -l $'TODO' {} + | tee /dev/stderr | grep -q . && exit 1 || exit 0
+      - name: Generate documentation
+        run: cargo doc --no-deps
+        env:
+          RUSTDOCFLAGS: -Dwarnings
