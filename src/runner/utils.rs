@@ -35,7 +35,8 @@ pub(crate) async fn create_adapter(instance: &Instance) -> Result<Adapter, Vec<L
                 loc: None,
                 inner: vec![],
             }]
-        }) // coverage: on
+        })
+    // coverage: on
 }
 
 pub(crate) async fn create_device(adapter: &Adapter) -> Result<(Device, Queue), Vec<Log>> {
@@ -58,7 +59,8 @@ pub(crate) async fn create_device(adapter: &Adapter) -> Result<(Device, Queue), 
                 loc: None,
                 inner: vec![],
             }]
-        }) // coverage: on
+        })
+    // coverage: on
 }
 
 pub(crate) fn create_buffer(device: &Device, label: &str, size: u64) -> Option<Buffer> {
