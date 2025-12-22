@@ -81,7 +81,7 @@ jobs:
       - name: Install general dependencies
         run: sudo apt-get update && sudo apt-get install libudev-dev xvfb
       - name: Install Vulkan SDK
-        uses: gfx-rs/wgpu/.github/workflows/install-vulkan-sdk@098f320f81c3bb704a5053b972c60a6fbe918d44
+        uses: gfx-rs/wgpu/.github/actions/install-vulkan-sdk@098f320f81c3bb704a5053b972c60a6fbe918d44
       - name: Install grcov
         run: cargo install grcov --debug --force
       - name: Run unit tests
