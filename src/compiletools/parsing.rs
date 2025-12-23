@@ -57,7 +57,7 @@ impl<'a> ParseCtx<'a> {
                 Ok(node) => return Ok(node),
                 Err(err) => {
                     errors.push(err);
-                    *self = previous_ctx.clone();
+                    self.clone_from(&previous_ctx);
                 }
             }
         }

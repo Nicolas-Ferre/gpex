@@ -51,9 +51,9 @@ impl IdentExpr {
         ctx: &mut ValidateCtx<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        validators::value::check_found(self.id, &self.span, ctx, indexes)?;
+        validators::value::check_found(self, &self.span, ctx, indexes)?;
         if let Some(const_span) = const_span {
-            validators::ident::check_const(self.id, &self.span, const_span, ctx, indexes)?;
+            validators::ident::check_const(self, &self.span, const_span, ctx, indexes)?;
         }
         Ok(())
     }

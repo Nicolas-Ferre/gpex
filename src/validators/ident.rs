@@ -1,16 +1,17 @@
 use crate::compiler::indexes::{Indexes, Value};
+use crate::compiletools::indexing::NodeRef;
 use crate::compiletools::parsing::Span;
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_const(
-    id: u64,
+    node: impl NodeRef,
     ident: &Span,
     const_span: &Span,
     ctx: &mut ValidateCtx<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    if matches!(indexes.value_sources[&id], Value::Const(_)) {
+    if matches!(indexes.value_sources[&node.id()], Value::Const(_)) {
         Ok(())
     } else {
         ctx.logs.push(Log {

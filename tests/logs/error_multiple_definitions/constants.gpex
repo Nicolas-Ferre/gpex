@@ -1,0 +1,4 @@
+const _VALUE = 0;
+const _OTHER = 1;
+const _VALUE = 2;
+var _VALUE = 3;

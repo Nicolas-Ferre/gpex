@@ -5,12 +5,12 @@ use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_found(
-    id: u64,
+    node: impl NodeRef,
     ident: &Span,
     ctx: &mut ValidateCtx<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    let is_source_found = indexes.value_sources.contains_key(&id);
+    let is_source_found = indexes.value_sources.contains_key(&node.id());
     if is_source_found {
         Ok(())
     } else {
