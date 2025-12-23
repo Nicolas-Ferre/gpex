@@ -49,11 +49,12 @@ impl<'a> ParseCtx<'a> {
         id
     }
 
-    pub(crate) fn parse_any<T>(&mut self, choices: &[Parser<'a, T>]) -> Result<T, ParseError<'a>> {
+    pub(crate) fn parse_any<T>(&mut self, parsers: &[Parser<'a, T>]) -> Result<T, ParseError<'a>> {
+        debug_assert!(!parsers.is_empty());
         let mut errors = vec![];
         let previous_ctx = self.clone();
-        for choice in choices {
-            match choice(self) {
+        for parser in parsers {
+            match parser(self) {
                 Ok(node) => return Ok(node),
                 Err(err) => {
                     errors.push(err);
@@ -68,13 +69,13 @@ impl<'a> ParseCtx<'a> {
         &mut self,
         min: usize,
         max: usize,
-        parse: fn(&mut Self) -> Result<T, ParseError<'a>>,
+        parser: Parser<'a, T>,
     ) -> Result<(Vec<T>, Option<ParseError<'a>>), ParseError<'a>> {
         let mut items = vec![];
         let mut error = None;
         for i in 0..max {
             let previous = self.clone();
-            match parse(self) {
+            match parser(self) {
                 Ok(parsed) => items.push(parsed),
                 Err(err) => {
                     *self = previous;
@@ -116,6 +117,7 @@ pub(crate) struct ParseError<'a> {
 impl ParseError<'_> {
     #[expect(clippy::expect_used)] // tests ensure this never occurs
     pub(crate) fn merge(errors: &[Self]) -> Self {
+        debug_assert!(!errors.is_empty());
         let max_offset = errors
             .iter()
             .map(|err| err.offset)
