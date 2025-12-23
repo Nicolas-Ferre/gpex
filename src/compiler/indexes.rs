@@ -1,13 +1,14 @@
-use crate::compiletools::indexing::NodeIndex;
+use crate::compiletools::indexing::{NodeIndex, NodeRef};
 use crate::compiletools::parsing::Span;
-use crate::language::var_stmt::VarStmt;
+use crate::language::stmts::const_::ConstStmt;
+use crate::language::stmts::var::VarStmt;
 use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct Indexes<'a> {
     pub(crate) item_first_ref: HashMap<u64, Span>,
-    pub(crate) value_sources: HashMap<u64, &'a VarStmt>,
-    pub(crate) values: NodeIndex<'a, VarStmt, false>,
+    pub(crate) value_sources: HashMap<u64, Value<'a>>,
+    pub(crate) values: NodeIndex<Value<'a>, false>,
 }
 
 impl Indexes<'_> {
@@ -16,6 +17,51 @@ impl Indexes<'_> {
             item_first_ref: HashMap::default(),
             value_sources: HashMap::default(),
             values: NodeIndex::new(file_count),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum Value<'a> {
+    Var(&'a VarStmt),
+    Const(&'a ConstStmt),
+}
+
+impl Value<'_> {
+    pub(crate) fn ident(&self) -> &Span {
+        match self {
+            Value::Var(node) => &node.ident,
+            Value::Const(node) => &node.ident,
+        }
+    }
+
+    pub(crate) fn transpile_ref(&self, shader: &mut String, indexes: &Indexes<'_>) {
+        match self {
+            Value::Var(node) => node.transpile_ref(shader),
+            Value::Const(node) => node.transpile_ref(shader, indexes),
+        }
+    }
+}
+
+impl NodeRef for Value<'_> {
+    fn file_index(&self) -> usize {
+        match self {
+            Value::Var(node) => node.ident.file_index,
+            Value::Const(node) => node.ident.file_index,
+        }
+    }
+
+    fn id(&self) -> u64 {
+        match self {
+            Value::Var(node) => node.id,
+            Value::Const(node) => node.id,
+        }
+    }
+
+    fn scope(&self) -> &[u64] {
+        match self {
+            Value::Var(node) => &node.scope,
+            Value::Const(node) => &node.scope,
         }
     }
 }

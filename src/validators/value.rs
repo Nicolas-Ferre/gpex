@@ -1,16 +1,16 @@
 use crate::compiler::indexes::Indexes;
-use crate::compiletools::indexing::Node;
+use crate::compiletools::indexing::NodeRef;
 use crate::compiletools::parsing::Span;
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_found(
-    node: &impl Node,
+    id: u64,
     ident: &Span,
     ctx: &mut ValidateCtx<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    let is_source_found = indexes.value_sources.contains_key(&node.id());
+    let is_source_found = indexes.value_sources.contains_key(&id);
     if is_source_found {
         Ok(())
     } else {
@@ -25,7 +25,7 @@ pub(crate) fn check_found(
 }
 
 pub(crate) fn check_unique_def(
-    node: &impl Node,
+    node: impl NodeRef,
     ident: &Span,
     ctx: &mut ValidateCtx<'_>,
     indexes: &Indexes<'_>,
@@ -38,7 +38,7 @@ pub(crate) fn check_unique_def(
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "item also defined here".into(),
-                loc: Some(ctx.loc(&duplicated_item.ident)),
+                loc: Some(ctx.loc(duplicated_item.ident())),
             }],
         });
         Err(ValidateError)
@@ -48,7 +48,7 @@ pub(crate) fn check_unique_def(
 }
 
 pub(crate) fn check_usage(
-    node: &impl Node,
+    node: impl NodeRef,
     ident: &Span,
     ctx: &mut ValidateCtx<'_>,
     indexes: &Indexes<'_>,

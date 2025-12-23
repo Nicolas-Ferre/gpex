@@ -1,3 +1,4 @@
 error: `i32` literal out of bounds (at tests/logs/error_out_of_bounds/i32.gpex:1:22)
 error: `i32` literal out of bounds (at tests/logs/error_out_of_bounds/i32.gpex:2:20)
 error: `i32` literal out of bounds (at tests/logs/error_out_of_bounds/i32.gpex:3:22)
+error: `i32` literal out of bounds (at tests/logs/error_out_of_bounds/i32.gpex:5:30)

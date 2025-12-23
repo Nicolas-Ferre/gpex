@@ -15,3 +15,6 @@ reviews:
       enabled: false
     unit_tests:
       enabled: false
+issue_enrichment:
+  auto_enrich:
+    enabled: false

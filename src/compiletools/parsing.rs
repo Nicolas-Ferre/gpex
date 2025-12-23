@@ -1,7 +1,8 @@
 use crate::compiletools::logs::{Log, LogLevel, LogLocation};
 use crate::compiletools::reading::ReadFile;
-use crate::utils::NonEmptyArray;
 use std::ops::Range;
+
+pub(crate) type Parser<'a, T> = fn(&mut ParseCtx<'a>) -> Result<T, ParseError<'a>>;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ParseCtx<'a> {
@@ -46,6 +47,21 @@ impl<'a> ParseCtx<'a> {
         let id = self.next_id;
         self.next_id += 1;
         id
+    }
+
+    pub(crate) fn parse_any<T>(&mut self, choices: &[Parser<'a, T>]) -> Result<T, ParseError<'a>> {
+        let mut errors = vec![];
+        let previous_ctx = self.clone();
+        for choice in choices {
+            match choice(self) {
+                Ok(node) => return Ok(node),
+                Err(err) => {
+                    errors.push(err);
+                    *self = previous_ctx.clone();
+                }
+            }
+        }
+        Err(ParseError::merge(&errors))
     }
 
     pub(crate) fn parse_many<T>(
@@ -98,10 +114,13 @@ pub(crate) struct ParseError<'a> {
 }
 
 impl ParseError<'_> {
-    pub(crate) fn merge<const N: usize>(errors: impl NonEmptyArray<Self, N>) -> Self {
-        let errors = errors.into_array();
-        #[expect(clippy::unwrap_used)] // array length checked at compile time
-        let max_offset = errors.iter().map(|err| err.offset).max().unwrap();
+    #[expect(clippy::expect_used)] // tests ensure this never occurs
+    pub(crate) fn merge(errors: &[Self]) -> Self {
+        let max_offset = errors
+            .iter()
+            .map(|err| err.offset)
+            .max()
+            .expect("internal error: cannot merge empty errors array");
         Self {
             file: errors[0].file,
             offset: max_offset,
