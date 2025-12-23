@@ -26,6 +26,11 @@ fn compile_with_multiple_definitions_errors() -> io::Result<()> {
 }
 
 #[test]
+fn compile_with_const_errors() -> io::Result<()> {
+    compile_and_check_logs(Path::new("tests/logs/error_const"))
+}
+
+#[test]
 fn compile_with_unused_warnings() -> io::Result<()> {
     compile_and_check_logs(Path::new("tests/logs/warning_unused"))
 }

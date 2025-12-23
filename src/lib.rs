@@ -4,7 +4,6 @@ mod compiler;
 mod compiletools;
 mod language;
 mod runner;
-mod utils;
 mod validators;
 
 pub use compiler::compile;

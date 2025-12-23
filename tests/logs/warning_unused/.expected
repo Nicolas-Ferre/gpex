@@ -1,1 +1,2 @@
+warning: `UNUSED` value unused (at tests/logs/warning_unused/constants.gpex:1:7)
 warning: `unused` value unused (at tests/logs/warning_unused/variables.gpex:1:5)

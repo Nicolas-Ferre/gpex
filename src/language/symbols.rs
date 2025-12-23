@@ -1,7 +1,11 @@
 use crate::compiletools::parsing::Symbol;
 
-pub(crate) const KEYWORDS: &[&str] = &[VAR_SYM.slice];
+pub(crate) const KEYWORDS: &[&str] = &[CONST_SYM.slice, VAR_SYM.slice];
 
+pub(crate) const CONST_SYM: Symbol = Symbol {
+    name: "`const`",
+    slice: "const",
+};
 pub(crate) const VAR_SYM: Symbol = Symbol {
     name: "`var`",
     slice: "var",

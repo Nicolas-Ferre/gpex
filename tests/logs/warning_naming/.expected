@@ -1,3 +1,8 @@
+warning: `_USED` value used but name starting with `_` (at tests/logs/warning_naming/constants.gpex:1:7)
+  --> info: value used here (at tests/logs/warning_naming/constants.gpex:2:35)
+warning: `_not_screaming_snake_case` identifier not in SCREAMING_SNAKE_CASE (at tests/logs/warning_naming/constants.gpex:2:7)
+warning: `I` value unused (at tests/logs/warning_naming/constants.gpex:3:7)
+warning: `I` identifier is single letter (at tests/logs/warning_naming/constants.gpex:3:7)
 warning: `_used` value used but name starting with `_` (at tests/logs/warning_naming/variables.gpex:1:5)
   --> info: value used here (at tests/logs/warning_naming/variables.gpex:2:23)
 warning: `_NOT_SNAKE_CASE` identifier not in snake_case (at tests/logs/warning_naming/variables.gpex:2:5)

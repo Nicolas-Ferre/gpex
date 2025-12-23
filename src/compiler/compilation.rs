@@ -44,6 +44,7 @@ pub(crate) fn validate(
     for module in modules {
         module.pre_validate(indexes);
     }
+
     for module in modules {
         let mut ctx = ValidateCtx::new(files);
         module.validate(&mut ctx, indexes);

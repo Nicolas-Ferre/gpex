@@ -1,5 +1,5 @@
 use crate::compiler::indexes::Indexes;
-use crate::compiletools::indexing::Node;
+use crate::compiletools::indexing::NodeRef;
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::patterns::IDENT_PAT;
@@ -9,12 +9,12 @@ use crate::validators;
 pub(crate) struct IdentExpr {
     id: u64,
     scope: Vec<u64>,
-    ident: Span,
+    span: Span,
 }
 
-impl Node for IdentExpr {
+impl NodeRef for &IdentExpr {
     fn file_index(&self) -> usize {
-        self.ident.file_index
+        self.span.file_index
     }
 
     fn id(&self) -> u64 {
@@ -31,30 +31,34 @@ impl IdentExpr {
         Ok(Self {
             id: ctx.next_id(),
             scope: ctx.scope().to_vec(),
-            ident: Span::parse_pattern(ctx, IDENT_PAT)?,
+            span: Span::parse_pattern(ctx, IDENT_PAT)?,
         })
     }
 
     pub(crate) fn pre_validate(&self, indexes: &mut Indexes<'_>) {
-        if let Some(source) = indexes.values.search(&self.ident.slice, self) {
+        if let Some(source) = indexes.values.search(&self.span.slice, self) {
             indexes.value_sources.insert(self.id, source);
             indexes
                 .item_first_ref
                 .entry(source.id())
-                .or_insert_with(|| self.ident.clone());
+                .or_insert_with(|| self.span.clone());
         }
     }
 
     pub(crate) fn validate(
         &self,
+        const_span: Option<&Span>,
         ctx: &mut ValidateCtx<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        validators::value::check_found(self, &self.ident, ctx, indexes)?;
+        validators::value::check_found(self, &self.span, ctx, indexes)?;
+        if let Some(const_span) = const_span {
+            validators::ident::check_const(self, &self.span, const_span, ctx, indexes)?;
+        }
         Ok(())
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        indexes.value_sources[&self.id].transpile_call(shader);
+        indexes.value_sources[&self.id].transpile_ref(shader, indexes);
     }
 }

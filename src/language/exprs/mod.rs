@@ -1,5 +1,5 @@
 use crate::compiler::indexes::Indexes;
-use crate::compiletools::parsing::{ParseCtx, ParseError};
+use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::exprs::literals::I32Lit;
 use ident::IdentExpr;
@@ -15,16 +15,10 @@ pub(crate) enum Expr {
 
 impl Expr {
     pub(crate) fn parse<'a>(ctx: &mut ParseCtx<'a>) -> Result<Self, ParseError<'a>> {
-        Err(ParseError::merge([
-            match I32Lit::parse(ctx) {
-                Ok(node) => return Ok(Self::I32Lit(node)),
-                Err(err) => err,
-            },
-            match IdentExpr::parse(ctx) {
-                Ok(node) => return Ok(Self::Ident(node)),
-                Err(err) => err,
-            },
-        ]))
+        ctx.parse_any(&[
+            |ctx| I32Lit::parse(ctx).map(Self::I32Lit),
+            |ctx| IdentExpr::parse(ctx).map(Self::Ident),
+        ])
     }
 
     pub(crate) fn pre_validate(&self, indexes: &mut Indexes<'_>) {
@@ -36,12 +30,13 @@ impl Expr {
 
     pub(crate) fn validate(
         &self,
+        const_span: Option<&Span>,
         ctx: &mut ValidateCtx<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
-            Self::Ident(node) => node.validate(ctx, indexes),
             Self::I32Lit(node) => node.validate(ctx),
+            Self::Ident(node) => node.validate(const_span, ctx, indexes),
         }
     }
 

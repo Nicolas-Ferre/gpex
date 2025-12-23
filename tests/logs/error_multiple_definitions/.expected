@@ -1,2 +1,8 @@
+error: `_VALUE` item defined multiple times (at tests/logs/error_multiple_definitions/constants.gpex:3:7)
+  --> info: item also defined here (at tests/logs/error_multiple_definitions/constants.gpex:1:7)
+error: `_VALUE` item defined multiple times (at tests/logs/error_multiple_definitions/constants.gpex:4:5)
+  --> info: item also defined here (at tests/logs/error_multiple_definitions/constants.gpex:3:7)
 error: `_value` item defined multiple times (at tests/logs/error_multiple_definitions/variables.gpex:3:5)
   --> info: item also defined here (at tests/logs/error_multiple_definitions/variables.gpex:1:5)
+error: `_value` item defined multiple times (at tests/logs/error_multiple_definitions/variables.gpex:4:7)
+  --> info: item also defined here (at tests/logs/error_multiple_definitions/variables.gpex:3:5)

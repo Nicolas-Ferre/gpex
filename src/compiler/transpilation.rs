@@ -1,5 +1,4 @@
 use crate::compiler::indexes::Indexes;
-use crate::compiletools::indexing::Node;
 use crate::compiletools::reading::ReadFile;
 use crate::language::module::Module;
 use itertools::Itertools;
@@ -45,10 +44,10 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
     let mut offset = 0;
     let fields = modules
         .iter()
-        .flat_map(|module| &module.items)
-        .sorted_unstable_by_key(|var| var.id())
+        .flat_map(Module::vars)
+        .sorted_unstable_by_key(|var| var.id)
         .map(|var| {
-            let dot_path = &files[var.file_index()].dot_path;
+            let dot_path = &files[var.ident.file_index].dot_path;
             let path = format!("{}:{}", dot_path, var.name());
             let field = BufferField {
                 size: VAR_BYTES,
