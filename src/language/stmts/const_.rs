@@ -1,3 +1,4 @@
+use crate::compiler::constants::ConstValue;
 use crate::compiler::indexes::{Indexes, Value};
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
@@ -46,7 +47,7 @@ impl<'a> ConstStmt {
     pub(crate) fn validate(
         &self,
         ctx: &mut ValidateCtx<'_>,
-        indexes: &Indexes<'_>,
+        indexes: &mut Indexes<'_>,
     ) -> Result<(), ValidateError> {
         validators::value::check_unique_def(Value::Const(self), &self.ident, ctx, indexes)?;
         validators::value::check_usage(Value::Const(self), &self.ident, ctx, indexes);
@@ -56,7 +57,14 @@ impl<'a> ConstStmt {
         Ok(())
     }
 
+    #[expect(clippy::expect_used)] // validated before
+    pub(crate) fn const_value(&self, indexes: &Indexes<'_>) -> ConstValue {
+        self.expr
+            .const_value(indexes)
+            .expect("internal error: invalid constant value")
+    }
+
     pub(crate) fn transpile_ref(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        self.expr.transpile(shader, indexes);
+        self.const_value(indexes).transpile(shader);
     }
 }

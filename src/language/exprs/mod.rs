@@ -1,3 +1,4 @@
+use crate::compiler::constants::ConstValue;
 use crate::compiler::indexes::Indexes;
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
@@ -32,17 +33,24 @@ impl Expr {
         &self,
         const_span: Option<&Span>,
         ctx: &mut ValidateCtx<'_>,
-        indexes: &Indexes<'_>,
+        indexes: &mut Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
-            Self::I32Lit(node) => node.validate(ctx),
+            Self::I32Lit(node) => node.validate(ctx, indexes),
             Self::Ident(node) => node.validate(const_span, ctx, indexes),
+        }
+    }
+
+    pub(crate) fn const_value(&self, indexes: &Indexes<'_>) -> Option<ConstValue> {
+        match self {
+            Self::I32Lit(node) => Some(node.const_value(indexes).clone()),
+            Self::Ident(node) => node.const_value(indexes),
         }
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         match self {
-            Self::I32Lit(node) => node.transpile(shader),
+            Self::I32Lit(node) => node.transpile(shader, indexes),
             Self::Ident(node) => node.transpile(shader, indexes),
         }
     }

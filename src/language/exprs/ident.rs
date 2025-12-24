@@ -1,3 +1,4 @@
+use crate::compiler::constants::ConstValue;
 use crate::compiler::indexes::Indexes;
 use crate::compiletools::indexing::NodeRef;
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
@@ -56,6 +57,10 @@ impl IdentExpr {
             validators::ident::check_const(self, &self.span, const_span, ctx, indexes)?;
         }
         Ok(())
+    }
+
+    pub(crate) fn const_value(&self, indexes: &Indexes<'_>) -> Option<ConstValue> {
+        indexes.value_sources[&self.id].const_value(indexes)
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
