@@ -40,7 +40,7 @@ impl Value<'_> {
 
     pub(crate) fn const_value(&self, indexes: &Indexes<'_>) -> Option<ConstValue> {
         match self {
-            Value::Var(_) => None,
+            Value::Var(_) => None, // no-coverage (unused for now)
             Value::Const(node) => Some(node.const_value(indexes)),
         }
     }
