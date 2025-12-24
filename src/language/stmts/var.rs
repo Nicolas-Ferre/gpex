@@ -44,7 +44,7 @@ impl<'a> VarStmt {
     pub(crate) fn validate(
         &self,
         ctx: &mut ValidateCtx<'_>,
-        indexes: &Indexes<'_>,
+        indexes: &mut Indexes<'_>,
     ) -> Result<(), ValidateError> {
         validators::value::check_unique_def(Value::Var(self), &self.ident, ctx, indexes)?;
         validators::value::check_usage(Value::Var(self), &self.ident, ctx, indexes);

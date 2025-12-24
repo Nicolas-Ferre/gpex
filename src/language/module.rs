@@ -30,7 +30,7 @@ impl Module {
         }
     }
 
-    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &Indexes<'_>) {
+    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &mut Indexes<'_>) {
         for item in &self.items {
             _ = item.validate(ctx, indexes);
         }
@@ -90,7 +90,7 @@ impl Item {
     pub(crate) fn validate(
         &self,
         ctx: &mut ValidateCtx<'_>,
-        indexes: &Indexes<'_>,
+        indexes: &mut Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
             Self::Var(item) => item.validate(ctx, indexes),

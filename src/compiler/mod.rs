@@ -1,4 +1,5 @@
 pub(crate) mod compilation;
+pub(crate) mod constants;
 pub(crate) mod indexes;
 pub(crate) mod transpilation;
 

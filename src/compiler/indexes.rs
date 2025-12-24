@@ -1,3 +1,4 @@
+use crate::compiler::constants::ConstValue;
 use crate::compiletools::indexing::{NodeIndex, NodeRef};
 use crate::compiletools::parsing::Span;
 use crate::language::stmts::const_::ConstStmt;
@@ -6,17 +7,19 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct Indexes<'a> {
-    pub(crate) item_first_ref: HashMap<u64, Span>,
-    pub(crate) value_sources: HashMap<u64, Value<'a>>,
     pub(crate) values: NodeIndex<Value<'a>, false>,
+    pub(crate) value_sources: HashMap<u64, Value<'a>>,
+    pub(crate) item_first_ref: HashMap<u64, Span>,
+    pub(crate) const_values: HashMap<u64, ConstValue>,
 }
 
 impl Indexes<'_> {
     pub(crate) fn new(file_count: usize) -> Self {
         Self {
-            item_first_ref: HashMap::default(),
-            value_sources: HashMap::default(),
             values: NodeIndex::new(file_count),
+            value_sources: HashMap::default(),
+            item_first_ref: HashMap::default(),
+            const_values: HashMap::default(),
         }
     }
 }
@@ -32,6 +35,13 @@ impl Value<'_> {
         match self {
             Value::Var(node) => &node.ident,
             Value::Const(node) => &node.ident,
+        }
+    }
+
+    pub(crate) fn const_value(&self, indexes: &Indexes<'_>) -> Option<ConstValue> {
+        match self {
+            Value::Var(_) => None, // no-coverage (unused for now)
+            Value::Const(node) => Some(node.const_value(indexes)),
         }
     }
 
