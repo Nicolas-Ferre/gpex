@@ -1,9 +1,10 @@
 use crate::compiler::constants::ConstValue;
-use crate::compiler::indexes::Indexes;
+use crate::compiler::indexes::{Indexes, Value};
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::exprs::literals::I32Lit;
 use ident::IdentExpr;
+use std::collections::HashSet;
 
 pub(crate) mod ident;
 pub(crate) mod literals;
@@ -52,6 +53,13 @@ impl Expr {
         match self {
             Self::I32Lit(node) => node.transpile(shader, indexes),
             Self::Ident(node) => node.transpile(shader, indexes),
+        }
+    }
+
+    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
+        match self {
+            Self::I32Lit(_) => HashSet::new(),
+            Self::Ident(node) => node.dependencies(indexes),
         }
     }
 }

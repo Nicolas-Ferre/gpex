@@ -30,7 +30,9 @@ pub(crate) fn check_unique_def(
     ctx: &mut ValidateCtx<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    if let Some(duplicated_item) = indexes.values.search(&ident.slice, node) {
+    if let Some(duplicated_item) = indexes.values.search(&ident.slice, node, &indexes.imports)
+        && duplicated_item.file_index() == node.file_index()
+    {
         ctx.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{}` item defined multiple times", ident.slice),

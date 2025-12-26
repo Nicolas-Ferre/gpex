@@ -1,10 +1,11 @@
 use crate::compiler::constants::ConstValue;
-use crate::compiler::indexes::Indexes;
+use crate::compiler::indexes::{Indexes, Value};
 use crate::compiletools::indexing::NodeRef;
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::patterns::IDENT_PAT;
 use crate::validators;
+use std::collections::HashSet;
 
 #[derive(Debug)]
 pub(crate) struct IdentExpr {
@@ -37,7 +38,10 @@ impl IdentExpr {
     }
 
     pub(crate) fn pre_validate(&self, indexes: &mut Indexes<'_>) {
-        if let Some(source) = indexes.values.search(&self.span.slice, self) {
+        if let Some(source) = indexes
+            .values
+            .search(&self.span.slice, self, &indexes.imports)
+        {
             indexes.value_sources.insert(self.id, source);
             indexes
                 .item_first_ref
@@ -65,5 +69,14 @@ impl IdentExpr {
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         indexes.value_sources[&self.id].transpile_ref(shader, indexes);
+    }
+
+    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
+        let source = indexes.value_sources[&self.id];
+        source
+            .dependencies(indexes)
+            .into_iter()
+            .chain([source])
+            .collect()
     }
 }

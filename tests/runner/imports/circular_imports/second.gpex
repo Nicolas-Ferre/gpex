@@ -1,0 +1,8 @@
+import circular_imports.first;
+
+var var2 = 2;
+var _var1_copy = var1; // expected: 1
+
+const CONST2 = 4;
+const CONST1_COPY = CONST1;
+var _const1_copy = CONST1_COPY; // expected: 3

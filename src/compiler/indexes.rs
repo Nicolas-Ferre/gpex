@@ -1,12 +1,13 @@
 use crate::compiler::constants::ConstValue;
-use crate::compiletools::indexing::{NodeIndex, NodeRef};
+use crate::compiletools::indexing::{ImportIndex, NodeIndex, NodeRef};
 use crate::compiletools::parsing::Span;
 use crate::language::stmts::const_::ConstStmt;
 use crate::language::stmts::var::VarStmt;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 pub(crate) struct Indexes<'a> {
+    pub(crate) imports: ImportIndex,
     pub(crate) values: NodeIndex<Value<'a>, false>,
     pub(crate) value_sources: HashMap<u64, Value<'a>>,
     pub(crate) item_first_ref: HashMap<u64, Span>,
@@ -16,6 +17,7 @@ pub(crate) struct Indexes<'a> {
 impl Indexes<'_> {
     pub(crate) fn new(file_count: usize) -> Self {
         Self {
+            imports: ImportIndex::new(file_count),
             values: NodeIndex::new(file_count),
             value_sources: HashMap::default(),
             item_first_ref: HashMap::default(),
@@ -24,7 +26,7 @@ impl Indexes<'_> {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) enum Value<'a> {
     Var(&'a VarStmt),
     Const(&'a ConstStmt),
@@ -49,6 +51,13 @@ impl Value<'_> {
         match self {
             Value::Var(node) => node.transpile_ref(shader),
             Value::Const(node) => node.transpile_ref(shader, indexes),
+        }
+    }
+
+    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
+        match self {
+            Value::Var(node) => node.dependencies(indexes),
+            Value::Const(node) => node.dependencies(indexes),
         }
     }
 }

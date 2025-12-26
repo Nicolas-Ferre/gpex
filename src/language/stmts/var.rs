@@ -6,18 +6,23 @@ use crate::language::exprs::Expr;
 use crate::language::patterns::IDENT_PAT;
 use crate::language::symbols::{EQ_SYM, SEMI_SYM, VAR_SYM};
 use crate::validators;
+use std::collections::HashSet;
 use std::fmt::Write;
 
 #[derive(Debug)]
+#[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct VarStmt {
     pub(crate) id: u64,
+    #[derive_where(skip)]
     pub(crate) scope: Vec<u64>,
+    #[derive_where(skip)]
     pub(crate) ident: Span,
+    #[derive_where(skip)]
     expr: Expr,
 }
 
-impl<'a> VarStmt {
-    pub(crate) fn parse(ctx: &mut ParseCtx<'a>) -> Result<Self, ParseError<'a>> {
+impl VarStmt {
+    pub(crate) fn parse<'a>(ctx: &mut ParseCtx<'a>) -> Result<Self, ParseError<'a>> {
         ctx.define_scope(|ctx, id| {
             let _ = Span::parse_symbol(ctx, VAR_SYM)?;
             let ident = Span::parse_pattern(ctx, IDENT_PAT)?;
@@ -72,5 +77,9 @@ impl<'a> VarStmt {
 
     pub(crate) fn name(&self) -> &str {
         &self.ident.slice
+    }
+
+    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
+        self.expr.dependencies(indexes)
     }
 }

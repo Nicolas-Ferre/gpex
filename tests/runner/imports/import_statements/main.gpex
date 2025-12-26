@@ -1,0 +1,3 @@
+import import_statements.import_absolute;
+
+var _value = INNER_ABSOLUTE_VALUE; // expected: 1

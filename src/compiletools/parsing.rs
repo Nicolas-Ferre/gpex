@@ -8,6 +8,7 @@ pub(crate) type Parser<'a, T> = fn(&mut ParseCtx<'a>) -> Result<T, ParseError<'a
 pub(crate) struct ParseCtx<'a> {
     pub(crate) file: &'a ReadFile,
     pub(crate) file_index: usize,
+    pub(crate) files: &'a [ReadFile],
     offset: usize,
     next_id: u64,
     comment_prefix: &'a str,
@@ -18,12 +19,14 @@ impl<'a> ParseCtx<'a> {
     pub(crate) fn new(
         file: &'a ReadFile,
         file_index: usize,
+        files: &'a [ReadFile],
         next_id: u64,
         comment_prefix: &'a str,
     ) -> Self {
         Self {
             file,
             file_index,
+            files,
             offset: 0,
             next_id,
             comment_prefix,
@@ -69,18 +72,27 @@ impl<'a> ParseCtx<'a> {
         &mut self,
         min: usize,
         max: usize,
-        parser: Parser<'a, T>,
+        item_parser: Parser<'a, T>,
+        sep_parser: Option<Parser<'a, T>>,
     ) -> Result<(Vec<T>, Option<ParseError<'a>>), ParseError<'a>> {
         let mut items = vec![];
         let mut error = None;
         for i in 0..max {
             let previous = self.clone();
-            match parser(self) {
+            if i > 0
+                && let Some(sep) = sep_parser
+                && sep(self).is_err()
+            {
+                *self = previous;
+                debug_assert!(i >= min);
+                break;
+            }
+            match item_parser(self) {
                 Ok(parsed) => items.push(parsed),
                 Err(err) => {
                     *self = previous;
                     if i < min {
-                        return Err(err); // no-coverage (unused for now)
+                        return Err(err);
                     }
                     let tmp = &mut self.clone();
                     Span::parse_whitespaces_and_comments(tmp);
@@ -149,7 +161,7 @@ impl ParseError<'_> {
                         } else if index == self.expected.len() - 1 {
                             format!(" or {expected}")
                         } else {
-                            format!(", {expected}") // no-coverage (unused for now)
+                            format!(", {expected}")
                         }
                     })
                     .collect::<String>(),
