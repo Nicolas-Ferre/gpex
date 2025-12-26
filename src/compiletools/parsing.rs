@@ -72,22 +72,22 @@ impl<'a> ParseCtx<'a> {
         &mut self,
         min: usize,
         max: usize,
-        item_parser: Parser<'a, T>,
-        sep_parser: Option<Parser<'a, T>>,
+        parser: Parser<'a, T>,
+        separator_parser: Option<Parser<'a, ()>>,
     ) -> Result<(Vec<T>, Option<ParseError<'a>>), ParseError<'a>> {
+        debug_assert!(min <= 1); // if removed, failing separator parsing should be better handled
         let mut items = vec![];
         let mut error = None;
         for i in 0..max {
             let previous = self.clone();
             if i > 0
-                && let Some(sep) = sep_parser
+                && let Some(sep) = separator_parser
                 && sep(self).is_err()
             {
                 *self = previous;
-                debug_assert!(i >= min);
                 break;
             }
-            match item_parser(self) {
+            match parser(self) {
                 Ok(parsed) => items.push(parsed),
                 Err(err) => {
                     *self = previous;

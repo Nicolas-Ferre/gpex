@@ -67,7 +67,7 @@ impl<Item: NodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
     }
 }
 
-impl<Item: NodeRef + Debug> NodeIndex<Item, false> {
+impl<Item: NodeRef> NodeIndex<Item, false> {
     pub(crate) fn search(
         &self,
         key: &str,
@@ -80,8 +80,8 @@ impl<Item: NodeRef + Debug> NodeIndex<Item, false> {
             .flatten()
             .rev()
             .find(|item| {
-                item.scope() != loc.scope()
-                    && (loc.file_index() != item.file_index() || item.id() < loc.id())
+                (loc.file_index() != item.file_index() || item.id() < loc.id())
+                    && item.scope() != loc.scope()
             })
             .copied()
     }

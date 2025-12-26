@@ -87,13 +87,11 @@ fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>
 
 fn sorted_vars<'a>(modules: &'a [Module], indexes: &Indexes<'a>) -> Vec<&'a VarStmt> {
     let mut dependency_graph = DiGraphMap::<&VarStmt, ()>::new();
-    for module in modules {
-        for var in module.vars() {
-            dependency_graph.add_node(var);
-            for dependency in var.dependencies(indexes) {
-                if let Value::Var(dependency) = dependency {
-                    dependency_graph.add_edge(dependency, var, ());
-                }
+    for var in modules.iter().flat_map(Module::vars) {
+        dependency_graph.add_node(var);
+        for dependency in var.dependencies(indexes) {
+            if let Value::Var(dependency) = dependency {
+                dependency_graph.add_edge(dependency, var, ());
             }
         }
     }

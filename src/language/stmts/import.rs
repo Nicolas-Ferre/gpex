@@ -20,16 +20,11 @@ impl ImportStmt {
             1,
             usize::MAX,
             |ctx| Span::parse_pattern(ctx, IDENT_PAT),
-            Some(|ctx| Span::parse_symbol(ctx, DOT_SYM)),
+            Some(|ctx| Span::parse_symbol(ctx, DOT_SYM).map(|_| ())),
         )?;
         Span::parse_symbol(ctx, SEMI_SYM)?;
         let dot_path = segments.iter().map(|segment| &segment.slice).join(".");
-        let imported_file_index = ctx
-            .files
-            .iter()
-            .enumerate()
-            .find(|(_, file)| file.dot_path == dot_path)
-            .map(|(index, _)| index);
+        let imported_file_index = ctx.files.iter().position(|file| file.dot_path == dot_path);
         Ok(Self {
             import,
             segments,

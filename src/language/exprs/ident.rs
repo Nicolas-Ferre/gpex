@@ -63,16 +63,20 @@ impl IdentExpr {
         Ok(())
     }
 
+    fn source<'a>(&self, indexes: &Indexes<'a>) -> Value<'a> {
+        indexes.value_sources[&self.id]
+    }
+
     pub(crate) fn const_value(&self, indexes: &Indexes<'_>) -> Option<ConstValue> {
-        indexes.value_sources[&self.id].const_value(indexes)
+        self.source(indexes).const_value(indexes)
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        indexes.value_sources[&self.id].transpile_ref(shader, indexes);
+        self.source(indexes).transpile_ref(shader, indexes);
     }
 
     pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
-        let source = indexes.value_sources[&self.id];
+        let source = self.source(indexes);
         source
             .dependencies(indexes)
             .into_iter()
