@@ -9,18 +9,27 @@ use crate::compiletools::reading;
 use std::fs;
 use std::path::Path;
 
-const EXTENSION: &str = "gpex";
+pub(crate) const EXTENSION: &str = "gpex";
 
 /// Compiles a `GPEx` project folder.
 ///
 /// # Errors
 ///
 /// An error is returned in case compilation fails.
-pub fn compile(root_path: &Path, warnings_as_error: bool) -> Result<(Program, Vec<Log>), Vec<Log>> {
+pub fn compile(
+    root_path: &Path,
+    warnings_as_errors: bool,
+) -> Result<(Program, Vec<Log>), Vec<Log>> {
     let files = reading::read(root_path, root_path, EXTENSION)?;
     let modules = compilation::parse(&files)?;
     let mut indexes = compilation::index(&modules);
-    let errors = compilation::validate(&files, &modules, &mut indexes, warnings_as_error)?;
+    let errors = compilation::validate(
+        root_path,
+        &files,
+        &modules,
+        &mut indexes,
+        warnings_as_errors,
+    )?;
     let program = transpilation::transpile(&files, &modules, &indexes);
     Ok((program, errors))
 }

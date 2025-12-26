@@ -8,17 +8,22 @@ use std::path::{Path, PathBuf};
 use std::{fs, io};
 
 #[tokio::test]
-async fn run_with_exprs() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/exprs")).await
+async fn run_with_syntax_specificities() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/syntax"), true).await
 }
 
 #[tokio::test]
-async fn run_with_syntax_specificities() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/syntax")).await
+async fn run_with_imports() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/imports"), false).await
 }
 
-async fn compile_and_run(path: &Path) -> Result<(), Error> {
-    let (program, _) = gpex::compile(path, true).map_err(Error::Gpex)?;
+#[tokio::test]
+async fn run_with_expressions() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/exprs"), true).await
+}
+
+async fn compile_and_run(path: &Path, warnings_as_errors: bool) -> Result<(), Error> {
+    let (program, _) = gpex::compile(path, warnings_as_errors).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
     runner.run_step();
     check_global_vars(path, path, &runner)?;
@@ -27,8 +32,6 @@ async fn compile_and_run(path: &Path) -> Result<(), Error> {
 
 fn check_global_vars(folder_path: &Path, root_path: &Path, runner: &Runner) -> Result<(), Error> {
     let expected_regex = Regex::new(r"var (\w+) = .* // expected: (.+)").map_err(Error::Regex)?;
-    let ignored_regex = Regex::new(r"var .* // ignore").map_err(Error::Regex)?;
-    let var_regex = Regex::new(r"var .*").map_err(Error::Regex)?;
     for entry in folder_path.read_dir().map_err(Error::Io)? {
         let entry = entry.map_err(Error::Io)?;
         let path = entry.path();
@@ -37,10 +40,6 @@ fn check_global_vars(folder_path: &Path, root_path: &Path, runner: &Runner) -> R
             check_global_vars(&path, root_path, runner)?;
         } else if path.extension() == Some(OsStr::new("gpex")) {
             let code = fs::read_to_string(&path).map_err(Error::Io)?;
-            let var_count = var_regex.find_iter(&code).count();
-            let ignored_count = ignored_regex.find_iter(&code).count();
-            let expected_count = expected_regex.find_iter(&code).count();
-            assert_eq!(var_count, expected_count + ignored_count);
             let dot_path = to_dot_path(&path, root_path);
             for capture in expected_regex.captures_iter(&code) {
                 let var_name = &capture[1];

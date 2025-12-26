@@ -6,18 +6,24 @@ use crate::language::exprs::Expr;
 use crate::language::patterns::IDENT_PAT;
 use crate::language::symbols::{CONST_SYM, EQ_SYM, SEMI_SYM};
 use crate::validators;
+use std::collections::HashSet;
 
 #[derive(Debug)]
+#[derive_where::derive_where(PartialEq, Eq, Hash)]
 pub(crate) struct ConstStmt {
     pub(crate) id: u64,
+    #[derive_where(skip)]
     pub(crate) scope: Vec<u64>,
+    #[derive_where(skip)]
     pub(crate) const_: Span,
+    #[derive_where(skip)]
     pub(crate) ident: Span,
+    #[derive_where(skip)]
     expr: Expr,
 }
 
-impl<'a> ConstStmt {
-    pub(crate) fn parse(ctx: &mut ParseCtx<'a>) -> Result<Self, ParseError<'a>> {
+impl ConstStmt {
+    pub(crate) fn parse<'a>(ctx: &mut ParseCtx<'a>) -> Result<Self, ParseError<'a>> {
         ctx.define_scope(|ctx, id| {
             let const_ = Span::parse_symbol(ctx, CONST_SYM)?;
             let ident = Span::parse_pattern(ctx, IDENT_PAT)?;
@@ -66,5 +72,9 @@ impl<'a> ConstStmt {
 
     pub(crate) fn transpile_ref(&self, shader: &mut String, indexes: &Indexes<'_>) {
         self.const_value(indexes).transpile(shader);
+    }
+
+    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
+        self.expr.dependencies(indexes)
     }
 }

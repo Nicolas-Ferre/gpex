@@ -68,7 +68,7 @@ impl Display for LogInner {
             if let Some(loc) = &self.loc {
                 format!(" (at {loc})")
             } else {
-                String::new() // no-coverage (unused for now)
+                String::new()
             }
         )
     }

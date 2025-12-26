@@ -1,0 +1,2 @@
+var public_variable = 1;
+const PUBLIC_CONSTANT = 2;

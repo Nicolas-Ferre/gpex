@@ -1,7 +1,9 @@
-use crate::compiler::indexes::Indexes;
+use crate::compiler::indexes::{Indexes, Value};
 use crate::compiletools::reading::ReadFile;
 use crate::language::module::Module;
+use crate::language::stmts::var::VarStmt;
 use itertools::Itertools;
+use petgraph::graphmap::DiGraphMap;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -69,14 +71,31 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
 fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
     *shader += "struct Buffer { ";
     for module in modules {
-        module.transpile_buffer_fields(shader);
+        for var in module.vars() {
+            var.transpile_buffer_field(shader);
+        }
     }
     *shader += "} @group(0) @binding(0) var<storage, read_write> ";
     *shader += MAIN_BUFFER_NAME;
     *shader += ": Buffer; ";
     *shader += "@compute @workgroup_size(1, 1, 1) fn main() { ";
-    for module in modules {
-        module.transpile_buffer_init(shader, indexes);
+    for var in sorted_vars(modules, indexes) {
+        var.transpile_buffer_init(shader, indexes);
     }
     *shader += "}";
+}
+
+fn sorted_vars<'a>(modules: &'a [Module], indexes: &Indexes<'a>) -> Vec<&'a VarStmt> {
+    let mut dependency_graph = DiGraphMap::<&VarStmt, ()>::new();
+    for var in modules.iter().flat_map(Module::vars) {
+        dependency_graph.add_node(var);
+        for dependency in var.dependencies(indexes) {
+            if let Value::Var(dependency) = dependency {
+                dependency_graph.add_edge(dependency, var, ());
+            }
+        }
+    }
+    #[expect(clippy::expect_used)] // checked during validation phase
+    petgraph::algo::toposort(&dependency_graph, None)
+        .expect("internal error: circular dependencies between global variables")
 }
