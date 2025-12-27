@@ -40,3 +40,25 @@ pub(crate) fn check_found(
         Err(ValidateError)
     }
 }
+
+pub(crate) fn check_not_top(
+    is_top_import: bool,
+    span: &Span,
+    ctx: &mut ValidateCtx<'_>,
+) -> Result<(), ValidateError> {
+    if is_top_import {
+        Ok(())
+    } else {
+        ctx.logs.push(Log {
+            level: LogLevel::Error,
+            msg: "`import` statement not at the top of the module".into(),
+            loc: Some(ctx.loc(span)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                msg: "`import` statements should appear before anything else".into(),
+                loc: None,
+            }],
+        });
+        Err(ValidateError)
+    }
+}
