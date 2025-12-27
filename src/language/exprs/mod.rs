@@ -1,10 +1,10 @@
 use crate::compiler::constants::ConstValue;
-use crate::compiler::indexes::{Indexes, Value};
+use crate::compiler::dependencies::Dependencies;
+use crate::compiler::indexes::Indexes;
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
 use crate::compiletools::validation::{ValidateCtx, ValidateError};
 use crate::language::exprs::literals::I32Lit;
 use ident::IdentExpr;
-use std::collections::HashSet;
 
 pub(crate) mod ident;
 pub(crate) mod literals;
@@ -27,6 +27,17 @@ impl Expr {
         match self {
             Self::Ident(node) => node.pre_validate(indexes),
             Self::I32Lit(_) => (),
+        }
+    }
+
+    pub(crate) fn dependencies<'a>(
+        &self,
+        dependencies: Dependencies<'a>,
+        indexes: &Indexes<'a>,
+    ) -> Result<Dependencies<'a>, Vec<Span>> {
+        match self {
+            Self::I32Lit(_) => Ok(dependencies),
+            Self::Ident(node) => node.dependencies(dependencies, indexes),
         }
     }
 
@@ -53,13 +64,6 @@ impl Expr {
         match self {
             Self::I32Lit(node) => node.transpile(shader, indexes),
             Self::Ident(node) => node.transpile(shader, indexes),
-        }
-    }
-
-    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
-        match self {
-            Self::I32Lit(_) => HashSet::new(),
-            Self::Ident(node) => node.dependencies(indexes),
         }
     }
 }

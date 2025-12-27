@@ -1,0 +1,8 @@
+import first;
+
+var direct_dependency_var2 = direct_dependency_var1;
+const DIRECT_DEPENDENCY_CONST2 = DIRECT_DEPENDENCY_CONST1;
+
+const INDIRECT_DEPENDENCY_CONST1 = INDIRECT_DEPENDENCY_CONST2;
+var indirect_dependency_var2 = INDIRECT_DEPENDENCY_CONST1;
+

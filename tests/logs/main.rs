@@ -11,6 +11,11 @@ fn compile_with_syntax_errors() -> io::Result<()> {
 }
 
 #[test]
+fn compile_with_circular_dependency_errors() -> io::Result<()> {
+    compile_and_check_logs(Path::new("tests/logs/error_circular_dependencies"))
+}
+
+#[test]
 fn compile_with_not_found_item_errors() -> io::Result<()> {
     compile_and_check_logs(Path::new("tests/logs/error_not_found_items"))
 }

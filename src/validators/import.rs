@@ -22,9 +22,10 @@ pub(crate) fn check_found(
             .with_extension(EXTENSION);
         let full_path = ctx.root_path.join(file_path);
         let span = Span {
-            range: segments[0].range.start..segments[segments.len() - 1].range.end,
-            slice: String::new(),
             file_index: segments[0].file_index,
+            start: segments[0].start,
+            end: segments[segments.len() - 1].end,
+            slice: String::new(),
         };
         ctx.logs.push(Log {
             level: LogLevel::Error,
