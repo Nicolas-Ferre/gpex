@@ -23,8 +23,8 @@ impl<'a> ValidateCtx<'a> {
         let file = &self.files[span.file_index];
         LogLocation {
             path: file.path.clone(),
+            span: span.start..span.end,
             code: file.content.clone(),
-            span: span.range.clone(),
         }
     }
 }

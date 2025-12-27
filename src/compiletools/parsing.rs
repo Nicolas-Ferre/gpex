@@ -195,11 +195,12 @@ pub(crate) struct PatternPart {
     pub(crate) max_count: usize,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Span {
-    pub(crate) range: Range<usize>,
-    pub(crate) slice: String,
     pub(crate) file_index: usize,
+    pub(crate) start: usize,
+    pub(crate) end: usize,
+    pub(crate) slice: String,
 }
 
 impl Span {
@@ -215,9 +216,10 @@ impl Span {
             if !is_keyword || !is_next_char_keyword {
                 ctx.offset = range.end;
                 return Ok(Self {
-                    range: range.clone(),
-                    slice: ctx.file.content[range].into(),
                     file_index: ctx.file_index,
+                    start: range.start,
+                    end: range.end,
+                    slice: ctx.file.content[range].into(),
                 });
             }
         }
@@ -248,9 +250,10 @@ impl Span {
         } else {
             ctx.offset = range.end;
             Ok(Self {
-                range: range.clone(),
-                slice: ctx.file.content[range].into(),
                 file_index: ctx.file_index,
+                start: range.start,
+                end: range.end,
+                slice: ctx.file.content[range].into(),
             })
         }
     }

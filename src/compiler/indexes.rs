@@ -1,9 +1,10 @@
 use crate::compiler::constants::ConstValue;
+use crate::compiler::dependencies::Dependencies;
 use crate::compiletools::indexing::{ImportIndex, NodeIndex, NodeRef};
 use crate::compiletools::parsing::Span;
 use crate::language::stmts::const_::ConstStmt;
 use crate::language::stmts::var::VarStmt;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct Indexes<'a> {
@@ -40,6 +41,17 @@ impl Value<'_> {
         }
     }
 
+    pub(crate) fn dependencies<'a>(
+        &self,
+        dependencies: Dependencies<'a>,
+        indexes: &Indexes<'a>,
+    ) -> Result<Dependencies<'a>, Vec<Span>> {
+        match self {
+            Value::Var(node) => node.dependencies(dependencies, indexes),
+            Value::Const(node) => node.dependencies(dependencies, indexes),
+        }
+    }
+
     pub(crate) fn const_value(&self, indexes: &Indexes<'_>) -> Option<ConstValue> {
         match self {
             Value::Var(_) => None, // no-coverage (unused for now)
@@ -51,13 +63,6 @@ impl Value<'_> {
         match self {
             Value::Var(node) => node.transpile_ref(shader),
             Value::Const(node) => node.transpile_ref(shader, indexes),
-        }
-    }
-
-    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
-        match self {
-            Value::Var(node) => node.dependencies(indexes),
-            Value::Const(node) => node.dependencies(indexes),
         }
     }
 }

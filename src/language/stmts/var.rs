@@ -1,3 +1,4 @@
+use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::{Indexes, Value};
 use crate::compiler::transpilation::MAIN_BUFFER_NAME;
 use crate::compiletools::parsing::{ParseCtx, ParseError, Span};
@@ -6,7 +7,6 @@ use crate::language::exprs::Expr;
 use crate::language::patterns::IDENT_PAT;
 use crate::language::symbols::{EQ_SYM, SEMI_SYM, VAR_SYM};
 use crate::validators;
-use std::collections::HashSet;
 use std::fmt::Write;
 
 #[derive(Debug)]
@@ -22,6 +22,10 @@ pub(crate) struct VarStmt {
 }
 
 impl VarStmt {
+    pub(crate) fn name(&self) -> &str {
+        &self.ident.slice
+    }
+
     pub(crate) fn parse<'a>(ctx: &mut ParseCtx<'a>) -> Result<Self, ParseError<'a>> {
         ctx.define_scope(|ctx, id| {
             let _ = Span::parse_symbol(ctx, VAR_SYM)?;
@@ -46,11 +50,21 @@ impl VarStmt {
         self.expr.pre_validate(indexes);
     }
 
+    pub(crate) fn dependencies<'a>(
+        &self,
+        dependencies: Dependencies<'a>,
+        indexes: &Indexes<'a>,
+    ) -> Result<Dependencies<'a>, Vec<Span>> {
+        self.expr.dependencies(dependencies, indexes)
+    }
+
     pub(crate) fn validate(
         &self,
         ctx: &mut ValidateCtx<'_>,
         indexes: &mut Indexes<'_>,
     ) -> Result<(), ValidateError> {
+        let dependencies = self.dependencies(Dependencies::new(Value::Var(self)), indexes);
+        validators::item::check_circular_dependencies(&self.ident, dependencies, ctx)?;
         validators::value::check_unique_def(Value::Var(self), &self.ident, ctx, indexes)?;
         validators::value::check_usage(Value::Var(self), &self.ident, ctx, indexes);
         validators::ident::check_letter_count(&self.ident, ctx);
@@ -73,13 +87,5 @@ impl VarStmt {
     pub(crate) fn transpile_ref(&self, shader: &mut String) {
         *shader += MAIN_BUFFER_NAME;
         _ = write!(shader, ".v{}", self.id);
-    }
-
-    pub(crate) fn name(&self) -> &str {
-        &self.ident.slice
-    }
-
-    pub(crate) fn dependencies<'a>(&self, indexes: &Indexes<'a>) -> HashSet<Value<'a>> {
-        self.expr.dependencies(indexes)
     }
 }

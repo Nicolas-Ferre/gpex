@@ -1,3 +1,4 @@
+use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::{Indexes, Value};
 use crate::compiletools::reading::ReadFile;
 use crate::language::module::Module;
@@ -85,17 +86,20 @@ fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>
     *shader += "}";
 }
 
+#[expect(clippy::expect_used)] // circular dependencies checked during validation phase
 fn sorted_vars<'a>(modules: &'a [Module], indexes: &Indexes<'a>) -> Vec<&'a VarStmt> {
     let mut dependency_graph = DiGraphMap::<&VarStmt, ()>::new();
     for var in modules.iter().flat_map(Module::vars) {
         dependency_graph.add_node(var);
-        for dependency in var.dependencies(indexes) {
+        let dependencies = var
+            .dependencies(Dependencies::new(Value::Var(var)), indexes)
+            .expect("internal error: circular dependencies between global variables");
+        for dependency in dependencies.into_iter() {
             if let Value::Var(dependency) = dependency {
                 dependency_graph.add_edge(dependency, var, ());
             }
         }
     }
-    #[expect(clippy::expect_used)] // checked during validation phase
     petgraph::algo::toposort(&dependency_graph, None)
         .expect("internal error: circular dependencies between global variables")
 }
