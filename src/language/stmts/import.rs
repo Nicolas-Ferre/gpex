@@ -8,7 +8,7 @@ use itertools::Itertools;
 
 #[derive(Debug)]
 pub(crate) struct ImportStmt {
-    import: Span,
+    span: Span,
     segments: Vec<Span>,
     imported_file_index: Option<usize>,
 }
@@ -22,11 +22,17 @@ impl ImportStmt {
             |ctx| Span::parse_pattern(ctx, IDENT_PAT),
             Some(|ctx| Span::parse_symbol(ctx, DOT_SYM).map(|_| ())),
         )?;
-        Span::parse_symbol(ctx, SEMI_SYM)?;
+        let semi = Span::parse_symbol(ctx, SEMI_SYM)?;
+        let span = Span {
+            file_index: import.file_index,
+            start: import.start,
+            end: semi.end,
+            slice: String::new(),
+        };
         let dot_path = segments.iter().map(|segment| &segment.slice).join(".");
         let imported_file_index = ctx.files.iter().position(|file| file.dot_path == dot_path);
         Ok(Self {
-            import,
+            span,
             segments,
             imported_file_index,
         })
@@ -36,12 +42,17 @@ impl ImportStmt {
         if let Some(imported_file_index) = self.imported_file_index {
             indexes
                 .imports
-                .register(self.import.file_index, imported_file_index);
+                .register(self.span.file_index, imported_file_index);
         }
     }
 
-    pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>) -> Result<(), ValidateError> {
+    pub(crate) fn validate(
+        &self,
+        is_top_import: bool,
+        ctx: &mut ValidateCtx<'_>,
+    ) -> Result<(), ValidateError> {
         validators::import::check_found(self.imported_file_index.is_some(), &self.segments, ctx)?;
+        validators::import::check_not_top(is_top_import, &self.span, ctx)?;
         Ok(())
     }
 }

@@ -32,15 +32,18 @@ impl Module {
     }
 
     pub(crate) fn validate(&self, ctx: &mut ValidateCtx<'_>, indexes: &mut Indexes<'_>) {
-        let mut has_invalid_import = false;
+        let mut is_module_invalid = false;
+        let mut are_imported_finished = false;
         for item in &self.items {
-            if let Item::Import(import) = item
-                && import.validate(ctx).is_err()
-            {
-                has_invalid_import = true;
+            if let Item::Import(import) = item {
+                if import.validate(!are_imported_finished, ctx).is_err() {
+                    is_module_invalid = true;
+                }
+            } else {
+                are_imported_finished = true;
             }
         }
-        if has_invalid_import {
+        if is_module_invalid {
             return;
         }
         for item in &self.items {
