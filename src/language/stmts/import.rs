@@ -53,6 +53,9 @@ impl ImportStmt {
     ) -> Result<(), ValidateError> {
         validators::import::check_found(self.imported_file_index.is_some(), &self.segments, ctx)?;
         validators::import::check_not_top(is_top_import, &self.span, ctx)?;
+        for segment in &self.segments {
+            validators::ident::check_snake_case(segment, ctx);
+        }
         Ok(())
     }
 }
