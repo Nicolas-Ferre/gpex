@@ -9,7 +9,7 @@ fn save_and_load_program() -> Result<(), Vec<Log>> {
     gpex::save_compiled(&program, out_path)?;
     let result = gpex::load_compiled(out_path);
     if out_path.is_file() {
-        let _ = fs::remove_file(out_path);
+        _ = fs::remove_file(out_path);
     }
     assert!(result.is_ok());
     Ok(())
@@ -23,7 +23,7 @@ fn save_in_non_existing_folder() -> Result<(), Vec<Log>> {
     let errors = result.expect_err("saving should generate errors");
     assert_eq!(errors.len(), 1);
     assert_eq!(errors[0].level, LogLevel::Error);
-    assert!(errors[0].loc.is_none());
+    assert!(errors[0].location.is_none());
     assert_eq!(errors[0].inner.len(), 0);
     assert!(
         errors[0]
@@ -40,7 +40,7 @@ fn load_non_existing_file() {
     let errors = result.expect_err("loading should generate errors");
     assert_eq!(errors.len(), 1);
     assert_eq!(errors[0].level, LogLevel::Error);
-    assert!(errors[0].loc.is_none());
+    assert!(errors[0].location.is_none());
     assert_eq!(errors[0].inner.len(), 0);
     assert!(
         errors[0]
@@ -56,7 +56,7 @@ fn load_invalid_file() {
     let errors = result.expect_err("loading should generate errors");
     assert_eq!(errors.len(), 1);
     assert_eq!(errors[0].level, LogLevel::Error);
-    assert!(errors[0].loc.is_none());
+    assert!(errors[0].location.is_none());
     assert_eq!(errors[0].inner.len(), 0);
     assert_eq!(
         errors[0].to_string(),

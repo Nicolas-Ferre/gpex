@@ -1,6 +1,6 @@
 use crate::compiler::EXTENSION;
-use crate::compiletools::parsing::Span;
-use crate::compiletools::validation::{ValidateCtx, ValidateError};
+use crate::utils::parsing::Span;
+use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 use itertools::Itertools;
 use std::path::PathBuf;
@@ -8,55 +8,49 @@ use std::path::PathBuf;
 pub(crate) fn check_found(
     is_found: bool,
     segments: &[Span],
-    ctx: &mut ValidateCtx<'_>,
+    context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
     debug_assert!(!segments.is_empty());
     if is_found {
         Ok(())
     } else {
-        let dot_path = segments.iter().map(|segment| &segment.slice).join(".");
-        let file_path = segments
-            .iter()
-            .map(|segment| &segment.slice)
+        let segment_slices = segments.iter().map(|&segment| context.slice(segment));
+        let dot_path = segment_slices.clone().join(".");
+        let file_path = segment_slices
             .collect::<PathBuf>()
             .with_extension(EXTENSION);
-        let full_path = ctx.root_path.join(file_path);
-        let span = Span {
-            file_index: segments[0].file_index,
-            start: segments[0].start,
-            end: segments[segments.len() - 1].end,
-            slice: String::new(),
-        };
-        ctx.logs.push(Log {
+        let full_path = context.root_path.join(file_path);
+        let segments_span = segments[0].until(&segments[segments.len() - 1]);
+        context.logs.push(Log {
             level: LogLevel::Error,
-            msg: format!("`{dot_path}` module not found"),
-            loc: Some(ctx.loc(&span)),
+            message: format!("`{dot_path}` module not found"),
+            location: Some(context.location(segments_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                msg: format!("cannot read \"{}\"", full_path.display()),
-                loc: None,
+                message: format!("cannot read \"{}\"", full_path.display()),
+                location: None,
             }],
         });
         Err(ValidateError)
     }
 }
 
-pub(crate) fn check_not_top(
-    is_top_import: bool,
-    span: &Span,
-    ctx: &mut ValidateCtx<'_>,
+pub(crate) fn check_top(
+    is_top: bool,
+    span: Span,
+    context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if is_top_import {
+    if is_top {
         Ok(())
     } else {
-        ctx.logs.push(Log {
+        context.logs.push(Log {
             level: LogLevel::Error,
-            msg: "`import` statement not at the top of the module".into(),
-            loc: Some(ctx.loc(span)),
+            message: "`import` statement not at the top of the module".into(),
+            location: Some(context.location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                msg: "`import` statements should appear before anything else".into(),
-                loc: None,
+                message: "`import` statements should appear before anything else".into(),
+                location: None,
             }],
         });
         Err(ValidateError)

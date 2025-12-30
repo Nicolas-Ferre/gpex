@@ -19,11 +19,11 @@ async fn run_with_imports() -> Result<(), Error> {
 
 #[tokio::test]
 async fn run_with_expressions() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/exprs"), true).await
+    compile_and_run(Path::new("tests/runner/expressions"), true).await
 }
 
-async fn compile_and_run(path: &Path, warnings_as_errors: bool) -> Result<(), Error> {
-    let (program, _) = gpex::compile(path, warnings_as_errors).map_err(Error::Gpex)?;
+async fn compile_and_run(path: &Path, is_warning_treated_as_error: bool) -> Result<(), Error> {
+    let (program, _) = gpex::compile(path, is_warning_treated_as_error).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
     runner.run_step();
     check_global_vars(path, path, &runner)?;
@@ -45,10 +45,10 @@ fn check_global_vars(folder_path: &Path, root_path: &Path, runner: &Runner) -> R
                 let var_name = &capture[1];
                 let expected_value = &capture[2];
                 let var_path = format!("{dot_path}:{var_name}");
-                let actual_value = runner.read_var(&var_path);
+                let actual_value = runner.read_variable(&var_path);
                 assert_eq!(
                     Some(expected_value.into()),
-                    actual_value.map(|v| v.to_string()),
+                    actual_value.map(|value| value.to_string()),
                     "`{var_path}` variable"
                 );
             }
@@ -64,7 +64,7 @@ fn to_dot_path(file_path: &Path, root_path: &Path) -> String {
         .collect::<PathBuf>()
         .with_extension("")
         .iter()
-        .map(|c| c.to_str().unwrap_or("<invalid>"))
+        .map(|segment| segment.to_str().unwrap_or("<invalid>"))
         .join(".")
 }
 

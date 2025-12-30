@@ -1,9 +1,9 @@
 use crate::compiler::indexes::Indexes;
-use crate::compiletools::logs::{Log, LogLevel};
-use crate::compiletools::parsing::ParseCtx;
-use crate::compiletools::reading::ReadFile;
-use crate::compiletools::validation::ValidateCtx;
 use crate::language::module::Module;
+use crate::utils::logs::{Log, LogLevel};
+use crate::utils::parsing::ParseContext;
+use crate::utils::reading::ReadFile;
+use crate::utils::validation::ValidateContext;
 use std::path::Path;
 
 const COMMENT_PREFIX: &str = "//";
@@ -13,12 +13,12 @@ pub(crate) fn parse(files: &[ReadFile]) -> Result<Vec<Module>, Vec<Log>> {
     let mut modules = vec![];
     let mut errors = vec![];
     for (file_index, file) in files.iter().enumerate() {
-        let mut ctx = ParseCtx::new(file, file_index, files, next_id, COMMENT_PREFIX);
-        match Module::parse(&mut ctx) {
+        let mut context = ParseContext::new(file, file_index, files, next_id, COMMENT_PREFIX);
+        match Module::parse(&mut context) {
             Ok(module) => modules.push(module),
-            Err(err) => errors.push(err.to_error()),
+            Err(error) => errors.push(error.to_error()),
         }
-        next_id = ctx.next_id();
+        next_id = context.next_id();
     }
     if errors.is_empty() {
         Ok(modules)
@@ -30,9 +30,12 @@ pub(crate) fn parse(files: &[ReadFile]) -> Result<Vec<Module>, Vec<Log>> {
 pub(crate) fn index(modules: &[Module]) -> Indexes<'_> {
     let mut indexes = Indexes::new(modules.len());
     for module in modules {
-        module.index(&mut indexes);
+        module.index_items(&mut indexes);
     }
     indexes.imports.consolidate();
+    for module in modules {
+        module.index_refs(&mut indexes);
+    }
     indexes
 }
 
@@ -41,20 +44,23 @@ pub(crate) fn validate(
     files: &[ReadFile],
     modules: &[Module],
     indexes: &mut Indexes<'_>,
-    warnings_as_errors: bool,
+    is_warning_treated_as_error: bool,
 ) -> Result<Vec<Log>, Vec<Log>> {
-    let mut ctx = ValidateCtx::new(files, root_path);
+    let mut context = ValidateContext::new(files, root_path);
     for module in modules {
-        module.pre_validate(indexes);
+        module.validate(&mut context, indexes);
     }
-    for module in modules {
-        module.validate(&mut ctx, indexes);
-    }
-    if ctx.logs.iter().any(|log| {
-        log.level == LogLevel::Error || (warnings_as_errors && log.level == LogLevel::Warning)
-    }) {
-        Err(ctx.logs)
+    if context
+        .logs
+        .iter()
+        .any(|log| is_log_error(log, is_warning_treated_as_error))
+    {
+        Err(context.logs)
     } else {
-        Ok(ctx.logs)
+        Ok(context.logs)
     }
+}
+
+fn is_log_error(log: &Log, is_warning_treated_as_error: bool) -> bool {
+    log.level == LogLevel::Error || (is_warning_treated_as_error && log.level == LogLevel::Warning)
 }

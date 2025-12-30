@@ -5,8 +5,8 @@ pub(crate) mod indexes;
 pub(crate) mod transpilation;
 
 use crate::compiler::transpilation::Program;
-use crate::compiletools::logs::Log;
-use crate::compiletools::reading;
+use crate::utils::logs::Log;
+use crate::utils::reading;
 use std::fs;
 use std::path::Path;
 
@@ -19,7 +19,7 @@ pub(crate) const EXTENSION: &str = "gpex";
 /// An error is returned in case compilation fails.
 pub fn compile(
     root_path: &Path,
-    warnings_as_errors: bool,
+    is_warning_treated_as_error: bool,
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
     let files = reading::read(root_path, root_path, EXTENSION)?;
     let modules = compilation::parse(&files)?;
@@ -29,7 +29,7 @@ pub fn compile(
         &files,
         &modules,
         &mut indexes,
-        warnings_as_errors,
+        is_warning_treated_as_error,
     )?;
     let program = transpilation::transpile(&files, &modules, &indexes);
     Ok((program, errors))
@@ -43,5 +43,6 @@ pub fn compile(
 pub fn save_compiled(program: &Program, path: &Path) -> Result<(), Vec<Log>> {
     #[expect(clippy::unwrap_used)] // JSON serialization of the program never fails
     let serialized = serde_json::to_string(&program).unwrap();
-    fs::write(path, serialized).map_err(|err| vec![Log::from_io_error(err, path, "cannot write")])
+    fs::write(path, serialized)
+        .map_err(|error| vec![Log::from_io_error(error, path, "cannot write")])
 }

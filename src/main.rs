@@ -21,16 +21,16 @@ struct CompileArgs {
     output: PathBuf,
     /// Exit with code 1 in case there are warnings.
     #[arg(long, default_value_t = false)]
-    fail_on_warning: bool,
+    is_warning_treated_as_error: bool,
 }
 
 #[derive(Debug, Parser)]
 struct RunArgs {
     /// Path to either the compiled program or the source folder to run.
     input: PathBuf,
-    /// List of variables to display at each step.
-    #[arg(short, long, num_args(0..), default_values_t = Vec::<String>::new())]
-    pub var: Vec<String>,
+    /// List of variables to display at each step in the terminal, in the format `<module dot path>:<variable name>`.
+    #[arg(short='v', long="var", num_args(0..), default_values_t = Vec::<String>::new())]
+    pub variable_paths: Vec<String>,
 }
 
 #[tokio::main]
@@ -42,7 +42,7 @@ async fn main() {
 }
 
 fn compile(args: &CompileArgs) {
-    let program = compile_folder(&args.input, args.fail_on_warning);
+    let program = compile_folder(&args.input, args.is_warning_treated_as_error);
     if let Err(errors) = gpex::save_compiled(&program, &args.output) {
         display_log(&errors);
         std::process::exit(1);
@@ -65,8 +65,8 @@ async fn run(args: &RunArgs) {
     }
 }
 
-fn compile_folder(folder_path: &Path, fail_on_warning: bool) -> Program {
-    match gpex::compile(folder_path, fail_on_warning) {
+fn compile_folder(folder_path: &Path, is_warning_treated_as_error: bool) -> Program {
+    match gpex::compile(folder_path, is_warning_treated_as_error) {
         Ok((program, logs)) => {
             display_log(&logs);
             program
@@ -87,11 +87,11 @@ async fn run_program(program: Program, args: &RunArgs) {
         }
     };
     runner.run_step();
-    for var_path in &args.var {
-        if let Some(value) = runner.read_var(var_path) {
-            println!("info: {var_path} = `{value}`");
+    for variable_path in &args.variable_paths {
+        if let Some(value) = runner.read_variable(variable_path) {
+            println!("info: {variable_path} = `{value}`");
         } else {
-            println!("warning: `{var_path}` variable not found");
+            println!("warning: `{variable_path}` variable not found");
         }
     }
 }

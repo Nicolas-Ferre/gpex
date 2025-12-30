@@ -1,16 +1,16 @@
-use crate::compiler::indexes::Value;
-use crate::compiletools::parsing::Span;
+use crate::language::items::ItemRef;
+use crate::utils::parsing::Span;
 use std::collections::HashSet;
 use std::mem;
 
-pub(crate) struct Dependencies<'a> {
-    item: Value<'a>,
-    registered: HashSet<Value<'a>>,
+pub(crate) struct Dependencies<'items> {
+    item: ItemRef<'items>,
+    registered: HashSet<ItemRef<'items>>,
     stack: Vec<Span>,
 }
 
-impl<'a> Dependencies<'a> {
-    pub(crate) fn new(item: Value<'a>) -> Self {
+impl<'items> Dependencies<'items> {
+    pub(crate) fn new(item: ItemRef<'items>) -> Self {
         Self {
             item,
             registered: HashSet::default(),
@@ -18,7 +18,11 @@ impl<'a> Dependencies<'a> {
         }
     }
 
-    pub(crate) fn register(mut self, span: Span, dependency: Value<'a>) -> Result<Self, Vec<Span>> {
+    pub(crate) fn register(
+        mut self,
+        span: Span,
+        dependency: ItemRef<'items>,
+    ) -> Result<Self, Vec<Span>> {
         self.stack.push(span);
         if dependency == self.item {
             Err(mem::take(&mut self.stack))
@@ -28,7 +32,7 @@ impl<'a> Dependencies<'a> {
         }
     }
 
-    pub(crate) fn into_iter(self) -> impl Iterator<Item = Value<'a>> {
+    pub(crate) fn into_iter(self) -> impl Iterator<Item = ItemRef<'items>> {
         self.registered.into_iter()
     }
 }

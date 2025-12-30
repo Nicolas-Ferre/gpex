@@ -1,2 +1,0 @@
-error: expression not constant (at tests/logs/error_const/expr.gpex:2:29)
-  --> info: expression must be constant (at tests/logs/error_const/expr.gpex:2:1)

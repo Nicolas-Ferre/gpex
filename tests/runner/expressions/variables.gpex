@@ -1,0 +1,9 @@
+const CONSTANT = 123;
+var variable = 456;
+
+var _i32_literal_min = -2_147_483_648; // expected: -2147483648
+var _i32_literal_max = 2_147_483_647; // expected: 2147483647
+var _i32_zero = 0; // expected: 0
+
+var _identifier_const = CONSTANT; // expected: 123
+var _identifier_var = variable; // expected: 456
