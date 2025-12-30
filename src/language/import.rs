@@ -1,15 +1,16 @@
+use crate::compiler::EXTENSION;
 use crate::compiler::indexes::Indexes;
 use crate::language::patterns::IDENTIFIER_PATTERN;
-use crate::language::symbols::{DOT_SYMBOL, IMPORT_KEYWORD, SEMICOLON_SYMBOL};
-use crate::utils::parsing::{ParseContext, ParseError, Span};
+use crate::language::symbols::{DOT_SYMBOL, IMPORT_KEYWORD, SEMICOLON_SYMBOL, TILDE_SYMBOL};
+use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
-use itertools::Itertools;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub(crate) struct Import {
     span: Span,
-    segments: Vec<Span>,
+    segments: Vec<ImportSegment>,
     imported_file_index: Option<usize>,
 }
 
@@ -33,24 +34,24 @@ impl Import {
 
     fn parse_segments<'context>(
         context: &mut ParseContext<'context>,
-    ) -> Result<Vec<Span>, ParseError<'context>> {
+    ) -> Result<Vec<ImportSegment>, ParseError<'context>> {
         let (segments, _) = context.parse_many(
             1,
-            |context| Span::parse_pattern(context, IDENTIFIER_PATTERN),
+            |context| ImportSegment::parse(context),
             Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
         )?;
         Ok(segments)
     }
 
-    fn find_imported_file_index(context: &ParseContext<'_>, segments: &[Span]) -> Option<usize> {
-        let dot_path = segments
-            .iter()
-            .map(|&segment| context.slice(segment))
-            .join(".");
+    fn find_imported_file_index(
+        context: &ParseContext<'_>,
+        segments: &[ImportSegment],
+    ) -> Option<usize> {
+        let fs_path = ImportSegment::fs_path(segments, context, context.root_path);
         context
             .files
             .iter()
-            .position(|file| file.dot_path == dot_path)
+            .position(|file| file.fs_path == fs_path)
     }
 
     pub(crate) fn index<'index>(&'index self, indexes: &mut Indexes<'index>) {
@@ -69,8 +70,58 @@ impl Import {
         validators::import::check_top(is_top_import, self.span, context)?;
         validators::import::check_self_import(self.imported_file_index, self.span, context);
         for &segment in &self.segments {
-            validators::identifier::check_snake_case(segment, context);
+            if let ImportSegment::Name(span) = segment {
+                validators::identifier::check_snake_case(span, context);
+            }
         }
         Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum ImportSegment {
+    Name(Span),
+    Parent(Span),
+}
+
+impl ImportSegment {
+    fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
+        context.parse_any(&[
+            |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(ImportSegment::Name),
+            |context| Span::parse_symbol(context, TILDE_SYMBOL).map(ImportSegment::Parent),
+        ])
+    }
+
+    pub(crate) fn span(self) -> Span {
+        let (Self::Name(span) | Self::Parent(span)) = self;
+        span
+    }
+
+    pub(crate) fn fs_path(
+        segments: &[Self],
+        span_properties: &impl SpanProperties,
+        root_path: &Path,
+    ) -> PathBuf {
+        let mut parent_segment_count = 0;
+        let mut path = match segments[0] {
+            Self::Name(_) => root_path.to_path_buf(),
+            Self::Parent(_) => span_properties.fs_path(segments[0].span()).to_path_buf(),
+        };
+        for &segment in segments {
+            match segment {
+                Self::Name(span) => path.push(span_properties.slice(span)),
+                Self::Parent(_) => {
+                    if parent_segment_count < path.iter().count()
+                        && let Some(parent) = path.parent()
+                    {
+                        path = parent.to_path_buf();
+                    } else {
+                        path.push("..");
+                        parent_segment_count += 1;
+                    }
+                }
+            }
+        }
+        path.with_extension(EXTENSION)
     }
 }

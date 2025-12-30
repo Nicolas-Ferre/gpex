@@ -1,3 +1,7 @@
-import import_statements.import_absolute;
+import ~.import_absolute;
+import ~.import_relative_direct;
+import ~.~.import_statements.~.import_statements.import_relative_indirect;
 
-var _value = INNER_ABSOLUTE_VALUE; // expected: 1
+var _absolute = INNER_ABSOLUTE_VALUE; // expected: 1
+var _relative_direct = INNER_RELATIVE_DIRECT_VALUE; // expected: 2
+var _relative_indirect = INNER_RELATIVE_INDIRECT_VALUE; // expected: 3

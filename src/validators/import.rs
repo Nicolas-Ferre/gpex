@@ -1,33 +1,34 @@
-use crate::compiler::EXTENSION;
-use crate::utils::parsing::Span;
+use crate::language::import::ImportSegment;
+use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 use itertools::Itertools;
-use std::path::PathBuf;
 
 pub(crate) fn check_found(
     is_found: bool,
-    segments: &[Span],
+    segments: &[ImportSegment],
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
     debug_assert!(!segments.is_empty());
     if is_found {
         Ok(())
     } else {
-        let segment_slices = segments.iter().map(|&segment| context.slice(segment));
-        let dot_path = segment_slices.clone().join(".");
-        let file_path = segment_slices
-            .collect::<PathBuf>()
-            .with_extension(EXTENSION);
-        let full_path = context.root_path.join(file_path);
-        let segments_span = segments[0].until(&segments[segments.len() - 1]);
+        let dot_path = segments
+            .iter()
+            .map(|&segment| context.slice(segment.span()))
+            .clone()
+            .join(".");
+        let fs_path = ImportSegment::fs_path(segments, context, context.root_path);
+        let first_segment = segments[0];
+        let last_segment = segments[segments.len() - 1];
+        let segments_span = first_segment.span().until(last_segment.span());
         context.logs.push(Log {
             level: LogLevel::Error,
             message: format!("`{dot_path}` module not found"),
             location: Some(context.location(segments_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                message: format!("cannot read \"{}\"", full_path.display()),
+                message: format!("cannot read \"{}\"", fs_path.display()),
                 location: None,
             }],
         });

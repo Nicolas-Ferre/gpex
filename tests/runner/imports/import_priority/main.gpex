@@ -1,5 +1,5 @@
-import import_priority.imported1;
-import import_priority.imported2;
+import ~.imported1;
+import ~.imported2;
 
 const UNIQUE3 = 31;
 const CONFLICTING1 = 32;

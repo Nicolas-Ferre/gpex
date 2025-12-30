@@ -8,12 +8,13 @@ use std::path::Path;
 
 const COMMENT_PREFIX: &str = "//";
 
-pub(crate) fn parse(files: &[ReadFile]) -> Result<Vec<Module>, Vec<Log>> {
+pub(crate) fn parse(root_path: &Path, files: &[ReadFile]) -> Result<Vec<Module>, Vec<Log>> {
     let mut next_id = 0;
     let mut modules = vec![];
     let mut errors = vec![];
     for (file_index, file) in files.iter().enumerate() {
-        let mut context = ParseContext::new(file, file_index, files, next_id, COMMENT_PREFIX);
+        let mut context =
+            ParseContext::new(root_path, file, file_index, files, next_id, COMMENT_PREFIX);
         match Module::parse(&mut context) {
             Ok(module) => modules.push(module),
             Err(error) => errors.push(error.to_error()),
