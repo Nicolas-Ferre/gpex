@@ -88,11 +88,11 @@ pub(crate) fn check_usage(
     {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{name}` item unused but name starting with `_`"),
+            message: format!("`{name}` item used but name starting with `_`"),
             location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                message: "item unused here".into(),
+                message: "item used here".into(),
                 location: Some(context.location(ref_span)),
             }],
         });
