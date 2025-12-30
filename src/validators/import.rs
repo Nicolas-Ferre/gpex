@@ -56,3 +56,20 @@ pub(crate) fn check_top(
         Err(ValidateError)
     }
 }
+
+pub(crate) fn check_self_import(
+    imported_file_index: Option<usize>,
+    span: Span,
+    context: &mut ValidateContext<'_>,
+) {
+    if let Some(imported_file_index) = imported_file_index
+        && imported_file_index == span.file_index
+    {
+        context.logs.push(Log {
+            level: LogLevel::Warning,
+            message: "module importing itself".into(),
+            location: Some(context.location(span)),
+            inner: vec![],
+        });
+    }
+}
