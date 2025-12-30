@@ -19,7 +19,7 @@ impl I32Literal {
         let span = Span::parse_pattern(context, I32_LITERAL_PATTERN)?;
         Ok(Self {
             id: context.next_id(),
-            cleaned: span.slice.replace('_', ""),
+            cleaned: context.slice(span).replace('_', ""),
             span,
         })
     }
@@ -29,7 +29,7 @@ impl I32Literal {
         context: &mut ValidateContext<'_>,
         indexes: &mut Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        let value = validators::literal::check_i32_bounds(&self.cleaned, &self.span, context)?;
+        let value = validators::literal::check_i32_bounds(&self.cleaned, self.span, context)?;
         indexes.constants.insert(self.id, Constant::I32(value));
         Ok(())
     }

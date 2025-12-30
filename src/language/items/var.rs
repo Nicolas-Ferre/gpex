@@ -17,7 +17,9 @@ pub(crate) struct VariableDefinition {
     #[derive_where(skip)]
     pub(crate) scope: Vec<u64>,
     #[derive_where(skip)]
-    pub(crate) name: Span,
+    pub(crate) name_span: Span,
+    #[derive_where(skip)]
+    pub(crate) name: String,
     #[derive_where(skip)]
     default_value: Expression,
 }
@@ -28,23 +30,22 @@ impl VariableDefinition {
     ) -> Result<Self, ParseError<'context>> {
         context.define_scope(|context, id| {
             Span::parse_symbol(context, VAR_KEYWORD)?;
-            let name = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
+            let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
             let default_value = Expression::parse(context)?;
             Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
             Ok(Self {
                 id,
                 scope: context.scope().to_vec(),
-                name,
+                name: context.slice(name_span).into(),
+                name_span,
                 default_value,
             })
         })
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
-        indexes
-            .items
-            .register(&self.name.slice, ItemRef::Variable(self));
+        indexes.items.register(&self.name, ItemRef::Variable(self));
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
@@ -69,8 +70,8 @@ impl VariableDefinition {
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
-        validators::identifier::check_char_count(&self.name, context);
-        validators::identifier::check_snake_case(&self.name, context);
+        validators::identifier::check_char_count(self.name_span, context);
+        validators::identifier::check_snake_case(self.name_span, context);
         self.default_value.validate(None, context, indexes)?;
         Ok(())
     }

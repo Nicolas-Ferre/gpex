@@ -25,7 +25,6 @@ impl Import {
                 file_index: import.file_index,
                 start: import.start,
                 end: semicolon.end,
-                slice: String::new(),
             },
             imported_file_index: Self::find_imported_file_index(context, &segments),
             segments,
@@ -44,7 +43,10 @@ impl Import {
     }
 
     fn find_imported_file_index(context: &ParseContext<'_>, segments: &[Span]) -> Option<usize> {
-        let dot_path = segments.iter().map(|segment| &segment.slice).join(".");
+        let dot_path = segments
+            .iter()
+            .map(|&segment| context.slice(segment))
+            .join(".");
         context
             .files
             .iter()
@@ -64,8 +66,8 @@ impl Import {
     ) -> Result<(), ValidateError> {
         let is_found = self.imported_file_index.is_some();
         validators::import::check_found(is_found, &self.segments, context)?;
-        validators::import::check_not_top(is_top_import, &self.span, context)?;
-        for segment in &self.segments {
+        validators::import::check_not_top(is_top_import, self.span, context)?;
+        for &segment in &self.segments {
             validators::identifier::check_snake_case(segment, context);
         }
         Ok(())

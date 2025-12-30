@@ -17,8 +17,8 @@ pub(crate) enum ItemRef<'item> {
 impl NodeRef for ItemRef<'_> {
     fn file_index(&self) -> usize {
         match self {
-            ItemRef::Variable(node) => node.name.file_index,
-            ItemRef::Constant(node) => node.name.file_index,
+            ItemRef::Variable(node) => node.name_span.file_index,
+            ItemRef::Constant(node) => node.name_span.file_index,
         }
     }
 
@@ -38,10 +38,10 @@ impl NodeRef for ItemRef<'_> {
 }
 
 impl ItemRef<'_> {
-    pub(crate) fn name_span(&self) -> &Span {
+    pub(crate) fn name_span(&self) -> Span {
         match self {
-            ItemRef::Variable(node) => &node.name,
-            ItemRef::Constant(node) => &node.name,
+            ItemRef::Variable(node) => node.name_span,
+            ItemRef::Constant(node) => node.name_span,
         }
     }
 

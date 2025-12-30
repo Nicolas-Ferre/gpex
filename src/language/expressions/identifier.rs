@@ -13,6 +13,7 @@ pub(crate) struct Identifier {
     id: u64,
     scope: Vec<u64>,
     span: Span,
+    slice: String,
 }
 
 impl NodeRef for &Identifier {
@@ -33,23 +34,22 @@ impl Identifier {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
+        let span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
         Ok(Self {
             id: context.next_id(),
             scope: context.scope().to_vec(),
-            span: Span::parse_pattern(context, IDENTIFIER_PATTERN)?,
+            slice: context.slice(span).into(),
+            span,
         })
     }
 
     pub(crate) fn index(&self, indexes: &mut Indexes<'_>) {
-        if let Some(source) = indexes
-            .items
-            .search(&self.span.slice, self, &indexes.imports)
-        {
+        if let Some(source) = indexes.items.search(&self.slice, self, &indexes.imports) {
             indexes.sources.insert(self.id, source);
             indexes
                 .item_first_refs
                 .entry(source.id())
-                .or_insert_with(|| self.span.clone());
+                .or_insert_with(|| self.span);
         }
     }
 
@@ -59,7 +59,7 @@ impl Identifier {
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<'index>, Vec<Span>> {
         if let Some(&source) = indexes.sources.get(&self.id) {
-            let dependencies = dependencies.register(self.span.clone(), source)?;
+            let dependencies = dependencies.register(self.span, source)?;
             source.dependencies(dependencies, indexes)
         } else {
             Ok(dependencies)
@@ -68,15 +68,15 @@ impl Identifier {
 
     pub(crate) fn validate(
         &self,
-        constant_mark_span: Option<&Span>,
+        constant_mark_span: Option<Span>,
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        validators::identifier::check_found(self, &self.span, context, indexes)?;
+        validators::identifier::check_found(self, self.span, context, indexes)?;
         if let Some(constant_mark_span) = constant_mark_span {
             validators::identifier::check_constant(
                 self,
-                &self.span,
+                self.span,
                 constant_mark_span,
                 context,
                 indexes,

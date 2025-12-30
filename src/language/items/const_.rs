@@ -18,7 +18,9 @@ pub(crate) struct ConstantDefinition {
     #[derive_where(skip)]
     pub(crate) const_keyword: Span,
     #[derive_where(skip)]
-    pub(crate) name: Span,
+    pub(crate) name_span: Span,
+    #[derive_where(skip)]
+    name: String,
     #[derive_where(skip)]
     value: Expression,
 }
@@ -29,7 +31,7 @@ impl ConstantDefinition {
     ) -> Result<Self, ParseError<'context>> {
         context.define_scope(|context, id| {
             let const_keyword = Span::parse_symbol(context, CONST_KEYWORD)?;
-            let name = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
+            let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
             let value = Expression::parse(context)?;
             Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
@@ -37,16 +39,15 @@ impl ConstantDefinition {
                 id,
                 scope: context.scope().to_vec(),
                 const_keyword,
-                name,
+                name: context.slice(name_span).into(),
+                name_span,
                 value,
             })
         })
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
-        indexes
-            .items
-            .register(&self.name.slice, ItemRef::Constant(self));
+        indexes.items.register(&self.name, ItemRef::Constant(self));
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
@@ -71,10 +72,10 @@ impl ConstantDefinition {
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
-        validators::identifier::check_char_count(&self.name, context);
-        validators::identifier::check_screaming_snake_case(&self.name, context);
+        validators::identifier::check_char_count(self.name_span, context);
+        validators::identifier::check_screaming_snake_case(self.name_span, context);
         self.value
-            .validate(Some(&self.const_keyword), context, indexes)?;
+            .validate(Some(self.const_keyword), context, indexes)?;
         Ok(())
     }
 

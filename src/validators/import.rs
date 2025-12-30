@@ -14,10 +14,9 @@ pub(crate) fn check_found(
     if is_found {
         Ok(())
     } else {
-        let dot_path = segments.iter().map(|segment| &segment.slice).join(".");
-        let file_path = segments
-            .iter()
-            .map(|segment| &segment.slice)
+        let segment_slices = segments.iter().map(|&segment| context.slice(segment));
+        let dot_path = segment_slices.clone().join(".");
+        let file_path = segment_slices
             .collect::<PathBuf>()
             .with_extension(EXTENSION);
         let full_path = context.root_path.join(file_path);
@@ -25,7 +24,7 @@ pub(crate) fn check_found(
         context.logs.push(Log {
             level: LogLevel::Error,
             message: format!("`{dot_path}` module not found"),
-            location: Some(context.location(&segments_span)),
+            location: Some(context.location(segments_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 message: format!("cannot read \"{}\"", full_path.display()),
@@ -38,7 +37,7 @@ pub(crate) fn check_found(
 
 pub(crate) fn check_not_top(
     is_top: bool,
-    span: &Span,
+    span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
     if is_top {

@@ -51,8 +51,8 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
         .flat_map(Module::global_variables)
         .sorted_unstable_by_key(|variable| variable.id)
         .map(|variable| {
-            let dot_path = &files[variable.name.file_index].dot_path;
-            let path = format!("{}:{}", dot_path, variable.name.slice);
+            let dot_path = &files[variable.name_span.file_index].dot_path;
+            let path = format!("{}:{}", dot_path, variable.name);
             let field = BufferField {
                 size: I32_SIZE_BYTES,
                 offset,

@@ -7,7 +7,7 @@ use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_found(
     node: impl NodeRef,
-    span: &Span,
+    span: Span,
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
@@ -16,7 +16,7 @@ pub(crate) fn check_found(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{}` value not found", span.slice),
+            message: format!("`{}` value not found", context.slice(span)),
             location: Some(context.location(span)),
             inner: vec![],
         });
@@ -26,8 +26,8 @@ pub(crate) fn check_found(
 
 pub(crate) fn check_constant(
     node: impl NodeRef,
-    span: &Span,
-    constant_mark_span: &Span,
+    span: Span,
+    constant_mark_span: Span,
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
@@ -48,33 +48,36 @@ pub(crate) fn check_constant(
     }
 }
 
-pub(crate) fn check_char_count(span: &Span, context: &mut ValidateContext<'_>) {
-    if span.slice.len() == 1 && span.slice != "_" {
+pub(crate) fn check_char_count(span: Span, context: &mut ValidateContext<'_>) {
+    let slice = context.slice(span);
+    if slice.len() == 1 && slice != "_" {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{}` identifier is single character", span.slice),
+            message: format!("`{slice}` identifier is single character"),
             location: Some(context.location(span)),
             inner: vec![],
         });
     }
 }
 
-pub(crate) fn check_snake_case(span: &Span, context: &mut ValidateContext<'_>) {
-    if !is_snake_case(&span.slice) {
+pub(crate) fn check_snake_case(span: Span, context: &mut ValidateContext<'_>) {
+    let slice = context.slice(span);
+    if !is_snake_case(slice) {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{}` identifier not in snake_case", span.slice),
+            message: format!("`{slice}` identifier not in snake_case"),
             location: Some(context.location(span)),
             inner: vec![],
         });
     }
 }
 
-pub(crate) fn check_screaming_snake_case(span: &Span, context: &mut ValidateContext<'_>) {
-    if !is_screaming_snake_case(&span.slice) {
+pub(crate) fn check_screaming_snake_case(span: Span, context: &mut ValidateContext<'_>) {
+    let slice = context.slice(span);
+    if !is_screaming_snake_case(slice) {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{}` identifier not in SCREAMING_SNAKE_CASE", span.slice),
+            message: format!("`{slice}` identifier not in SCREAMING_SNAKE_CASE"),
             location: Some(context.location(span)),
             inner: vec![],
         });

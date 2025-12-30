@@ -4,7 +4,7 @@ use crate::{Log, LogLevel};
 
 pub(crate) fn check_i32_bounds(
     value: &str,
-    span: &Span,
+    span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<i32, ValidateError> {
     if let Ok(value) = value.parse::<i32>() {

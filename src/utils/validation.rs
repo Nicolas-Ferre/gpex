@@ -19,7 +19,11 @@ impl<'config> ValidateContext<'config> {
         }
     }
 
-    pub(crate) fn location(&self, span: &Span) -> LogLocation {
+    pub(crate) fn slice(&self, span: Span) -> &str {
+        &self.files[span.file_index].content[span.start..span.end]
+    }
+
+    pub(crate) fn location(&self, span: Span) -> LogLocation {
         let file = &self.files[span.file_index];
         LogLocation {
             path: file.fs_path.clone(),

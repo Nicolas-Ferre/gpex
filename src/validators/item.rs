@@ -11,7 +11,8 @@ pub(crate) fn check_circular_dependencies(
     dependencies: Result<Dependencies<'_>, Vec<Span>>,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    let name = item.name_span();
+    let name_span = item.name_span();
+    let name = context.slice(name_span);
     if let Err(stack) = dependencies {
         if stack.iter().any(|ref_| &stack[0] > ref_) {
             // avoid repeating the same error for each item of the stack
@@ -19,8 +20,8 @@ pub(crate) fn check_circular_dependencies(
         }
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{}` item has circular dependencies", name.slice),
-            location: Some(context.location(name)),
+            message: format!("`{name}` item has circular dependencies"),
+            location: Some(context.location(name_span)),
             inner: stack
                 .iter()
                 .enumerate()
@@ -31,7 +32,7 @@ pub(crate) fn check_circular_dependencies(
                     } else {
                         "depends on this item".into()
                     },
-                    location: Some(context.location(ref_)),
+                    location: Some(context.location(*ref_)),
                 })
                 .collect(),
         });
@@ -46,14 +47,15 @@ pub(crate) fn check_unique_definition(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    let name = item.name_span();
-    if let Some(duplicated_item) = indexes.items.search(&name.slice, item, &indexes.imports)
+    let name_span = item.name_span();
+    let name = context.slice(name_span);
+    if let Some(duplicated_item) = indexes.items.search(name, item, &indexes.imports)
         && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{}` item defined multiple times", name.slice),
-            location: Some(context.location(name)),
+            message: format!("`{name}` item defined multiple times"),
+            location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 message: "item also defined here".into(),
@@ -71,22 +73,23 @@ pub(crate) fn check_usage(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
-    let name = item.name_span();
+    let name_span = item.name_span();
+    let name = context.slice(name_span);
     let ref_span = indexes.item_first_refs.get(&item.id());
-    if ref_span.is_none() && !name.slice.starts_with('_') {
+    if ref_span.is_none() && !name.starts_with('_') {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{}` value unused", name.slice),
-            location: Some(context.location(name)),
+            message: format!("`{name}` value unused"),
+            location: Some(context.location(name_span)),
             inner: vec![],
         });
-    } else if let Some(ref_span) = ref_span
-        && name.slice.starts_with('_')
+    } else if let Some(&ref_span) = ref_span
+        && name.starts_with('_')
     {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{}` value used but name starting with `_`", name.slice),
-            location: Some(context.location(name)),
+            message: format!("`{name}` value used but name starting with `_`"),
+            location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 message: "value used here".into(),

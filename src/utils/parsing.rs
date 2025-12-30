@@ -35,6 +35,10 @@ impl<'config> ParseContext<'config> {
         }
     }
 
+    pub(crate) fn slice(&self, span: Span) -> &str {
+        &self.files[span.file_index].content[span.start..span.end]
+    }
+
     pub(crate) fn scope(&self) -> &[u64] {
         &self.scope
     }
@@ -43,7 +47,7 @@ impl<'config> ParseContext<'config> {
         let id = self.next_id();
         self.scope.push(id);
         let output = scoped(self, id);
-        _ = self.scope.pop();
+        self.scope.pop();
         output
     }
 
@@ -194,12 +198,11 @@ pub(crate) struct PatternPart {
     pub(crate) max_count: usize,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct Span {
     pub(crate) file_index: usize,
     pub(crate) start: usize,
     pub(crate) end: usize,
-    pub(crate) slice: String,
 }
 
 impl Span {
@@ -208,7 +211,6 @@ impl Span {
             file_index: self.file_index,
             start: self.start,
             end: end.end,
-            slice: String::new(),
         }
     }
 
@@ -227,7 +229,6 @@ impl Span {
                     file_index: context.file_index,
                     start: range.start,
                     end: range.end,
-                    slice: context.file.content[range].into(),
                 });
             }
         }
@@ -261,7 +262,6 @@ impl Span {
                 file_index: context.file_index,
                 start: range.start,
                 end: range.end,
-                slice: context.file.content[range].into(),
             })
         }
     }

@@ -45,7 +45,7 @@ impl Expression {
 
     pub(crate) fn validate(
         &self,
-        constant_mark_span: Option<&Span>,
+        constant_mark_span: Option<Span>,
         context: &mut ValidateContext<'_>,
         indexes: &mut Indexes<'_>,
     ) -> Result<(), ValidateError> {
