@@ -46,7 +46,7 @@ fn compile_missing_folder() {
     let errors = result.expect_err("compilation should generate logs");
     assert_eq!(errors.len(), 1);
     assert_eq!(errors[0].level, LogLevel::Error);
-    assert!(errors[0].loc.is_none());
+    assert!(errors[0].location.is_none());
     assert_eq!(errors[0].inner.len(), 0);
     assert!(
         errors[0]

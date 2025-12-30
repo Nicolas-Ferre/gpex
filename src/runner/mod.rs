@@ -19,12 +19,12 @@ pub fn load_compiled(path: &Path) -> Result<Program, Vec<Log>> {
         Ok(content) => Ok(serde_json::from_str(&content).map_err(|_| {
             vec![Log {
                 level: LogLevel::Error,
-                msg: format!("invalid compiled program \"{}\"", path.display()),
-                loc: None,
+                message: format!("invalid compiled program \"{}\"", path.display()),
+                location: None,
                 inner: vec![],
             }]
         })?),
-        Err(err) => Err(vec![Log::from_io_error(err, path, "cannot read")]),
+        Err(error) => Err(vec![Log::from_io_error(error, path, "cannot read")]),
     }
 }
 
@@ -67,7 +67,7 @@ impl Runner {
     /// (e.g. `inner.module:my_buffer`).
     ///
     /// If the buffer doesn't exist, an empty vector is returned.
-    pub fn read_var(&self, path: &str) -> Option<GpuValue> {
+    pub fn read_variable(&self, path: &str) -> Option<GpuValue> {
         if let Some(buffer) = self.buffer.as_ref()
             && let Some(field) = self.program.buffer.fields.get(path)
         {
@@ -89,11 +89,11 @@ impl Runner {
     /// Runs a program step.
     pub fn run_step(&mut self) {
         let mut encoder = utils::create_encoder(&self.device);
-        if let Some(init_shader) = &mut self.init_shader
-            && !init_shader.is_init_done
+        if let Some(shader) = &mut self.init_shader
+            && !shader.is_init_done
         {
             let mut pass = utils::start_compute_pass(&mut encoder);
-            init_shader.run(&mut pass);
+            shader.run(&mut pass);
         }
         self.queue.submit(Some(encoder.finish()));
     }

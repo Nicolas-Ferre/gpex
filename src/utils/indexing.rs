@@ -3,7 +3,7 @@ use std::fmt::Debug;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ImportIndex {
-    imports: Vec<Vec<usize>>, // ordered by import priority (lowest priority first)
+    imports: Vec<Vec<usize>>, // for each file, ordered by import priority (lowest priority first)
 }
 
 impl ImportIndex {
@@ -33,9 +33,9 @@ impl ImportIndex {
         imports: &mut Vec<usize>,
         unique_imports: &mut HashSet<usize>,
         new_import: usize,
-        forced: bool,
+        is_always_expanded: bool,
     ) {
-        if !forced && unique_imports.contains(&new_import) {
+        if !is_always_expanded && unique_imports.contains(&new_import) {
             return;
         }
         imports.push(new_import);

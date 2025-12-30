@@ -19,28 +19,25 @@ pub(crate) fn create_instance() -> Instance {
 }
 
 pub(crate) async fn create_adapter(instance: &Instance) -> Result<Adapter, Vec<Log>> {
-    let adapter_request = RequestAdapterOptions {
+    let options = RequestAdapterOptions {
         power_preference: PowerPreference::default(),
         force_fallback_adapter: false,
         compatible_surface: None,
     };
-    instance
-        .request_adapter(&adapter_request)
-        .await
-        .map_err(|err| {
-            // coverage: off (difficult to test)
-            vec![Log {
-                level: LogLevel::Error,
-                msg: format!("no supported graphic adapter found: {err}"),
-                loc: None,
-                inner: vec![],
-            }]
-        })
+    instance.request_adapter(&options).await.map_err(|error| {
+        // coverage: off (difficult to test)
+        vec![Log {
+            level: LogLevel::Error,
+            message: format!("no supported graphic adapter found: {error}"),
+            location: None,
+            inner: vec![],
+        }]
+    })
     // coverage: on
 }
 
 pub(crate) async fn create_device(adapter: &Adapter) -> Result<(Device, Queue), Vec<Log>> {
-    let device_descriptor = DeviceDescriptor {
+    let descriptor = DeviceDescriptor {
         label: Some("gpex:device"),
         required_features: Features::default(),
         required_limits: Limits::default(),
@@ -48,18 +45,15 @@ pub(crate) async fn create_device(adapter: &Adapter) -> Result<(Device, Queue), 
         memory_hints: MemoryHints::Performance,
         trace: Trace::Off,
     };
-    adapter
-        .request_device(&device_descriptor)
-        .await
-        .map_err(|err| {
-            // coverage: off (difficult to test)
-            vec![Log {
-                level: LogLevel::Error,
-                msg: format!("cannot retrieve graphic device: {err}"),
-                loc: None,
-                inner: vec![],
-            }]
-        })
+    adapter.request_device(&descriptor).await.map_err(|error| {
+        // coverage: off (difficult to test)
+        vec![Log {
+            level: LogLevel::Error,
+            message: format!("cannot retrieve graphic device: {error}"),
+            location: None,
+            inner: vec![],
+        }]
+    })
     // coverage: on
 }
 
@@ -119,10 +113,6 @@ pub(crate) fn create_compute_pipeline(
     layout: &BindGroupLayout,
     code: &str,
 ) -> ComputePipeline {
-    let module = device.create_shader_module(ShaderModuleDescriptor {
-        label: Some("gpex:shader_module"),
-        source: wgpu::ShaderSource::Wgsl(code.into()),
-    });
     device.create_compute_pipeline(&ComputePipelineDescriptor {
         label: Some("gpex:compute_pipeline"),
         layout: Some(&device.create_pipeline_layout(&PipelineLayoutDescriptor {
@@ -130,7 +120,10 @@ pub(crate) fn create_compute_pipeline(
             bind_group_layouts: &[layout],
             immediate_size: 0,
         })),
-        module: &module,
+        module: &device.create_shader_module(ShaderModuleDescriptor {
+            label: Some("gpex:shader_module"),
+            source: wgpu::ShaderSource::Wgsl(code.into()),
+        }),
         entry_point: None,
         compilation_options: PipelineCompilationOptions::default(),
         cache: None,

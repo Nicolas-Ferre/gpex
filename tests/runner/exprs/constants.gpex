@@ -1,5 +1,0 @@
-const LIT = 123;
-const IDENT_CONST = LIT;
-
-var _lit = LIT; // expected: 123
-var _ident_const = IDENT_CONST; // expected: 123

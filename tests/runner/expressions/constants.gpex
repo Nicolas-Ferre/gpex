@@ -1,0 +1,11 @@
+const CONSTANT = 123;
+
+const I32_LITERAL_MIN = -2_147_483_648;
+var _i32_literal_min = I32_LITERAL_MIN; // expected: -2147483648
+const I32_LITERAL_MAX = 2_147_483_647;
+var _i32_literal_max = I32_LITERAL_MAX; // expected: 2147483647
+const I32_ZERO = 0;
+var _i32_zero = I32_ZERO; // expected: 0
+
+const IDENTIFIER_CONST = CONSTANT;
+var _identifier_const = IDENTIFIER_CONST; // expected: 123

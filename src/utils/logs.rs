@@ -9,9 +9,9 @@ pub struct Log {
     /// The log level.
     pub level: LogLevel,
     /// The log message.
-    pub msg: String,
+    pub message: String,
     /// A reference to the source code.
-    pub loc: Option<LogLocation>,
+    pub location: Option<LogLocation>,
     /// Inner logs.
     pub inner: Vec<LogInner>,
 }
@@ -22,8 +22,8 @@ impl Display for Log {
             f,
             "{}: {}{}",
             self.level,
-            self.msg,
-            if let Some(loc) = &self.loc {
+            self.message,
+            if let Some(loc) = &self.location {
                 format!(" (at {loc})")
             } else {
                 String::new()
@@ -37,11 +37,11 @@ impl Display for Log {
 }
 
 impl Log {
-    pub(crate) fn from_io_error(err: io::Error, path: &Path, message_prefix: &str) -> Self {
+    pub(crate) fn from_io_error(error: io::Error, path: &Path, message_prefix: &str) -> Self {
         Self {
             level: LogLevel::Error,
-            msg: format!("{} \"{}\": {}", message_prefix, path.display(), err),
-            loc: None,
+            message: format!("{} \"{}\": {}", message_prefix, path.display(), error),
+            location: None,
             inner: vec![],
         }
     }
@@ -53,9 +53,9 @@ pub struct LogInner {
     /// The log level.
     pub level: LogLevel,
     /// The log message.
-    pub msg: String,
+    pub message: String,
     /// A reference to the source code.
-    pub loc: Option<LogLocation>,
+    pub location: Option<LogLocation>,
 }
 
 impl Display for LogInner {
@@ -64,8 +64,8 @@ impl Display for LogInner {
             f,
             "  --> {}: {}{}",
             self.level,
-            self.msg,
-            if let Some(loc) = &self.loc {
+            self.message,
+            if let Some(loc) = &self.location {
                 format!(" (at {loc})")
             } else {
                 String::new()
