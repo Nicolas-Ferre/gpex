@@ -82,7 +82,7 @@ impl<'config> ParseContext<'config> {
         item_parser: Parser<'config, T>,
         separator_parser: Option<Parser<'config, ()>>,
     ) -> Result<(Vec<T>, Option<ParseError<'config>>), ParseError<'config>> {
-        debug_assert!(min <= 1); // if removed, failing separator parsing should be better handled
+        debug_assert!(min <= 1); // if removed, separator parsing error should be handled the same way as item parsing error
         let mut items = vec![];
         let mut item_index = 0;
         loop {

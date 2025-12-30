@@ -35,7 +35,7 @@ pub(crate) fn check_found(
     }
 }
 
-pub(crate) fn check_not_top(
+pub(crate) fn check_top(
     is_top: bool,
     span: Span,
     context: &mut ValidateContext<'_>,

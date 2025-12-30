@@ -66,7 +66,7 @@ impl Import {
     ) -> Result<(), ValidateError> {
         let is_found = self.imported_file_index.is_some();
         validators::import::check_found(is_found, &self.segments, context)?;
-        validators::import::check_not_top(is_top_import, self.span, context)?;
+        validators::import::check_top(is_top_import, self.span, context)?;
         for &segment in &self.segments {
             validators::identifier::check_snake_case(segment, context);
         }
