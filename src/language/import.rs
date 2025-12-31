@@ -35,11 +35,20 @@ impl Import {
     fn parse_segments<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Vec<ImportSegment>, ParseError<'context>> {
-        let (segments, _) = context.parse_many(
-            1,
-            |context| ImportSegment::parse(context),
+        let (mut segments, _) = context.parse_many(
+            0,
+            |context| Span::parse_symbol(context, TILDE_SYMBOL).map(ImportSegment::Parent),
             Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
         )?;
+        if !segments.is_empty() {
+            Span::parse_symbol(context, DOT_SYMBOL)?;
+        }
+        let (name_segments, _) = context.parse_many(
+            1,
+            |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(ImportSegment::Name),
+            Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
+        )?;
+        segments.extend(name_segments);
         Ok(segments)
     }
 
@@ -85,13 +94,6 @@ pub(crate) enum ImportSegment {
 }
 
 impl ImportSegment {
-    fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
-        context.parse_any(&[
-            |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(ImportSegment::Name),
-            |context| Span::parse_symbol(context, TILDE_SYMBOL).map(ImportSegment::Parent),
-        ])
-    }
-
     pub(crate) fn span(self) -> Span {
         let (Self::Name(span) | Self::Parent(span)) = self;
         span
