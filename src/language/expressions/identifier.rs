@@ -4,7 +4,7 @@ use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::utils::indexing::NodeRef;
-use crate::utils::parsing::{ParseContext, ParseError, Span};
+use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 

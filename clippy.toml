@@ -2,9 +2,11 @@ excessive-nesting-threshold = 5
 disallowed-names = [
     "..",
     # forbid full names when abbreviations are preferred
-    "ident", "identifier", "reference", "argument", "arguments", "character", "characters", "initialize", "initialization", "length", "file_system", "configuration",
+    "ident", "reference", "argument", "arguments", "character", "characters", "initialize", "initialization", "length", "file_system", "configuration",
+    "Ident", "Reference", "Argument", "Arguments", "Character", "Characters", "Initialization", "Length", "FileSystem", "Configuration",
     # forbid abbreviations when full names are preferred
-    "err", "ctx", "const", "var", "semi"
+    "err", "ctx", "const", "var", "semi",
+    "Err", "Ctx", "Const", "Var", "Semi"
 ]
 min-ident-chars-threshold = 2 # 2 instead of 1 to dectect also single letter lifetime names
 allowed-idents-below-min-chars = ["'_", "_", "io", "Io", "fs", "id"]

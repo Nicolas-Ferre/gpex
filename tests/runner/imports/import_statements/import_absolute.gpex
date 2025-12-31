@@ -1,1 +1,1 @@
-const INNER_ABSOLUTE_VALUE = 1;
+const ABSOLUTE_VALUE = 1;

@@ -1,7 +1,7 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
 use crate::language::patterns::I32_LITERAL_PATTERN;
-use crate::utils::parsing::{ParseContext, ParseError, Span};
+use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 

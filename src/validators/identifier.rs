@@ -1,7 +1,7 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
 use crate::utils::indexing::NodeRef;
-use crate::utils::parsing::Span;
+use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 

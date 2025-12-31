@@ -1,12 +1,14 @@
 use crate::utils::logs::{Log, LogLevel, LogLocation};
 use crate::utils::reading::ReadFile;
 use std::ops::Range;
+use std::path::Path;
 
 pub(crate) type Parser<'context, T> =
     fn(&mut ParseContext<'context>) -> Result<T, ParseError<'context>>;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ParseContext<'config> {
+    pub(crate) root_path: &'config Path,
     pub(crate) file: &'config ReadFile,
     pub(crate) file_index: usize,
     pub(crate) files: &'config [ReadFile],
@@ -16,8 +18,19 @@ pub(crate) struct ParseContext<'config> {
     comment_prefix: &'config str,
 }
 
+impl SpanProperties for ParseContext<'_> {
+    fn slice(&self, span: Span) -> &str {
+        &self.files[span.file_index].content[span.start..span.end]
+    }
+
+    fn fs_path(&self, span: Span) -> &Path {
+        &self.files[span.file_index].fs_path
+    }
+}
+
 impl<'config> ParseContext<'config> {
     pub(crate) fn new(
+        root_path: &'config Path,
         file: &'config ReadFile,
         file_index: usize,
         files: &'config [ReadFile],
@@ -25,6 +38,7 @@ impl<'config> ParseContext<'config> {
         comment_prefix: &'config str,
     ) -> Self {
         Self {
+            root_path,
             file,
             file_index,
             files,
@@ -33,10 +47,6 @@ impl<'config> ParseContext<'config> {
             next_id,
             comment_prefix,
         }
-    }
-
-    pub(crate) fn slice(&self, span: Span) -> &str {
-        &self.files[span.file_index].content[span.start..span.end]
     }
 
     pub(crate) fn scope(&self) -> &[u64] {
@@ -206,7 +216,7 @@ pub(crate) struct Span {
 }
 
 impl Span {
-    pub(crate) fn until(&self, end: &Self) -> Self {
+    pub(crate) fn until(&self, end: Self) -> Self {
         Self {
             file_index: self.file_index,
             start: self.start,
@@ -318,4 +328,10 @@ impl Span {
             .next()
             .is_some_and(Self::is_char_keyword)
     }
+}
+
+pub(crate) trait SpanProperties {
+    fn slice(&self, span: Span) -> &str;
+
+    fn fs_path(&self, span: Span) -> &Path;
 }

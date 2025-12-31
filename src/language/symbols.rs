@@ -28,3 +28,7 @@ pub(crate) const SEMICOLON_SYMBOL: Symbol = Symbol {
     name: "`;`",
     slice: ";",
 };
+pub(crate) const TILDE_SYMBOL: Symbol = Symbol {
+    name: "`~`",
+    slice: "~",
+};

@@ -1,4 +1,4 @@
-import circular_imports.second;
+import ~.second;
 
 var var1 = 1;
 var _var2_copy = var2; // expected: 2
