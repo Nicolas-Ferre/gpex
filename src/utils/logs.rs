@@ -23,8 +23,8 @@ impl Display for Log {
             "{}: {}{}",
             self.level,
             self.message,
-            if let Some(loc) = &self.location {
-                format!(" (at {loc})")
+            if let Some(location) = &self.location {
+                format!(" (at {location})")
             } else {
                 String::new()
             }
@@ -65,8 +65,8 @@ impl Display for LogInner {
             "  --> {}: {}{}",
             self.level,
             self.message,
-            if let Some(loc) = &self.location {
-                format!(" (at {loc})")
+            if let Some(location) = &self.location {
+                format!(" (at {location})")
             } else {
                 String::new()
             }
