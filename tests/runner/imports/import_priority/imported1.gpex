@@ -1,3 +1,3 @@
-const UNIQUE1 = 11;
-const CONFLICTING1 = 12;
-const CONFLICTING2 = 13;
+pub const UNIQUE1 = 11;
+pub const CONFLICTING1 = 12;
+pub const CONFLICTING2 = 13;

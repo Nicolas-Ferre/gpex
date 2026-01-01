@@ -4,7 +4,7 @@ use crate::compiler::indexes::Indexes;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
-use crate::language::symbols::{CONST_KEYWORD, EQUAL_SYMBOL, SEMICOLON_SYMBOL};
+use crate::language::symbols::{CONST_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -16,7 +16,9 @@ pub(crate) struct ConstantDefinition {
     #[derive_where(skip)]
     pub(crate) scope: Vec<u64>,
     #[derive_where(skip)]
-    pub(crate) const_keyword: Span,
+    pub(crate) pub_keyword_span: Option<Span>,
+    #[derive_where(skip)]
+    pub(crate) const_keyword_span: Span,
     #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]
@@ -30,7 +32,8 @@ impl ConstantDefinition {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         context.define_scope(|context, id| {
-            let const_keyword = Span::parse_symbol(context, CONST_KEYWORD)?;
+            let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
+            let const_keyword_span = Span::parse_symbol(context, CONST_KEYWORD)?;
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
             let value = Expression::parse(context)?;
@@ -38,7 +41,8 @@ impl ConstantDefinition {
             Ok(Self {
                 id,
                 scope: context.scope().to_vec(),
-                const_keyword,
+                pub_keyword_span,
+                const_keyword_span,
                 name: context.slice(name_span).into(),
                 name_span,
                 value,
@@ -75,7 +79,7 @@ impl ConstantDefinition {
         validators::identifier::check_char_count(self.name_span, context);
         validators::identifier::check_screaming_snake_case(self.name_span, context);
         self.value
-            .validate(Some(self.const_keyword), context, indexes)?;
+            .validate(Some(self.const_keyword_span), context, indexes)?;
         Ok(())
     }
 

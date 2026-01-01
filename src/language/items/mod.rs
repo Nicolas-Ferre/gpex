@@ -35,6 +35,13 @@ impl NodeRef for ItemRef<'_> {
             ItemRef::Constant(node) => &node.scope,
         }
     }
+
+    fn is_public(&self) -> bool {
+        match self {
+            ItemRef::Variable(node) => node.pub_keyword_span.is_some(),
+            ItemRef::Constant(node) => node.pub_keyword_span.is_some(),
+        }
+    }
 }
 
 impl ItemRef<'_> {

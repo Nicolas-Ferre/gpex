@@ -1,7 +1,11 @@
 use crate::utils::parsing::Symbol;
 
-pub(crate) const KEYWORDS: &[&str] =
-    &[CONST_KEYWORD.slice, IMPORT_KEYWORD.slice, VAR_KEYWORD.slice];
+pub(crate) const KEYWORDS: &[&str] = &[
+    CONST_KEYWORD.slice,
+    IMPORT_KEYWORD.slice,
+    PUB_KEYWORD.slice,
+    VAR_KEYWORD.slice,
+];
 
 pub(crate) const CONST_KEYWORD: Symbol = Symbol {
     name: "`const`",
@@ -10,6 +14,10 @@ pub(crate) const CONST_KEYWORD: Symbol = Symbol {
 pub(crate) const IMPORT_KEYWORD: Symbol = Symbol {
     name: "`import`",
     slice: "import",
+};
+pub(crate) const PUB_KEYWORD: Symbol = Symbol {
+    name: "`pub`",
+    slice: "pub",
 };
 pub(crate) const VAR_KEYWORD: Symbol = Symbol {
     name: "`var`",

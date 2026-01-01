@@ -1,4 +1,7 @@
+import imported;
+
 var _value = not_found;
 var _itself = _itself;
 var _after = _after_value;
 var _after_value = 0;
+var _private = _imported_var;

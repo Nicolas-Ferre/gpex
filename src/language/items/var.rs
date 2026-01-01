@@ -4,7 +4,7 @@ use crate::compiler::transpilation::MAIN_BUFFER_NAME;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
-use crate::language::symbols::{EQUAL_SYMBOL, SEMICOLON_SYMBOL, VAR_KEYWORD};
+use crate::language::symbols::{EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL, VAR_KEYWORD};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -16,6 +16,8 @@ pub(crate) struct VariableDefinition {
     pub(crate) id: u64,
     #[derive_where(skip)]
     pub(crate) scope: Vec<u64>,
+    #[derive_where(skip)]
+    pub(crate) pub_keyword_span: Option<Span>,
     #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]
@@ -29,6 +31,7 @@ impl VariableDefinition {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         context.define_scope(|context, id| {
+            let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             Span::parse_symbol(context, VAR_KEYWORD)?;
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
@@ -38,6 +41,7 @@ impl VariableDefinition {
                 id,
                 scope: context.scope().to_vec(),
                 name: context.slice(name_span).into(),
+                pub_keyword_span,
                 name_span,
                 default_value,
             })

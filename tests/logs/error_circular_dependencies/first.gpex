@@ -1,7 +1,7 @@
 import second;
 
-var direct_dependency_var1 = direct_dependency_var2;
-const DIRECT_DEPENDENCY_CONST1 = DIRECT_DEPENDENCY_CONST2;
+pub var direct_dependency_var1 = direct_dependency_var2;
+pub const DIRECT_DEPENDENCY_CONST1 = DIRECT_DEPENDENCY_CONST2;
 
-var indirect_dependency_var1 = indirect_dependency_var2;
-const INDIRECT_DEPENDENCY_CONST2 = indirect_dependency_var1;
+pub var indirect_dependency_var1 = indirect_dependency_var2;
+pub const INDIRECT_DEPENDENCY_CONST2 = indirect_dependency_var1;

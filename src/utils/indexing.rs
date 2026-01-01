@@ -79,11 +79,14 @@ impl<Item: NodeRef> NodeIndex<Item, false> {
             .filter_map(|&file_index| self.items[file_index].get(key))
             .flatten()
             .rev()
-            .find(|item| {
-                (loc.file_index() != item.file_index() || item.id() < loc.id())
-                    && item.scope() != loc.scope()
-            })
+            .find(|&&item| Self::is_item_visible(item, loc))
             .copied()
+    }
+
+    fn is_item_visible(item: Item, loc: impl NodeRef) -> bool {
+        let is_same_file = loc.file_index() == item.file_index();
+        ((is_same_file && item.id() < loc.id()) || (!is_same_file && item.is_public()))
+            && item.scope() != loc.scope()
     }
 }
 
@@ -93,4 +96,6 @@ pub(crate) trait NodeRef: Clone + Copy {
     fn id(&self) -> u64;
 
     fn scope(&self) -> &[u64];
+
+    fn is_public(&self) -> bool;
 }
