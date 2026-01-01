@@ -28,10 +28,6 @@ impl NodeRef for &Identifier {
     fn scope(&self) -> &[u64] {
         &self.scope
     }
-
-    fn is_public(&self) -> bool {
-        false
-    }
 }
 
 impl Identifier {

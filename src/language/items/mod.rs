@@ -5,7 +5,7 @@ use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::const_::ConstantDefinition;
 use crate::language::items::var::VariableDefinition;
-use crate::utils::indexing::NodeRef;
+use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::Span;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -35,7 +35,9 @@ impl NodeRef for ItemRef<'_> {
             ItemRef::Constant(node) => &node.scope,
         }
     }
+}
 
+impl ItemNodeRef for ItemRef<'_> {
     fn is_public(&self) -> bool {
         match self {
             ItemRef::Variable(node) => node.pub_keyword_span.is_some(),

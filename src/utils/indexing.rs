@@ -51,7 +51,7 @@ pub(crate) struct NodeIndex<Item, const SEARCH_BEFORE: bool> {
     items: Vec<HashMap<String, Vec<Item>>>,
 }
 
-impl<Item: NodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
+impl<Item: ItemNodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
     pub(crate) fn new(file_count: usize) -> Self {
         Self {
             items: vec![HashMap::new(); file_count],
@@ -67,7 +67,7 @@ impl<Item: NodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
     }
 }
 
-impl<Item: NodeRef> NodeIndex<Item, false> {
+impl<Item: ItemNodeRef> NodeIndex<Item, false> {
     pub(crate) fn search(
         &self,
         key: &str,
@@ -96,6 +96,8 @@ pub(crate) trait NodeRef: Clone + Copy {
     fn id(&self) -> u64;
 
     fn scope(&self) -> &[u64];
+}
 
+pub(crate) trait ItemNodeRef: NodeRef {
     fn is_public(&self) -> bool;
 }
