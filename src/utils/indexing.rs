@@ -51,7 +51,7 @@ pub(crate) struct NodeIndex<Item, const SEARCH_BEFORE: bool> {
     items: Vec<HashMap<String, Vec<Item>>>,
 }
 
-impl<Item: NodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
+impl<Item: ItemNodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
     pub(crate) fn new(file_count: usize) -> Self {
         Self {
             items: vec![HashMap::new(); file_count],
@@ -67,23 +67,26 @@ impl<Item: NodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
     }
 }
 
-impl<Item: NodeRef> NodeIndex<Item, false> {
+impl<Item: ItemNodeRef> NodeIndex<Item, false> {
     pub(crate) fn search(
         &self,
         key: &str,
-        loc: impl NodeRef,
+        location: impl NodeRef,
         imports: &ImportIndex,
     ) -> Option<Item> {
-        imports.imports[loc.file_index()]
+        imports.imports[location.file_index()]
             .iter()
             .filter_map(|&file_index| self.items[file_index].get(key))
             .flatten()
             .rev()
-            .find(|item| {
-                (loc.file_index() != item.file_index() || item.id() < loc.id())
-                    && item.scope() != loc.scope()
-            })
+            .find(|&&item| Self::is_item_visible(item, location))
             .copied()
+    }
+
+    fn is_item_visible(item: Item, location: impl NodeRef) -> bool {
+        let is_same_file = location.file_index() == item.file_index();
+        ((is_same_file && item.id() < location.id()) || (!is_same_file && item.is_public()))
+            && item.scope() != location.scope()
     }
 }
 
@@ -93,4 +96,8 @@ pub(crate) trait NodeRef: Clone + Copy {
     fn id(&self) -> u64;
 
     fn scope(&self) -> &[u64];
+}
+
+pub(crate) trait ItemNodeRef: NodeRef {
+    fn is_public(&self) -> bool;
 }

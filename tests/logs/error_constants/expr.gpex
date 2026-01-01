@@ -1,2 +1,2 @@
-var var_value = 1;
-const _INVALID_CONST_EXPR = var_value;
+var variable_value = 1;
+const _INVALID_CONSTANT_EXPRESSION = variable_value;

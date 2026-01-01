@@ -1,4 +1,7 @@
+import imported;
+
 const _VALUE = NOT_FOUND;
 const _ITSELF = _ITSELF;
 const _AFTER = _AFTER_VALUE;
 const _AFTER_VALUE = 0;
+const _PRIVATE = _IMPORTED_CONSTANT;

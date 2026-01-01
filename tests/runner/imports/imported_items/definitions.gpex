@@ -1,2 +1,2 @@
-var public_variable = 1;
-const PUBLIC_CONSTANT = 2;
+pub var public_variable = 1;
+pub const PUBLIC_CONSTANT = 2;
