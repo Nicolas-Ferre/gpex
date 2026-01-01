@@ -7,5 +7,5 @@ var _i32_literal_max = I32_LITERAL_MAX; // expected: 2147483647
 const I32_ZERO = 0;
 var _i32_zero = I32_ZERO; // expected: 0
 
-const IDENTIFIER_CONST = CONSTANT;
-var _identifier_const = IDENTIFIER_CONST; // expected: 123
+const IDENTIFIER_CONSTANT = CONSTANT;
+var _identifier_constant = IDENTIFIER_CONSTANT; // expected: 123
