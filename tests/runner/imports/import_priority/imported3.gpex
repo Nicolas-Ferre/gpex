@@ -1,3 +1,5 @@
+pub import ~.imported2;
+
 pub const UNIQUE_IMPORTED3 = 31;
 pub const CONFLICTING_MAIN = 32;
 pub const CONFLICTING_IMPORTED2 = 33;

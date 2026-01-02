@@ -30,11 +30,11 @@ impl ImportIndex {
         for file_index in 0..self.imports.len() {
             let mut imports = vec![];
             let mut unique_imports = HashSet::new();
-            let current_import = ImportItem {
+            let self_import = ImportItem {
                 file_index,
                 is_public: true,
             };
-            direct_imports.expand_imports(&mut imports, &mut unique_imports, current_import, true);
+            direct_imports.expand_imports(&mut imports, &mut unique_imports, self_import, true);
             imports.reverse();
             self.imports[file_index] = imports;
         }
