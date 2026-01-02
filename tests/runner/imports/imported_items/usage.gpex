@@ -2,3 +2,4 @@ import ~.definitions;
 
 var _imported_variable = public_variable; // expected: 1
 var _imported_constant = PUBLIC_CONSTANT; // expected: 2
+var _imported_import = PUBLIC_IMPORT_ITEM; // expected: 3

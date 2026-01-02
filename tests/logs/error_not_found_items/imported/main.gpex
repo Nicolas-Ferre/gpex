@@ -1,0 +1,4 @@
+import ~.private_import;
+
+var _private_variable = 0;
+const _PRIVATE_CONSTANT = 0;

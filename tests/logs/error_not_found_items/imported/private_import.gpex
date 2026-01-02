@@ -1,0 +1,2 @@
+pub var _public_variable = 0;
+pub const _PUBLIC_CONSTANT = 0;

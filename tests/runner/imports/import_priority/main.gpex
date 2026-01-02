@@ -1,11 +1,13 @@
 import ~.imported1;
 import ~.imported2;
 
-const UNIQUE3 = 31;
-const CONFLICTING1 = 32;
+const UNIQUE_MAIN = 41;
+const CONFLICTING_MAIN = 42;
 
-var _unique1 = UNIQUE1; // expected: 11
-var _unique2 = UNIQUE2; // expected: 21
-var _unique3 = UNIQUE3; // expected: 31
-var _conflicting1 = CONFLICTING1; // expected: 32
-var _conflicting2 = CONFLICTING2; // expected: 23
+var _unique_imported1 = UNIQUE_IMPORTED1; // expected: 11
+var _unique_imported2 = UNIQUE_IMPORTED2; // expected: 21
+var _unique_imported3 = UNIQUE_IMPORTED3; // expected: 31
+var _unique_main = UNIQUE_MAIN; // expected: 41
+var _conflicting_main = CONFLICTING_MAIN; // expected: 42
+var _conflicting_imported2 = CONFLICTING_IMPORTED2; // expected: 23
+var _conflicting_imported3 = CONFLICTING_IMPORTED3; // expected: 34
