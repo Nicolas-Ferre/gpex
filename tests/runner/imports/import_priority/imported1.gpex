@@ -1,3 +1,4 @@
-pub const UNIQUE1 = 11;
-pub const CONFLICTING1 = 12;
-pub const CONFLICTING2 = 13;
+pub const UNIQUE_IMPORTED1 = 11;
+pub const CONFLICTING_MAIN = 12;
+pub const CONFLICTING_IMPORTED2 = 13;
+pub const CONFLICTING_IMPORTED3 = 14;

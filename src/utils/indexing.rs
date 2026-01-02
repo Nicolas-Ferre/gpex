@@ -3,7 +3,7 @@ use std::fmt::Debug;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ImportIndex {
-    imports: Vec<Vec<usize>>, // for each file, ordered by import priority (lowest priority first)
+    imports: Vec<Vec<ImportItem>>, // for each file, ordered by import priority (lowest priority first)
 }
 
 impl ImportIndex {
@@ -13,8 +13,16 @@ impl ImportIndex {
         }
     }
 
-    pub(crate) fn register(&mut self, file_index: usize, imported_file_index: usize) {
-        self.imports[file_index].push(imported_file_index);
+    pub(crate) fn register(
+        &mut self,
+        file_index: usize,
+        imported_file_index: usize,
+        is_import_public: bool,
+    ) {
+        self.imports[file_index].push(ImportItem {
+            file_index: imported_file_index,
+            is_public: is_import_public,
+        });
     }
 
     pub(crate) fn consolidate(&mut self) {
@@ -22,7 +30,11 @@ impl ImportIndex {
         for file_index in 0..self.imports.len() {
             let mut imports = vec![];
             let mut unique_imports = HashSet::new();
-            direct_imports.expand_imports(&mut imports, &mut unique_imports, file_index, true);
+            let self_import = ImportItem {
+                file_index,
+                is_public: true,
+            };
+            direct_imports.expand_imports(&mut imports, &mut unique_imports, self_import, true);
             imports.reverse();
             self.imports[file_index] = imports;
         }
@@ -30,20 +42,28 @@ impl ImportIndex {
 
     fn expand_imports(
         &self,
-        imports: &mut Vec<usize>,
-        unique_imports: &mut HashSet<usize>,
-        new_import: usize,
-        is_always_expanded: bool,
+        imports: &mut Vec<ImportItem>,
+        unique_imports: &mut HashSet<ImportItem>,
+        new_import: ImportItem,
+        is_self_import: bool,
     ) {
-        if !is_always_expanded && unique_imports.contains(&new_import) {
+        if unique_imports.contains(&new_import) {
             return;
         }
-        imports.push(new_import);
-        unique_imports.insert(new_import);
-        for &inner_import in self.imports[new_import].iter().rev() {
-            self.expand_imports(imports, unique_imports, inner_import, false);
+        imports.push(new_import.clone());
+        unique_imports.insert(new_import.clone());
+        for inner_import in self.imports[new_import.file_index].iter().rev() {
+            if is_self_import || inner_import.is_public {
+                self.expand_imports(imports, unique_imports, inner_import.clone(), false);
+            }
         }
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub(crate) struct ImportItem {
+    pub(crate) file_index: usize,
+    pub(crate) is_public: bool,
 }
 
 #[derive(Debug)]
@@ -76,7 +96,7 @@ impl<Item: ItemNodeRef> NodeIndex<Item, false> {
     ) -> Option<Item> {
         imports.imports[location.file_index()]
             .iter()
-            .filter_map(|&file_index| self.items[file_index].get(key))
+            .filter_map(|import| self.items[import.file_index].get(key))
             .flatten()
             .rev()
             .find(|&&item| Self::is_item_visible(item, location))

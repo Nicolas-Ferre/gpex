@@ -1,7 +1,9 @@
 use crate::compiler::EXTENSION;
 use crate::compiler::indexes::Indexes;
 use crate::language::patterns::IDENTIFIER_PATTERN;
-use crate::language::symbols::{DOT_SYMBOL, IMPORT_KEYWORD, SEMICOLON_SYMBOL, TILDE_SYMBOL};
+use crate::language::symbols::{
+    DOT_SYMBOL, IMPORT_KEYWORD, PUB_KEYWORD, SEMICOLON_SYMBOL, TILDE_SYMBOL,
+};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -10,6 +12,7 @@ use std::path::{Path, PathBuf};
 #[derive(Debug)]
 pub(crate) struct Import {
     span: Span,
+    pub_keyword_span: Option<Span>,
     segments: Vec<ImportSegment>,
     imported_file_index: Option<usize>,
 }
@@ -18,6 +21,7 @@ impl Import {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
+        let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
         let import = Span::parse_symbol(context, IMPORT_KEYWORD)?;
         let segments = Self::parse_segments(context)?;
         let semicolon = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
@@ -27,6 +31,7 @@ impl Import {
                 start: import.start,
                 end: semicolon.end,
             },
+            pub_keyword_span,
             imported_file_index: Self::find_imported_file_index(context, &segments),
             segments,
         })
@@ -68,7 +73,10 @@ impl Import {
 
     pub(crate) fn index<'index>(&'index self, indexes: &mut Indexes<'index>) {
         if let Some(file_index) = self.imported_file_index {
-            indexes.imports.register(self.span.file_index, file_index);
+            let is_public = self.pub_keyword_span.is_some();
+            indexes
+                .imports
+                .register(self.span.file_index, file_index, is_public);
         }
     }
 
