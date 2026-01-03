@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
+use std::iter;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ImportIndex {
@@ -15,26 +16,53 @@ impl ImportIndex {
 
     pub(crate) fn register(
         &mut self,
+        import_item_id: u64,
         file_index: usize,
         imported_file_index: usize,
         is_import_public: bool,
     ) {
         self.imports[file_index].push(ImportItem {
+            source_import_id: Some(import_item_id),
             file_index: imported_file_index,
             is_public: is_import_public,
+            is_used: false,
         });
+    }
+
+    pub(crate) fn is_used(&self, file_index: usize, import_id: u64) -> bool {
+        self.imports[file_index]
+            .iter()
+            .filter(|item| item.source_import_id == Some(import_id))
+            .any(|item| item.is_used)
+    }
+
+    pub(crate) fn mark_as_used(&mut self, file_index: usize, imported_file_index: usize) {
+        if let Some(import) = self.imports[file_index]
+            .iter_mut()
+            .find(|import| import.file_index == imported_file_index)
+        {
+            import.is_used = true;
+        }
     }
 
     pub(crate) fn consolidate(&mut self) {
         let direct_imports = self.clone();
         for file_index in 0..self.imports.len() {
-            let mut imports = vec![];
-            let mut unique_imports = HashSet::new();
-            let self_import = ImportItem {
+            let mut imports = vec![ImportItem {
+                source_import_id: None,
                 file_index,
                 is_public: true,
-            };
-            direct_imports.expand_imports(&mut imports, &mut unique_imports, self_import, true);
+                is_used: false,
+            }];
+            let mut unique_file_indexes = iter::once(file_index).collect();
+            for inner_import in self.imports[file_index].iter().rev() {
+                direct_imports.expand_imports(
+                    &mut imports,
+                    &mut unique_file_indexes,
+                    inner_import,
+                    inner_import.source_import_id,
+                );
+            }
             imports.reverse();
             self.imports[file_index] = imports;
         }
@@ -43,18 +71,23 @@ impl ImportIndex {
     fn expand_imports(
         &self,
         imports: &mut Vec<ImportItem>,
-        unique_imports: &mut HashSet<ImportItem>,
-        new_import: ImportItem,
-        is_self_import: bool,
+        unique_file_indexes: &mut HashSet<usize>,
+        new_import: &ImportItem,
+        source_import_id: Option<u64>,
     ) {
-        if unique_imports.contains(&new_import) {
+        if unique_file_indexes.contains(&new_import.file_index) {
             return;
         }
-        imports.push(new_import.clone());
-        unique_imports.insert(new_import.clone());
+        imports.push(ImportItem {
+            source_import_id,
+            file_index: new_import.file_index,
+            is_public: new_import.is_public,
+            is_used: new_import.is_used,
+        });
+        unique_file_indexes.insert(new_import.file_index);
         for inner_import in self.imports[new_import.file_index].iter().rev() {
-            if is_self_import || inner_import.is_public {
-                self.expand_imports(imports, unique_imports, inner_import.clone(), false);
+            if inner_import.is_public {
+                self.expand_imports(imports, unique_file_indexes, inner_import, source_import_id);
             }
         }
     }
@@ -62,8 +95,10 @@ impl ImportIndex {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct ImportItem {
+    pub(crate) source_import_id: Option<u64>,
     pub(crate) file_index: usize,
     pub(crate) is_public: bool,
+    pub(crate) is_used: bool,
 }
 
 #[derive(Debug)]

@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
 pub(crate) struct Import {
+    id: u64,
     span: Span,
     pub_keyword_span: Option<Span>,
     segments: Vec<ImportSegment>,
@@ -26,6 +27,7 @@ impl Import {
         let segments = Self::parse_segments(context)?;
         let semicolon = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self {
+            id: context.next_id(),
             span: Span {
                 file_index: import.file_index,
                 start: import.start,
@@ -76,7 +78,7 @@ impl Import {
             let is_public = self.pub_keyword_span.is_some();
             indexes
                 .imports
-                .register(self.span.file_index, file_index, is_public);
+                .register(self.id, self.span.file_index, file_index, is_public);
         }
     }
 
@@ -84,11 +86,22 @@ impl Import {
         &self,
         is_top_import: bool,
         context: &mut ValidateContext<'_>,
+        indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let is_found = self.imported_file_index.is_some();
+        let is_public = self.pub_keyword_span.is_some();
         validators::import::check_found(is_found, &self.segments, context)?;
         validators::import::check_top(is_top_import, self.span, context)?;
         validators::import::check_self_import(self.imported_file_index, self.span, context);
+        validators::import::check_usage(
+            self.id,
+            self.imported_file_index,
+            self.span,
+            is_public,
+            &self.segments,
+            context,
+            indexes,
+        );
         for &segment in &self.segments {
             if let ImportSegment::Name(span) = segment {
                 validators::identifier::check_snake_case(span, context);

@@ -1,3 +1,4 @@
+use crate::compiler::indexes::Indexes;
 use crate::language::import::ImportSegment;
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -69,6 +70,31 @@ pub(crate) fn check_self_import(
         context.logs.push(Log {
             level: LogLevel::Warning,
             message: "module importing itself".into(),
+            location: Some(context.location(span)),
+            inner: vec![],
+        });
+    }
+}
+
+pub(crate) fn check_usage(
+    import_id: u64,
+    imported_file_index: Option<usize>,
+    span: Span,
+    is_public: bool,
+    segments: &[ImportSegment],
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) {
+    let is_self_import = imported_file_index == Some(span.file_index);
+    if !is_self_import && !is_public && !indexes.imports.is_used(span.file_index, import_id) {
+        let dot_path = segments
+            .iter()
+            .map(|&segment| context.slice(segment.span()))
+            .clone()
+            .join(".");
+        context.logs.push(Log {
+            level: LogLevel::Warning,
+            message: format!("`{dot_path}` import unused"),
             location: Some(context.location(span)),
             inner: vec![],
         });

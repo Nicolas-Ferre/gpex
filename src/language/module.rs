@@ -38,7 +38,10 @@ impl Module {
         let mut are_imports_finished = false;
         for item in &self.items {
             if let Item::Import(import) = item {
-                if import.validate(!are_imports_finished, context).is_err() {
+                if import
+                    .validate(!are_imports_finished, context, indexes)
+                    .is_err()
+                {
                     is_module_invalid = true;
                 }
             } else {

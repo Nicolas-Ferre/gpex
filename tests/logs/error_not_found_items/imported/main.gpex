@@ -1,4 +1,6 @@
 import ~.private_import;
 
+pub const IMPORTED_VALUE = IMPORTED_VALUE; // to avoid unnecessary warnings
+
 var _private_variable = 0;
 const _PRIVATE_CONSTANT = 0;
