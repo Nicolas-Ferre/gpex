@@ -1,5 +1,7 @@
 import imported.main;
 
+const _USAGE = IMPORTED_VALUE; // to avoid unnecessary warnings
+
 const _VALUE = NOT_FOUND;
 const _ITSELF = _ITSELF;
 const _AFTER = _AFTER_VALUE;

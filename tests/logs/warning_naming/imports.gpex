@@ -1,1 +1,3 @@
-import InvalidCase.InvalidCase;
+pub import InvalidCase.InvalidCase;
+
+const _USAGE = IMPORTED_VALUE; // to avoid unnecessary warnings

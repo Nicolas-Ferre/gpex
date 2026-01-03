@@ -1,2 +1,4 @@
+pub const IMPORTED_VALUE = 0; // to avoid unnecessary warnings
+
 pub var _public_variable = 0;
 pub const _PUBLIC_CONSTANT = 0;
