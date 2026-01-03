@@ -14,11 +14,7 @@ pub(crate) fn check_found(
     if is_found {
         Ok(())
     } else {
-        let dot_path = segments
-            .iter()
-            .map(|&segment| context.slice(segment.span()))
-            .clone()
-            .join(".");
+        let dot_path = dot_path_from_segments(segments, context);
         let fs_path = ImportSegment::fs_path(segments, context, context.root_path);
         let first_segment = segments[0];
         let last_segment = segments[segments.len() - 1];
@@ -87,11 +83,7 @@ pub(crate) fn check_usage(
 ) {
     let is_self_import = imported_file_index == Some(span.file_index);
     if !is_self_import && !is_public && !indexes.imports.is_used(span.file_index, import_id) {
-        let dot_path = segments
-            .iter()
-            .map(|&segment| context.slice(segment.span()))
-            .clone()
-            .join(".");
+        let dot_path = dot_path_from_segments(segments, context);
         context.logs.push(Log {
             level: LogLevel::Warning,
             message: format!("`{dot_path}` import unused"),
@@ -99,4 +91,11 @@ pub(crate) fn check_usage(
             inner: vec![],
         });
     }
+}
+
+fn dot_path_from_segments(segments: &[ImportSegment], context: &ValidateContext<'_>) -> String {
+    segments
+        .iter()
+        .map(|&segment| context.slice(segment.span()))
+        .join(".")
 }
