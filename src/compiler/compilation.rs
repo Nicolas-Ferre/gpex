@@ -29,9 +29,9 @@ pub(crate) fn parse(root_path: &Path, files: &[ReadFile]) -> Result<Vec<Module>,
     }
 }
 
-pub(crate) fn index(modules: &[Module], file_count: usize) -> Indexes<'_> {
+pub(crate) fn index(modules: &[Module]) -> Indexes<'_> {
     let mut indexes = Indexes::new(modules.len());
-    for file_index in 0..file_count {
+    for file_index in 0..modules.len() {
         indexes
             .imports
             .register(None, file_index, PRELUDE_FILE_INDEX, false);
