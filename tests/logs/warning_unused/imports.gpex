@@ -2,5 +2,6 @@ import imports;
 import imported.unused;
 pub import imported.unused; // public items shouldn't be considered as unused
 
+import imported.used1; // this import will trigger an unused warning because it is duplicated
 import imported.used1; // test that indirect imports don't trigger unused warnings
 const _USED_VALUE = IMPORTED_VALUE;

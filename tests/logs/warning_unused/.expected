@@ -1,4 +1,5 @@
 warning: `UNUSED` item unused (at tests/logs/warning_unused/constants.gpex:1:7)
 warning: module importing itself (at tests/logs/warning_unused/imports.gpex:1:1)
 warning: `imported.unused` import unused (at tests/logs/warning_unused/imports.gpex:2:1)
+warning: `imported.used1` import unused (at tests/logs/warning_unused/imports.gpex:5:1)
 warning: `unused` item unused (at tests/logs/warning_unused/variables.gpex:1:5)
