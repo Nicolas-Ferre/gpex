@@ -1,7 +1,7 @@
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
-use crate::utils::indexing::NodeRef;
+use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -73,6 +73,9 @@ pub(crate) fn check_usage(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
+    if item.is_public() {
+        return;
+    }
     let name_span = item.name_span();
     let name = context.slice(name_span);
     let ref_span = indexes.item_first_refs.get(&item.id());

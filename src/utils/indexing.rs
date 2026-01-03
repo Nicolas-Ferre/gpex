@@ -16,13 +16,13 @@ impl ImportIndex {
 
     pub(crate) fn register(
         &mut self,
-        import_item_id: u64,
+        import_item_id: Option<u64>,
         file_index: usize,
         imported_file_index: usize,
         is_import_public: bool,
     ) {
         self.imports[file_index].push(ImportItem {
-            source_import_id: Some(import_item_id),
+            source_import_id: import_item_id,
             file_index: imported_file_index,
             is_public: is_import_public,
             is_used: false,
