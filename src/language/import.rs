@@ -78,7 +78,7 @@ impl Import {
             let is_public = self.pub_keyword_span.is_some();
             indexes
                 .imports
-                .register(self.id, self.span.file_index, file_index, is_public);
+                .register(Some(self.id), self.span.file_index, file_index, is_public);
         }
     }
 

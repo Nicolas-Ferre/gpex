@@ -2,6 +2,7 @@ pub(crate) mod compilation;
 pub(crate) mod constants;
 pub(crate) mod dependencies;
 pub(crate) mod indexes;
+pub(crate) mod prelude;
 pub(crate) mod transpilation;
 
 use crate::compiler::transpilation::Program;
@@ -21,9 +22,10 @@ pub fn compile(
     root_path: &Path,
     is_warning_treated_as_error: bool,
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
-    let files = reading::read(root_path, root_path, EXTENSION)?;
+    let mut files = vec![prelude::file()];
+    files.extend(reading::read(root_path, root_path, EXTENSION)?);
     let modules = compilation::parse(root_path, &files)?;
-    let mut indexes = compilation::index(&modules);
+    let mut indexes = compilation::index(&modules, files.len());
     let errors = compilation::validate(
         root_path,
         &files,

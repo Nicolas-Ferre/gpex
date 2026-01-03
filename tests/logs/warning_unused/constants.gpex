@@ -1,1 +1,2 @@
 const UNUSED = 0;
+pub const PUBLIC_ITEM = 0; // public items shouldn't be considered as unused

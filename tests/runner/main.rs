@@ -22,6 +22,11 @@ async fn run_with_expressions() -> Result<(), Error> {
     compile_and_run(Path::new("tests/runner/expressions"), true).await
 }
 
+#[tokio::test]
+async fn run_with_prelude() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/prelude"), true).await
+}
+
 async fn compile_and_run(path: &Path, is_warning_treated_as_error: bool) -> Result<(), Error> {
     let (program, _) = gpex::compile(path, is_warning_treated_as_error).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;

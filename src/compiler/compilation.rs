@@ -1,4 +1,5 @@
 use crate::compiler::indexes::Indexes;
+use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::module::Module;
 use crate::utils::logs::{Log, LogLevel};
 use crate::utils::parsing::ParseContext;
@@ -28,8 +29,13 @@ pub(crate) fn parse(root_path: &Path, files: &[ReadFile]) -> Result<Vec<Module>,
     }
 }
 
-pub(crate) fn index(modules: &[Module]) -> Indexes<'_> {
+pub(crate) fn index(modules: &[Module], file_count: usize) -> Indexes<'_> {
     let mut indexes = Indexes::new(modules.len());
+    for file_index in 0..file_count {
+        indexes
+            .imports
+            .register(None, file_index, PRELUDE_FILE_INDEX, false);
+    }
     for module in modules {
         module.index_items(&mut indexes);
     }

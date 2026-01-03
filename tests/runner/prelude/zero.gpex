@@ -1,0 +1,1 @@
+var _zero = ZERO; // expected: 0
