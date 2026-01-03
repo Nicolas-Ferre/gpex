@@ -37,6 +37,10 @@ impl<'config> ValidateContext<'config> {
             code: file.content.clone(),
         }
     }
+
+    pub(crate) fn dot_path(&self, file_index: usize) -> &str {
+        &self.files[file_index].dot_path
+    }
 }
 
 #[derive(Debug)]

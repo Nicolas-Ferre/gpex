@@ -1,6 +1,6 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
-use crate::utils::indexing::NodeRef;
+use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -14,11 +14,32 @@ pub(crate) fn check_found(
     if indexes.sources.contains_key(&node.id()) {
         Ok(())
     } else {
+        let slice = context.slice(span);
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{}` value not found", context.slice(span)),
+            message: format!("`{slice}` value not found"),
             location: Some(context.location(span)),
-            inner: vec![],
+            inner: if let Some(private_source) = indexes.private_sources.get(&node.id()) {
+                vec![LogInner {
+                    level: LogLevel::Info,
+                    message: "value not qualified with `pub`".into(),
+                    location: Some(context.location(private_source.name_span())),
+                }]
+            } else {
+                indexes
+                    .items
+                    .iter_by_key(slice)
+                    .filter(ItemNodeRef::is_public)
+                    .map(|item| LogInner {
+                        level: LogLevel::Info,
+                        message: format!(
+                            "value can be imported from `{}`",
+                            context.dot_path(item.file_index())
+                        ),
+                        location: Some(context.location(item.name_span())),
+                    })
+                    .collect()
+            },
         });
         Err(ValidateError)
     }
