@@ -44,12 +44,16 @@ impl Identifier {
     }
 
     pub(crate) fn index(&self, indexes: &mut Indexes<'_>) {
-        if let Some(source) = indexes.items.search(&self.slice, self, &indexes.imports) {
+        let imports = &indexes.imports;
+        if let Some(source) = indexes.items.search(&self.slice, self, imports, false) {
             indexes.sources.insert(self.id, source);
             indexes
                 .item_first_refs
                 .entry(source.id())
                 .or_insert_with(|| self.span);
+        }
+        if let Some(source) = indexes.items.search(&self.slice, self, imports, true) {
+            indexes.private_sources.insert(self.id, source);
         }
     }
 

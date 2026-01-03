@@ -88,24 +88,34 @@ impl<Item: ItemNodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE
 }
 
 impl<Item: ItemNodeRef> NodeIndex<Item, false> {
+    pub(crate) fn iter_by_key(&self, key: &str) -> impl Iterator<Item = Item> {
+        self.items
+            .iter()
+            .filter_map(|items| items.get(key))
+            .flatten()
+            .copied()
+    }
+
     pub(crate) fn search(
         &self,
         key: &str,
         location: impl NodeRef,
         imports: &ImportIndex,
+        is_visibility_ignored: bool,
     ) -> Option<Item> {
         imports.imports[location.file_index()]
             .iter()
             .filter_map(|import| self.items[import.file_index].get(key))
             .flatten()
             .rev()
-            .find(|&&item| Self::is_item_visible(item, location))
+            .find(|&&item| Self::is_item_visible(item, location, is_visibility_ignored))
             .copied()
     }
 
-    fn is_item_visible(item: Item, location: impl NodeRef) -> bool {
+    fn is_item_visible(item: Item, location: impl NodeRef, is_visibility_ignored: bool) -> bool {
         let is_same_file = location.file_index() == item.file_index();
-        ((is_same_file && item.id() < location.id()) || (!is_same_file && item.is_public()))
+        let is_item_public = is_visibility_ignored || item.is_public();
+        ((is_same_file && item.id() < location.id()) || (!is_same_file && is_item_public))
             && item.scope() != location.scope()
     }
 }

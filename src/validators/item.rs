@@ -49,7 +49,7 @@ pub(crate) fn check_unique_definition(
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let name = context.slice(name_span);
-    if let Some(duplicated_item) = indexes.items.search(name, item, &indexes.imports)
+    if let Some(duplicated_item) = indexes.items.search(name, item, &indexes.imports, false)
         && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
