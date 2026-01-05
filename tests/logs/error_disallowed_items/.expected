@@ -1,2 +1,4 @@
 error: `import` statement not at the top of the module (at tests/logs/error_disallowed_items/imports.gpex:3:1)
   --> info: `import` statements should appear before anything else
+error: forbidden item (at tests/logs/error_disallowed_items/struct_compilerimpl.gpex:1:8)
+  --> info: `compilerimpl` items can only be defined in prelude

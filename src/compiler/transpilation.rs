@@ -10,12 +10,13 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub(crate) const MAIN_BUFFER_NAME: &str = "b";
-const I32_SIZE_BYTES: u32 = 4;
 
 /// A compiled `GPEx` program.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct Program {
+    /// For each type index, the dot path of the type.
+    pub type_paths: Vec<String>,
     /// The buffer storing all global variables.
     pub buffer: Buffer,
     /// The shader used to initialize all global variables.
@@ -36,6 +37,8 @@ pub struct Buffer {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct BufferField {
+    /// The dot path of the field type.
+    pub type_path: String,
     /// The size of the field in bytes.
     pub size: u32,
     /// The offset in bytes of the field inside its buffer.
@@ -54,7 +57,8 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
             let dot_path = &files[variable.name_span.file_index].dot_path;
             let path = format!("{}:{}", dot_path, variable.name);
             let field = BufferField {
-                size: I32_SIZE_BYTES,
+                type_path: variable.type_(indexes).dot_path(),
+                size: variable.type_(indexes).size(),
                 offset,
             };
             offset += field.size;
@@ -62,6 +66,7 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
         })
         .collect::<HashMap<_, _>>();
     Program {
+        type_paths: indexes.types.iter().map(|type_| type_.dot_path()).collect(),
         buffer: Buffer {
             size: offset,
             fields,
@@ -74,7 +79,7 @@ fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>
     *shader += "struct Buffer { ";
     for module in modules {
         for variable in module.global_variables() {
-            variable.transpile_buffer_field(shader);
+            variable.transpile_buffer_field(shader, indexes);
         }
     }
     *shader += "} @group(0) @binding(0) var<storage, read_write> ";

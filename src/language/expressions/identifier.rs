@@ -2,6 +2,7 @@ use crate::compiler::constants::Constant;
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
+use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
@@ -90,10 +91,19 @@ impl Identifier {
         Ok(())
     }
 
-    pub(crate) fn constant(&self, indexes: &Indexes<'_>) -> Option<Constant> {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
+        match indexes.sources[&self.id] {
+            ItemRef::Variable(node) => node.type_(indexes),
+            ItemRef::Constant(node) => node.type_(indexes),
+            ItemRef::Struct(_) => StructDefinition::type_(indexes),
+        }
+    }
+
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
         match indexes.sources[&self.id] {
             ItemRef::Variable(_) => None, // no-coverage (unused for now)
             ItemRef::Constant(node) => Some(node.constant(indexes)),
+            ItemRef::Struct(node) => Some(Constant::TypeRef(node)),
         }
     }
 
@@ -101,6 +111,7 @@ impl Identifier {
         match indexes.sources[&self.id] {
             ItemRef::Variable(node) => node.transpile_ref(shader),
             ItemRef::Constant(node) => node.transpile_ref(shader, indexes),
+            ItemRef::Struct(node) => node.transpile_ref(shader),
         }
     }
 }

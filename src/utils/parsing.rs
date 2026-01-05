@@ -15,6 +15,7 @@ pub(crate) struct ParseContext<'config> {
     offset: usize,
     scope: Vec<u64>,
     next_id: u64,
+    next_type_index: u32,
     comment_prefix: &'config str,
 }
 
@@ -35,6 +36,7 @@ impl<'config> ParseContext<'config> {
         file_index: usize,
         files: &'config [ReadFile],
         next_id: u64,
+        next_type_index: u32,
         comment_prefix: &'config str,
     ) -> Self {
         Self {
@@ -45,6 +47,7 @@ impl<'config> ParseContext<'config> {
             offset: 0,
             scope: vec![],
             next_id,
+            next_type_index,
             comment_prefix,
         }
     }
@@ -65,6 +68,12 @@ impl<'config> ParseContext<'config> {
         let id = self.next_id;
         self.next_id += 1;
         id
+    }
+
+    pub(crate) fn next_type_index(&mut self) -> u32 {
+        let index = self.next_type_index;
+        self.next_type_index += 1;
+        index
     }
 
     pub(crate) fn parse_any<T>(

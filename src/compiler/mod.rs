@@ -25,12 +25,12 @@ pub fn compile(
     let mut files = vec![prelude::file()];
     files.extend(reading::read(root_path, root_path, EXTENSION)?);
     let modules = compilation::parse(root_path, &files)?;
-    let mut indexes = compilation::index(&modules);
+    let indexes = compilation::index(&modules);
     let errors = compilation::validate(
         root_path,
         &files,
         &modules,
-        &mut indexes,
+        &indexes,
         is_warning_treated_as_error,
     )?;
     let program = transpilation::transpile(&files, &modules, &indexes);

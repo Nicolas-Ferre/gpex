@@ -1,5 +1,6 @@
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::{Span, SpanProperties};
@@ -65,6 +66,27 @@ pub(crate) fn check_unique_definition(
         Err(ValidateError)
     } else {
         Ok(())
+    }
+}
+
+pub(crate) fn check_prelude_location(
+    item: ItemRef<'_>,
+    context: &mut ValidateContext<'_>,
+) -> Result<(), ValidateError> {
+    if item.file_index() == PRELUDE_FILE_INDEX {
+        Ok(())
+    } else {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            message: "forbidden item".into(),
+            location: Some(context.location(item.name_span())),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                message: "`compilerimpl` items can only be defined in prelude".into(),
+                location: None,
+            }],
+        });
+        Err(ValidateError)
     }
 }
 

@@ -1,6 +1,7 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::import::Import;
 use crate::language::items::const_::ConstantDefinition;
+use crate::language::items::struct_::StructDefinition;
 use crate::language::items::var::VariableDefinition;
 use crate::utils::parsing::{ParseContext, ParseError};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -33,7 +34,7 @@ impl Module {
         }
     }
 
-    pub(crate) fn validate(&self, context: &mut ValidateContext<'_>, indexes: &mut Indexes<'_>) {
+    pub(crate) fn validate(&self, context: &mut ValidateContext<'_>, indexes: &Indexes<'_>) {
         let mut is_module_invalid = false;
         let mut are_imports_finished = false;
         for item in &self.items {
@@ -72,6 +73,7 @@ pub(crate) enum Item {
     Import(Import),
     Variable(VariableDefinition),
     Constant(ConstantDefinition),
+    Struct(StructDefinition),
 }
 
 impl Item {
@@ -82,6 +84,7 @@ impl Item {
             |context| Import::parse(context).map(Self::Import),
             |context| VariableDefinition::parse(context).map(Self::Variable),
             |context| ConstantDefinition::parse(context).map(Self::Constant),
+            |context| StructDefinition::parse(context).map(Self::Struct),
         ])
     }
 
@@ -90,26 +93,28 @@ impl Item {
             Self::Import(item) => item.index(indexes),
             Self::Variable(item) => item.index_item(indexes),
             Self::Constant(item) => item.index_item(indexes),
+            Self::Struct(item) => item.index_item(indexes),
         }
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
         match self {
-            Self::Import(_) => (),
             Self::Variable(item) => item.index_refs(indexes),
             Self::Constant(item) => item.index_refs(indexes),
+            Self::Import(_) | Self::Struct(_) => (),
         }
     }
 
     pub(crate) fn validate(
         &self,
         context: &mut ValidateContext<'_>,
-        indexes: &mut Indexes<'_>,
+        indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
             Self::Import(_) => Ok(()), // validated during previous pass
             Self::Variable(item) => item.validate(context, indexes),
             Self::Constant(item) => item.validate(context, indexes),
+            Self::Struct(item) => item.validate(context),
         }
     }
 }

@@ -7,6 +7,10 @@ pub(crate) const KEYWORDS: &[&str] = &[
     VAR_KEYWORD.slice,
 ];
 
+pub(crate) const COMPILERIMPL_KEYWORD: Symbol = Symbol {
+    name: "`compilerimpl`",
+    slice: "compilerimpl",
+};
 pub(crate) const CONST_KEYWORD: Symbol = Symbol {
     name: "`const`",
     slice: "const",
@@ -18,6 +22,10 @@ pub(crate) const IMPORT_KEYWORD: Symbol = Symbol {
 pub(crate) const PUB_KEYWORD: Symbol = Symbol {
     name: "`pub`",
     slice: "pub",
+};
+pub(crate) const STRUCT_KEYWORD: Symbol = Symbol {
+    name: "`struct`",
+    slice: "struct",
 };
 pub(crate) const VAR_KEYWORD: Symbol = Symbol {
     name: "`var`",
@@ -39,4 +47,12 @@ pub(crate) const SEMICOLON_SYMBOL: Symbol = Symbol {
 pub(crate) const TILDE_SYMBOL: Symbol = Symbol {
     name: "`~`",
     slice: "~",
+};
+pub(crate) const OPEN_BRACE_SYMBOL: Symbol = Symbol {
+    name: "`{`",
+    slice: "{",
+};
+pub(crate) const CLOSE_BRACE_SYMBOL: Symbol = Symbol {
+    name: "`}`",
+    slice: "}",
 };

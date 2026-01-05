@@ -2,6 +2,7 @@ use crate::compiler::constants::Constant;
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::literals::I32Literal;
+use crate::language::items::struct_::StructDefinition;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use identifier::Identifier;
@@ -47,24 +48,31 @@ impl Expression {
         &self,
         constant_mark_span: Option<Span>,
         context: &mut ValidateContext<'_>,
-        indexes: &mut Indexes<'_>,
+        indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
-            Self::I32Literal(node) => node.validate(context, indexes),
+            Self::I32Literal(node) => node.validate(context),
             Self::Identifier(node) => node.validate(constant_mark_span, context, indexes),
         }
     }
 
-    pub(crate) fn constant(&self, indexes: &Indexes<'_>) -> Option<Constant> {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
         match self {
-            Self::I32Literal(node) => Some(node.constant(indexes).clone()),
+            Self::I32Literal(_) => I32Literal::type_(indexes),
+            Self::Identifier(node) => node.type_(indexes),
+        }
+    }
+
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+        match self {
+            Self::I32Literal(node) => Some(node.constant()),
             Self::Identifier(node) => node.constant(indexes),
         }
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         match self {
-            Self::I32Literal(node) => node.transpile(shader, indexes),
+            Self::I32Literal(node) => node.transpile(shader),
             Self::Identifier(node) => node.transpile(shader, indexes),
         }
     }

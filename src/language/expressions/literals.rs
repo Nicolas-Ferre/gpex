@@ -1,5 +1,8 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::prelude::PreludeEndLocation;
+use crate::language::items::ItemRef;
+use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::I32_LITERAL_PATTERN;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -7,9 +10,8 @@ use crate::validators;
 
 #[derive(Debug)]
 pub(crate) struct I32Literal {
-    id: u64,
     span: Span,
-    cleaned: String,
+    value: Option<i32>,
 }
 
 impl I32Literal {
@@ -18,27 +20,32 @@ impl I32Literal {
     ) -> Result<Self, ParseError<'context>> {
         let span = Span::parse_pattern(context, I32_LITERAL_PATTERN)?;
         Ok(Self {
-            id: context.next_id(),
-            cleaned: context.slice(span).replace('_', ""),
+            value: context.slice(span).replace('_', "").parse::<i32>().ok(),
             span,
         })
     }
 
-    pub(crate) fn validate(
-        &self,
-        context: &mut ValidateContext<'_>,
-        indexes: &mut Indexes<'_>,
-    ) -> Result<(), ValidateError> {
-        let value = validators::literal::check_i32_bounds(&self.cleaned, self.span, context)?;
-        indexes.constants.insert(self.id, Constant::I32(value));
+    pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
+        validators::literal::check_i32_bounds(self.value, self.span, context)?;
         Ok(())
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &'index Indexes<'_>) -> &'index Constant {
-        &indexes.constants[&self.id]
+    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
+        match indexes
+            .items
+            .search("i32", PreludeEndLocation, &indexes.imports, false)
+        {
+            Some(ItemRef::Struct(item)) => item,
+            Some(_) | None => unreachable!("missing `i32` type in prelude"),
+        }
     }
 
-    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        self.constant(indexes).transpile(shader);
+    #[expect(clippy::expect_used)] // validated during previous pass
+    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
+        Constant::I32(self.value.expect("internal error: invalid `i32` literal"))
+    }
+
+    pub(crate) fn transpile(&self, shader: &mut String) {
+        self.constant().transpile(shader);
     }
 }
