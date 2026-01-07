@@ -78,13 +78,9 @@ pub(crate) fn check_prelude_location(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: "forbidden item".into(),
+            message: "forbidden `compilerimpl` item outside prelude".into(),
             location: Some(context.location(item.name_span())),
-            inner: vec![LogInner {
-                level: LogLevel::Info,
-                message: "`compilerimpl` items can only be defined in prelude".into(),
-                location: None,
-            }],
+            inner: vec![],
         });
         Err(ValidateError)
     }

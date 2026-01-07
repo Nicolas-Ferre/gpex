@@ -1,7 +1,5 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
-use crate::compiler::prelude::PreludeEndLocation;
-use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::I32_LITERAL_PATTERN;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
@@ -31,13 +29,7 @@ impl I32Literal {
     }
 
     pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
-        match indexes
-            .items
-            .search("i32", PreludeEndLocation, &indexes.imports, false)
-        {
-            Some(ItemRef::Struct(item)) => item,
-            Some(_) | None => unreachable!("missing `i32` type in prelude"),
-        }
+        indexes.search_prelude_type("i32")
     }
 
     #[expect(clippy::expect_used)] // validated during previous pass

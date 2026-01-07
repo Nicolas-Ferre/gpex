@@ -11,25 +11,16 @@ const COMMENT_PREFIX: &str = "//";
 
 pub(crate) fn parse(root_path: &Path, files: &[ReadFile]) -> Result<Vec<Module>, Vec<Log>> {
     let mut next_id = 0;
-    let mut next_type_index = 0;
     let mut modules = vec![];
     let mut errors = vec![];
     for (file_index, file) in files.iter().enumerate() {
-        let mut context = ParseContext::new(
-            root_path,
-            file,
-            file_index,
-            files,
-            next_id,
-            next_type_index,
-            COMMENT_PREFIX,
-        );
+        let mut context =
+            ParseContext::new(root_path, file, file_index, files, next_id, COMMENT_PREFIX);
         match Module::parse(&mut context) {
             Ok(module) => modules.push(module),
             Err(error) => errors.push(error.to_error()),
         }
         next_id = context.next_id();
-        next_type_index = context.next_type_index();
     }
     if errors.is_empty() {
         Ok(modules)

@@ -15,8 +15,8 @@ pub(crate) const MAIN_BUFFER_NAME: &str = "b";
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct Program {
-    /// For each type index, the dot path of the type.
-    pub type_paths: Vec<String>,
+    /// For each type ID, the dot path of the type.
+    pub type_paths: HashMap<u64, String>,
     /// The buffer storing all global variables.
     pub buffer: Buffer,
     /// The shader used to initialize all global variables.
@@ -37,8 +37,8 @@ pub struct Buffer {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct BufferField {
-    /// The dot path of the field type.
-    pub type_path: String,
+    /// The field type ID.
+    pub type_id: u64,
     /// The size of the field in bytes.
     pub size: u32,
     /// The offset in bytes of the field inside its buffer.
@@ -49,26 +49,46 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
     let mut init_shader = String::with_capacity(100);
     transpile_init(&mut init_shader, modules, indexes);
     let mut offset = 0;
-    let fields = modules
+    let variables: Vec<_> = modules.iter().flat_map(Module::global_variables).collect();
+    let buffer_alignment = variables
         .iter()
-        .flat_map(Module::global_variables)
-        .sorted_unstable_by_key(|variable| variable.id)
-        .map(|variable| {
+        .map(|variable| variable.type_(indexes).alignment())
+        .max()
+        .unwrap_or(0);
+    let fields = variables
+        .iter()
+        .enumerate()
+        .sorted_unstable_by_key(|(_, variable)| variable.id)
+        .map(|(index, variable)| {
             let dot_path = &files[variable.name_span.file_index].dot_path;
             let path = format!("{}:{}", dot_path, variable.name);
+            let type_ = variable.type_(indexes);
             let field = BufferField {
-                type_path: variable.type_(indexes).dot_path(),
-                size: variable.type_(indexes).size(),
+                type_id: type_.id,
+                size: type_.size(),
                 offset,
             };
-            offset += field.size;
+            offset = if let Some(next_variable) = variables.get(index + 1) {
+                round_up(
+                    next_variable.type_(indexes).alignment(),
+                    offset + type_.size(),
+                )
+            } else {
+                offset + type_.size()
+            };
             (path, field)
         })
         .collect::<HashMap<_, _>>();
     Program {
-        type_paths: indexes.types.iter().map(|type_| type_.dot_path()).collect(),
+        type_paths: indexes
+            .types
+            .iter()
+            .copied()
+            .chain(variables.iter().map(|variables| variables.type_(indexes)))
+            .map(|type_| (type_.id, type_.dot_path()))
+            .collect(),
         buffer: Buffer {
-            size: offset,
+            size: round_up(buffer_alignment, offset),
             fields,
         },
         init_shader,
@@ -111,4 +131,12 @@ fn sorted_global_variables<'items>(
     }
     petgraph::algo::toposort(&dependency_graph, None)
         .expect("internal error: found circular dependencies")
+}
+
+fn round_up(rounded_to: u32, value: u32) -> u32 {
+    if rounded_to == 0 {
+        0
+    } else {
+        value.div_ceil(rounded_to) * rounded_to
+    }
 }

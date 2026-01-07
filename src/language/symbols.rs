@@ -1,9 +1,11 @@
 use crate::utils::parsing::Symbol;
 
 pub(crate) const KEYWORDS: &[&str] = &[
+    COMPILERIMPL_KEYWORD.slice,
     CONST_KEYWORD.slice,
     IMPORT_KEYWORD.slice,
     PUB_KEYWORD.slice,
+    STRUCT_KEYWORD.slice,
     VAR_KEYWORD.slice,
 ];
 

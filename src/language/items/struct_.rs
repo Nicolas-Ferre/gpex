@@ -1,11 +1,12 @@
 use crate::compiler::indexes::Indexes;
-use crate::compiler::prelude::{PRELUDE_FILE_INDEX, PreludeEndLocation};
+use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{
     CLOSE_BRACE_SYMBOL, COMPILERIMPL_KEYWORD, EQUAL_SYMBOL, OPEN_BRACE_SYMBOL, PUB_KEYWORD,
     STRUCT_KEYWORD,
 };
+use crate::utils::endianness;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -23,7 +24,6 @@ pub(crate) struct StructDefinition {
     pub(crate) name_span: Span,
     #[derive_where(skip)]
     name: String,
-    type_index: u32,
 }
 
 impl StructDefinition {
@@ -44,15 +44,16 @@ impl StructDefinition {
                 pub_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),
-                type_index: context.next_type_index(),
             })
         })
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
         indexes.items.register(&self.name, ItemRef::Struct(self));
-        debug_assert_eq!(indexes.types.len(), self.type_index as usize);
-        indexes.types.push(self);
+    }
+
+    pub(crate) fn index_ref<'index>(&'index self, indexes: &mut Indexes<'index>) {
+        indexes.types.insert(self);
     }
 
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
@@ -61,33 +62,35 @@ impl StructDefinition {
     }
 
     pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index Self {
-        match indexes
-            .items
-            .search("typeref", PreludeEndLocation, &indexes.imports, false)
-        {
-            Some(ItemRef::Struct(item)) => item,
-            Some(_) | None => unreachable!("missing `typeref` type in prelude"),
-        }
+        indexes.search_prelude_type("typeref")
     }
 
     pub(crate) fn dot_path(&self) -> String {
         self.name.clone()
     }
 
-    #[expect(clippy::unused_self)] // will be used in the future
     pub(crate) fn size(&self) -> u32 {
-        4
+        if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "typeref" {
+            8
+        } else {
+            4
+        }
+    }
+
+    pub(crate) fn alignment(&self) -> u32 {
+        self.size()
     }
 
     pub(crate) fn transpile_name(&self) -> String {
         if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "typeref" {
-            "u32".into()
+            "vec2<u32>".into()
         } else {
             "i32".into()
         }
     }
 
     pub(crate) fn transpile_ref(&self, shader: &mut String) {
-        _ = write!(shader, "u32({})", self.type_index);
+        let [id_part1, id_part2] = endianness::to_portable_u32x2(self.id);
+        _ = write!(shader, "vec2<u32>({id_part1}, {id_part2})");
     }
 }
