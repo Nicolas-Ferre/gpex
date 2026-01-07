@@ -1,6 +1,7 @@
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
+use crate::language::items::struct_::StructDefinition;
 use crate::language::items::var::VariableDefinition;
 use crate::language::module::Module;
 use crate::utils::reading::ReadFile;
@@ -49,15 +50,14 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
     let mut init_shader = String::with_capacity(100);
     transpile_init(&mut init_shader, modules, indexes);
     let mut offset = 0;
-    let variables: Vec<_> = modules.iter().flat_map(Module::global_variables).collect();
-    let buffer_alignment = variables
+    let variables: Vec<_> = modules
         .iter()
-        .map(|variable| variable.type_(indexes).alignment())
-        .max()
-        .unwrap_or(0);
+        .flat_map(Module::global_variables)
+        .sorted_unstable_by_key(|variable| variable.id)
+        .collect();
+    let buffer_alignment = main_buffer_alignment(indexes, &variables);
     let fields = variables
         .iter()
-        .sorted_unstable_by_key(|variable| variable.id)
         .enumerate()
         .map(|(index, variable)| {
             let dot_path = &files[variable.name_span.file_index].dot_path;
@@ -68,31 +68,61 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
                 size: type_.size(),
                 offset,
             };
-            offset = if let Some(next_variable) = variables.get(index + 1) {
-                round_up(
-                    next_variable.type_(indexes).alignment(),
-                    offset + type_.size(),
-                )
-            } else {
-                offset + type_.size()
-            };
+            offset = main_buffer_next_field_offset(indexes, &variables, index, offset, type_);
             (path, field)
         })
         .collect::<HashMap<_, _>>();
     Program {
-        type_paths: indexes
-            .types
-            .iter()
-            .copied()
-            .chain(variables.iter().map(|variables| variables.type_(indexes)))
-            .map(|type_| (type_.id, type_.dot_path()))
-            .collect(),
+        type_paths: type_paths(indexes, &variables),
         buffer: Buffer {
             size: round_up(buffer_alignment, offset),
             fields,
         },
         init_shader,
     }
+}
+
+fn main_buffer_next_field_offset(
+    indexes: &Indexes<'_>,
+    fields: &[&VariableDefinition],
+    current_field_index: usize,
+    current_field_offset: u32,
+    current_field_type: &StructDefinition,
+) -> u32 {
+    if let Some(next_variable) = fields.get(current_field_index + 1) {
+        round_up(
+            next_variable.type_(indexes).alignment(),
+            current_field_offset + current_field_type.size(),
+        )
+    } else {
+        current_field_offset + current_field_type.size()
+    }
+}
+
+fn main_buffer_alignment(indexes: &Indexes<'_>, variables: &Vec<&VariableDefinition>) -> u32 {
+    variables
+        .iter()
+        .map(|variable| variable.type_(indexes).alignment())
+        .max()
+        .unwrap_or(0)
+}
+
+fn round_up(rounded_to: u32, value: u32) -> u32 {
+    if rounded_to == 0 {
+        0
+    } else {
+        value.div_ceil(rounded_to) * rounded_to
+    }
+}
+
+fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashMap<u64, String> {
+    indexes
+        .types
+        .iter()
+        .copied()
+        .chain(variables.iter().map(|variables| variables.type_(indexes)))
+        .map(|type_| (type_.id, type_.dot_path()))
+        .collect()
 }
 
 fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
@@ -131,12 +161,4 @@ fn sorted_global_variables<'items>(
     }
     petgraph::algo::toposort(&dependency_graph, None)
         .expect("internal error: found circular dependencies")
-}
-
-fn round_up(rounded_to: u32, value: u32) -> u32 {
-    if rounded_to == 0 {
-        0
-    } else {
-        value.div_ceil(rounded_to) * rounded_to
-    }
 }
