@@ -57,8 +57,8 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
         .unwrap_or(0);
     let fields = variables
         .iter()
+        .sorted_unstable_by_key(|variable| variable.id)
         .enumerate()
-        .sorted_unstable_by_key(|(_, variable)| variable.id)
         .map(|(index, variable)| {
             let dot_path = &files[variable.name_span.file_index].dot_path;
             let path = format!("{}:{}", dot_path, variable.name);

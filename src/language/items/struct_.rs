@@ -12,6 +12,9 @@ use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 use std::fmt::Write;
 
+const TYPEREF_SIZE: u32 = 8;
+const I32_SIZE: u32 = 4;
+
 #[derive(Debug)]
 #[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct StructDefinition {
@@ -71,9 +74,9 @@ impl StructDefinition {
 
     pub(crate) fn size(&self) -> u32 {
         if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "typeref" {
-            8
+            TYPEREF_SIZE
         } else {
-            4
+            I32_SIZE
         }
     }
 

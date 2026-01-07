@@ -8,6 +8,11 @@ use std::path::{Path, PathBuf};
 use std::{fs, io};
 
 #[tokio::test]
+async fn run_with_empty_program() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/empty"), true).await
+}
+
+#[tokio::test]
 async fn run_with_syntax_specificities() -> Result<(), Error> {
     compile_and_run(Path::new("tests/runner/syntax"), true).await
 }
