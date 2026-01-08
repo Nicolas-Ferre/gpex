@@ -33,9 +33,10 @@ impl I32Literal {
         indexes.search_prelude_type("i32")
     }
 
-    #[expect(clippy::expect_used)] // validated during previous pass
     pub(crate) fn constant<'index>(&self) -> Constant<'index> {
-        Constant::I32(self.value.expect("internal error: invalid `i32` literal"))
+        Constant::I32(self.value.unwrap_or_else(|| {
+            unreachable!("`i32` literal should be validated during previous pass")
+        }))
     }
 
     pub(crate) fn transpile(&self, shader: &mut String) {
@@ -73,9 +74,10 @@ impl U32Literal {
         indexes.search_prelude_type("u32")
     }
 
-    #[expect(clippy::expect_used)] // validated during previous pass
     pub(crate) fn constant<'index>(&self) -> Constant<'index> {
-        Constant::U32(self.value.expect("internal error: invalid `u32` literal"))
+        Constant::U32(self.value.unwrap_or_else(|| {
+            unreachable!("`u32` literal should be validated during previous pass")
+        }))
     }
 
     pub(crate) fn transpile(&self, shader: &mut String) {
@@ -114,9 +116,10 @@ impl F32Literal {
         indexes.search_prelude_type("f32")
     }
 
-    #[expect(clippy::expect_used)] // validated during previous pass
     pub(crate) fn constant<'index>(&self) -> Constant<'index> {
-        Constant::F32(self.value.expect("internal error: invalid `f32` literal"))
+        Constant::F32(self.value.unwrap_or_else(|| {
+            unreachable!("`f32` literal should be validated during previous pass")
+        }))
     }
 
     pub(crate) fn transpile(&self, shader: &mut String) {

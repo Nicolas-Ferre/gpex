@@ -88,11 +88,10 @@ impl ConstantDefinition {
         self.value.type_(indexes)
     }
 
-    #[expect(clippy::expect_used)] // validated during previous pass
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
         self.value
             .constant(indexes)
-            .expect("internal error: invalid constant value")
+            .unwrap_or_else(|| unreachable!("constant should be validated during previous pass"))
     }
 
     pub(crate) fn transpile_ref(&self, shader: &mut String, indexes: &Indexes<'_>) {

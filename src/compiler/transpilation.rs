@@ -142,17 +142,16 @@ fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>
     *shader += "}";
 }
 
-#[expect(clippy::expect_used)] // circular dependencies checked during validation phase
-fn sorted_global_variables<'items>(
-    modules: &'items [Module],
-    indexes: &Indexes<'items>,
-) -> Vec<&'items VariableDefinition> {
+fn sorted_global_variables<'item>(
+    modules: &'item [Module],
+    indexes: &Indexes<'item>,
+) -> Vec<&'item VariableDefinition> {
     let mut dependency_graph = DiGraphMap::<&VariableDefinition, ()>::new();
     for variable in modules.iter().flat_map(Module::global_variables) {
         dependency_graph.add_node(variable);
         let dependencies = variable
             .dependencies(Dependencies::new(ItemRef::Variable(variable)), indexes)
-            .expect("internal error: found circular dependencies");
+            .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"));
         for dependency in dependencies.into_iter() {
             if let ItemRef::Variable(dependency) = dependency {
                 dependency_graph.add_edge(dependency, variable, ());
@@ -160,5 +159,5 @@ fn sorted_global_variables<'items>(
         }
     }
     petgraph::algo::toposort(&dependency_graph, None)
-        .expect("internal error: found circular dependencies")
+        .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"))
 }
