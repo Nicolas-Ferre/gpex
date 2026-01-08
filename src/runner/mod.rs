@@ -3,7 +3,7 @@ mod utils;
 
 use crate::compiler::transpilation::Program;
 use crate::runner::resources::ComputeShader;
-use crate::utils::endianness;
+use crate::utils::{endianness, formatting};
 use crate::{Log, LogLevel};
 use std::fmt::{Display, Formatter};
 use std::fs;
@@ -132,14 +132,7 @@ impl Display for GpuValue {
             Self::TypeRef(path) => write!(f, "{path}"),
             Self::I32(value) => write!(f, "{value}"),
             Self::U32(value) => write!(f, "{value}u"),
-            Self::F32(value) => {
-                let string_value = format!("{value}");
-                if string_value.contains('.') {
-                    write!(f, "{string_value}")
-                } else {
-                    write!(f, "{string_value}.0")
-                }
-            }
+            Self::F32(value) => write!(f, "{}", formatting::f32_to_string(*value)),
         }
     }
 }

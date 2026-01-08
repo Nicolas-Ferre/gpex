@@ -1,4 +1,5 @@
 use crate::language::items::struct_::StructDefinition;
+use crate::utils::formatting;
 use std::fmt::Write;
 
 #[derive(Debug, Clone)]
@@ -15,14 +16,7 @@ impl Constant<'_> {
             Self::TypeRef(value) => value.transpile_ref(shader),
             Self::I32(value) => _ = write!(shader, "i32({value})"),
             Self::U32(value) => _ = write!(shader, "u32({value})"),
-            Self::F32(value) => {
-                let string_value = format!("{value}");
-                if string_value.contains('.') {
-                    _ = write!(shader, "f32({string_value})");
-                } else {
-                    _ = write!(shader, "f32({string_value}.0)");
-                }
-            }
+            Self::F32(value) => _ = write!(shader, "f32({})", formatting::f32_to_string(*value)),
         }
     }
 }

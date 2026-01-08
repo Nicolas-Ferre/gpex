@@ -63,7 +63,7 @@ pub(crate) const U32_LITERAL_PATTERN: Pattern = Pattern {
 };
 
 pub(crate) const F32_LITERAL_PATTERN: Pattern = Pattern {
-    name: "f32` literal",
+    name: "`f32` literal",
     excluded_tokens: &[],
     parts: &[
         PatternPart {
