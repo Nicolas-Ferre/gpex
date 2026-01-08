@@ -16,8 +16,8 @@ Here are the code conventions applied in this repository:
           `is_connected_user`).
         - Avoid including a negation in the name (e.g. avoid `is_not_active`,
           `is_disconnected`, ...).
-    - `unreachable` should be preferred to `unwrap()` and `expect()` for errors that should never
-      occur in practice. If the error can occur, then a clean error should be returned to the user
-      instead of panicking.
+    - `unreachable!()` should be preferred to `unwrap()` and `expect()` for conditions that should
+      never occur in practice. If an error can occur, then a clean error should be returned to the
+      user instead of panicking.
     - `use` statements should be placed after `mod` statements.
     - Favor `_ = value;` over `let _ = value;`.
