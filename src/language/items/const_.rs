@@ -3,6 +3,7 @@ use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
+use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{CONST_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
@@ -43,8 +44,8 @@ impl ConstantDefinition {
                 scope: context.scope().to_vec(),
                 pub_keyword_span,
                 const_keyword_span,
-                name: context.slice(name_span).into(),
                 name_span,
+                name: context.slice(name_span).into(),
                 value,
             })
         })
@@ -69,7 +70,7 @@ impl ConstantDefinition {
     pub(crate) fn validate(
         &self,
         context: &mut ValidateContext<'_>,
-        indexes: &mut Indexes<'_>,
+        indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Constant(self);
         let dependencies = self.dependencies(Dependencies::new(ref_), indexes);
@@ -83,8 +84,12 @@ impl ConstantDefinition {
         Ok(())
     }
 
-    #[expect(clippy::expect_used)] // validated before
-    pub(crate) fn constant(&self, indexes: &Indexes<'_>) -> Constant {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
+        self.value.type_(indexes)
+    }
+
+    #[expect(clippy::expect_used)] // validated during previous pass
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
         self.value
             .constant(indexes)
             .expect("internal error: invalid constant value")

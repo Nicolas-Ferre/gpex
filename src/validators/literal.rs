@@ -3,12 +3,12 @@ use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogLevel};
 
 pub(crate) fn check_i32_bounds(
-    value: &str,
+    value: Option<i32>,
     span: Span,
     context: &mut ValidateContext<'_>,
-) -> Result<i32, ValidateError> {
-    if let Ok(value) = value.parse::<i32>() {
-        Ok(value)
+) -> Result<(), ValidateError> {
+    if value.is_some() {
+        Ok(())
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,

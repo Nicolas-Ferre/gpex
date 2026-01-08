@@ -52,7 +52,10 @@ pub(crate) fn check_constant(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    if matches!(indexes.sources[&node.id()], ItemRef::Constant(_)) {
+    if matches!(
+        indexes.sources[&node.id()],
+        ItemRef::Constant(_) | ItemRef::Struct(_)
+    ) {
         Ok(())
     } else {
         context.logs.push(Log {

@@ -1,1 +1,19 @@
-pub const ZERO = 0;
+/// A reference to a type.
+///
+/// # Examples
+///
+/// ```gpex
+/// const Integer = i32; // a type alias of type `typeref`
+/// ```
+pub struct typeref = compilerimpl {}
+
+/// A 32-bit signed integer.
+///
+/// # Examples
+///
+/// ```gpex
+/// var zero = 0;
+/// var positive = 123;
+/// var negative = -123;
+/// ```
+pub struct i32 = compilerimpl {}

@@ -2,6 +2,7 @@ use crate::compiler::constants::Constant;
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
+use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
@@ -45,16 +46,19 @@ impl Identifier {
 
     pub(crate) fn index(&self, indexes: &mut Indexes<'_>) {
         let imports = &mut indexes.imports;
+        if let Some(source) = indexes.items.search(&self.slice, self, imports, true) {
+            indexes.private_sources.insert(self.id, source);
+        }
         if let Some(source) = indexes.items.search(&self.slice, self, imports, false) {
+            imports.mark_as_used(self.file_index(), source.file_index());
             indexes.sources.insert(self.id, source);
             indexes
                 .item_first_refs
                 .entry(source.id())
                 .or_insert_with(|| self.span);
-            imports.mark_as_used(self.file_index(), source.file_index());
-        }
-        if let Some(source) = indexes.items.search(&self.slice, self, imports, true) {
-            indexes.private_sources.insert(self.id, source);
+            if let ItemRef::Struct(struct_) = source {
+                struct_.index_ref(indexes);
+            }
         }
     }
 
@@ -90,10 +94,19 @@ impl Identifier {
         Ok(())
     }
 
-    pub(crate) fn constant(&self, indexes: &Indexes<'_>) -> Option<Constant> {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
+        match indexes.sources[&self.id] {
+            ItemRef::Variable(node) => node.type_(indexes),
+            ItemRef::Constant(node) => node.type_(indexes),
+            ItemRef::Struct(_) => StructDefinition::type_(indexes),
+        }
+    }
+
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
         match indexes.sources[&self.id] {
             ItemRef::Variable(_) => None, // no-coverage (unused for now)
             ItemRef::Constant(node) => Some(node.constant(indexes)),
+            ItemRef::Struct(node) => Some(Constant::TypeRef(node)),
         }
     }
 
@@ -101,6 +114,7 @@ impl Identifier {
         match indexes.sources[&self.id] {
             ItemRef::Variable(node) => node.transpile_ref(shader),
             ItemRef::Constant(node) => node.transpile_ref(shader, indexes),
+            ItemRef::Struct(node) => node.transpile_ref(shader),
         }
     }
 }

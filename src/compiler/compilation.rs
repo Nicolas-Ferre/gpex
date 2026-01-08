@@ -50,7 +50,7 @@ pub(crate) fn validate(
     root_path: &Path,
     files: &[ReadFile],
     modules: &[Module],
-    indexes: &mut Indexes<'_>,
+    indexes: &Indexes<'_>,
     is_warning_treated_as_error: bool,
 ) -> Result<Vec<Log>, Vec<Log>> {
     let mut context = ValidateContext::new(files, root_path);

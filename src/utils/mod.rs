@@ -1,3 +1,4 @@
+pub(crate) mod endianness;
 pub(crate) mod indexing;
 pub(crate) mod logs;
 pub(crate) mod parsing;

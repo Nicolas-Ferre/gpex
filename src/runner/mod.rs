@@ -3,6 +3,7 @@ mod utils;
 
 use crate::compiler::transpilation::Program;
 use crate::runner::resources::ComputeShader;
+use crate::utils::endianness;
 use crate::{Log, LogLevel};
 use std::fmt::{Display, Formatter};
 use std::fs;
@@ -78,9 +79,15 @@ impl Runner {
                 field.offset.into(),
                 field.size.into(),
             );
-            Some(GpuValue::I32(i32::from_ne_bytes([
-                buffer[0], buffer[1], buffer[2], buffer[3],
-            ])))
+            Some(match self.program.type_paths[&field.type_id].as_str() {
+                "i32" => GpuValue::I32(i32::from_ne_bytes([
+                    buffer[0], buffer[1], buffer[2], buffer[3],
+                ])),
+                "typeref" => GpuValue::TypeRef(
+                    self.program.type_paths[&endianness::from_portable_u32x2(&buffer)].clone(),
+                ),
+                _ => unreachable!("unrecognized GPU type"),
+            })
         } else {
             None
         }
@@ -103,6 +110,8 @@ impl Runner {
 #[derive(Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum GpuValue {
+    /// A `typeref` value as dot path.
+    TypeRef(String),
     /// An `i32` value.
     I32(i32),
 }
@@ -110,6 +119,7 @@ pub enum GpuValue {
 impl Display for GpuValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::TypeRef(path) => Display::fmt(path, f),
             Self::I32(value) => Display::fmt(value, f),
         }
     }

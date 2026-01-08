@@ -3,6 +3,7 @@ use crate::compiler::indexes::Indexes;
 use crate::compiler::transpilation::MAIN_BUFFER_NAME;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
+use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL, VAR_KEYWORD};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
@@ -40,9 +41,9 @@ impl VariableDefinition {
             Ok(Self {
                 id,
                 scope: context.scope().to_vec(),
-                name: context.slice(name_span).into(),
                 pub_keyword_span,
                 name_span,
+                name: context.slice(name_span).into(),
                 default_value,
             })
         })
@@ -67,7 +68,7 @@ impl VariableDefinition {
     pub(crate) fn validate(
         &self,
         context: &mut ValidateContext<'_>,
-        indexes: &mut Indexes<'_>,
+        indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Variable(self);
         let dependencies = self.dependencies(Dependencies::new(ref_), indexes);
@@ -80,8 +81,13 @@ impl VariableDefinition {
         Ok(())
     }
 
-    pub(crate) fn transpile_buffer_field(&self, shader: &mut String) {
-        _ = write!(shader, "v{}: i32, ", self.id);
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
+        self.default_value.type_(indexes)
+    }
+
+    pub(crate) fn transpile_buffer_field(&self, shader: &mut String, indexes: &Indexes<'_>) {
+        let type_ = self.type_(indexes);
+        _ = write!(shader, "v{}: {}, ", self.id, type_.transpile_name());
     }
 
     pub(crate) fn transpile_buffer_init(&self, shader: &mut String, indexes: &Indexes<'_>) {

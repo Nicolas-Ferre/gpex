@@ -1,16 +1,17 @@
+use crate::language::items::struct_::StructDefinition;
 use std::fmt::Write;
 
 #[derive(Debug, Clone)]
-pub(crate) enum Constant {
+pub(crate) enum Constant<'items> {
+    TypeRef(&'items StructDefinition),
     I32(i32),
 }
 
-impl Constant {
+impl Constant<'_> {
     pub(crate) fn transpile(&self, shader: &mut String) {
         match self {
-            Self::I32(value) => {
-                _ = write!(shader, "i32({value})");
-            }
+            Self::TypeRef(value) => value.transpile_ref(shader),
+            Self::I32(value) => _ = write!(shader, "i32({value})"),
         }
     }
 }
