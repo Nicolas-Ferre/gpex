@@ -83,6 +83,9 @@ impl Runner {
                 "i32" => GpuValue::I32(i32::from_ne_bytes([
                     buffer[0], buffer[1], buffer[2], buffer[3],
                 ])),
+                "u32" => GpuValue::U32(u32::from_ne_bytes([
+                    buffer[0], buffer[1], buffer[2], buffer[3],
+                ])),
                 "typeref" => GpuValue::TypeRef(
                     self.program.type_paths[&endianness::from_portable_u32x2(&buffer)].clone(),
                 ),
@@ -114,13 +117,16 @@ pub enum GpuValue {
     TypeRef(String),
     /// An `i32` value.
     I32(i32),
+    /// An `u32` value.
+    U32(u32),
 }
 
 impl Display for GpuValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::TypeRef(path) => Display::fmt(path, f),
-            Self::I32(value) => Display::fmt(value, f),
+            Self::TypeRef(path) => write!(f, "{path}"),
+            Self::I32(value) => write!(f, "{value}"),
+            Self::U32(value) => write!(f, "{value}u"),
         }
     }
 }

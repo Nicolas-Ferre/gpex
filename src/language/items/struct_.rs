@@ -14,6 +14,7 @@ use std::fmt::Write;
 
 const TYPEREF_SIZE: u32 = 8;
 const I32_SIZE: u32 = 4;
+const U32_SIZE: u32 = 4;
 
 #[derive(Debug)]
 #[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -75,6 +76,8 @@ impl StructDefinition {
     pub(crate) fn size(&self) -> u32 {
         if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "typeref" {
             TYPEREF_SIZE
+        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "u32" {
+            U32_SIZE
         } else {
             I32_SIZE
         }
@@ -87,6 +90,8 @@ impl StructDefinition {
     pub(crate) fn transpile_name(&self) -> String {
         if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "typeref" {
             "vec2<u32>".into()
+        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "u32" {
+            "u32".into()
         } else {
             "i32".into()
         }

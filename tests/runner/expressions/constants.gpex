@@ -6,6 +6,10 @@ const I32_LITERAL_MAX = 2_147_483_647;
 var _i32_literal_max = I32_LITERAL_MAX; // expected: 2147483647
 const I32_LITERAL_ZERO = 0;
 var _i32_literal_zero = I32_LITERAL_ZERO; // expected: 0
+const U32_LITERAL_MAX = 4_294_967_295u;
+var _u32_literal_max = U32_LITERAL_MAX; // expected: 4294967295u
+const U32_LITERAL_ZERO = 0u;
+var _u32_literal_zero = U32_LITERAL_ZERO; // expected: 0u
 const TYPEREF_NATIVE = i32;
 var _typeref_native = TYPEREF_NATIVE; // expected: i32
 

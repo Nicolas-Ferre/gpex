@@ -19,3 +19,21 @@ pub(crate) fn check_i32_bounds(
         Err(ValidateError)
     }
 }
+
+pub(crate) fn check_u32_bounds(
+    value: Option<u32>,
+    span: Span,
+    context: &mut ValidateContext<'_>,
+) -> Result<(), ValidateError> {
+    if value.is_some() {
+        Ok(())
+    } else {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            message: "`u32` literal out of bounds".into(),
+            location: Some(context.location(span)),
+            inner: vec![],
+        });
+        Err(ValidateError)
+    }
+}
