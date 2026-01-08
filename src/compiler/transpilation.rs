@@ -99,7 +99,7 @@ fn main_buffer_next_field_offset(
     }
 }
 
-fn main_buffer_alignment(indexes: &Indexes<'_>, variables: &Vec<&VariableDefinition>) -> u32 {
+fn main_buffer_alignment(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> u32 {
     variables
         .iter()
         .map(|variable| variable.type_(indexes).alignment())
@@ -120,7 +120,7 @@ fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashM
         .types
         .iter()
         .copied()
-        .chain(variables.iter().map(|variables| variables.type_(indexes)))
+        .chain(variables.iter().map(|variable| variable.type_(indexes)))
         .map(|type_| (type_.id, type_.dot_path()))
         .collect()
 }
