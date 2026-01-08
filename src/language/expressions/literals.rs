@@ -1,7 +1,7 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::patterns::{I32_LITERAL_PATTERN, U32_LITERAL_PATTERN};
+use crate::language::patterns::{F32_LITERAL_PATTERN, I32_LITERAL_PATTERN, U32_LITERAL_PATTERN};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -24,7 +24,7 @@ impl I32Literal {
     }
 
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
-        validators::literal::check_i32_bounds(self.value, self.span, context)?;
+        validators::literal::check_bounds(self.value.is_some(), self.span, "i32", context)?;
         Ok(())
     }
 
@@ -53,10 +53,10 @@ impl U32Literal {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         let span = Span::parse_pattern(context, U32_LITERAL_PATTERN)?;
-        let slice = context.slice(span);
         Ok(Self {
-            value: slice[..slice.len() - 1]
-                .replace('_', "")
+            value: context
+                .slice(span)
+                .replace(['_', 'u'], "")
                 .parse::<u32>()
                 .ok(),
             span,
@@ -64,7 +64,7 @@ impl U32Literal {
     }
 
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
-        validators::literal::check_u32_bounds(self.value, self.span, context)?;
+        validators::literal::check_bounds(self.value.is_some(), self.span, "u32", context)?;
         Ok(())
     }
 
@@ -75,6 +75,47 @@ impl U32Literal {
     #[expect(clippy::expect_used)] // validated during previous pass
     pub(crate) fn constant<'index>(&self) -> Constant<'index> {
         Constant::U32(self.value.expect("internal error: invalid `u32` literal"))
+    }
+
+    pub(crate) fn transpile(&self, shader: &mut String) {
+        self.constant().transpile(shader);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct F32Literal {
+    span: Span,
+    value: Option<f32>,
+}
+
+impl F32Literal {
+    pub(crate) fn parse<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Self, ParseError<'context>> {
+        let span = Span::parse_pattern(context, F32_LITERAL_PATTERN)?;
+        Ok(Self {
+            value: context
+                .slice(span)
+                .replace('_', "")
+                .parse::<f32>()
+                .ok()
+                .filter(|value| value.is_finite()),
+            span,
+        })
+    }
+
+    pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
+        validators::literal::check_bounds(self.value.is_some(), self.span, "f32", context)?;
+        Ok(())
+    }
+
+    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
+        indexes.search_prelude_type("f32")
+    }
+
+    #[expect(clippy::expect_used)] // validated during previous pass
+    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
+        Constant::F32(self.value.expect("internal error: invalid `f32` literal"))
     }
 
     pub(crate) fn transpile(&self, shader: &mut String) {

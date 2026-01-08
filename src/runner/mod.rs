@@ -86,6 +86,9 @@ impl Runner {
                 "u32" => GpuValue::U32(u32::from_ne_bytes([
                     buffer[0], buffer[1], buffer[2], buffer[3],
                 ])),
+                "f32" => GpuValue::F32(f32::from_ne_bytes([
+                    buffer[0], buffer[1], buffer[2], buffer[3],
+                ])),
                 "typeref" => GpuValue::TypeRef(
                     self.program.type_paths[&endianness::from_portable_u32x2(&buffer)].clone(),
                 ),
@@ -110,7 +113,7 @@ impl Runner {
 }
 
 /// A value retrieved from GPU.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 #[non_exhaustive]
 pub enum GpuValue {
     /// A `typeref` value as dot path.
@@ -119,6 +122,8 @@ pub enum GpuValue {
     I32(i32),
     /// An `u32` value.
     U32(u32),
+    /// An `f32` value.
+    F32(f32),
 }
 
 impl Display for GpuValue {
@@ -127,6 +132,14 @@ impl Display for GpuValue {
             Self::TypeRef(path) => write!(f, "{path}"),
             Self::I32(value) => write!(f, "{value}"),
             Self::U32(value) => write!(f, "{value}u"),
+            Self::F32(value) => {
+                let string_value = format!("{value}");
+                if string_value.contains('.') {
+                    write!(f, "{string_value}")
+                } else {
+                    write!(f, "{string_value}.0")
+                }
+            }
         }
     }
 }
