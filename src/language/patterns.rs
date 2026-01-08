@@ -61,3 +61,40 @@ pub(crate) const U32_LITERAL_PATTERN: Pattern = Pattern {
         },
     ],
 };
+
+pub(crate) const F32_LITERAL_PATTERN: Pattern = Pattern {
+    name: "`f32` literal",
+    excluded_tokens: &[],
+    parts: &[
+        PatternPart {
+            is_valid_char: |char| char == '-',
+            min_count: 0,
+            max_count: 1,
+        },
+        PatternPart {
+            is_valid_char: |char| char.is_ascii_digit(),
+            min_count: 1,
+            max_count: 1,
+        },
+        PatternPart {
+            is_valid_char: |char| char.is_ascii_digit() || char == '_',
+            min_count: 0,
+            max_count: usize::MAX,
+        },
+        PatternPart {
+            is_valid_char: |char| char == '.',
+            min_count: 1,
+            max_count: 1,
+        },
+        PatternPart {
+            is_valid_char: |char| char.is_ascii_digit(),
+            min_count: 1,
+            max_count: 1,
+        },
+        PatternPart {
+            is_valid_char: |char| char.is_ascii_digit() || char == '_',
+            min_count: 0,
+            max_count: usize::MAX,
+        },
+    ],
+};

@@ -27,3 +27,14 @@ pub struct i32 = compilerimpl {}
 /// var positive = 123u;
 /// ```
 pub struct u32 = compilerimpl {}
+
+/// A 32-bit floating-point number.
+///
+/// # Examples
+///
+/// ```gpex
+/// var zero = 0.0;
+/// var positive = 123.456;
+/// var negative = -123.456;
+/// ```
+pub struct f32 = compilerimpl {}

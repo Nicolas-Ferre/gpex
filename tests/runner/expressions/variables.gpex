@@ -6,6 +6,10 @@ var _i32_literal_max = 2_147_483_647; // expected: 2147483647
 var _i32_literal_zero = 0; // expected: 0
 var _u32_literal_max = 4_294_967_295u; // expected: 4294967295u
 var _u32_literal_zero = 0u; // expected: 0u
+var _f32_literal_min = -340_282_347_000_000_000_000_000_000_000_000_000_000.0; // expected: -340282350000000000000000000000000000000.0
+var _f32_literal_max = 340_282_347_000_000_000_000_000_000_000_000_000_000.0; // expected: 340282350000000000000000000000000000000.0
+var _f32_literal_zero = 0.0; // expected: 0.0
+var _f32_very_small = 0.00000000000000000000001; // expected: 0.00000000000000000000001
 var _typeref_native = i32; // expected: i32
 
 var _identifier_constant = CONSTANT; // expected: 123
