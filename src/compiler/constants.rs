@@ -3,8 +3,8 @@ use crate::utils::formatting;
 use std::fmt::Write;
 
 #[derive(Debug, Clone)]
-pub(crate) enum Constant<'items> {
-    TypeRef(&'items StructDefinition),
+pub(crate) enum Constant<'item> {
+    TypeRef(&'item StructDefinition),
     I32(i32),
     U32(u32),
     F32(f32),

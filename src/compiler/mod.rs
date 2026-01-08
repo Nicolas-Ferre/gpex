@@ -43,8 +43,8 @@ pub fn compile(
 ///
 /// An error is returned in case the compiled program cannot be saved at the specified path.
 pub fn save_compiled(program: &Program, path: &Path) -> Result<(), Vec<Log>> {
-    #[expect(clippy::unwrap_used)] // JSON serialization of the program never fails
-    let serialized = serde_json::to_string(&program).unwrap();
+    let serialized = serde_json::to_string(&program)
+        .unwrap_or_else(|_| unreachable!("JSON serialization of the program should never fail"));
     fs::write(path, serialized)
         .map_err(|error| vec![Log::from_io_error(error, path, "cannot write")])
 }

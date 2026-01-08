@@ -56,10 +56,9 @@ fn read_entry(
 }
 
 fn dot_path(path: &Path, root_path: &Path) -> String {
-    #[expect(clippy::unwrap_used)] // path is always obtained from root_path
     path.with_extension("")
         .strip_prefix(root_path)
-        .unwrap()
+        .unwrap_or_else(|_| unreachable!("path should always be obtained from root path"))
         .components()
         .map(|component| component.as_os_str().to_string_lossy())
         .join(".")

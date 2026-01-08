@@ -144,10 +144,12 @@ pub(crate) struct ParseError<'config> {
 }
 
 impl ParseError<'_> {
-    #[expect(clippy::unwrap_used)] // tests ensure this never occurs
     pub(crate) fn merge(errors: &[Self]) -> Self {
-        debug_assert!(!errors.is_empty());
-        let max_offset = errors.iter().map(|error| error.offset).max().unwrap();
+        let max_offset = errors
+            .iter()
+            .map(|error| error.offset)
+            .max()
+            .unwrap_or_else(|| unreachable!("cannot merge empty array of errors"));
         Self {
             file: errors[0].file,
             offset: max_offset,

@@ -148,13 +148,12 @@ pub(crate) fn read_buffer(
     let submission_index = queue.submit(Some(encoder.finish()));
     let slice = read_buffer.slice(..);
     slice.map_async(MapMode::Read, |_| ());
-    #[expect(clippy::expect_used)] // should never happen
     device
         .poll(PollType::Wait {
             submission_index: Some(submission_index),
             timeout: None,
         })
-        .expect("internal error: cannot read buffer");
+        .unwrap_or_else(|_| unreachable!("GPU poll should never fail"));
     let view = slice.get_mapped_range();
     let content = view.to_vec();
     drop(view);

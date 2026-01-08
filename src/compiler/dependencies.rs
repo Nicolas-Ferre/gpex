@@ -3,14 +3,14 @@ use crate::utils::parsing::Span;
 use std::collections::HashSet;
 use std::mem;
 
-pub(crate) struct Dependencies<'items> {
-    item: ItemRef<'items>,
-    registered: HashSet<ItemRef<'items>>,
+pub(crate) struct Dependencies<'item> {
+    item: ItemRef<'item>,
+    registered: HashSet<ItemRef<'item>>,
     stack: Vec<Span>,
 }
 
-impl<'items> Dependencies<'items> {
-    pub(crate) fn new(item: ItemRef<'items>) -> Self {
+impl<'item> Dependencies<'item> {
+    pub(crate) fn new(item: ItemRef<'item>) -> Self {
         Self {
             item,
             registered: HashSet::default(),
@@ -21,7 +21,7 @@ impl<'items> Dependencies<'items> {
     pub(crate) fn register(
         mut self,
         span: Span,
-        dependency: ItemRef<'items>,
+        dependency: ItemRef<'item>,
     ) -> Result<Self, Vec<Span>> {
         self.stack.push(span);
         if dependency == self.item {
@@ -32,7 +32,7 @@ impl<'items> Dependencies<'items> {
         }
     }
 
-    pub(crate) fn into_iter(self) -> impl Iterator<Item = ItemRef<'items>> {
+    pub(crate) fn into_iter(self) -> impl Iterator<Item = ItemRef<'item>> {
         self.registered.into_iter()
     }
 }
