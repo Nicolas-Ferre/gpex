@@ -79,7 +79,9 @@ impl StructDefinition {
             TYPEREF_SIZE
         } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "f32" {
             F32_SIZE
-        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "u32" {
+        } else if self.name_span.file_index == PRELUDE_FILE_INDEX
+            && (self.name == "u32" || self.name == "bool")
+        {
             U32_SIZE
         } else {
             I32_SIZE
@@ -95,7 +97,9 @@ impl StructDefinition {
             "vec2<u32>".into()
         } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "f32" {
             "f32".into()
-        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "u32" {
+        } else if self.name_span.file_index == PRELUDE_FILE_INDEX
+            && (self.name == "u32" || self.name == "bool")
+        {
             "u32".into()
         } else {
             "i32".into()

@@ -2,3 +2,4 @@ var _typeref_typeref = typeref; // expected: typeref
 var _typeref_i32 = i32; // expected: i32
 var _typeref_u32 = u32; // expected: u32
 var _typeref_f32 = f32; // expected: f32
+var _typeref_bool = bool; // expected: bool

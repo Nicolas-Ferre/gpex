@@ -2,6 +2,7 @@ mod resources;
 mod utils;
 
 use crate::compiler::transpilation::Program;
+use crate::language::symbols::{FALSE_KEYWORD, TRUE_KEYWORD};
 use crate::runner::resources::ComputeShader;
 use crate::utils::{endianness, formatting};
 use crate::{Log, LogLevel};
@@ -89,6 +90,9 @@ impl Runner {
                 "f32" => GpuValue::F32(f32::from_ne_bytes([
                     buffer[0], buffer[1], buffer[2], buffer[3],
                 ])),
+                "bool" => GpuValue::Bool(
+                    u32::from_ne_bytes([buffer[0], buffer[1], buffer[2], buffer[3]]) != 0,
+                ),
                 "typeref" => GpuValue::TypeRef(
                     self.program.type_paths[&endianness::from_portable_u32x2(&buffer)].clone(),
                 ),
@@ -124,6 +128,8 @@ pub enum GpuValue {
     U32(u32),
     /// An `f32` value.
     F32(f32),
+    /// An `bool` value.
+    Bool(bool),
 }
 
 impl Display for GpuValue {
@@ -133,6 +139,15 @@ impl Display for GpuValue {
             Self::I32(value) => write!(f, "{value}"),
             Self::U32(value) => write!(f, "{value}u"),
             Self::F32(value) => write!(f, "{}", formatting::f32_to_string(*value)),
+            Self::Bool(value) => write!(
+                f,
+                "{}",
+                if *value {
+                    TRUE_KEYWORD.slice
+                } else {
+                    FALSE_KEYWORD.slice
+                }
+            ),
         }
     }
 }

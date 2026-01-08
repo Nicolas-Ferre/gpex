@@ -38,3 +38,13 @@ pub struct u32 = compilerimpl {}
 /// var negative = -123.456;
 /// ```
 pub struct f32 = compilerimpl {}
+
+/// A boolean value.
+///
+/// # Examples
+///
+/// ```gpex
+/// var true_value = true;
+/// var false_value = false;
+/// ```
+pub struct bool = compilerimpl {}
