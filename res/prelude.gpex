@@ -17,3 +17,13 @@ pub struct typeref = compilerimpl {}
 /// var negative = -123;
 /// ```
 pub struct i32 = compilerimpl {}
+
+/// A 32-bit unsigned integer.
+///
+/// # Examples
+///
+/// ```gpex
+/// var zero = 0u;
+/// var positive = 123u;
+/// ```
+pub struct u32 = compilerimpl {}
