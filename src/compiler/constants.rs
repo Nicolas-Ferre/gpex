@@ -8,6 +8,7 @@ pub(crate) enum Constant<'items> {
     I32(i32),
     U32(u32),
     F32(f32),
+    Bool(bool),
 }
 
 impl Constant<'_> {
@@ -17,6 +18,7 @@ impl Constant<'_> {
             Self::I32(value) => _ = write!(shader, "i32({value})"),
             Self::U32(value) => _ = write!(shader, "u32({value})"),
             Self::F32(value) => _ = write!(shader, "f32({})", formatting::f32_to_string(*value)),
+            Self::Bool(value) => _ = write!(shader, "u32({})", u32::from(*value)),
         }
     }
 }

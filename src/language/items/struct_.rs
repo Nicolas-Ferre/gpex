@@ -75,14 +75,12 @@ impl StructDefinition {
     }
 
     pub(crate) fn size(&self) -> u32 {
-        if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "typeref" {
-            TYPEREF_SIZE
-        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "f32" {
-            F32_SIZE
-        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "u32" {
-            U32_SIZE
-        } else {
-            I32_SIZE
+        match (self.name_span.file_index, self.name.as_str()) {
+            (PRELUDE_FILE_INDEX, "typeref") => TYPEREF_SIZE,
+            (PRELUDE_FILE_INDEX, "f32") => F32_SIZE,
+            (PRELUDE_FILE_INDEX, "i32") => I32_SIZE,
+            (PRELUDE_FILE_INDEX, "u32" | "bool") => U32_SIZE,
+            _ => unreachable!("not implemented GPU type"),
         }
     }
 
@@ -91,14 +89,12 @@ impl StructDefinition {
     }
 
     pub(crate) fn transpile_name(&self) -> String {
-        if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "typeref" {
-            "vec2<u32>".into()
-        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "f32" {
-            "f32".into()
-        } else if self.name_span.file_index == PRELUDE_FILE_INDEX && self.name == "u32" {
-            "u32".into()
-        } else {
-            "i32".into()
+        match (self.name_span.file_index, self.name.as_str()) {
+            (PRELUDE_FILE_INDEX, "typeref") => "vec2<u32>".into(),
+            (PRELUDE_FILE_INDEX, "f32") => "f32".into(),
+            (PRELUDE_FILE_INDEX, "i32") => "i32".into(),
+            (PRELUDE_FILE_INDEX, "u32" | "bool") => "u32".into(),
+            _ => unreachable!("not implemented GPU type"),
         }
     }
 

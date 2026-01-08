@@ -3,9 +3,11 @@ use crate::utils::parsing::Symbol;
 pub(crate) const KEYWORDS: &[&str] = &[
     COMPILERIMPL_KEYWORD.slice,
     CONST_KEYWORD.slice,
+    FALSE_KEYWORD.slice,
     IMPORT_KEYWORD.slice,
     PUB_KEYWORD.slice,
     STRUCT_KEYWORD.slice,
+    TRUE_KEYWORD.slice,
     VAR_KEYWORD.slice,
 ];
 
@@ -16,6 +18,10 @@ pub(crate) const COMPILERIMPL_KEYWORD: Symbol = Symbol {
 pub(crate) const CONST_KEYWORD: Symbol = Symbol {
     name: "`const`",
     slice: "const",
+};
+pub(crate) const FALSE_KEYWORD: Symbol = Symbol {
+    name: "`false`",
+    slice: "false",
 };
 pub(crate) const IMPORT_KEYWORD: Symbol = Symbol {
     name: "`import`",
@@ -28,6 +34,10 @@ pub(crate) const PUB_KEYWORD: Symbol = Symbol {
 pub(crate) const STRUCT_KEYWORD: Symbol = Symbol {
     name: "`struct`",
     slice: "struct",
+};
+pub(crate) const TRUE_KEYWORD: Symbol = Symbol {
+    name: "`true`",
+    slice: "true",
 };
 pub(crate) const VAR_KEYWORD: Symbol = Symbol {
     name: "`var`",

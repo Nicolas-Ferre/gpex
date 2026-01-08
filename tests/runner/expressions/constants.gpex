@@ -6,10 +6,12 @@ const I32_LITERAL_MAX = 2_147_483_647;
 var _i32_literal_max = I32_LITERAL_MAX; // expected: 2147483647
 const I32_LITERAL_ZERO = 0;
 var _i32_literal_zero = I32_LITERAL_ZERO; // expected: 0
+
 const U32_LITERAL_MAX = 4_294_967_295u;
 var _u32_literal_max = U32_LITERAL_MAX; // expected: 4294967295u
 const U32_LITERAL_ZERO = 0u;
 var _u32_literal_zero = U32_LITERAL_ZERO; // expected: 0u
+
 const F32_LITERAL_MIN = -340_282_347_000_000_000_000_000_000_000_000_000_000.0;
 var _f32_literal_min = F32_LITERAL_MIN; // expected: -340282350000000000000000000000000000000.0
 const F32_LITERAL_MAX = 340_282_347_000_000_000_000_000_000_000_000_000_000.0;
@@ -18,6 +20,12 @@ const F32_LITERAL_ZERO = 0.0;
 var _f32_literal_zero = F32_LITERAL_ZERO; // expected: 0.0
 const F32_VERY_SMALL = 0.00000000000000000000001;
 var _f32_very_small = F32_VERY_SMALL; // expected: 0.00000000000000000000001
+
+const BOOL_TRUE = true;
+var _bool_true = BOOL_TRUE; // expected: true
+const BOOL_FALSE = false;
+var _bool_false = BOOL_FALSE; // expected: false
+
 const TYPEREF_NATIVE = i32;
 var _typeref_native = TYPEREF_NATIVE; // expected: i32
 

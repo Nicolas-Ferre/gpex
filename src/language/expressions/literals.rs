@@ -2,6 +2,7 @@ use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::{F32_LITERAL_PATTERN, I32_LITERAL_PATTERN, U32_LITERAL_PATTERN};
+use crate::language::symbols::{FALSE_KEYWORD, TRUE_KEYWORD};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -116,6 +117,37 @@ impl F32Literal {
     #[expect(clippy::expect_used)] // validated during previous pass
     pub(crate) fn constant<'index>(&self) -> Constant<'index> {
         Constant::F32(self.value.expect("internal error: invalid `f32` literal"))
+    }
+
+    pub(crate) fn transpile(&self, shader: &mut String) {
+        self.constant().transpile(shader);
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct BoolLiteral {
+    value: bool,
+}
+
+impl BoolLiteral {
+    pub(crate) fn parse<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Self, ParseError<'context>> {
+        let span = context.parse_any(&[
+            |context| Span::parse_symbol(context, TRUE_KEYWORD),
+            |context| Span::parse_symbol(context, FALSE_KEYWORD),
+        ])?;
+        Ok(Self {
+            value: context.slice(span) == TRUE_KEYWORD.slice,
+        })
+    }
+
+    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
+        indexes.search_prelude_type("bool")
+    }
+
+    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
+        Constant::Bool(self.value)
     }
 
     pub(crate) fn transpile(&self, shader: &mut String) {
