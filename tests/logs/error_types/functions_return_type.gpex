@@ -1,5 +1,9 @@
 const VALUE = 0;
 
-fn literal_as_return_type() -> 0 {}
+fn literal_as_return_type() -> 0 {
+    return 0;
+}
 
-fn non_type_value_as_return_type() -> VALUE {}
+fn non_type_value_as_return_type() -> VALUE {
+    return 0;
+}

@@ -88,7 +88,7 @@ impl ItemRef<'_> {
             Self::Variable(node) => node.dependencies(dependencies, indexes),
             Self::Constant(node) => node.dependencies(dependencies, indexes),
             Self::Struct(_) => Ok(dependencies),
-            Self::Function(node) => node.dependencies(dependencies, indexes),
+            Self::Function(_) => unreachable!("functions cannot yet be called"),
         }
     }
 }

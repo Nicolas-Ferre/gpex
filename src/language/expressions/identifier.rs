@@ -83,12 +83,12 @@ impl Identifier {
             ItemRef::Variable(node) => node.type_(indexes),
             ItemRef::Constant(node) => node.type_(indexes),
             ItemRef::Struct(_) => Some(StructDefinition::type_(indexes)),
-            ItemRef::Function(node) => node.type_(indexes),
+            ItemRef::Function(_) => unreachable!("an identifier alone cannot be a function"),
         }
     }
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
-        match indexes.sources[&self.id] {
+        match indexes.sources.get(&self.id)? {
             ItemRef::Variable(_) | ItemRef::Function(_) => None, // no-coverage (unused for now)
             ItemRef::Constant(node) => node.constant(indexes),
             ItemRef::Struct(node) => Some(Constant::TypeRef(node)),

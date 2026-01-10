@@ -1,4 +1,3 @@
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
@@ -93,9 +92,9 @@ impl FunctionDefinition {
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Function(self);
         validators::item::check_unique_definition(ref_, context, indexes)?;
-        self.validate_return_type(context, indexes)?;
-        self.validate_statements(context, indexes)?;
-        Ok(())
+        let return_type_result = self.validate_return_type(context, indexes);
+        let statements_result = self.validate_statements(context, indexes);
+        return_type_result.or(statements_result)
     }
 
     fn validate_return_type(
@@ -147,17 +146,5 @@ impl FunctionDefinition {
             context,
         )?;
         Ok(())
-    }
-
-    pub(crate) fn dependencies<'index>(
-        &self,
-        dependencies: Dependencies<'index>,
-        indexes: &Indexes<'index>,
-    ) -> Result<Dependencies<'index>, Vec<Span>> {
-        let mut dependencies = self.return_type.dependencies(dependencies, indexes)?;
-        for statement in &self.statements {
-            dependencies = statement.dependencies(dependencies, indexes)?;
-        }
-        Ok(dependencies)
     }
 }

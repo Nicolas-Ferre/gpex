@@ -1,4 +1,3 @@
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::Expression;
 use crate::language::symbols::{RETURN_KEYWORD, SEMICOLON_SYMBOL};
@@ -35,13 +34,5 @@ impl ReturnStatement {
     ) -> Result<(), ValidateError> {
         self.value.validate(None, context, indexes)?;
         Ok(())
-    }
-
-    pub(crate) fn dependencies<'index>(
-        &self,
-        dependencies: Dependencies<'index>,
-        indexes: &Indexes<'index>,
-    ) -> Result<Dependencies<'index>, Vec<Span>> {
-        self.value.dependencies(dependencies, indexes)
     }
 }

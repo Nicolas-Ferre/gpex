@@ -1,3 +1,7 @@
-fn invalid_return_type() -> i32 {
+fn invalid_return_type_i32_u32() -> i32 {
     return 1u;
+}
+
+fn invalid_return_type_f32_bool() -> f32 {
+    return true;
 }
