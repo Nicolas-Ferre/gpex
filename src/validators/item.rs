@@ -49,13 +49,13 @@ pub(crate) fn check_unique_definition(
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
-    let name = context.slice(name_span);
-    if let Some(duplicated_item) = indexes.items.search(name, item, &indexes.imports, false)
+    let key = item.key();
+    if let Some(duplicated_item) = indexes.items.search(&key, item, &indexes.imports, false)
         && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{name}` item defined multiple times"),
+            message: format!("`{key}` item defined multiple times"),
             location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,

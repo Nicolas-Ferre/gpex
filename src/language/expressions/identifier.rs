@@ -13,7 +13,7 @@ use crate::validators;
 pub(crate) struct Identifier {
     id: u64,
     scope: Vec<u64>,
-    span: Span,
+    pub(crate) span: Span,
     slice: String,
 }
 
@@ -75,6 +75,26 @@ impl Identifier {
         }
     }
 
+    pub(crate) fn type_<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+    ) -> Option<&'index StructDefinition> {
+        match indexes.sources.get(&self.id)? {
+            ItemRef::Variable(node) => node.type_(indexes),
+            ItemRef::Constant(node) => node.type_(indexes),
+            ItemRef::Struct(_) => Some(StructDefinition::type_(indexes)),
+            ItemRef::Function(node) => node.type_(indexes),
+        }
+    }
+
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+        match indexes.sources[&self.id] {
+            ItemRef::Variable(_) | ItemRef::Function(_) => None, // no-coverage (unused for now)
+            ItemRef::Constant(node) => node.constant(indexes),
+            ItemRef::Struct(node) => Some(Constant::TypeRef(node)),
+        }
+    }
+
     pub(crate) fn validate(
         &self,
         constant_mark_span: Option<Span>,
@@ -94,27 +114,12 @@ impl Identifier {
         Ok(())
     }
 
-    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
-        match indexes.sources[&self.id] {
-            ItemRef::Variable(node) => node.type_(indexes),
-            ItemRef::Constant(node) => node.type_(indexes),
-            ItemRef::Struct(_) => StructDefinition::type_(indexes),
-        }
-    }
-
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
-        match indexes.sources[&self.id] {
-            ItemRef::Variable(_) => None, // no-coverage (unused for now)
-            ItemRef::Constant(node) => Some(node.constant(indexes)),
-            ItemRef::Struct(node) => Some(Constant::TypeRef(node)),
-        }
-    }
-
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         match indexes.sources[&self.id] {
             ItemRef::Variable(node) => node.transpile_ref(shader),
             ItemRef::Constant(node) => node.transpile_ref(shader, indexes),
             ItemRef::Struct(node) => node.transpile_ref(shader),
+            ItemRef::Function(_) => unreachable!("functions cannot yet be called"),
         }
     }
 }

@@ -1,2 +1,0 @@
-var variable_value = 1;
-const _INVALID_CONSTANT_EXPRESSION = variable_value;

@@ -1,0 +1,4 @@
+fn return_not_at_the_end() -> i32 {
+    return 0;
+    return 1;
+}

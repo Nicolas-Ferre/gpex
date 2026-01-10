@@ -1,0 +1,6 @@
+error: expression with invalid type `i32` (at tests/logs/error_types/functions_return_type.gpex:3:32)
+  --> info: expected `typeref` type
+error: expression with invalid type `i32` (at tests/logs/error_types/functions_return_type.gpex:5:39)
+  --> info: expected `typeref` type
+error: expression with invalid type `u32` (at tests/logs/error_types/statements_return.gpex:2:12)
+  --> info: expected `i32` type (at tests/logs/error_types/statements_return.gpex:1:29)

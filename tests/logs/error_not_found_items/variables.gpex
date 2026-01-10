@@ -1,3 +1,5 @@
+// test all cases of not found variables
+
 import imported.main;
 
 const _USAGE = IMPORTED_VALUE; // to avoid unnecessary warnings

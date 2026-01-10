@@ -23,7 +23,7 @@ pub(crate) struct ConstantDefinition {
     #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]
-    name: String,
+    pub(crate) name: String,
     #[derive_where(skip)]
     value: Expression,
 }
@@ -52,7 +52,7 @@ impl ConstantDefinition {
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
-        indexes.items.register(&self.name, ItemRef::Constant(self));
+        indexes.items.register(ItemRef::Constant(self));
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
@@ -65,6 +65,17 @@ impl ConstantDefinition {
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<'index>, Vec<Span>> {
         self.value.dependencies(dependencies, indexes)
+    }
+
+    pub(crate) fn type_<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+    ) -> Option<&'index StructDefinition> {
+        self.value.type_(indexes)
+    }
+
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+        self.value.constant(indexes)
     }
 
     pub(crate) fn validate(
@@ -84,17 +95,9 @@ impl ConstantDefinition {
         Ok(())
     }
 
-    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
-        self.value.type_(indexes)
-    }
-
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
-        self.value
-            .constant(indexes)
-            .unwrap_or_else(|| unreachable!("constant should be validated during previous pass"))
-    }
-
     pub(crate) fn transpile_ref(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        self.constant(indexes).transpile(shader);
+        self.constant(indexes)
+            .unwrap_or_else(|| unreachable!("constants should be validated before transpilation"))
+            .transpile(shader);
     }
 }

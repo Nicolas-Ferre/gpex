@@ -9,7 +9,7 @@ use crate::validators;
 
 #[derive(Debug)]
 pub(crate) struct I32Literal {
-    span: Span,
+    pub(crate) span: Span,
     value: Option<i32>,
 }
 
@@ -24,29 +24,29 @@ impl I32Literal {
         })
     }
 
+    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
+        indexes.search_prelude_type("i32")
+    }
+
+    pub(crate) fn constant<'index>(&self) -> Option<Constant<'index>> {
+        self.value.map(Constant::I32)
+    }
+
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
         validators::literal::check_bounds(self.value.is_some(), self.span, "i32", context)?;
         Ok(())
     }
 
-    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
-        indexes.search_prelude_type("i32")
-    }
-
-    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
-        Constant::I32(self.value.unwrap_or_else(|| {
-            unreachable!("`i32` literal should be validated during previous pass")
-        }))
-    }
-
     pub(crate) fn transpile(&self, shader: &mut String) {
-        self.constant().transpile(shader);
+        self.constant()
+            .unwrap_or_else(|| unreachable!("literals should be validated before transpilation"))
+            .transpile(shader);
     }
 }
 
 #[derive(Debug)]
 pub(crate) struct U32Literal {
-    span: Span,
+    pub(crate) span: Span,
     value: Option<u32>,
 }
 
@@ -65,29 +65,29 @@ impl U32Literal {
         })
     }
 
+    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
+        indexes.search_prelude_type("u32")
+    }
+
+    pub(crate) fn constant<'index>(&self) -> Option<Constant<'index>> {
+        self.value.map(Constant::U32)
+    }
+
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
         validators::literal::check_bounds(self.value.is_some(), self.span, "u32", context)?;
         Ok(())
     }
 
-    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
-        indexes.search_prelude_type("u32")
-    }
-
-    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
-        Constant::U32(self.value.unwrap_or_else(|| {
-            unreachable!("`u32` literal should be validated during previous pass")
-        }))
-    }
-
     pub(crate) fn transpile(&self, shader: &mut String) {
-        self.constant().transpile(shader);
+        self.constant()
+            .unwrap_or_else(|| unreachable!("literals should be validated before transpilation"))
+            .transpile(shader);
     }
 }
 
 #[derive(Debug)]
 pub(crate) struct F32Literal {
-    span: Span,
+    pub(crate) span: Span,
     value: Option<f32>,
 }
 
@@ -107,29 +107,30 @@ impl F32Literal {
         })
     }
 
+    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
+        indexes.search_prelude_type("f32")
+    }
+
+    pub(crate) fn constant<'index>(&self) -> Option<Constant<'index>> {
+        self.value.map(Constant::F32)
+    }
+
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
         validators::literal::check_bounds(self.value.is_some(), self.span, "f32", context)?;
         Ok(())
     }
 
-    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index StructDefinition {
-        indexes.search_prelude_type("f32")
-    }
-
-    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
-        Constant::F32(self.value.unwrap_or_else(|| {
-            unreachable!("`f32` literal should be validated during previous pass")
-        }))
-    }
-
     pub(crate) fn transpile(&self, shader: &mut String) {
-        self.constant().transpile(shader);
+        self.constant()
+            .unwrap_or_else(|| unreachable!("literals should be validated before transpilation"))
+            .transpile(shader);
     }
 }
 
 #[derive(Debug)]
 pub(crate) struct BoolLiteral {
-    value: bool,
+    pub(crate) span: Span,
+    pub(crate) value: bool,
 }
 
 impl BoolLiteral {
@@ -141,6 +142,7 @@ impl BoolLiteral {
             |context| Span::parse_symbol(context, FALSE_KEYWORD),
         ])?;
         Ok(Self {
+            span,
             value: context.slice(span) == TRUE_KEYWORD.slice,
         })
     }

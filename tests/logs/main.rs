@@ -41,6 +41,11 @@ fn compile_with_constant_errors() -> io::Result<()> {
 }
 
 #[test]
+fn compile_with_type_errors() -> io::Result<()> {
+    compile_and_check_logs(Path::new("tests/logs/error_types"))
+}
+
+#[test]
 fn compile_with_unused_warnings() -> io::Result<()> {
     compile_and_check_logs(Path::new("tests/logs/warning_unused"))
 }

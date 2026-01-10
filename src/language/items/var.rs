@@ -50,7 +50,7 @@ impl VariableDefinition {
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
-        indexes.items.register(&self.name, ItemRef::Variable(self));
+        indexes.items.register(ItemRef::Variable(self));
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
@@ -63,6 +63,13 @@ impl VariableDefinition {
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<'index>, Vec<Span>> {
         self.default_value.dependencies(dependencies, indexes)
+    }
+
+    pub(crate) fn type_<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+    ) -> Option<&'index StructDefinition> {
+        self.default_value.type_(indexes)
     }
 
     pub(crate) fn validate(
@@ -81,12 +88,10 @@ impl VariableDefinition {
         Ok(())
     }
 
-    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
-        self.default_value.type_(indexes)
-    }
-
     pub(crate) fn transpile_buffer_field(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        let type_ = self.type_(indexes);
+        let type_ = self
+            .type_(indexes)
+            .unwrap_or_else(|| unreachable!("variable type should be validated before"));
         _ = write!(shader, "v{}: {}, ", self.id, type_.transpile_name());
     }
 
