@@ -129,23 +129,17 @@ impl FunctionDefinition {
                 context,
             )?;
         }
-        validators::statements::check_missing_return(
-            self.statements.is_empty(),
+        let return_statement = validators::statements::check_missing_return(
+            &self.statements,
             self.body_end_span,
             self.return_type.span(),
             context,
         )?;
-        let last_statement = &self
-            .statements
-            .last()
-            .unwrap_or_else(|| unreachable!("`return` statement presence was tested just before"));
-        let returned_type = last_statement.value.type_(indexes);
-        let expected_type = self.type_(indexes);
         validators::expression::check_types(
-            last_statement.value.span(),
-            returned_type,
+            return_statement.value.span(),
+            return_statement.value.type_(indexes),
             Some(self.return_type.span()),
-            expected_type,
+            self.type_(indexes),
             context,
         )?;
         Ok(())

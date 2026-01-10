@@ -1,3 +1,4 @@
+use crate::language::statements::return_::ReturnStatement;
 use crate::utils::parsing::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -21,13 +22,15 @@ pub(crate) fn check_return(
     }
 }
 
-pub(crate) fn check_missing_return(
-    is_missing: bool,
+pub(crate) fn check_missing_return<'statement>(
+    statements: &'statement [ReturnStatement],
     block_end_span: Span,
     return_type_span: Span,
     context: &mut ValidateContext<'_>,
-) -> Result<(), ValidateError> {
-    if is_missing {
+) -> Result<&'statement ReturnStatement, ValidateError> {
+    if let Some(return_statement) = statements.last() {
+        Ok(return_statement)
+    } else {
         context.logs.push(Log {
             level: LogLevel::Error,
             message: "missing `return` statement".into(),
@@ -39,7 +42,5 @@ pub(crate) fn check_missing_return(
             }],
         });
         Err(ValidateError)
-    } else {
-        Ok(())
     }
 }
