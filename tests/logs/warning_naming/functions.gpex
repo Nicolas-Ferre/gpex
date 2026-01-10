@@ -1,0 +1,15 @@
+fn _NotSnakeCaseFunctionReturningValue() -> i32 {
+    return 0;
+}
+
+fn _NOT_SNAKE_CASE_OR_PASCAL_CASE_FUNCTION_RETURNING_TYPEREF() -> typeref {
+    return i32;
+}
+
+fn _invalidPascalCaseFunctionReturningTyperef() -> typeref {
+    return i32;
+}
+
+fn f() -> i32 {
+    return 0;
+}

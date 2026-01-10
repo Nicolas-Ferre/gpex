@@ -11,6 +11,7 @@ use crate::language::symbols::{
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
+use crate::validators::identifier::Case;
 
 #[derive(Debug)]
 #[derive_where::derive_where(PartialEq, Eq, Hash)]
@@ -92,12 +93,12 @@ impl FunctionDefinition {
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Function(self);
         validators::item::check_unique_definition(ref_, context, indexes)?;
-        let return_type_result = self.validate_return_type(context, indexes);
+        let signature_result = self.validate_signature(context, indexes);
         let statements_result = self.validate_statements(context, indexes);
-        return_type_result.and(statements_result)
+        signature_result.and(statements_result)
     }
 
-    fn validate_return_type(
+    fn validate_signature(
         &self,
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
@@ -112,6 +113,16 @@ impl FunctionDefinition {
             Some(typeref_type),
             context,
         )?;
+        validators::identifier::check_char_count(self.name_span, context);
+        let may_return_typeref = self
+            .type_(indexes)
+            .is_none_or(|type_| type_ == typeref_type);
+        let possible_cases: &[Case] = if may_return_typeref {
+            &[Case::Snake, Case::Pascal]
+        } else {
+            &[Case::Snake]
+        };
+        validators::identifier::check_case(self.name_span, possible_cases, context);
         Ok(())
     }
 

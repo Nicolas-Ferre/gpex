@@ -9,6 +9,7 @@ use crate::language::symbols::{EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL, VAR_
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
+use crate::validators::identifier::Case;
 use std::fmt::Write;
 
 #[derive(Debug)]
@@ -83,7 +84,7 @@ impl VariableDefinition {
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
         validators::identifier::check_char_count(self.name_span, context);
-        validators::identifier::check_snake_case(self.name_span, context);
+        validators::identifier::check_case(self.name_span, &[Case::Snake], context);
         self.default_value.validate(None, context, indexes)?;
         Ok(())
     }
