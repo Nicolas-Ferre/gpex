@@ -7,6 +7,7 @@ use crate::language::symbols::{
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
+use crate::validators::identifier::Case;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
@@ -103,7 +104,7 @@ impl Import {
         );
         for &segment in &self.segments {
             if let ImportSegment::Name(span) = segment {
-                validators::identifier::check_snake_case(span, context);
+                validators::identifier::check_case(span, &[Case::Snake], context);
             }
         }
         Ok(())

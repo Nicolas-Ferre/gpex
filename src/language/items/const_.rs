@@ -9,6 +9,7 @@ use crate::language::symbols::{CONST_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD, SEMICOL
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
+use crate::validators::identifier::Case;
 
 #[derive(Debug)]
 #[derive_where::derive_where(PartialEq, Eq, Hash)]
@@ -89,7 +90,7 @@ impl ConstantDefinition {
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
         validators::identifier::check_char_count(self.name_span, context);
-        validators::identifier::check_screaming_snake_case(self.name_span, context);
+        validators::identifier::check_case(self.name_span, &[Case::ScreamingSnake], context);
         self.value
             .validate(Some(self.const_keyword_span), context, indexes)?;
         Ok(())
