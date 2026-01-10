@@ -3,7 +3,7 @@ use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{
-    CLOSE_BRACE_SYMBOL, COMPILERIMPL_KEYWORD, EQUAL_SYMBOL, OPEN_BRACE_SYMBOL, PUB_KEYWORD,
+    BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, COMPILERIMPL_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD,
     STRUCT_KEYWORD,
 };
 use crate::utils::endianness;
@@ -28,7 +28,7 @@ pub(crate) struct StructDefinition {
     #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]
-    name: String,
+    pub(crate) name: String,
 }
 
 impl StructDefinition {
@@ -41,8 +41,8 @@ impl StructDefinition {
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
             Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
-            Span::parse_symbol(context, OPEN_BRACE_SYMBOL)?;
-            Span::parse_symbol(context, CLOSE_BRACE_SYMBOL)?;
+            Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
+            Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
                 id,
                 scope: context.scope().to_vec(),
@@ -54,20 +54,20 @@ impl StructDefinition {
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
-        indexes.items.register(&self.name, ItemRef::Struct(self));
+        indexes.items.register(ItemRef::Struct(self));
     }
 
     pub(crate) fn index_ref<'index>(&'index self, indexes: &mut Indexes<'index>) {
         indexes.types.insert(self);
     }
 
+    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index Self {
+        indexes.search_prelude_type("typeref")
+    }
+
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
         validators::item::check_prelude_location(ItemRef::Struct(self), context)?;
         Ok(())
-    }
-
-    pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index Self {
-        indexes.search_prelude_type("typeref")
     }
 
     pub(crate) fn dot_path(&self) -> String {

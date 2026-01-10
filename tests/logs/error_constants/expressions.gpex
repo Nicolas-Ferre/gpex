@@ -1,0 +1,5 @@
+// test all forms of non-constant expressions
+
+var variable_value = 1;
+
+const _VARIABLE = variable_value;

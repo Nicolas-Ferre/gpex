@@ -1,0 +1,9 @@
+// test non-constant expressions in all constant locations
+
+var not_constant_value = i32;
+
+const _CONSTANT = not_constant_value;
+
+fn _function_return_type() -> not_constant_value {
+    return 0;
+}

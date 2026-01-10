@@ -1,10 +1,12 @@
 pub(crate) mod const_;
+pub(crate) mod function;
 pub(crate) mod struct_;
 pub(crate) mod var;
 
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::items::const_::ConstantDefinition;
+use crate::language::items::function::FunctionDefinition;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::items::var::VariableDefinition;
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
@@ -15,6 +17,7 @@ pub(crate) enum ItemRef<'item> {
     Variable(&'item VariableDefinition),
     Constant(&'item ConstantDefinition),
     Struct(&'item StructDefinition),
+    Function(&'item FunctionDefinition),
 }
 
 impl NodeRef for ItemRef<'_> {
@@ -23,6 +26,7 @@ impl NodeRef for ItemRef<'_> {
             Self::Variable(node) => node.name_span.file_index,
             Self::Constant(node) => node.name_span.file_index,
             Self::Struct(node) => node.name_span.file_index,
+            Self::Function(node) => node.name_span.file_index,
         }
     }
 
@@ -31,6 +35,7 @@ impl NodeRef for ItemRef<'_> {
             Self::Variable(node) => node.id,
             Self::Constant(node) => node.id,
             Self::Struct(node) => node.id,
+            Self::Function(node) => node.id,
         }
     }
 
@@ -39,6 +44,7 @@ impl NodeRef for ItemRef<'_> {
             Self::Variable(node) => &node.scope,
             Self::Constant(node) => &node.scope,
             Self::Struct(node) => &node.scope,
+            Self::Function(node) => &node.scope,
         }
     }
 }
@@ -49,6 +55,16 @@ impl ItemNodeRef for ItemRef<'_> {
             Self::Variable(node) => node.pub_keyword_span.is_some(),
             Self::Constant(node) => node.pub_keyword_span.is_some(),
             Self::Struct(node) => node.pub_keyword_span.is_some(),
+            Self::Function(node) => node.pub_keyword_span.is_some(),
+        }
+    }
+
+    fn key(&self) -> String {
+        match self {
+            ItemRef::Variable(node) => node.name.clone(),
+            ItemRef::Constant(node) => node.name.clone(),
+            ItemRef::Struct(node) => node.name.clone(),
+            ItemRef::Function(node) => node.key(),
         }
     }
 }
@@ -59,6 +75,7 @@ impl ItemRef<'_> {
             Self::Variable(node) => node.name_span,
             Self::Constant(node) => node.name_span,
             Self::Struct(node) => node.name_span,
+            Self::Function(node) => node.name_span,
         }
     }
 
@@ -71,6 +88,7 @@ impl ItemRef<'_> {
             Self::Variable(node) => node.dependencies(dependencies, indexes),
             Self::Constant(node) => node.dependencies(dependencies, indexes),
             Self::Struct(_) => Ok(dependencies),
+            Self::Function(_) => unreachable!("functions cannot yet be called"),
         }
     }
 }

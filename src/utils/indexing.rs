@@ -114,9 +114,9 @@ impl<Item: ItemNodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE
     }
 
     // It is assumed the item IDs are ordered by location in the file
-    pub(crate) fn register(&mut self, key: impl Into<String>, item: Item) {
+    pub(crate) fn register(&mut self, item: Item) {
         self.items[item.file_index()]
-            .entry(key.into())
+            .entry(item.key())
             .or_default()
             .push(item);
     }
@@ -165,4 +165,6 @@ pub(crate) trait NodeRef: Clone + Copy {
 
 pub(crate) trait ItemNodeRef: NodeRef {
     fn is_public(&self) -> bool;
+
+    fn key(&self) -> String;
 }

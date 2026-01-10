@@ -62,7 +62,9 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
         .map(|(index, variable)| {
             let dot_path = &files[variable.name_span.file_index].dot_path;
             let path = format!("{}:{}", dot_path, variable.name);
-            let type_ = variable.type_(indexes);
+            let type_ = variable
+                .type_(indexes)
+                .unwrap_or_else(|| unreachable!("variable type should be validated before"));
             let field = BufferField {
                 type_id: type_.id,
                 size: type_.size(),
@@ -90,8 +92,11 @@ fn main_buffer_next_field_offset(
     current_field_type: &StructDefinition,
 ) -> u32 {
     if let Some(next_variable) = fields.get(current_field_index + 1) {
+        let next_variable_type = next_variable
+            .type_(indexes)
+            .unwrap_or_else(|| unreachable!("variable type should be validated before"));
         round_up(
-            next_variable.type_(indexes).alignment(),
+            next_variable_type.alignment(),
             current_field_offset + current_field_type.size(),
         )
     } else {
@@ -102,7 +107,12 @@ fn main_buffer_next_field_offset(
 fn main_buffer_alignment(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> u32 {
     variables
         .iter()
-        .map(|variable| variable.type_(indexes).alignment())
+        .map(|variable| {
+            variable
+                .type_(indexes)
+                .unwrap_or_else(|| unreachable!("variable type should be validated before"))
+                .alignment()
+        })
         .max()
         .unwrap_or(0)
 }
@@ -120,7 +130,11 @@ fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashM
         .types
         .iter()
         .copied()
-        .chain(variables.iter().map(|variable| variable.type_(indexes)))
+        .chain(variables.iter().map(|variable| {
+            variable
+                .type_(indexes)
+                .unwrap_or_else(|| unreachable!("variable type should be validated before"))
+        }))
         .map(|type_| (type_.id, type_.dot_path()))
         .collect()
 }

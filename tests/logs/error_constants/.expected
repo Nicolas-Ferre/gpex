@@ -1,2 +1,6 @@
-error: expression not constant (at tests/logs/error_constants/expr.gpex:2:38)
-  --> info: expression must be constant (at tests/logs/error_constants/expr.gpex:2:1)
+error: expression not constant (at tests/logs/error_constants/expressions.gpex:5:19)
+  --> info: expression must be constant (at tests/logs/error_constants/expressions.gpex:5:1)
+error: expression not constant (at tests/logs/error_constants/locations.gpex:5:19)
+  --> info: expression must be constant (at tests/logs/error_constants/locations.gpex:5:1)
+error: expression not constant (at tests/logs/error_constants/locations.gpex:7:31)
+  --> info: expression must be constant (at tests/logs/error_constants/locations.gpex:7:28)

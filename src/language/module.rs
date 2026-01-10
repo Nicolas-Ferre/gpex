@@ -1,6 +1,7 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::import::Import;
 use crate::language::items::const_::ConstantDefinition;
+use crate::language::items::function::FunctionDefinition;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::items::var::VariableDefinition;
 use crate::utils::parsing::{ParseContext, ParseError};
@@ -74,6 +75,7 @@ pub(crate) enum Item {
     Variable(VariableDefinition),
     Constant(ConstantDefinition),
     Struct(StructDefinition),
+    Function(FunctionDefinition),
 }
 
 impl Item {
@@ -85,6 +87,7 @@ impl Item {
             |context| VariableDefinition::parse(context).map(Self::Variable),
             |context| ConstantDefinition::parse(context).map(Self::Constant),
             |context| StructDefinition::parse(context).map(Self::Struct),
+            |context| FunctionDefinition::parse(context).map(Self::Function),
         ])
     }
 
@@ -94,6 +97,7 @@ impl Item {
             Self::Variable(item) => item.index_item(indexes),
             Self::Constant(item) => item.index_item(indexes),
             Self::Struct(item) => item.index_item(indexes),
+            Self::Function(item) => item.index_item(indexes),
         }
     }
 
@@ -101,6 +105,7 @@ impl Item {
         match self {
             Self::Variable(item) => item.index_refs(indexes),
             Self::Constant(item) => item.index_refs(indexes),
+            Self::Function(item) => item.index_refs(indexes),
             Self::Import(_) | Self::Struct(_) => (),
         }
     }
@@ -115,6 +120,7 @@ impl Item {
             Self::Variable(item) => item.validate(context, indexes),
             Self::Constant(item) => item.validate(context, indexes),
             Self::Struct(item) => item.validate(context),
+            Self::Function(item) => item.validate(context, indexes),
         }
     }
 }

@@ -32,6 +32,16 @@ impl Expression {
         ])
     }
 
+    pub(crate) fn span(&self) -> Span {
+        match self {
+            Self::F32Literal(node) => node.span,
+            Self::U32Literal(node) => node.span,
+            Self::I32Literal(node) => node.span,
+            Self::BoolLiteral(node) => node.span,
+            Self::Identifier(node) => node.span,
+        }
+    }
+
     pub(crate) fn index(&self, indexes: &mut Indexes<'_>) {
         match self {
             Self::F32Literal(_)
@@ -56,6 +66,29 @@ impl Expression {
         }
     }
 
+    pub(crate) fn type_<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+    ) -> Option<&'index StructDefinition> {
+        match self {
+            Self::F32Literal(_) => Some(F32Literal::type_(indexes)),
+            Self::U32Literal(_) => Some(U32Literal::type_(indexes)),
+            Self::I32Literal(_) => Some(I32Literal::type_(indexes)),
+            Self::BoolLiteral(_) => Some(BoolLiteral::type_(indexes)),
+            Self::Identifier(node) => node.type_(indexes),
+        }
+    }
+
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+        match self {
+            Self::F32Literal(node) => node.constant(),
+            Self::U32Literal(node) => node.constant(),
+            Self::I32Literal(node) => node.constant(),
+            Self::BoolLiteral(node) => Some(node.constant()),
+            Self::Identifier(node) => node.constant(indexes),
+        }
+    }
+
     pub(crate) fn validate(
         &self,
         constant_mark_span: Option<Span>,
@@ -68,26 +101,6 @@ impl Expression {
             Self::I32Literal(node) => node.validate(context),
             Self::BoolLiteral(_) => Ok(()),
             Self::Identifier(node) => node.validate(constant_mark_span, context, indexes),
-        }
-    }
-
-    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> &'index StructDefinition {
-        match self {
-            Self::F32Literal(_) => F32Literal::type_(indexes),
-            Self::U32Literal(_) => U32Literal::type_(indexes),
-            Self::I32Literal(_) => I32Literal::type_(indexes),
-            Self::BoolLiteral(_) => BoolLiteral::type_(indexes),
-            Self::Identifier(node) => node.type_(indexes),
-        }
-    }
-
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
-        match self {
-            Self::F32Literal(node) => Some(node.constant()),
-            Self::U32Literal(node) => Some(node.constant()),
-            Self::I32Literal(node) => Some(node.constant()),
-            Self::BoolLiteral(node) => Some(node.constant()),
-            Self::Identifier(node) => node.constant(indexes),
         }
     }
 
