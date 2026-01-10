@@ -9,6 +9,7 @@ pub(crate) fn check_return(
     statement_count: usize,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
+    debug_assert_ne!(statement_count, 0);
     if position == statement_count - 1 {
         Ok(())
     } else {
