@@ -122,9 +122,13 @@ impl Case {
             Self::ScreamingSnake => slice
                 .chars()
                 .all(|char| char.is_ascii_uppercase() || char.is_ascii_digit() || char == '_'),
-            Self::Pascal => slice
-                .char_indices()
-                .all(|(index, char)| char.is_ascii_alphanumeric() || (index == 0 && char == '_')),
+            Self::Pascal => {
+                let first_uppercase_index = usize::from(slice.starts_with('_'));
+                slice.char_indices().all(|(index, char)| {
+                    (index != first_uppercase_index || char.is_ascii_uppercase())
+                        && (char.is_ascii_alphanumeric() || (index == 0 && char == '_'))
+                })
+            }
         }
     }
 }
