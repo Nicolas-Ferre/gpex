@@ -94,7 +94,7 @@ impl FunctionDefinition {
         validators::item::check_unique_definition(ref_, context, indexes)?;
         let return_type_result = self.validate_return_type(context, indexes);
         let statements_result = self.validate_statements(context, indexes);
-        return_type_result.or(statements_result)
+        return_type_result.and(statements_result)
     }
 
     fn validate_return_type(
@@ -135,7 +135,10 @@ impl FunctionDefinition {
             self.return_type.span(),
             context,
         )?;
-        let last_statement = &self.statements[self.statements.len() - 1];
+        let last_statement = &self
+            .statements
+            .last()
+            .unwrap_or_else(|| unreachable!("`return` statement presence was tested just before"));
         let returned_type = last_statement.value.type_(indexes);
         let expected_type = self.type_(indexes);
         validators::expression::check_types(

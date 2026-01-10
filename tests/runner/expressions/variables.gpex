@@ -1,4 +1,4 @@
-// test all form of expressions in details as variable default values
+// test all forms of expressions in details as variable default values
 
 const CONSTANT = 123;
 var variable = 456;
