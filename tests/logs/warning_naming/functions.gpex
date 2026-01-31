@@ -1,5 +1,9 @@
-fn _NotSnakeCaseFunctionReturningValue() -> i32 {
+fn _used() -> i32 {
     return 0;
+}
+
+fn _NotSnakeCaseFunctionReturningValue() -> i32 {
+    return _used();
 }
 
 fn _NOT_SNAKE_CASE_OR_PASCAL_CASE_FUNCTION_RETURNING_TYPEREF() -> typeref {

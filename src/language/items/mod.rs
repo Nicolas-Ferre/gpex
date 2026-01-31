@@ -70,7 +70,7 @@ impl ItemNodeRef for ItemRef<'_> {
 }
 
 impl ItemRef<'_> {
-    pub(crate) fn name_span(&self) -> Span {
+    pub(crate) fn name_span(self) -> Span {
         match self {
             Self::Variable(node) => node.name_span,
             Self::Constant(node) => node.name_span,
@@ -79,8 +79,20 @@ impl ItemRef<'_> {
         }
     }
 
+    pub(crate) fn type_<'index>(
+        self,
+        indexes: &Indexes<'index>,
+    ) -> Option<&'index StructDefinition> {
+        match self {
+            ItemRef::Variable(node) => node.type_(indexes),
+            ItemRef::Constant(node) => node.type_(indexes),
+            ItemRef::Struct(_) => Some(StructDefinition::type_(indexes)),
+            ItemRef::Function(node) => node.type_(indexes),
+        }
+    }
+
     pub(crate) fn dependencies<'index>(
-        &self,
+        self,
         dependencies: Dependencies<'index>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<'index>, Vec<Span>> {
@@ -88,7 +100,14 @@ impl ItemRef<'_> {
             Self::Variable(node) => node.dependencies(dependencies, indexes),
             Self::Constant(node) => node.dependencies(dependencies, indexes),
             Self::Struct(_) => Ok(dependencies),
-            Self::Function(_) => unreachable!("functions cannot yet be called"),
+            Self::Function(node) => node.dependencies(dependencies, indexes),
+        }
+    }
+
+    pub(crate) fn transpile(self, shader: &mut String, indexes: &Indexes<'_>) {
+        match self {
+            Self::Function(node) => node.transpile(shader, indexes),
+            Self::Variable(_) | Self::Constant(_) | Self::Struct(_) => (),
         }
     }
 }

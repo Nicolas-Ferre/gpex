@@ -136,21 +136,34 @@ impl<Item: ItemNodeRef> NodeIndex<Item, false> {
         key: &str,
         location: impl NodeRef,
         imports: &ImportIndex,
-        is_visibility_ignored: bool,
+        visibility: Visibility,
+        definition_order: DefinitionOrder,
     ) -> Option<Item> {
         imports.imports[location.file_index()]
             .iter()
             .filter_map(|import| self.items[import.file_index].get(key))
             .flatten()
             .rev()
-            .find(|&&item| Self::is_item_visible(item, location, is_visibility_ignored))
+            .find(|&&item| Self::is_item_visible(item, location, visibility, definition_order))
             .copied()
     }
 
-    fn is_item_visible(item: Item, location: impl NodeRef, is_visibility_ignored: bool) -> bool {
+    fn is_item_visible(
+        item: Item,
+        location: impl NodeRef,
+        visibility: Visibility,
+        definition_order: DefinitionOrder,
+    ) -> bool {
         let is_same_file = location.file_index() == item.file_index();
-        let is_item_public = is_visibility_ignored || item.is_public();
-        ((is_same_file && item.id() < location.id()) || (!is_same_file && is_item_public))
+        let is_visible_locally = match definition_order {
+            DefinitionOrder::BeforeOnly => item.id() < location.id(),
+            DefinitionOrder::BeforeOrAfter => true,
+        };
+        let is_item_public = match visibility {
+            Visibility::Enforced => item.is_public(),
+            Visibility::Ignored => true,
+        };
+        ((is_same_file && is_visible_locally) || (!is_same_file && is_item_public))
             && item.scope() != location.scope()
     }
 }
@@ -167,4 +180,16 @@ pub(crate) trait ItemNodeRef: NodeRef {
     fn is_public(&self) -> bool;
 
     fn key(&self) -> String;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Visibility {
+    Enforced,
+    Ignored,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum DefinitionOrder {
+    BeforeOnly,
+    BeforeOrAfter,
 }

@@ -3,6 +3,10 @@
 const CONSTANT = 123;
 var variable = 456;
 
+fn function_with_no_parameter() -> i32 {
+    return 123;
+}
+
 var _i32_literal_min = -2_147_483_648; // expected: -2147483648
 var _i32_literal_max = 2_147_483_647; // expected: 2147483647
 var _i32_literal_zero = 0; // expected: 0
@@ -18,3 +22,4 @@ var _typeref_native = i32; // expected: i32
 
 var _identifier_constant = CONSTANT; // expected: 123
 var _identifier_variable = variable; // expected: 456
+var _function_call_with_no_parameter = function_with_no_parameter(); // expected: 123

@@ -4,13 +4,13 @@ use std::collections::HashSet;
 use std::mem;
 
 pub(crate) struct Dependencies<'item> {
-    item: ItemRef<'item>,
+    item: Option<ItemRef<'item>>,
     registered: HashSet<ItemRef<'item>>,
     stack: Vec<Span>,
 }
 
 impl<'item> Dependencies<'item> {
-    pub(crate) fn new(item: ItemRef<'item>) -> Self {
+    pub(crate) fn new(item: Option<ItemRef<'item>>) -> Self {
         Self {
             item,
             registered: HashSet::default(),
@@ -24,7 +24,7 @@ impl<'item> Dependencies<'item> {
         dependency: ItemRef<'item>,
     ) -> Result<Self, Vec<Span>> {
         self.stack.push(span);
-        if dependency == self.item {
+        if self.item == Some(dependency) {
             Err(mem::take(&mut self.stack))
         } else {
             self.registered.insert(dependency);

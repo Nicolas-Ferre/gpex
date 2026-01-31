@@ -1,3 +1,4 @@
+use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
@@ -12,6 +13,7 @@ use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 use crate::validators::identifier::Case;
+use std::fmt::Write;
 
 #[derive(Debug)]
 #[derive_where::derive_where(PartialEq, Eq, Hash)]
@@ -79,6 +81,18 @@ impl FunctionDefinition {
         }
     }
 
+    pub(crate) fn dependencies<'index>(
+        &self,
+        dependencies: Dependencies<'index>,
+        indexes: &Indexes<'index>,
+    ) -> Result<Dependencies<'index>, Vec<Span>> {
+        let mut dependencies = self.return_type.dependencies(dependencies, indexes)?;
+        for statement in &self.statements {
+            dependencies = statement.dependencies(dependencies, indexes)?;
+        }
+        Ok(dependencies)
+    }
+
     pub(crate) fn type_<'index>(
         &self,
         indexes: &Indexes<'index>,
@@ -93,6 +107,7 @@ impl FunctionDefinition {
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Function(self);
         validators::item::check_unique_definition(ref_, context, indexes)?;
+        validators::item::check_usage(ref_, context, indexes);
         let signature_result = self.validate_signature(context, indexes);
         let statements_result = self.validate_statements(context, indexes);
         signature_result.and(statements_result)
@@ -133,14 +148,14 @@ impl FunctionDefinition {
     ) -> Result<(), ValidateError> {
         for (index, statement) in self.statements.iter().enumerate() {
             statement.validate(context, indexes)?;
-            validators::statements::check_return(
+            validators::statement::check_return(
                 statement.span,
                 index,
                 self.statements.len(),
                 context,
             )?;
         }
-        let return_statement = validators::statements::check_missing_return(
+        let return_statement = validators::statement::check_missing_return(
             &self.statements,
             self.body_end_span,
             self.return_type.span(),
@@ -154,5 +169,22 @@ impl FunctionDefinition {
             context,
         )?;
         Ok(())
+    }
+
+    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
+        let id = self.id;
+        let return_type = self
+            .type_(indexes)
+            .unwrap_or_else(|| unreachable!("return type validated before"))
+            .transpile_name();
+        _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
+        for statement in &self.statements {
+            statement.transpile(shader, indexes);
+        }
+        _ = write!(shader, " }}");
+    }
+
+    pub(crate) fn transpile_ref(&self, shader: &mut String) {
+        _ = write!(shader, "_{}()", self.id);
     }
 }

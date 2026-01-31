@@ -1,0 +1,8 @@
+fn private_unused() -> i32 {
+    return 0;
+}
+
+// public items shouldn't be considered as unused
+pub fn public_unused() -> i32 {
+    return 0;
+}

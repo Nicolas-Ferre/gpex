@@ -1,2 +1,2 @@
-var unused = 0;
+var private_unused = 0;
 pub var public_item = 0; // public items shouldn't be considered as unused

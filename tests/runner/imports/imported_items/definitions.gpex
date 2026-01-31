@@ -1,4 +1,8 @@
 pub import ~.public_import;
 
-pub var public_variable = 1;
-pub const PUBLIC_CONSTANT = 2;
+pub var public_variable = 2;
+pub const PUBLIC_CONSTANT = 3;
+
+pub fn public_function() -> i32 {
+    return 4;
+}

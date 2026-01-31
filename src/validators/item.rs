@@ -2,7 +2,7 @@ use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
-use crate::utils::indexing::{ItemNodeRef, NodeRef};
+use crate::utils::indexing::{DefinitionOrder, ItemNodeRef, NodeRef, Visibility};
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -50,8 +50,13 @@ pub(crate) fn check_unique_definition(
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let key = item.key();
-    if let Some(duplicated_item) = indexes.items.search(&key, item, &indexes.imports, false)
-        && duplicated_item.file_index() == item.file_index()
+    if let Some(duplicated_item) = indexes.items.search(
+        &key,
+        item,
+        &indexes.imports,
+        Visibility::Enforced,
+        DefinitionOrder::BeforeOnly,
+    ) && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
@@ -100,7 +105,7 @@ pub(crate) fn check_usage(
     if ref_span.is_none() && !name.starts_with('_') {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{name}` item unused"),
+            message: format!("`{}` item unused", item.key()),
             location: Some(context.location(name_span)),
             inner: vec![],
         });
@@ -109,7 +114,7 @@ pub(crate) fn check_usage(
     {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{name}` item used but name starting with `_`"),
+            message: format!("`{}` item used but name starting with `_`", item.key()),
             location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
@@ -117,5 +122,45 @@ pub(crate) fn check_usage(
                 location: Some(context.location(ref_span)),
             }],
         });
+    }
+}
+
+pub(crate) fn check_found(
+    node: impl NodeRef,
+    span: Span,
+    key: &str,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) -> Result<(), ValidateError> {
+    if indexes.sources.contains_key(&node.id()) {
+        Ok(())
+    } else {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            message: format!("`{key}` item not found"),
+            location: Some(context.location(span)),
+            inner: if let Some(private_source) = indexes.private_sources.get(&node.id()) {
+                vec![LogInner {
+                    level: LogLevel::Info,
+                    message: "item not qualified with `pub`".into(),
+                    location: Some(context.location(private_source.name_span())),
+                }]
+            } else {
+                indexes
+                    .items
+                    .iter_by_key(key)
+                    .filter(ItemNodeRef::is_public)
+                    .map(|item| LogInner {
+                        level: LogLevel::Info,
+                        message: format!(
+                            "item can be imported from `{}`",
+                            context.dot_path(item.file_index())
+                        ),
+                        location: Some(context.location(item.name_span())),
+                    })
+                    .collect()
+            },
+        });
+        Err(ValidateError)
     }
 }

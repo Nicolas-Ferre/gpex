@@ -10,11 +10,11 @@ var _private_item = _private_variable;
 var _private_import_public_item = _public_variable;
 var _after = _after_value;
 
-fn value_defined_after_in_return_type() -> _after_value {
+fn _value_defined_after_in_return_type() -> _after_value {
     return 0;
 }
 
-fn value_defined_after_in_return_statement() -> i32 {
+fn _value_defined_after_in_return_statement() -> i32 {
     return _after_value;
 }
 
