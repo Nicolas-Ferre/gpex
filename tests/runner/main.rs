@@ -28,6 +28,11 @@ async fn run_with_expressions() -> Result<(), Error> {
 }
 
 #[tokio::test]
+async fn run_with_visibility() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/visibility"), true).await
+}
+
+#[tokio::test]
 async fn run_with_prelude() -> Result<(), Error> {
     compile_and_run(Path::new("tests/runner/prelude"), true).await
 }

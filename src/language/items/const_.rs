@@ -85,7 +85,7 @@ impl ConstantDefinition {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Constant(self);
-        let dependencies = self.dependencies(Dependencies::new(ref_), indexes);
+        let dependencies = self.dependencies(Dependencies::new(Some(ref_)), indexes);
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);

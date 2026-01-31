@@ -1,12 +1,12 @@
-error: expression with invalid type `i32` (at tests/logs/error_types/functions_return_type.gpex:3:32)
+error: expression with invalid type `i32` (at tests/logs/error_types/functions_return_type.gpex:3:33)
   --> info: expected `typeref` type
-error: expression with invalid type `i32` (at tests/logs/error_types/functions_return_type.gpex:7:39)
+error: expression with invalid type `i32` (at tests/logs/error_types/functions_return_type.gpex:7:40)
   --> info: expected `typeref` type
 error: expression with invalid type `bool` (at tests/logs/error_types/statements_return.gpex:2:12)
-  --> info: expected `u32` type (at tests/logs/error_types/statements_return.gpex:1:39)
+  --> info: expected `u32` type (at tests/logs/error_types/statements_return.gpex:1:40)
 error: expression with invalid type `f32` (at tests/logs/error_types/statements_return.gpex:6:12)
-  --> info: expected `i32` type (at tests/logs/error_types/statements_return.gpex:5:38)
+  --> info: expected `i32` type (at tests/logs/error_types/statements_return.gpex:5:39)
 error: expression with invalid type `i32` (at tests/logs/error_types/statements_return.gpex:10:12)
-  --> info: expected `f32` type (at tests/logs/error_types/statements_return.gpex:9:38)
+  --> info: expected `f32` type (at tests/logs/error_types/statements_return.gpex:9:39)
 error: expression with invalid type `u32` (at tests/logs/error_types/statements_return.gpex:14:12)
-  --> info: expected `bool` type (at tests/logs/error_types/statements_return.gpex:13:38)
+  --> info: expected `bool` type (at tests/logs/error_types/statements_return.gpex:13:39)

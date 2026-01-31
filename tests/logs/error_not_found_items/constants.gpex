@@ -10,11 +10,11 @@ const _PRIVATE_ITEM = _PRIVATE_CONSTANT;
 const _PRIVATE_IMPORT_PUBLIC_ITEM = _PUBLIC_CONSTANT;
 const _AFTER = _AFTER_VALUE;
 
-fn value_defined_after_in_return_type() -> _AFTER_VALUE {
+fn _value_defined_after_in_return_type() -> _AFTER_VALUE {
     return 0;
 }
 
-fn value_defined_after_in_return_statement() -> i32 {
+fn _value_defined_after_in_return_statement() -> i32 {
     return _AFTER_VALUE;
 }
 

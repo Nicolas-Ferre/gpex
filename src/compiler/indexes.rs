@@ -1,7 +1,7 @@
 use crate::compiler::prelude::PreludeEndLocation;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
-use crate::utils::indexing::{ImportIndex, NodeIndex};
+use crate::utils::indexing::{DefinitionOrder, ImportIndex, NodeIndex, Visibility};
 use crate::utils::parsing::Span;
 use std::collections::{HashMap, HashSet};
 
@@ -28,10 +28,13 @@ impl<'item> Indexes<'item> {
     }
 
     pub(crate) fn search_prelude_type(&self, type_name: &str) -> &'item StructDefinition {
-        match self
-            .items
-            .search(type_name, PreludeEndLocation, &self.imports, false)
-        {
+        match self.items.search(
+            type_name,
+            PreludeEndLocation,
+            &self.imports,
+            Visibility::Enforced,
+            DefinitionOrder::BeforeOnly,
+        ) {
             Some(ItemRef::Struct(item)) => item,
             Some(_) | None => unreachable!("missing `{type_name}` type in prelude"),
         }

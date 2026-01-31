@@ -1,0 +1,11 @@
+// test all type of expressions in function return types (expressions tested more in details in variables.gpex)
+
+const CONSTANT = i32;
+
+fn _literal() -> i32 {
+    return 123;
+}
+
+fn _constant() -> CONSTANT {
+    return 123;
+}

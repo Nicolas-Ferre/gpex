@@ -1,12 +1,14 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
+use crate::language::expressions::function_call::FunctionCall;
 use crate::language::expressions::literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
 use crate::language::items::struct_::StructDefinition;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use identifier::Identifier;
 
+pub(crate) mod function_call;
 pub(crate) mod identifier;
 pub(crate) mod literals;
 
@@ -16,6 +18,7 @@ pub(crate) enum Expression {
     U32Literal(U32Literal),
     I32Literal(I32Literal),
     BoolLiteral(BoolLiteral),
+    FunctionCall(FunctionCall),
     Identifier(Identifier),
 }
 
@@ -28,6 +31,7 @@ impl Expression {
             |context| U32Literal::parse(context).map(Self::U32Literal),
             |context| I32Literal::parse(context).map(Self::I32Literal),
             |context| BoolLiteral::parse(context).map(Self::BoolLiteral),
+            |context| FunctionCall::parse(context).map(Self::FunctionCall),
             |context| Identifier::parse(context).map(Self::Identifier),
         ])
     }
@@ -38,6 +42,7 @@ impl Expression {
             Self::U32Literal(node) => node.span,
             Self::I32Literal(node) => node.span,
             Self::BoolLiteral(node) => node.span,
+            Self::FunctionCall(node) => node.span,
             Self::Identifier(node) => node.span,
         }
     }
@@ -48,6 +53,7 @@ impl Expression {
             | Self::U32Literal(_)
             | Self::I32Literal(_)
             | Self::BoolLiteral(_) => (),
+            Self::FunctionCall(node) => node.index(indexes),
             Self::Identifier(node) => node.index(indexes),
         }
     }
@@ -62,6 +68,7 @@ impl Expression {
             | Self::U32Literal(_)
             | Self::I32Literal(_)
             | Self::BoolLiteral(_) => Ok(dependencies),
+            Self::FunctionCall(node) => node.dependencies(dependencies, indexes),
             Self::Identifier(node) => node.dependencies(dependencies, indexes),
         }
     }
@@ -75,6 +82,7 @@ impl Expression {
             Self::U32Literal(_) => Some(U32Literal::type_(indexes)),
             Self::I32Literal(_) => Some(I32Literal::type_(indexes)),
             Self::BoolLiteral(_) => Some(BoolLiteral::type_(indexes)),
+            Self::FunctionCall(node) => node.type_(indexes),
             Self::Identifier(node) => node.type_(indexes),
         }
     }
@@ -85,6 +93,7 @@ impl Expression {
             Self::U32Literal(node) => node.constant(),
             Self::I32Literal(node) => node.constant(),
             Self::BoolLiteral(node) => Some(node.constant()),
+            Self::FunctionCall(_) => unreachable!("function calls cannot be constants"),
             Self::Identifier(node) => node.constant(indexes),
         }
     }
@@ -100,6 +109,7 @@ impl Expression {
             Self::U32Literal(node) => node.validate(context),
             Self::I32Literal(node) => node.validate(context),
             Self::BoolLiteral(_) => Ok(()),
+            Self::FunctionCall(node) => node.validate(constant_mark_span, context, indexes),
             Self::Identifier(node) => node.validate(constant_mark_span, context, indexes),
         }
     }
@@ -110,6 +120,7 @@ impl Expression {
             Self::U32Literal(node) => node.transpile(shader),
             Self::I32Literal(node) => node.transpile(shader),
             Self::BoolLiteral(node) => node.transpile(shader),
+            Self::FunctionCall(node) => node.transpile(shader, indexes),
             Self::Identifier(node) => node.transpile(shader, indexes),
         }
     }

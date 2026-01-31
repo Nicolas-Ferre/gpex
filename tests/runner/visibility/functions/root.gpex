@@ -1,0 +1,12 @@
+// test visibility of functions from root expressions
+
+fn function_before() -> i32 {
+    return 1;
+}
+
+var _function_before = function_before(); // expected: 1
+var _function_after = function_after(); // expected: 2
+
+fn function_after() -> i32 {
+    return 2;
+}

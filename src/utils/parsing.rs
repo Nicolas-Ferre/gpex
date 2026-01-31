@@ -1,5 +1,6 @@
 use crate::utils::logs::{Log, LogLevel, LogLocation};
 use crate::utils::reading::ReadFile;
+use itertools::Itertools;
 use std::ops::Range;
 use std::path::Path;
 
@@ -163,17 +164,17 @@ impl ParseError<'_> {
     }
 
     pub(crate) fn to_error(&self) -> Log {
+        let unique_tokens: Vec<_> = self.expected_tokens.iter().unique().collect();
         Log {
             level: LogLevel::Error,
             message: "expected ".to_string()
-                + &self
-                    .expected_tokens
+                + &unique_tokens
                     .iter()
                     .enumerate()
                     .map(|(index, &expected)| {
                         if index == 0 {
                             expected.to_string()
-                        } else if index == self.expected_tokens.len() - 1 {
+                        } else if index == unique_tokens.len() - 1 {
                             format!(" or {expected}")
                         } else {
                             format!(", {expected}")

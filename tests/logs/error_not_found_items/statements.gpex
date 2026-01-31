@@ -1,4 +1,4 @@
 // test all cases of not found statements while they are expected
 
-fn missing_return() -> i32 {
+fn _missing_return() -> i32 {
 }

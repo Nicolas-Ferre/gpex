@@ -140,15 +140,24 @@ fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashM
 }
 
 fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
+    let mut dependencies = Dependencies::new(None);
     *shader += "struct Buffer { ";
     for module in modules {
         for variable in module.global_variables() {
             variable.transpile_buffer_field(shader, indexes);
+            dependencies = variable
+                .dependencies(dependencies, indexes)
+                .unwrap_or_else(|_| {
+                    unreachable!("circular dependencies should be validated before")
+                });
         }
     }
     *shader += "} @group(0) @binding(0) var<storage, read_write> ";
     *shader += MAIN_BUFFER_NAME;
     *shader += ": Buffer; ";
+    for dependency in dependencies.into_iter() {
+        dependency.transpile(shader, indexes);
+    }
     *shader += "@compute @workgroup_size(1, 1, 1) fn main() { ";
     for variable in sorted_global_variables(modules, indexes) {
         variable.transpile_buffer_init(shader, indexes);
@@ -164,7 +173,7 @@ fn sorted_global_variables<'item>(
     for variable in modules.iter().flat_map(Module::global_variables) {
         dependency_graph.add_node(variable);
         let dependencies = variable
-            .dependencies(Dependencies::new(ItemRef::Variable(variable)), indexes)
+            .dependencies(Dependencies::new(None), indexes)
             .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"));
         for dependency in dependencies.into_iter() {
             if let ItemRef::Variable(dependency) = dependency {
