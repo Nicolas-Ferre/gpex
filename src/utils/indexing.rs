@@ -137,14 +137,14 @@ impl<Item: ItemNodeRef> NodeIndex<Item, false> {
         location: impl NodeRef,
         imports: &ImportIndex,
         visibility: Visibility,
-        definition_order: DefinitionOrder,
+        config: SearchConfig,
     ) -> Option<Item> {
         imports.imports[location.file_index()]
             .iter()
             .filter_map(|import| self.items[import.file_index].get(key))
             .flatten()
             .rev()
-            .find(|&&item| Self::is_item_visible(item, location, visibility, definition_order))
+            .find(|&&item| Self::is_item_visible(item, location, visibility, config))
             .copied()
     }
 
@@ -152,19 +152,16 @@ impl<Item: ItemNodeRef> NodeIndex<Item, false> {
         item: Item,
         location: impl NodeRef,
         visibility: Visibility,
-        definition_order: DefinitionOrder,
+        config: SearchConfig,
     ) -> bool {
         let is_same_file = location.file_index() == item.file_index();
-        let is_visible_locally = match definition_order {
-            DefinitionOrder::BeforeOnly => item.id() < location.id(),
-            DefinitionOrder::BeforeOrAfter => true,
-        };
+        let is_visible_locally = config.can_be_after || item.id() <= location.id();
         let is_item_public = match visibility {
             Visibility::Enforced => item.is_public(),
             Visibility::Ignored => true,
         };
         ((is_same_file && is_visible_locally) || (!is_same_file && is_item_public))
-            && item.scope() != location.scope()
+            && (config.can_be_parent_node || item.scope() != location.scope())
     }
 }
 
@@ -189,7 +186,7 @@ pub(crate) enum Visibility {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum DefinitionOrder {
-    BeforeOnly,
-    BeforeOrAfter,
+pub(crate) struct SearchConfig {
+    pub(crate) can_be_after: bool,
+    pub(crate) can_be_parent_node: bool,
 }

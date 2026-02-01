@@ -5,3 +5,19 @@ pub const DIRECT_DEPENDENCY_CONSTANT1 = DIRECT_DEPENDENCY_CONSTANT2;
 
 pub var indirect_dependency_variable1 = indirect_dependency_variable2;
 pub const INDIRECT_DEPENDENCY_CONSTANT2 = indirect_dependency_variable1;
+
+fn direct_dependency_function() -> i32 {
+    return direct_dependency_function();
+}
+
+fn indirect_dependency_function1() -> i32 {
+    return indirect_dependency_function2();
+}
+
+fn indirect_dependency_function2() -> i32 {
+    return indirect_dependency_function3();
+}
+
+fn indirect_dependency_function3() -> i32 {
+    return indirect_dependency_function1();
+}

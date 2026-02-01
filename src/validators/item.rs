@@ -2,7 +2,7 @@ use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
-use crate::utils::indexing::{DefinitionOrder, ItemNodeRef, NodeRef, Visibility};
+use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, Visibility};
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -50,12 +50,16 @@ pub(crate) fn check_unique_definition(
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let key = item.key();
+    let search_config = SearchConfig {
+        can_be_after: false,
+        can_be_parent_node: false,
+    };
     if let Some(duplicated_item) = indexes.items.search(
         &key,
         item,
         &indexes.imports,
         Visibility::Enforced,
-        DefinitionOrder::BeforeOnly,
+        search_config,
     ) && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {

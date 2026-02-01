@@ -4,10 +4,15 @@ use crate::compiler::indexes::Indexes;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
-use crate::utils::indexing::{DefinitionOrder, NodeRef, Visibility};
+use crate::utils::indexing::{NodeRef, SearchConfig, Visibility};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
+
+const SEARCH_CONFIG: SearchConfig = SearchConfig {
+    can_be_after: false,
+    can_be_parent_node: false,
+};
 
 #[derive(Debug)]
 pub(crate) struct Identifier {
@@ -51,7 +56,7 @@ impl Identifier {
             self,
             imports,
             Visibility::Ignored,
-            DefinitionOrder::BeforeOnly,
+            SEARCH_CONFIG,
         ) {
             indexes.private_sources.insert(self.id, source);
         }
@@ -60,7 +65,7 @@ impl Identifier {
             self,
             imports,
             Visibility::Enforced,
-            DefinitionOrder::BeforeOnly,
+            SEARCH_CONFIG,
         ) {
             imports.mark_as_used(self.file_index(), source.file_index());
             indexes.sources.insert(self.id, source);
@@ -80,8 +85,9 @@ impl Identifier {
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<'index>, Vec<Span>> {
         if let Some(&source) = indexes.sources.get(&self.id) {
-            let dependencies = dependencies.register(self.span, source)?;
-            source.dependencies(dependencies, indexes)
+            dependencies.register(self.span, source, |dependencies| {
+                source.dependencies(dependencies, indexes)
+            })
         } else {
             Ok(dependencies)
         }
