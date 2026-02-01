@@ -106,6 +106,8 @@ impl FunctionDefinition {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Function(self);
+        let dependencies = self.dependencies(Dependencies::new(Some(ref_)), indexes);
+        validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
         let signature_result = self.validate_signature(context, indexes);

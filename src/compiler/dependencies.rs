@@ -22,14 +22,16 @@ impl<'item> Dependencies<'item> {
         mut self,
         span: Span,
         dependency: ItemRef<'item>,
+        mut inner_dependencies: impl FnMut(Self) -> Result<Self, Vec<Span>>,
     ) -> Result<Self, Vec<Span>> {
         self.stack.push(span);
         if self.item == Some(dependency) {
-            Err(mem::take(&mut self.stack))
-        } else {
-            self.registered.insert(dependency);
-            Ok(self)
+            return Err(mem::take(&mut self.stack));
         }
+        self.registered.insert(dependency);
+        let mut dependencies = inner_dependencies(self)?;
+        dependencies.stack.pop();
+        Ok(dependencies)
     }
 
     pub(crate) fn into_iter(self) -> impl Iterator<Item = ItemRef<'item>> {
