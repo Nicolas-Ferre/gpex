@@ -31,9 +31,11 @@ impl NodeRef for &FunctionCall {
         self.id
     }
 
+    // coverage: off (unused because function can be called in itself)
     fn scope(&self) -> &[u64] {
         &self.scope
     }
+    // coverage: on
 }
 
 impl FunctionCall {
