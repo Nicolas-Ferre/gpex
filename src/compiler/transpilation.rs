@@ -140,7 +140,7 @@ fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashM
 }
 
 fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
-    let mut dependencies = Dependencies::new(None);
+    let mut dependencies = Dependencies::new();
     *shader += "struct Buffer { ";
     for module in modules {
         for variable in module.global_variables() {
@@ -173,7 +173,7 @@ fn sorted_global_variables<'item>(
     for variable in modules.iter().flat_map(Module::global_variables) {
         dependency_graph.add_node(variable);
         let dependencies = variable
-            .dependencies(Dependencies::new(None), indexes)
+            .dependencies(Dependencies::new(), indexes)
             .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"));
         for dependency in dependencies.into_iter() {
             if let ItemRef::Variable(dependency) = dependency {

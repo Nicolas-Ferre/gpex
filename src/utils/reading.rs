@@ -1,3 +1,5 @@
+use crate::compiler::prelude;
+use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::utils::logs::Log;
 use itertools::Itertools;
 use std::ffi::OsStr;
@@ -12,11 +14,13 @@ pub(crate) struct ReadFile {
     pub(crate) dot_path: String,
 }
 
-pub(crate) fn read(
-    path: &Path,
-    root_path: &Path,
-    extension: &str,
-) -> Result<Vec<ReadFile>, Vec<Log>> {
+pub(crate) fn read(path: &Path, extension: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
+    let mut files = read_folder(path, path, extension)?;
+    files.insert(PRELUDE_FILE_INDEX, prelude::file());
+    Ok(files)
+}
+
+fn read_folder(path: &Path, root_path: &Path, extension: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
     let mut files = vec![];
     let mut errors = vec![];
     for entry in fs::read_dir(path).map_err(|error| to_log(error, path))? {
@@ -42,7 +46,7 @@ fn read_entry(
     let path = entry.path();
     let file_type = entry.file_type().map_err(|error| to_log(error, &path))?;
     if file_type.is_dir() {
-        read(&path, root_path, extension)
+        read_folder(&path, root_path, extension)
     } else if path.extension() == Some(OsStr::new(extension)) {
         let content = fs::read_to_string(&path).map_err(|error| to_log(error, &path))?;
         Ok(vec![ReadFile {

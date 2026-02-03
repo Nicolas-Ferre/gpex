@@ -1,8 +1,0 @@
-import ~.first;
-
-pub var variable2 = 2;
-var _variable1_copy = variable1; // expected: 1
-
-pub const CONSTANT2 = 4;
-const CONSTANT1_COPY = CONSTANT1;
-var _constant1_copy = CONSTANT1_COPY; // expected: 3

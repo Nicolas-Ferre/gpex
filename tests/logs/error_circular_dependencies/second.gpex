@@ -1,7 +1,0 @@
-import first;
-
-pub var direct_dependency_variable2 = direct_dependency_variable1;
-pub const DIRECT_DEPENDENCY_CONSTANT2 = DIRECT_DEPENDENCY_CONSTANT1;
-
-pub const INDIRECT_DEPENDENCY_CONSTANT1 = INDIRECT_DEPENDENCY_CONSTANT2;
-pub var indirect_dependency_variable2 = INDIRECT_DEPENDENCY_CONSTANT1;

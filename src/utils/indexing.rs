@@ -1,3 +1,4 @@
+use crate::utils::parsing::Span;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::iter;
@@ -14,15 +15,21 @@ impl ImportIndex {
         }
     }
 
+    pub(crate) fn imports(&self, file_index: usize) -> &[ImportItem] {
+        &self.imports[file_index]
+    }
+
     pub(crate) fn register(
         &mut self,
         import_item_id: Option<u64>,
+        span: Option<Span>,
         file_index: usize,
         imported_file_index: usize,
         is_import_public: bool,
     ) {
         self.imports[file_index].push(ImportItem {
             source_import_id: import_item_id,
+            span,
             file_index: imported_file_index,
             is_public: is_import_public,
             is_used: false,
@@ -50,6 +57,7 @@ impl ImportIndex {
         for file_index in 0..self.imports.len() {
             let mut imports = vec![ImportItem {
                 source_import_id: None,
+                span: None,
                 file_index,
                 is_public: true,
                 is_used: false,
@@ -80,6 +88,7 @@ impl ImportIndex {
         }
         imports.push(ImportItem {
             source_import_id,
+            span: new_import.span,
             file_index: new_import.file_index,
             is_public: new_import.is_public,
             is_used: new_import.is_used,
@@ -96,17 +105,18 @@ impl ImportIndex {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct ImportItem {
     pub(crate) source_import_id: Option<u64>,
+    pub(crate) span: Option<Span>,
     pub(crate) file_index: usize,
     pub(crate) is_public: bool,
     pub(crate) is_used: bool,
 }
 
 #[derive(Debug)]
-pub(crate) struct NodeIndex<Item, const SEARCH_BEFORE: bool> {
+pub(crate) struct NodeIndex<Item> {
     items: Vec<HashMap<String, Vec<Item>>>,
 }
 
-impl<Item: ItemNodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE> {
+impl<Item: ItemNodeRef> NodeIndex<Item> {
     pub(crate) fn new(file_count: usize) -> Self {
         Self {
             items: vec![HashMap::new(); file_count],
@@ -122,7 +132,7 @@ impl<Item: ItemNodeRef, const SEARCH_BEFORE: bool> NodeIndex<Item, SEARCH_BEFORE
     }
 }
 
-impl<Item: ItemNodeRef> NodeIndex<Item, false> {
+impl<Item: ItemNodeRef> NodeIndex<Item> {
     pub(crate) fn iter_by_key(&self, key: &str) -> impl Iterator<Item = Item> {
         self.items
             .iter()

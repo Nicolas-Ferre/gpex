@@ -211,7 +211,7 @@ pub(crate) struct PatternPart {
     pub(crate) max_count: usize,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct Span {
     pub(crate) file_index: usize,
     pub(crate) start: usize,
