@@ -12,6 +12,7 @@ error: `_private_function()` item not found (at tests/logs/error_not_found_items
   --> info: item not qualified with `pub` (at tests/logs/error_not_found_items/imported/main.gpex:8:4)
 error: `_public_function()` item not found (at tests/logs/error_not_found_items/functions.gpex:9:35)
   --> info: item can be imported from `imported.private_import` (at tests/logs/error_not_found_items/imported/private_import.gpex:6:8)
+error: `not_found()` item not found (at tests/logs/error_not_found_items/functions.gpex:12:12)
 error: `missing` module not found (at tests/logs/error_not_found_items/imports.gpex:3:8)
   --> info: cannot read "tests/logs/error_not_found_items/missing.gpex"
 error: `inner.missing` module not found (at tests/logs/error_not_found_items/imports.gpex:4:8)
