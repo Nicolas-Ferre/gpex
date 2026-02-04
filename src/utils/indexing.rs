@@ -130,9 +130,7 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
             .or_default()
             .push(item);
     }
-}
 
-impl<Item: ItemNodeRef> NodeIndex<Item> {
     pub(crate) fn iter_by_key(&self, key: &str) -> impl Iterator<Item = Item> {
         self.items
             .iter()

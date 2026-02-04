@@ -14,8 +14,10 @@ pub(crate) struct ReadFile {
     pub(crate) dot_path: String,
 }
 
+#[expect(clippy::absurd_extreme_comparisons)]
 pub(crate) fn read(path: &Path, extension: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
     let mut files = read_folder(path, path, extension)?;
+    debug_assert!(files.len() >= PRELUDE_FILE_INDEX);
     files.insert(PRELUDE_FILE_INDEX, prelude::file());
     Ok(files)
 }

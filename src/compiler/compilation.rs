@@ -46,6 +46,8 @@ pub(crate) fn index(modules: &[Module]) -> Indexes<'_> {
         for module in &sorted_modules {
             module.index_refs(&mut indexes);
         }
+    } else {
+        // do nothing, as the validation step will detect the cyclic imports
     }
     indexes
 }
