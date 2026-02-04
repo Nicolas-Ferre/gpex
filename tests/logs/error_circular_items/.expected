@@ -1,0 +1,6 @@
+error: `direct_dependency_function` item has circular dependencies (at tests/logs/error_circular_items/main.gpex:1:4)
+  --> info: depends on itself (at tests/logs/error_circular_items/main.gpex:2:12)
+error: `indirect_dependency_function1` item has circular dependencies (at tests/logs/error_circular_items/main.gpex:5:4)
+  --> info: depends on this item (at tests/logs/error_circular_items/main.gpex:6:12)
+  --> info: depends on this item (at tests/logs/error_circular_items/main.gpex:10:12)
+  --> info: depends on itself (at tests/logs/error_circular_items/main.gpex:14:12)

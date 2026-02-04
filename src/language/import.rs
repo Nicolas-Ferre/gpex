@@ -76,9 +76,13 @@ impl Import {
     pub(crate) fn index<'index>(&'index self, indexes: &mut Indexes<'index>) {
         if let Some(file_index) = self.imported_file_index {
             let is_public = self.pub_keyword_span.is_some();
-            indexes
-                .imports
-                .register(Some(self.id), self.span.file_index, file_index, is_public);
+            indexes.imports.register(
+                Some(self.id),
+                Some(self.span),
+                self.span.file_index,
+                file_index,
+                is_public,
+            );
         }
     }
 

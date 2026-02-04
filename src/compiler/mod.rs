@@ -22,8 +22,7 @@ pub fn compile(
     root_path: &Path,
     is_warning_treated_as_error: bool,
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
-    let mut files = vec![prelude::file()];
-    files.extend(reading::read(root_path, root_path, EXTENSION)?);
+    let files = reading::read(root_path, EXTENSION)?;
     let modules = compilation::parse(root_path, &files)?;
     let indexes = compilation::index(&modules);
     let errors = compilation::validate(

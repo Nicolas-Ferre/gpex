@@ -1,0 +1,5 @@
+error: module with circular import (at tests/logs/error_circular_imports/direct1.gpex:1:1)
+  --> info: imports itself (at tests/logs/error_circular_imports/direct2.gpex:1:1)
+error: module with circular import (at tests/logs/error_circular_imports/indirect1.gpex:1:1)
+  --> info: imports this module (at tests/logs/error_circular_imports/indirect2.gpex:1:1)
+  --> info: imports itself (at tests/logs/error_circular_imports/indirect3.gpex:1:1)

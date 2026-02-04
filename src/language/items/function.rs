@@ -83,9 +83,9 @@ impl FunctionDefinition {
 
     pub(crate) fn dependencies<'index>(
         &self,
-        dependencies: Dependencies<'index>,
+        dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
-    ) -> Result<Dependencies<'index>, Vec<Span>> {
+    ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         let mut dependencies = self.return_type.dependencies(dependencies, indexes)?;
         for statement in &self.statements {
             dependencies = statement.dependencies(dependencies, indexes)?;
@@ -106,7 +106,7 @@ impl FunctionDefinition {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Function(self);
-        let dependencies = self.dependencies(Dependencies::new(Some(ref_)), indexes);
+        let dependencies = self.dependencies(Dependencies::new(), indexes);
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);

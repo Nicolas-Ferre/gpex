@@ -1,6 +1,7 @@
 use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::Expression;
+use crate::language::items::ItemRef;
 use crate::language::symbols::{RETURN_KEYWORD, SEMICOLON_SYMBOL};
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -30,9 +31,9 @@ impl ReturnStatement {
 
     pub(crate) fn dependencies<'index>(
         &self,
-        dependencies: Dependencies<'index>,
+        dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
-    ) -> Result<Dependencies<'index>, Vec<Span>> {
+    ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         self.value.dependencies(dependencies, indexes)
     }
 

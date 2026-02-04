@@ -93,9 +93,9 @@ impl ItemRef<'_> {
 
     pub(crate) fn dependencies<'index>(
         self,
-        dependencies: Dependencies<'index>,
+        dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
-    ) -> Result<Dependencies<'index>, Vec<Span>> {
+    ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         match self {
             Self::Variable(node) => node.dependencies(dependencies, indexes),
             Self::Constant(node) => node.dependencies(dependencies, indexes),

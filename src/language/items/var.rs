@@ -60,9 +60,9 @@ impl VariableDefinition {
 
     pub(crate) fn dependencies<'index>(
         &self,
-        dependencies: Dependencies<'index>,
+        dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
-    ) -> Result<Dependencies<'index>, Vec<Span>> {
+    ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         self.default_value.dependencies(dependencies, indexes)
     }
 
@@ -79,8 +79,6 @@ impl VariableDefinition {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Variable(self);
-        let dependencies = self.dependencies(Dependencies::new(Some(ref_)), indexes);
-        validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
         validators::identifier::check_char_count(self.name_span, context);

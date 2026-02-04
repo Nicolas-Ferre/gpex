@@ -9,13 +9,13 @@ use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_circular_dependencies(
     item: ItemRef<'_>,
-    dependencies: Result<Dependencies<'_>, Vec<Span>>,
+    dependencies: Result<Dependencies<ItemRef<'_>>, Vec<Span>>,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let name = context.slice(name_span);
     if let Err(stack) = dependencies {
-        if stack.iter().any(|ref_| &stack[0] > ref_) {
+        if stack.iter().min() != Some(&stack[0]) {
             // avoid repeating the same error for each item of the stack
             return Err(ValidateError);
         }

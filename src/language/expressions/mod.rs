@@ -3,6 +3,7 @@ use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::function_call::FunctionCall;
 use crate::language::expressions::literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
+use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -60,9 +61,9 @@ impl Expression {
 
     pub(crate) fn dependencies<'index>(
         &self,
-        dependencies: Dependencies<'index>,
+        dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
-    ) -> Result<Dependencies<'index>, Vec<Span>> {
+    ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         match self {
             Self::F32Literal(_)
             | Self::U32Literal(_)

@@ -8,7 +8,7 @@ use std::collections::{HashMap, HashSet};
 #[derive(Debug)]
 pub(crate) struct Indexes<'item> {
     pub(crate) imports: ImportIndex,
-    pub(crate) items: NodeIndex<ItemRef<'item>, false>,
+    pub(crate) items: NodeIndex<ItemRef<'item>>,
     pub(crate) types: HashSet<&'item StructDefinition>,
     pub(crate) sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) private_sources: HashMap<u64, ItemRef<'item>>,
