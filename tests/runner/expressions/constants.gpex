@@ -2,6 +2,10 @@
 
 const CONSTANT = 123;
 
+const fn function() -> i32 {
+    return 123;
+}
+
 const I32_LITERAL = 123;
 var _i32_literal = I32_LITERAL; // expected: 123
 const U32_LITERAL = 123u;
@@ -17,3 +21,5 @@ var _typeref_native = TYPEREF_NATIVE; // expected: i32
 
 const IDENTIFIER_CONSTANT = CONSTANT;
 var _identifier_constant = IDENTIFIER_CONSTANT; // expected: 123
+const FUNCTION_CALL = function();
+var _function_call = FUNCTION_CALL; // expected: 123

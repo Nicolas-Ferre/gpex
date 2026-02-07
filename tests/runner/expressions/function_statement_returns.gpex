@@ -2,6 +2,7 @@
 
 const CONSTANT = 123;
 var variable = 456;
+
 fn function() -> i32 {
     return 123;
 }

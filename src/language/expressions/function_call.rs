@@ -1,9 +1,11 @@
-use crate::compiler::dependencies::Dependencies;
+use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::language::DependencyType;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL};
+use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{NodeRef, SearchConfig, Visibility};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -86,12 +88,13 @@ impl FunctionCall {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         if let Some(&source) = indexes.sources.get(&self.id) {
             dependencies.register(self.span, source, |dependencies| {
-                source.dependencies(dependencies, indexes)
+                source.dependencies(type_, dependencies, indexes)
             })
         } else {
             Ok(dependencies)
@@ -105,6 +108,13 @@ impl FunctionCall {
         indexes.sources.get(&self.id)?.type_(indexes)
     }
 
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+        match indexes.sources.get(&self.id)? {
+            ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_) => None,
+            ItemRef::Function(node) => node.constant(indexes),
+        }
+    }
+
     pub(crate) fn validate(
         &self,
         constant_mark_span: Option<Span>,
@@ -114,11 +124,10 @@ impl FunctionCall {
         validators::item::check_found(self, self.span, &self.key(), context, indexes)?;
         if let Some(constant_mark_span) = constant_mark_span {
             validators::expression::check_constant(
-                self,
+                self.constant(indexes),
                 self.span,
                 constant_mark_span,
                 context,
-                indexes,
             )?;
         }
         Ok(())

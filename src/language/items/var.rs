@@ -1,11 +1,12 @@
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::transpilation::MAIN_BUFFER_NAME;
+use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL, VAR_KEYWORD};
+use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -60,10 +61,12 @@ impl VariableDefinition {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        self.default_value.dependencies(dependencies, indexes)
+        self.default_value
+            .dependencies(type_, dependencies, indexes)
     }
 
     pub(crate) fn type_<'index>(

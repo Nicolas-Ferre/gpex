@@ -1,7 +1,7 @@
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
+use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, Visibility};
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};

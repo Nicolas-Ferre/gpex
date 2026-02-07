@@ -1,9 +1,17 @@
 const VALUE = 0;
 
+const fn function_not_returning_typeref() -> i32 {
+    return 0;
+}
+
 fn _literal_as_return_type() -> 0 {
     return 0;
 }
 
 fn _non_type_value_as_return_type() -> VALUE {
+    return 0;
+}
+
+fn _non_type_function_call_as_return_type() -> function_not_returning_typeref() {
     return 0;
 }
