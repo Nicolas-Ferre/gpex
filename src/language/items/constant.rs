@@ -95,10 +95,4 @@ impl ConstantDefinition {
             .validate(Some(self.const_keyword_span), context, indexes)?;
         Ok(())
     }
-
-    pub(crate) fn transpile_ref(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        self.constant(indexes)
-            .unwrap_or_else(|| unreachable!("constants should be validated before transpilation"))
-            .transpile(shader);
-    }
 }

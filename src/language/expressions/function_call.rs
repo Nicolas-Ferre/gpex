@@ -110,8 +110,10 @@ impl FunctionCall {
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
         match indexes.sources.get(&self.id)? {
-            ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_) => None,
             ItemRef::Function(node) => node.constant(indexes),
+            ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_) => {
+                unreachable!("identifier should not refer to a value")
+            }
         }
     }
 

@@ -1,14 +1,14 @@
-pub(crate) mod const_;
+pub(crate) mod constant;
 pub(crate) mod function;
 pub(crate) mod struct_;
-pub(crate) mod var;
+pub(crate) mod variable;
 
 use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
-use crate::language::items::const_::ConstantDefinition;
+use crate::language::items::constant::ConstantDefinition;
 use crate::language::items::function::FunctionDefinition;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::items::var::VariableDefinition;
+use crate::language::items::variable::VariableDefinition;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::Span;

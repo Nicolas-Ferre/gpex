@@ -1,9 +1,9 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::import::Import;
-use crate::language::items::const_::ConstantDefinition;
+use crate::language::items::constant::ConstantDefinition;
 use crate::language::items::function::FunctionDefinition;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::items::var::VariableDefinition;
+use crate::language::items::variable::VariableDefinition;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};

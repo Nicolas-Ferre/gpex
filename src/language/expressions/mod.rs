@@ -126,12 +126,12 @@ impl Expression {
             constant.transpile(shader);
         } else {
             match self {
-                Self::F32Literal(node) => node.transpile(shader),
-                Self::U32Literal(node) => node.transpile(shader),
-                Self::I32Literal(node) => node.transpile(shader),
-                Self::BoolLiteral(node) => node.transpile(shader),
                 Self::FunctionCall(node) => node.transpile(shader, indexes),
                 Self::Identifier(node) => node.transpile(shader, indexes),
+                Self::F32Literal(_)
+                | Self::U32Literal(_)
+                | Self::I32Literal(_)
+                | Self::BoolLiteral(_) => unreachable!("literals should be constant"),
             }
         }
     }

@@ -104,9 +104,10 @@ impl Identifier {
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
         match indexes.sources.get(&self.id)? {
-            ItemRef::Variable(_) | ItemRef::Function(_) => None,
+            ItemRef::Variable(_) => None,
             ItemRef::Constant(node) => node.constant(indexes),
             ItemRef::Struct(node) => Some(Constant::TypeRef(node)),
+            ItemRef::Function(_) => unreachable!("identifier should not refer to a function"),
         }
     }
 
@@ -131,9 +132,10 @@ impl Identifier {
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         match indexes.sources[&self.id] {
             ItemRef::Variable(node) => node.transpile_ref(shader),
-            ItemRef::Constant(node) => node.transpile_ref(shader, indexes),
-            ItemRef::Struct(node) => node.transpile_ref(shader),
             ItemRef::Function(_) => unreachable!("identifiers cannot reference functions"),
+            ItemRef::Constant(_) | ItemRef::Struct(_) => {
+                unreachable!("constant item should be transpiled in `Expression::transpile`")
+            }
         }
     }
 }

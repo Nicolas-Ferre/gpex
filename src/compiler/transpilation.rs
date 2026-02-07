@@ -2,7 +2,7 @@ use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::items::var::VariableDefinition;
+use crate::language::items::variable::VariableDefinition;
 use crate::language::module::Module;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::reading::ReadFile;
