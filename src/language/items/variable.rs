@@ -1,82 +1,79 @@
-use crate::compiler::constants::Constant;
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::transpilation::MAIN_BUFFER_NAME;
+use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
-use crate::language::symbols::{CONST_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL};
+use crate::language::symbols::{EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL, VAR_KEYWORD};
+use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 use crate::validators::identifier::Case;
+use std::fmt::Write;
 
 #[derive(Debug)]
-#[derive_where::derive_where(PartialEq, Eq, Hash)]
-pub(crate) struct ConstantDefinition {
+#[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub(crate) struct VariableDefinition {
     pub(crate) id: u64,
     #[derive_where(skip)]
     pub(crate) scope: Vec<u64>,
     #[derive_where(skip)]
     pub(crate) pub_keyword_span: Option<Span>,
     #[derive_where(skip)]
-    pub(crate) const_keyword_span: Span,
-    #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]
     pub(crate) name: String,
     #[derive_where(skip)]
-    value: Expression,
+    default_value: Expression,
 }
 
-impl ConstantDefinition {
+impl VariableDefinition {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         context.define_scope(|context, id| {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
-            let const_keyword_span = Span::parse_symbol(context, CONST_KEYWORD)?;
+            Span::parse_symbol(context, VAR_KEYWORD)?;
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
-            let value = Expression::parse(context)?;
+            let default_value = Expression::parse(context)?;
             Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
             Ok(Self {
                 id,
                 scope: context.scope().to_vec(),
                 pub_keyword_span,
-                const_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),
-                value,
+                default_value,
             })
         })
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
-        indexes.items.register(ItemRef::Constant(self));
+        indexes.items.register(ItemRef::Variable(self));
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
-        self.value.index(indexes);
+        self.default_value.index(indexes);
     }
 
     pub(crate) fn dependencies<'index>(
         &self,
+        type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        self.value.dependencies(dependencies, indexes)
+        self.default_value
+            .dependencies(type_, dependencies, indexes)
     }
 
     pub(crate) fn type_<'index>(
         &self,
         indexes: &Indexes<'index>,
     ) -> Option<&'index StructDefinition> {
-        self.value.type_(indexes)
-    }
-
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
-        self.value.constant(indexes)
+        self.default_value.type_(indexes)
     }
 
     pub(crate) fn validate(
@@ -84,19 +81,31 @@ impl ConstantDefinition {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        let ref_ = ItemRef::Constant(self);
+        let ref_ = ItemRef::Variable(self);
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
         validators::identifier::check_char_count(self.name_span, context);
-        validators::identifier::check_case(self.name_span, &[Case::ScreamingSnake], context);
-        self.value
-            .validate(Some(self.const_keyword_span), context, indexes)?;
+        validators::identifier::check_case(self.name_span, &[Case::Snake], context);
+        self.default_value.validate(None, context, indexes)?;
         Ok(())
     }
 
-    pub(crate) fn transpile_ref(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        self.constant(indexes)
-            .unwrap_or_else(|| unreachable!("constants should be validated before transpilation"))
-            .transpile(shader);
+    pub(crate) fn transpile_buffer_field(&self, shader: &mut String, indexes: &Indexes<'_>) {
+        let type_ = self
+            .type_(indexes)
+            .unwrap_or_else(|| unreachable!("variable type should be validated before"));
+        _ = write!(shader, "v{}: {}, ", self.id, type_.transpile_name());
+    }
+
+    pub(crate) fn transpile_buffer_init(&self, shader: &mut String, indexes: &Indexes<'_>) {
+        self.transpile_ref(shader);
+        *shader += " = ";
+        self.default_value.transpile(shader, indexes);
+        *shader += "; ";
+    }
+
+    pub(crate) fn transpile_ref(&self, shader: &mut String) {
+        *shader += MAIN_BUFFER_NAME;
+        _ = write!(shader, ".v{}", self.id);
     }
 }

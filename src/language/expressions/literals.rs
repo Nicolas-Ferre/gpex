@@ -36,12 +36,6 @@ impl I32Literal {
         validators::literal::check_bounds(self.value.is_some(), self.span, "i32", context)?;
         Ok(())
     }
-
-    pub(crate) fn transpile(&self, shader: &mut String) {
-        self.constant()
-            .unwrap_or_else(|| unreachable!("literals should be validated before transpilation"))
-            .transpile(shader);
-    }
 }
 
 #[derive(Debug)]
@@ -76,12 +70,6 @@ impl U32Literal {
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
         validators::literal::check_bounds(self.value.is_some(), self.span, "u32", context)?;
         Ok(())
-    }
-
-    pub(crate) fn transpile(&self, shader: &mut String) {
-        self.constant()
-            .unwrap_or_else(|| unreachable!("literals should be validated before transpilation"))
-            .transpile(shader);
     }
 }
 
@@ -119,12 +107,6 @@ impl F32Literal {
         validators::literal::check_bounds(self.value.is_some(), self.span, "f32", context)?;
         Ok(())
     }
-
-    pub(crate) fn transpile(&self, shader: &mut String) {
-        self.constant()
-            .unwrap_or_else(|| unreachable!("literals should be validated before transpilation"))
-            .transpile(shader);
-    }
 }
 
 #[derive(Debug)]
@@ -153,9 +135,5 @@ impl BoolLiteral {
 
     pub(crate) fn constant<'index>(&self) -> Constant<'index> {
         Constant::Bool(self.value)
-    }
-
-    pub(crate) fn transpile(&self, shader: &mut String) {
-        self.constant().transpile(shader);
     }
 }

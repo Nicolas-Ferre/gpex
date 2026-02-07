@@ -1,9 +1,10 @@
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
+use crate::language::DependencyType;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::items::var::VariableDefinition;
+use crate::language::items::variable::VariableDefinition;
 use crate::language::module::Module;
+use crate::utils::dependencies::Dependencies;
 use crate::utils::reading::ReadFile;
 use itertools::Itertools;
 use petgraph::graphmap::DiGraphMap;
@@ -146,7 +147,7 @@ fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>
         for variable in module.global_variables() {
             variable.transpile_buffer_field(shader, indexes);
             dependencies = variable
-                .dependencies(dependencies, indexes)
+                .dependencies(DependencyType::Transpilation, dependencies, indexes)
                 .unwrap_or_else(|_| {
                     unreachable!("circular dependencies should be validated before")
                 });
@@ -158,7 +159,7 @@ fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>
     for dependency in dependencies.into_iter() {
         dependency.transpile(shader, indexes);
     }
-    *shader += "@compute @workgroup_size(1, 1, 1) fn main() { ";
+    *shader += " @compute @workgroup_size(1, 1, 1) fn main() { ";
     for variable in sorted_global_variables(modules, indexes) {
         variable.transpile_buffer_init(shader, indexes);
     }
@@ -173,7 +174,7 @@ fn sorted_global_variables<'item>(
     for variable in modules.iter().flat_map(Module::global_variables) {
         dependency_graph.add_node(variable);
         let dependencies = variable
-            .dependencies(Dependencies::new(), indexes)
+            .dependencies(DependencyType::Transpilation, Dependencies::new(), indexes)
             .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"));
         for dependency in dependencies.into_iter() {
             if let ItemRef::Variable(dependency) = dependency {

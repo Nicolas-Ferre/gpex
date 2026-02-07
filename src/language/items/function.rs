@@ -1,14 +1,16 @@
-use crate::compiler::dependencies::Dependencies;
+use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::statements::return_::ReturnStatement;
 use crate::language::symbols::{
-    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, FN_KEYWORD, PARENTHESIS_CLOSE_SYMBOL,
-    PARENTHESIS_OPEN_SYMBOL, PUB_KEYWORD,
+    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, FN_KEYWORD,
+    PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL, PUB_KEYWORD,
 };
+use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -23,6 +25,8 @@ pub(crate) struct FunctionDefinition {
     pub(crate) scope: Vec<u64>,
     #[derive_where(skip)]
     pub(crate) pub_keyword_span: Option<Span>,
+    #[derive_where(skip)]
+    pub(crate) const_keyword_span: Option<Span>,
     #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]
@@ -43,6 +47,7 @@ impl FunctionDefinition {
     ) -> Result<Self, ParseError<'context>> {
         context.define_scope(|context, id| {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
+            let const_keyword_span = Span::parse_symbol(context, CONST_KEYWORD).ok();
             Span::parse_symbol(context, FN_KEYWORD)?;
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
@@ -56,6 +61,7 @@ impl FunctionDefinition {
                 id,
                 scope: context.scope().to_vec(),
                 pub_keyword_span,
+                const_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),
                 arrow_span,
@@ -83,12 +89,15 @@ impl FunctionDefinition {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        let mut dependencies = self.return_type.dependencies(dependencies, indexes)?;
+        let mut dependencies = self
+            .return_type
+            .dependencies(type_, dependencies, indexes)?;
         for statement in &self.statements {
-            dependencies = statement.dependencies(dependencies, indexes)?;
+            dependencies = statement.dependencies(type_, dependencies, indexes)?;
         }
         Ok(dependencies)
     }
@@ -100,13 +109,22 @@ impl FunctionDefinition {
         self.return_type.constant(indexes)?.type_ref()
     }
 
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+        self.const_keyword_span.and_then(|_| {
+            self.statements
+                .first()
+                .and_then(|statement| statement.value.constant(indexes))
+        })
+    }
+
     pub(crate) fn validate(
         &self,
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Function(self);
-        let dependencies = self.dependencies(Dependencies::new(), indexes);
+        let dependencies =
+            self.dependencies(DependencyType::CycleDetection, Dependencies::new(), indexes);
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
@@ -149,7 +167,7 @@ impl FunctionDefinition {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         for (index, statement) in self.statements.iter().enumerate() {
-            statement.validate(context, indexes)?;
+            statement.validate(self.const_keyword_span, context, indexes)?;
             validators::statement::check_return(
                 statement.span,
                 index,

@@ -1,6 +1,5 @@
 pub(crate) mod compilation;
 pub(crate) mod constants;
-pub(crate) mod dependencies;
 pub(crate) mod indexes;
 pub(crate) mod prelude;
 pub(crate) mod transpilation;

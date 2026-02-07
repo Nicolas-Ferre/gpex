@@ -1,7 +1,5 @@
-use crate::compiler::indexes::Indexes;
-use crate::language::items::ItemRef;
+use crate::compiler::constants::Constant;
 use crate::language::items::struct_::StructDefinition;
-use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -37,16 +35,12 @@ pub(crate) fn check_types(
 }
 
 pub(crate) fn check_constant(
-    node: impl NodeRef,
+    constant_value: Option<Constant<'_>>,
     span: Span,
     constant_mark_span: Span,
     context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    if matches!(
-        indexes.sources[&node.id()],
-        ItemRef::Constant(_) | ItemRef::Struct(_)
-    ) {
+    if constant_value.is_some() {
         Ok(())
     } else {
         context.logs.push(Log {

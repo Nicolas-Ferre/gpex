@@ -1,3 +1,4 @@
+pub(crate) mod dependencies;
 pub(crate) mod endianness;
 pub(crate) mod formatting;
 pub(crate) mod indexing;

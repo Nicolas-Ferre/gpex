@@ -1,14 +1,15 @@
-pub(crate) mod const_;
+pub(crate) mod constant;
 pub(crate) mod function;
 pub(crate) mod struct_;
-pub(crate) mod var;
+pub(crate) mod variable;
 
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
-use crate::language::items::const_::ConstantDefinition;
+use crate::language::DependencyType;
+use crate::language::items::constant::ConstantDefinition;
 use crate::language::items::function::FunctionDefinition;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::items::var::VariableDefinition;
+use crate::language::items::variable::VariableDefinition;
+use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::Span;
 
@@ -93,14 +94,15 @@ impl ItemRef<'_> {
 
     pub(crate) fn dependencies<'index>(
         self,
+        type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         match self {
-            Self::Variable(node) => node.dependencies(dependencies, indexes),
-            Self::Constant(node) => node.dependencies(dependencies, indexes),
+            Self::Variable(node) => node.dependencies(type_, dependencies, indexes),
+            Self::Constant(node) => node.dependencies(type_, dependencies, indexes),
             Self::Struct(_) => Ok(dependencies),
-            Self::Function(node) => node.dependencies(dependencies, indexes),
+            Self::Function(node) => node.dependencies(type_, dependencies, indexes),
         }
     }
 

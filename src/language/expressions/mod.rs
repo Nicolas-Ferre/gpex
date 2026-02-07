@@ -1,10 +1,11 @@
 use crate::compiler::constants::Constant;
-use crate::compiler::dependencies::Dependencies;
 use crate::compiler::indexes::Indexes;
+use crate::language::DependencyType;
 use crate::language::expressions::function_call::FunctionCall;
 use crate::language::expressions::literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
+use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use identifier::Identifier;
@@ -61,16 +62,21 @@ impl Expression {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        match self {
-            Self::F32Literal(_)
-            | Self::U32Literal(_)
-            | Self::I32Literal(_)
-            | Self::BoolLiteral(_) => Ok(dependencies),
-            Self::FunctionCall(node) => node.dependencies(dependencies, indexes),
-            Self::Identifier(node) => node.dependencies(dependencies, indexes),
+        if type_ == DependencyType::Transpilation && self.constant(indexes).is_some() {
+            Ok(dependencies)
+        } else {
+            match self {
+                Self::F32Literal(_)
+                | Self::U32Literal(_)
+                | Self::I32Literal(_)
+                | Self::BoolLiteral(_) => Ok(dependencies),
+                Self::FunctionCall(node) => node.dependencies(type_, dependencies, indexes),
+                Self::Identifier(node) => node.dependencies(type_, dependencies, indexes),
+            }
         }
     }
 
@@ -94,7 +100,7 @@ impl Expression {
             Self::U32Literal(node) => node.constant(),
             Self::I32Literal(node) => node.constant(),
             Self::BoolLiteral(node) => Some(node.constant()),
-            Self::FunctionCall(_) => unreachable!("function calls cannot be constants"),
+            Self::FunctionCall(node) => node.constant(indexes),
             Self::Identifier(node) => node.constant(indexes),
         }
     }
@@ -116,13 +122,17 @@ impl Expression {
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        match self {
-            Self::F32Literal(node) => node.transpile(shader),
-            Self::U32Literal(node) => node.transpile(shader),
-            Self::I32Literal(node) => node.transpile(shader),
-            Self::BoolLiteral(node) => node.transpile(shader),
-            Self::FunctionCall(node) => node.transpile(shader, indexes),
-            Self::Identifier(node) => node.transpile(shader, indexes),
+        if let Some(constant) = self.constant(indexes) {
+            constant.transpile(shader);
+        } else {
+            match self {
+                Self::FunctionCall(node) => node.transpile(shader, indexes),
+                Self::Identifier(node) => node.transpile(shader, indexes),
+                Self::F32Literal(_)
+                | Self::U32Literal(_)
+                | Self::I32Literal(_)
+                | Self::BoolLiteral(_) => unreachable!("literals should be constant"),
+            }
         }
     }
 }

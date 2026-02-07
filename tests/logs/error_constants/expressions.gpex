@@ -2,13 +2,9 @@
 
 var variable_value = 1;
 
-fn function() -> i32 {
+fn non_const_function() -> i32 {
     return 0;
 }
 
 const _VARIABLE = variable_value;
-const _FUNCTION_CALL = function();
-
-fn _function_return_type() -> variable_value {
-    return 0;
-}
+const _FUNCTION_CALL = non_const_function();
