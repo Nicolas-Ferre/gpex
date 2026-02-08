@@ -1,43 +1,9 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::import::ImportSegment;
-use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 use itertools::Itertools;
-
-pub(crate) fn check_circular_dependencies(
-    dependencies: Result<Dependencies<usize>, Vec<Span>>,
-    context: &mut ValidateContext<'_>,
-) -> Result<(), ValidateError> {
-    if let Err(stack) = dependencies {
-        if stack.iter().min() != Some(&stack[0]) {
-            // avoid repeating the same error for each import of the stack
-            return Err(ValidateError);
-        }
-        context.logs.push(Log {
-            level: LogLevel::Error,
-            message: "module with circular import".into(),
-            location: Some(context.location(stack[0])),
-            inner: stack[1..]
-                .iter()
-                .enumerate()
-                .map(|(index, ref_)| LogInner {
-                    level: LogLevel::Info,
-                    message: if index == stack.len() - 2 {
-                        "imports itself".into()
-                    } else {
-                        "imports this module".into()
-                    },
-                    location: Some(context.location(*ref_)),
-                })
-                .collect(),
-        });
-        Err(ValidateError)
-    } else {
-        Ok(())
-    }
-}
 
 pub(crate) fn check_found(
     is_found: bool,

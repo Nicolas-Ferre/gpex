@@ -1,0 +1,4 @@
+import ~.indirect_imported1;
+
+pub const CONSTANT1 = function2();
+pub const CONSTANT2 = function1();

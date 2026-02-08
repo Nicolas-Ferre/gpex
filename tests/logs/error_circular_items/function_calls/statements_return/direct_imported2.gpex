@@ -1,0 +1,5 @@
+import ~.direct_imported1;
+
+pub fn function2() -> i32 {
+    return function1();
+}

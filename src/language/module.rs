@@ -4,10 +4,8 @@ use crate::language::items::constant::ConstantDefinition;
 use crate::language::items::function::FunctionDefinition;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::items::variable::VariableDefinition;
-use crate::utils::dependencies::Dependencies;
-use crate::utils::parsing::{ParseContext, ParseError, Span};
+use crate::utils::parsing::{ParseContext, ParseError};
 use crate::utils::validation::{ValidateContext, ValidateError};
-use crate::validators;
 
 #[derive(Debug)]
 #[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -54,9 +52,6 @@ impl Module {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        let dependencies = Dependencies::new();
-        let dependencies = Self::collect_dependencies(dependencies, self.file_index, indexes);
-        validators::import::check_circular_dependencies(dependencies, context)?;
         let mut is_module_invalid = false;
         let mut are_imports_finished = false;
         for item in &self.items {
@@ -78,21 +73,6 @@ impl Module {
             _ = item.validate(context, indexes);
         }
         Ok(())
-    }
-
-    fn collect_dependencies(
-        mut dependencies: Dependencies<usize>,
-        file_index: usize,
-        indexes: &Indexes<'_>,
-    ) -> Result<Dependencies<usize>, Vec<Span>> {
-        for import in indexes.imports.imports(file_index) {
-            if let Some(span) = import.span {
-                dependencies = dependencies.register(span, import.file_index, |dependencies| {
-                    Self::collect_dependencies(dependencies, import.file_index, indexes)
-                })?;
-            }
-        }
-        Ok(dependencies)
     }
 
     pub(crate) fn global_variables(&self) -> impl Iterator<Item = &VariableDefinition> {

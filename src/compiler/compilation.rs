@@ -5,7 +5,6 @@ use crate::utils::logs::{Log, LogLevel};
 use crate::utils::parsing::ParseContext;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::ValidateContext;
-use petgraph::graphmap::DiGraphMap;
 use std::path::Path;
 
 const COMMENT_PREFIX: &str = "//";
@@ -39,35 +38,13 @@ pub(crate) fn index(modules: &[Module]) -> Indexes<'_> {
         module.index_imports(&mut indexes);
     }
     indexes.imports.consolidate();
-    if let Some(sorted_modules) = sorted_modules_based_on_dependencies(modules, &indexes) {
-        for module in &sorted_modules {
-            module.index_items(&mut indexes);
-        }
-        for module in &sorted_modules {
-            module.index_refs(&mut indexes);
-        }
-    } else {
-        // do nothing, as the validation step will detect the cyclic imports
+    for module in modules {
+        module.index_items(&mut indexes);
+    }
+    for module in modules {
+        module.index_refs(&mut indexes);
     }
     indexes
-}
-
-fn sorted_modules_based_on_dependencies<'item>(
-    modules: &'item [Module],
-    indexes: &Indexes<'item>,
-) -> Option<Vec<&'item Module>> {
-    let mut dependency_graph = DiGraphMap::<&Module, ()>::new();
-    for module in modules {
-        dependency_graph.add_node(module);
-        for import in indexes.imports.imports(module.file_index) {
-            if import.file_index == module.file_index {
-                continue;
-            }
-            let imported_module = &modules[import.file_index];
-            dependency_graph.add_edge(imported_module, module, ());
-        }
-    }
-    petgraph::algo::toposort(&dependency_graph, None).ok()
 }
 
 pub(crate) fn validate(
