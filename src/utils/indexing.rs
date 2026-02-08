@@ -15,10 +15,6 @@ impl ImportIndex {
         }
     }
 
-    pub(crate) fn imports(&self, file_index: usize) -> &[ImportItem] {
-        &self.imports[file_index]
-    }
-
     pub(crate) fn register(
         &mut self,
         import_item_id: Option<u64>,

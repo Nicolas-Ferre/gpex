@@ -11,11 +11,6 @@ fn compile_with_syntax_errors() -> io::Result<()> {
 }
 
 #[test]
-fn compile_with_circular_imports_errors() -> io::Result<()> {
-    compile_and_check_logs(Path::new("tests/logs/error_circular_imports"))
-}
-
-#[test]
 fn compile_with_circular_items_errors() -> io::Result<()> {
     compile_and_check_logs(Path::new("tests/logs/error_circular_items"))
 }

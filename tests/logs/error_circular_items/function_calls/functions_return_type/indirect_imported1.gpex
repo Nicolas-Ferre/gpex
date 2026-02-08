@@ -1,0 +1,9 @@
+import ~.indirect_imported2;
+
+pub fn function1() -> function2() {
+    return 0;
+}
+
+pub fn function3() -> function4() {
+    return 0;
+}

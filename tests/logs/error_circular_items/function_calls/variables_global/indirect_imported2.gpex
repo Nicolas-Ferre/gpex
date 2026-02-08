@@ -1,0 +1,4 @@
+import ~.indirect_imported1;
+
+pub var variable1 = function2();
+pub var variable2 = function1();

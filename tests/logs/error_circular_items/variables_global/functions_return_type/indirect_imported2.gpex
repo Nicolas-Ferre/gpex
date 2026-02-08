@@ -1,0 +1,9 @@
+import ~.indirect_imported1;
+
+pub const fn function1() -> variable2 {
+    return 0;
+}
+
+pub const fn function2() -> variable1 {
+    return 0;
+}

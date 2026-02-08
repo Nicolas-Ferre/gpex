@@ -1,0 +1,5 @@
+import ~.direct_imported1;
+
+pub const fn function() -> variable {
+    return 0;
+}
