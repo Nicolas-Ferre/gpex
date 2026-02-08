@@ -1,0 +1,3 @@
+var _SCREAMING_CASE = 0;
+var _camelCase = 0;
+var _PascalCase = 0;

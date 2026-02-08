@@ -1,0 +1,5 @@
+fn function() -> i32 {
+    return 123;
+}
+
+var _result = function(); // expected: 123

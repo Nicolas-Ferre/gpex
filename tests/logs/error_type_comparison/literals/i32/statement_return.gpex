@@ -1,0 +1,3 @@
+fn _function() -> u32 {
+    return 123;
+}

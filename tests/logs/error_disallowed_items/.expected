@@ -1,4 +1,4 @@
-error: `import` statement not at the top of the module (at tests/logs/error_disallowed_items/imports.gpex:3:1)
+error: `import` statement not at the top of the module (at tests/logs/error_disallowed_items/imports/import_after_item.gpex:3:1)
   --> info: `import` statements should appear before anything else
-error: `return` statement not at the end of the block (at tests/logs/error_disallowed_items/statements.gpex:2:5)
-error: forbidden `compilerimpl` item outside prelude (at tests/logs/error_disallowed_items/struct_compilerimpl.gpex:1:8)
+error: `return` statement not at the end of the block (at tests/logs/error_disallowed_items/statements/return_after_other_statement.gpex:2:5)
+error: forbidden `compilerimpl` item outside prelude (at tests/logs/error_disallowed_items/struct/compilerimpl_struct_outside_prelude.gpex:1:8)

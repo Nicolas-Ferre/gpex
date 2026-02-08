@@ -1,0 +1,9 @@
+fn called_function() -> i32 {
+    return 123;
+}
+
+const fn function() -> i32 {
+    return called_function();
+}
+
+var _result = function(); // expected: 123

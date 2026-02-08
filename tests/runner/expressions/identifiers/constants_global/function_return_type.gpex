@@ -1,0 +1,7 @@
+const CONSTANT = i32;
+
+fn function() -> CONSTANT {
+    return 123;
+}
+
+var _result = function(); // expected: 123

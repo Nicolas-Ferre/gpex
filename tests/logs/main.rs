@@ -41,13 +41,13 @@ fn compile_with_multiple_definitions_errors() -> io::Result<()> {
 }
 
 #[test]
-fn compile_with_constant_errors() -> io::Result<()> {
-    compile_and_check_logs(Path::new("tests/logs/error_constants"))
+fn compile_with_non_constant_expression_errors() -> io::Result<()> {
+    compile_and_check_logs(Path::new("tests/logs/error_non_constant_expressions"))
 }
 
 #[test]
 fn compile_with_type_errors() -> io::Result<()> {
-    compile_and_check_logs(Path::new("tests/logs/error_types"))
+    compile_and_check_logs(Path::new("tests/logs/error_type_comparison"))
 }
 
 #[test]

@@ -1,0 +1,11 @@
+fn _SCREAMING_CASE() -> i32 {
+    return 0;
+}
+
+fn _camelCase() -> i32 {
+    return 0;
+}
+
+fn _PascalCase() -> i32 {
+    return 0;
+}

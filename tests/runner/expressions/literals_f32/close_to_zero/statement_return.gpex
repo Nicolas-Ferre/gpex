@@ -1,0 +1,5 @@
+fn function() -> f32 {
+    return 0.00000000000000000000001;
+}
+
+var _result = function();  // expected: 0.00000000000000000000001

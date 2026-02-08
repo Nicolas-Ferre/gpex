@@ -1,0 +1,2 @@
+const CONSTANT = -2_147_483_648;
+var _result = CONSTANT; // expected: -2147483648

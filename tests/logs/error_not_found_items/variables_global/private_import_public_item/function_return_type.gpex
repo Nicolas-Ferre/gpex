@@ -1,0 +1,5 @@
+import ~.imported;
+
+fn _function() -> imported {
+    return 0;
+}

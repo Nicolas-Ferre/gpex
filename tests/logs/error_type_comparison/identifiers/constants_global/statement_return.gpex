@@ -1,0 +1,6 @@
+const ExpectedType = u32;
+const CONSTANT = 123;
+
+fn _function() -> ExpectedType {
+    return CONSTANT;
+}

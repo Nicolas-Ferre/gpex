@@ -1,4 +1,0 @@
-// test all cases of not found statements while they are expected
-
-fn _missing_return() -> i32 {
-}

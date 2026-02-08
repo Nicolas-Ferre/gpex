@@ -1,0 +1,5 @@
+fn function() -> i32 {
+    return -2_147_483_648;
+}
+
+var _result = function();  // expected: -2147483648

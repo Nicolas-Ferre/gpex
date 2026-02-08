@@ -1,0 +1,2 @@
+const CONSTANT = i32;
+var _result = CONSTANT; // expected: i32

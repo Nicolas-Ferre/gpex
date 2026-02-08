@@ -1,0 +1,3 @@
+fn _function() -> f32 {
+    return 123u;
+}

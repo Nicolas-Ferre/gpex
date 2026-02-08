@@ -1,0 +1,5 @@
+fn _function() -> _AFTER {
+    return 0;
+}
+
+const _AFTER = i32;
