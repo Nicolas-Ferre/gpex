@@ -90,7 +90,15 @@ impl ConstantDefinition {
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
         validators::identifier::check_char_count(self.name_span, context);
-        validators::identifier::check_case(self.name_span, &[Case::ScreamingSnake], context);
+        let may_return_typeref = self
+            .type_(indexes)
+            .is_none_or(|type_| type_ == indexes.search_prelude_type("typeref"));
+        let allowed_cases: &[Case] = if may_return_typeref {
+            &[Case::ScreamingSnake, Case::Pascal]
+        } else {
+            &[Case::ScreamingSnake]
+        };
+        validators::identifier::check_case(self.name_span, allowed_cases, context);
         self.value
             .validate(Some(self.const_keyword_span), context, indexes)?;
         Ok(())

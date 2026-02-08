@@ -152,12 +152,12 @@ impl FunctionDefinition {
         let may_return_typeref = self
             .type_(indexes)
             .is_none_or(|type_| type_ == typeref_type);
-        let possible_cases: &[Case] = if may_return_typeref {
+        let allowed_cases: &[Case] = if may_return_typeref {
             &[Case::Snake, Case::Pascal]
         } else {
             &[Case::Snake]
         };
-        validators::identifier::check_case(self.name_span, possible_cases, context);
+        validators::identifier::check_case(self.name_span, allowed_cases, context);
         Ok(())
     }
 
