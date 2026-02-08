@@ -1,0 +1,5 @@
+fn _function() -> _after {
+    return 0;
+}
+
+var _after = i32;

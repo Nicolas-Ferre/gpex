@@ -1,6 +1,0 @@
-// test all cases of not found imports
-
-import missing;
-import inner.missing;
-import ~.~.~.missing;
-import ~.~.~.~.~.~.missing;

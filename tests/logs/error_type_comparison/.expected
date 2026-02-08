@@ -1,0 +1,33 @@
+error: expression with invalid type `i32` (at tests/logs/error_type_comparison/function_calls/no_parameter/function_return_type.gpex:5:19)
+  --> info: expected `typeref` type
+error: expression with invalid type `i32` (at tests/logs/error_type_comparison/function_calls/no_parameter/statement_return.gpex:10:12)
+  --> info: expected `u32` type (at tests/logs/error_type_comparison/function_calls/no_parameter/statement_return.gpex:9:19)
+error: expression with invalid type `i32` (at tests/logs/error_type_comparison/identifiers/constants_global/function_return_type.gpex:3:19)
+  --> info: expected `typeref` type
+warning: `ExpectedType` identifier not in SCREAMING_SNAKE_CASE (at tests/logs/error_type_comparison/identifiers/constants_global/statement_return.gpex:1:7)
+error: expression with invalid type `i32` (at tests/logs/error_type_comparison/identifiers/constants_global/statement_return.gpex:5:12)
+  --> info: expected `u32` type (at tests/logs/error_type_comparison/identifiers/constants_global/statement_return.gpex:4:19)
+error: expression with invalid type `typeref` (at tests/logs/error_type_comparison/identifiers/type_native/statement_return.gpex:2:12)
+  --> info: expected `u32` type (at tests/logs/error_type_comparison/identifiers/type_native/statement_return.gpex:1:19)
+error: expression with invalid type `i32` (at tests/logs/error_type_comparison/identifiers/variables_global/statement_return.gpex:4:12)
+  --> info: expected `u32` type (at tests/logs/error_type_comparison/identifiers/variables_global/statement_return.gpex:3:19)
+error: expression with invalid type `bool` (at tests/logs/error_type_comparison/literals/bool_false/function_return_type.gpex:1:19)
+  --> info: expected `typeref` type
+error: expression with invalid type `bool` (at tests/logs/error_type_comparison/literals/bool_false/statement_return.gpex:2:12)
+  --> info: expected `i32` type (at tests/logs/error_type_comparison/literals/bool_false/statement_return.gpex:1:19)
+error: expression with invalid type `bool` (at tests/logs/error_type_comparison/literals/bool_true/function_return_type.gpex:1:19)
+  --> info: expected `typeref` type
+error: expression with invalid type `bool` (at tests/logs/error_type_comparison/literals/bool_true/statement_return.gpex:2:12)
+  --> info: expected `i32` type (at tests/logs/error_type_comparison/literals/bool_true/statement_return.gpex:1:19)
+error: expression with invalid type `f32` (at tests/logs/error_type_comparison/literals/f32/function_return_type.gpex:1:19)
+  --> info: expected `typeref` type
+error: expression with invalid type `f32` (at tests/logs/error_type_comparison/literals/f32/statement_return.gpex:2:12)
+  --> info: expected `bool` type (at tests/logs/error_type_comparison/literals/f32/statement_return.gpex:1:19)
+error: expression with invalid type `i32` (at tests/logs/error_type_comparison/literals/i32/function_return_type.gpex:1:19)
+  --> info: expected `typeref` type
+error: expression with invalid type `i32` (at tests/logs/error_type_comparison/literals/i32/statement_return.gpex:2:12)
+  --> info: expected `u32` type (at tests/logs/error_type_comparison/literals/i32/statement_return.gpex:1:19)
+error: expression with invalid type `u32` (at tests/logs/error_type_comparison/literals/u32/function_return_type.gpex:1:19)
+  --> info: expected `typeref` type
+error: expression with invalid type `u32` (at tests/logs/error_type_comparison/literals/u32/statement_return.gpex:2:12)
+  --> info: expected `f32` type (at tests/logs/error_type_comparison/literals/u32/statement_return.gpex:1:19)

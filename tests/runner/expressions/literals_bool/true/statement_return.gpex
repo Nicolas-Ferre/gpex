@@ -1,0 +1,5 @@
+fn function() -> bool {
+    return true;
+}
+
+var _result = function();  // expected: true

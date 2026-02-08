@@ -1,0 +1,2 @@
+const CONSTANT = true;
+var _result = CONSTANT; // expected: true

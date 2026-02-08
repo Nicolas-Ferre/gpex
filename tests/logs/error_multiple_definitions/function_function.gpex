@@ -1,0 +1,7 @@
+fn _function() -> i32 {
+    return 0;
+}
+
+fn _function() -> i32 {
+    return 1;
+}

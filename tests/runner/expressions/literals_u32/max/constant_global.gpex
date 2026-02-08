@@ -1,0 +1,2 @@
+const CONSTANT = 4_294_967_295u;
+var _result = CONSTANT; // expected: 4294967295u

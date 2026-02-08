@@ -1,0 +1,2 @@
+var variable = 123;
+var _result = variable; // expected: 123

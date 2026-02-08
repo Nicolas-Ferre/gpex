@@ -1,0 +1,7 @@
+fn _SCREAMING_CASE() -> typeref {
+    return i32;
+}
+
+fn _camelCase() -> typeref {
+    return i32;
+}

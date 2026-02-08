@@ -1,0 +1,3 @@
+fn _function() -> false {
+    return 123;
+}

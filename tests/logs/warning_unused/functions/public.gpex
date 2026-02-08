@@ -1,0 +1,4 @@
+// public items shouldn't be considered as unused
+pub fn function() -> i32 {
+    return 0;
+}
