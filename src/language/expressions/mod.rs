@@ -105,6 +105,17 @@ impl Expression {
         }
     }
 
+    pub(crate) fn is_ref(&self, indexes: &Indexes<'_>) -> Option<bool> {
+        match self {
+            Self::F32Literal(_)
+            | Self::U32Literal(_)
+            | Self::I32Literal(_)
+            | Self::BoolLiteral(_)
+            | Self::FunctionCall(_) => Some(false),
+            Self::Identifier(node) => node.is_ref(indexes),
+        }
+    }
+
     pub(crate) fn validate(
         &self,
         constant_mark_span: Option<Span>,

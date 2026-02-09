@@ -1,0 +1,8 @@
+var result = 0;
+
+fn execute() -> bool {
+	result = 123.456;
+	return true;
+}
+
+var _ = execute();

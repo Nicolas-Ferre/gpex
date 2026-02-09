@@ -5,6 +5,7 @@ use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
+use crate::language::statements::Statement;
 use crate::language::statements::return_::ReturnStatement;
 use crate::language::symbols::{
     ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, FN_KEYWORD,
@@ -36,7 +37,7 @@ pub(crate) struct FunctionDefinition {
     #[derive_where(skip)]
     return_type: Expression,
     #[derive_where(skip)]
-    statements: Vec<ReturnStatement>,
+    statements: Vec<Statement>,
     #[derive_where(skip)]
     body_end_span: Span,
 }
@@ -55,7 +56,7 @@ impl FunctionDefinition {
             let arrow_span = Span::parse_symbol(context, ARROW_SYMBOL)?;
             let return_type = Expression::parse(context)?;
             Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
-            let (statements, _) = context.parse_many(0, ReturnStatement::parse, None)?;
+            let (statements, _) = context.parse_many(0, Statement::parse, None)?;
             let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
                 id,
@@ -111,9 +112,8 @@ impl FunctionDefinition {
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
         self.const_keyword_span.and_then(|_| {
-            self.statements
-                .first()
-                .and_then(|statement| statement.value.constant(indexes))
+            self.return_statement()
+                .and_then(|return_| return_.value.constant(indexes))
         })
     }
 
@@ -168,12 +168,14 @@ impl FunctionDefinition {
     ) -> Result<(), ValidateError> {
         for (index, statement) in self.statements.iter().enumerate() {
             statement.validate(self.const_keyword_span, context, indexes)?;
-            validators::statement::check_return(
-                statement.span,
-                index,
-                self.statements.len(),
-                context,
-            )?;
+            if let Statement::Return(return_) = statement {
+                validators::statement::check_return_before_end(
+                    return_.span,
+                    index,
+                    self.statements.len(),
+                    context,
+                )?;
+            }
         }
         let return_statement = validators::statement::check_missing_return(
             &self.statements,
@@ -206,5 +208,15 @@ impl FunctionDefinition {
 
     pub(crate) fn transpile_ref(&self, shader: &mut String) {
         _ = write!(shader, "_{}()", self.id);
+    }
+
+    fn return_statement(&self) -> Option<&ReturnStatement> {
+        self.statements.iter().find_map(|statement| {
+            if let Statement::Return(statement) = statement {
+                Some(statement)
+            } else {
+                None
+            }
+        })
     }
 }

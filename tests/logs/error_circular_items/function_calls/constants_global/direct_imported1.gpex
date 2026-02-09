@@ -1,5 +1,0 @@
-import ~.direct_imported2;
-
-pub const fn function() -> i32 {
-    return CONSTANT;
-}

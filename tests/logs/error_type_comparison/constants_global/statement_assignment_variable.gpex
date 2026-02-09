@@ -1,0 +1,9 @@
+const VALUE = 123u;
+var result = 0;
+
+fn execute() -> bool {
+	result = VALUE;
+	return true;
+}
+
+var _ = execute();

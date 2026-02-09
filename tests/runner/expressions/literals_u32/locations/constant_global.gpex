@@ -1,0 +1,2 @@
+const CONSTANT = 123u;
+var _result = CONSTANT; // expected: 123u

@@ -111,6 +111,14 @@ impl Identifier {
         }
     }
 
+    pub(crate) fn is_ref(&self, indexes: &Indexes<'_>) -> Option<bool> {
+        Some(match indexes.sources.get(&self.id)? {
+            ItemRef::Variable(_) => true,
+            ItemRef::Constant(_) | ItemRef::Struct(_) => false,
+            ItemRef::Function(_) => unreachable!("identifier should not refer to a function"),
+        })
+    }
+
     pub(crate) fn validate(
         &self,
         constant_mark_span: Option<Span>,

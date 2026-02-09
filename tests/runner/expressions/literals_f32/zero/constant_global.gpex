@@ -1,2 +1,0 @@
-const CONSTANT = 0.0;
-var _result = CONSTANT; // expected: 0.0

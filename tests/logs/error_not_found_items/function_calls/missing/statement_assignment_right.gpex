@@ -1,0 +1,6 @@
+var assigned = 0;
+
+fn _function() -> bool {
+    assigned = called_function();
+    return true;
+}

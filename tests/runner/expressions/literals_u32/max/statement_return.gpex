@@ -1,5 +1,0 @@
-fn function() -> u32 {
-    return 4_294_967_295u;
-}
-
-var _result = function();  // expected: 4294967295u

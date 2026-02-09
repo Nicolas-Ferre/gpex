@@ -1,3 +1,0 @@
-import ~.direct_imported2;
-
-pub const CONSTANT1 = CONSTANT2;

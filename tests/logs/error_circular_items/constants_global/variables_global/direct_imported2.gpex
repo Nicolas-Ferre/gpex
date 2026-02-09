@@ -1,3 +1,0 @@
-import ~.direct_imported1;
-
-pub var variable = CONSTANT;

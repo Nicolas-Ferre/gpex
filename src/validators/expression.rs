@@ -1,4 +1,6 @@
 use crate::compiler::constants::Constant;
+use crate::compiler::indexes::Indexes;
+use crate::language::expressions::Expression;
 use crate::language::items::struct_::StructDefinition;
 use crate::utils::parsing::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -54,5 +56,20 @@ pub(crate) fn check_constant(
             }],
         });
         Err(ValidateError)
+    }
+}
+
+pub(crate) fn check_ref(
+    expression: &Expression,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) {
+    if expression.is_ref(indexes) == Some(false) {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            message: "expression is not a reference".into(),
+            location: Some(context.location(expression.span())),
+            inner: vec![],
+        });
     }
 }

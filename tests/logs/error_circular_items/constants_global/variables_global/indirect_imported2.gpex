@@ -1,4 +1,0 @@
-import ~.indirect_imported1;
-
-pub var variable1 = CONSTANT2;
-pub var variable2 = CONSTANT1;

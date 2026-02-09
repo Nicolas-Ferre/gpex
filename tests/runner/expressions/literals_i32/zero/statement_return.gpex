@@ -1,5 +1,0 @@
-fn function() -> i32 {
-    return 0;
-}
-
-var _result = function();  // expected: 0

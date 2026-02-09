@@ -1,0 +1,6 @@
+fn _function() -> bool {
+    _after = 123;
+    return true;
+}
+
+var _after = 0;

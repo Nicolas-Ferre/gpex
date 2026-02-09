@@ -1,0 +1,6 @@
+fn _function() -> bool {
+    _AFTER = 123;
+    return true;
+}
+
+const _AFTER = i32;

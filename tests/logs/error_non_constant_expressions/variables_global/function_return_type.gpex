@@ -1,7 +1,5 @@
 var variable = i32;
 
-fn function() -> variable {
+fn _function() -> variable {
     return 123;
 }
-
-var _result = function(); // expected: 123

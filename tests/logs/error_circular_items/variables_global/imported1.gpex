@@ -1,0 +1,4 @@
+import ~.imported2;
+
+pub var variable1 = cyclic1;
+pub var variable2 = cyclic2;

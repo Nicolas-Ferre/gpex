@@ -1,0 +1,9 @@
+var value = 123;
+var result = 0; // expected: 123
+
+fn execute() -> bool {
+	result = value;
+	return true;
+}
+
+var _ = execute();

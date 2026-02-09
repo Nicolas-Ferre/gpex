@@ -1,3 +1,2 @@
 var variable = 123;
-const RESULT = variable;
-var _result = RESULT; // expected: 123
+const _RESULT = variable;

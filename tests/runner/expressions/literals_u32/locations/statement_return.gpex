@@ -1,0 +1,5 @@
+fn function() -> u32 {
+    return 123u;
+}
+
+var _result = function();  // expected: 123u

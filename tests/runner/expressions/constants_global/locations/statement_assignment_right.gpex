@@ -1,0 +1,9 @@
+const VALUE = 123;
+var result = 0; // expected: 123
+
+fn execute() -> bool {
+	result = VALUE;
+	return true;
+}
+
+var _ = execute();
