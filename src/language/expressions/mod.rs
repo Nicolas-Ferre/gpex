@@ -96,9 +96,9 @@ impl Expression {
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
         match self {
-            Self::F32Literal(node) => node.constant(),
-            Self::U32Literal(node) => node.constant(),
-            Self::I32Literal(node) => node.constant(),
+            Self::F32Literal(node) => Some(node.constant()),
+            Self::U32Literal(node) => Some(node.constant()),
+            Self::I32Literal(node) => Some(node.constant()),
             Self::BoolLiteral(node) => Some(node.constant()),
             Self::FunctionCall(node) => node.constant(indexes),
             Self::Identifier(node) => node.constant(indexes),
