@@ -28,8 +28,12 @@ impl I32Literal {
         indexes.search_prelude_type("i32")
     }
 
-    pub(crate) fn constant<'index>(&self) -> Option<Constant<'index>> {
-        self.value.map(Constant::I32)
+    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
+        if let Some(value) = self.value {
+            Constant::I32(value)
+        } else {
+            Constant::Unknown
+        }
     }
 
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
@@ -63,8 +67,12 @@ impl U32Literal {
         indexes.search_prelude_type("u32")
     }
 
-    pub(crate) fn constant<'index>(&self) -> Option<Constant<'index>> {
-        self.value.map(Constant::U32)
+    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
+        if let Some(value) = self.value {
+            Constant::U32(value)
+        } else {
+            Constant::Unknown
+        }
     }
 
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {
@@ -99,8 +107,12 @@ impl F32Literal {
         indexes.search_prelude_type("f32")
     }
 
-    pub(crate) fn constant<'index>(&self) -> Option<Constant<'index>> {
-        self.value.map(Constant::F32)
+    pub(crate) fn constant<'index>(&self) -> Constant<'index> {
+        if let Some(value) = self.value {
+            Constant::F32(value)
+        } else {
+            Constant::Unknown
+        }
     }
 
     pub(crate) fn validate(&self, context: &mut ValidateContext<'_>) -> Result<(), ValidateError> {

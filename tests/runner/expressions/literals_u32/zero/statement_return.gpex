@@ -1,5 +1,0 @@
-fn function() -> u32 {
-    return 0u;
-}
-
-var _result = function();  // expected: 0u

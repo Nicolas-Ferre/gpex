@@ -1,0 +1,6 @@
+import ~.imported;
+
+fn _function() -> bool {
+    imported() = 123;
+    return true;
+}

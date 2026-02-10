@@ -1,0 +1,9 @@
+var variable = 0;
+
+const fn function() -> i32 {
+    variable = 1;
+}
+
+const fn _usage() -> i32 {
+    return function();
+}

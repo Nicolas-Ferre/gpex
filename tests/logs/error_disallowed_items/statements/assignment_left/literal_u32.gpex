@@ -1,0 +1,4 @@
+fn _function() -> bool {
+    0u = 1u;
+    return true;
+}

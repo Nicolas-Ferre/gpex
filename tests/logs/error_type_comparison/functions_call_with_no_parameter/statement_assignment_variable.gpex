@@ -1,0 +1,12 @@
+var result = 0;
+
+const fn called_function() -> u32 {
+    return 123u;
+}
+
+fn execute() -> bool {
+	result = called_function();
+	return true;
+}
+
+var _ = execute();

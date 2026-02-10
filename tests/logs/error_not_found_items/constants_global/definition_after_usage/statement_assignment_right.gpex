@@ -1,0 +1,8 @@
+var assigned = 0;
+
+fn _function() -> bool {
+    assigned = _AFTER;
+    return true;
+}
+
+const _AFTER = i32;

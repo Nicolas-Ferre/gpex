@@ -103,12 +103,21 @@ impl Identifier {
     }
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
-        match indexes.sources.get(&self.id)? {
-            ItemRef::Variable(_) => None,
-            ItemRef::Constant(node) => node.constant(indexes),
-            ItemRef::Struct(node) => Some(Constant::TypeRef(node)),
-            ItemRef::Function(_) => unreachable!("identifier should not refer to a function"),
+        match indexes.sources.get(&self.id) {
+            Some(ItemRef::Variable(_)) => None,
+            Some(ItemRef::Constant(node)) => node.constant(indexes),
+            Some(ItemRef::Struct(node)) => Some(Constant::TypeRef(node)),
+            Some(ItemRef::Function(_)) => unreachable!("identifier should not refer to a function"),
+            None => Some(Constant::Unknown),
         }
+    }
+
+    pub(crate) fn is_ref(&self, indexes: &Indexes<'_>) -> Option<bool> {
+        Some(match indexes.sources.get(&self.id)? {
+            ItemRef::Variable(_) => true,
+            ItemRef::Constant(_) | ItemRef::Struct(_) => false,
+            ItemRef::Function(_) => unreachable!("identifier should not refer to a function"),
+        })
     }
 
     pub(crate) fn validate(

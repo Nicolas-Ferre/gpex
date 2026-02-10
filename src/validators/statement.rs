@@ -1,9 +1,10 @@
+use crate::language::statements::Statement;
 use crate::language::statements::return_::ReturnStatement;
 use crate::utils::parsing::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 
-pub(crate) fn check_return(
+pub(crate) fn check_return_before_end(
     span: Span,
     position: usize,
     statement_count: usize,
@@ -24,12 +25,12 @@ pub(crate) fn check_return(
 }
 
 pub(crate) fn check_missing_return<'statement>(
-    statements: &'statement [ReturnStatement],
+    statements: &'statement [Statement],
     block_end_span: Span,
     return_type_span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<&'statement ReturnStatement, ValidateError> {
-    if let Some(return_statement) = statements.last() {
+    if let Some(Statement::Return(return_statement)) = statements.last() {
         Ok(return_statement)
     } else {
         context.logs.push(Log {

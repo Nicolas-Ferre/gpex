@@ -1,0 +1,13 @@
+import ~.imported2;
+
+var variable = 0;
+
+pub fn function1() -> bool {
+    variable = cyclic1;
+    return true;
+}
+
+pub fn function2() -> bool {
+    variable = cyclic2;
+    return true;
+}

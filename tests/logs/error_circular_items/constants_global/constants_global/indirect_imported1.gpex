@@ -1,4 +1,0 @@
-import ~.indirect_imported2;
-
-pub const CONSTANT1 = CONSTANT2;
-pub const CONSTANT3 = CONSTANT4;

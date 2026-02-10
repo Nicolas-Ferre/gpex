@@ -1,3 +1,0 @@
-import ~.direct_imported2;
-
-pub var variable1 = variable2;

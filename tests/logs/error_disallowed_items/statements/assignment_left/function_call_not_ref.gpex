@@ -1,0 +1,8 @@
+fn called_function() -> i32 {
+    return 0;
+}
+
+fn _function() -> bool {
+    called_function() = 1;
+    return true;
+}

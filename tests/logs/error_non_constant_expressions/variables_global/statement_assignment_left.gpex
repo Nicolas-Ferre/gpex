@@ -1,0 +1,6 @@
+var variable = 123;
+
+const fn _function() -> bool {
+    variable = 456;
+    return true;
+}

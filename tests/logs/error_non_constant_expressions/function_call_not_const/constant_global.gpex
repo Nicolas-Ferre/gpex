@@ -2,5 +2,4 @@ fn called_function() -> i32 {
     return 123;
 }
 
-const RESULT = called_function();
-var _result = RESULT; // expected: 123
+const _RESULT = called_function();

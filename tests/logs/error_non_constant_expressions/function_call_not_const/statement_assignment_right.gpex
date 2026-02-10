@@ -1,0 +1,8 @@
+fn called_function() -> i32 {
+    return 123;
+}
+
+const fn _function() -> bool {
+    other_variable = called_function();
+    return true;
+}

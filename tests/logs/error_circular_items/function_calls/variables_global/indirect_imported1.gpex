@@ -1,9 +1,0 @@
-import ~.indirect_imported2;
-
-pub fn function1() -> i32 {
-    return variable1;
-}
-
-pub fn function2() -> i32 {
-    return variable2;
-}
