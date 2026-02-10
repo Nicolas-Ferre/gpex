@@ -9,6 +9,7 @@ pub(crate) enum Constant<'item> {
     U32(u32),
     F32(f32),
     Bool(bool),
+    Unknown,
 }
 
 impl<'item> Constant<'item> {
@@ -19,6 +20,7 @@ impl<'item> Constant<'item> {
             Self::U32(value) => _ = write!(shader, "u32({value})"),
             Self::F32(value) => _ = write!(shader, "f32({})", formatting::f32_to_string(*value)),
             Self::Bool(value) => _ = write!(shader, "u32({})", u32::from(*value)),
+            Self::Unknown => unreachable!("unknown constants should not be transpiled")
         }
     }
 

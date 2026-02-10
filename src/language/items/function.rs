@@ -112,8 +112,11 @@ impl FunctionDefinition {
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
         self.const_keyword_span.and_then(|_| {
-            self.return_statement()
-                .and_then(|return_| return_.value.constant(indexes))
+            if let Some(return_) = self.return_statement() {
+                return_.value.constant(indexes)
+            } else {
+                Some(Constant::Unknown)
+            }
         })
     }
 

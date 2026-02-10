@@ -106,8 +106,10 @@ error: `~.~.imported` module not found (at tests/logs/error_not_found_items/impo
   --> info: cannot read "tests/logs/error_not_found_items/imported.gpex"
 error: `~.~.~.~.~.~.missing` module not found (at tests/logs/error_not_found_items/imports/relative_outside_project.gpex:1:8)
   --> info: cannot read "../missing.gpex"
-error: missing `return` statement (at tests/logs/error_not_found_items/statements/return.gpex:2:1)
-  --> info: function has a return type (at tests/logs/error_not_found_items/statements/return.gpex:1:19)
+error: missing `return` statement (at tests/logs/error_not_found_items/statements/missing_return.gpex:2:1)
+  --> info: function has a return type (at tests/logs/error_not_found_items/statements/missing_return.gpex:1:19)
+error: expression not constant (at tests/logs/error_not_found_items/statements/missing_return_used_as_const.gpex:4:5)
+  --> info: expression must be constant (at tests/logs/error_not_found_items/statements/missing_return_used_as_const.gpex:3:1)
 error: `_after` item not found (at tests/logs/error_not_found_items/variables_global/definition_after_usage/constant_global.gpex:1:19)
 error: `_after` item not found (at tests/logs/error_not_found_items/variables_global/definition_after_usage/function_return_type.gpex:1:19)
 error: `_after` item not found (at tests/logs/error_not_found_items/variables_global/definition_after_usage/statement_assignment_left.gpex:2:5)
