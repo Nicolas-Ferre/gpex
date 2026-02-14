@@ -1,4 +1,3 @@
-fn _function() -> bool {
+fn _function() {
     identifier = 123;
-    return true;
 }

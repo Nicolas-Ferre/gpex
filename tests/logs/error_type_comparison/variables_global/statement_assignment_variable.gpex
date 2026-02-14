@@ -1,9 +1,6 @@
 var value = 123u;
 var result = 0;
 
-fn execute() -> bool {
+fn _execute() {
 	result = value;
-	return true;
 }
-
-var _ = execute();

@@ -1,5 +1,5 @@
 var result = 0; // expected: 0
 
-pub fn set_result() {
+fn _function() {
 	result = 42;
 }

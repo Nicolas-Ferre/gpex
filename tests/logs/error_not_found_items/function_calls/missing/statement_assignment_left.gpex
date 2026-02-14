@@ -1,4 +1,3 @@
-fn _function() -> bool {
+fn _function() {
     called_function() = 123;
-    return true;
 }

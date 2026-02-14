@@ -4,9 +4,6 @@ const fn called_function() -> u32 {
     return 123u;
 }
 
-fn execute() -> bool {
+fn _execute() {
 	result = called_function();
-	return true;
 }
-
-var _ = execute();

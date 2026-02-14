@@ -2,7 +2,6 @@ import ~.imported;
 
 var assigned = 0;
 
-fn _function() -> bool {
+fn _function() {
     assigned = imported();
-    return true;
 }

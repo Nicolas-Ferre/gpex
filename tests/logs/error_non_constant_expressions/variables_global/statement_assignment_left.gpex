@@ -1,6 +1,5 @@
 var variable = 123;
 
-const fn _function() -> bool {
+const fn _function() {
     variable = 456;
-    return true;
 }

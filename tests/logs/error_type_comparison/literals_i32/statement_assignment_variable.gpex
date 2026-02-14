@@ -1,8 +1,5 @@
 var result = 0u;
 
-fn execute() -> bool {
+fn _execute() {
 	result = 123;
-	return true;
 }
-
-var _ = execute();
