@@ -1,0 +1,13 @@
+var anchor = 0;
+
+fn _SCREAMING_CASE() {
+    anchor = 0;
+}
+
+fn _camelCase() {
+    anchor = 0;
+}
+
+fn _PascalCase() -> i32 {
+    return 0;
+}
