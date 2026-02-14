@@ -68,16 +68,16 @@ pub(crate) fn check_no_return_type(
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
     if let Some(&ItemRef::Function(function)) = indexes.sources.get(&node.id())
-        && !function.has_return_type()
+        && function.return_type.is_none()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("function `{}` has no return type", function.key()),
+            message: format!("called function `{}` with no return type", function.key()),
             location: Some(context.location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 message: "function has no return type".into(),
-                location: Some(context.location(function.name_span)),
+                location: Some(context.location(function.signature_span)),
             }],
         });
         return Err(ValidateError);

@@ -1,4 +1,4 @@
-error: function `called_function()` has no return type (at tests/logs/error_disallowed_items/function_calls/no_return_type.gpex:7:15)
+error: called function `called_function()` with no return type (at tests/logs/error_disallowed_items/function_calls/no_return_type.gpex:7:15)
   --> info: function has no return type (at tests/logs/error_disallowed_items/function_calls/no_return_type.gpex:3:4)
 error: `import` statement not at the top of the module (at tests/logs/error_disallowed_items/imports/import_after_item.gpex:3:1)
   --> info: `import` statements should appear before anything else

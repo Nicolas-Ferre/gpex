@@ -71,16 +71,16 @@ pub(crate) fn check_disallowed_return(
     result
 }
 
-pub(crate) fn check_empty_body(
+pub(crate) fn check_empty_block(
     statements: &[Statement],
-    body_end_span: Span,
+    body_span: Span,
     context: &mut ValidateContext<'_>,
 ) {
     if statements.is_empty() {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: "function body is empty".into(),
-            location: Some(context.location(body_end_span)),
+            message: "empty statement block".into(),
+            location: Some(context.location(body_span)),
             inner: vec![],
         });
     }
