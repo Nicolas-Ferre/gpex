@@ -1,0 +1,3 @@
+fn _function() {
+    return 0;
+}

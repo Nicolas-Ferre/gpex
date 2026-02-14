@@ -1,7 +1,9 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
 use crate::language::expressions::Expression;
+use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
+use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -57,6 +59,30 @@ pub(crate) fn check_constant(
     } else {
         Ok(())
     }
+}
+
+pub(crate) fn check_no_return_type(
+    node: impl NodeRef,
+    span: Span,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) -> Result<(), ValidateError> {
+    if let Some(&ItemRef::Function(function)) = indexes.sources.get(&node.id())
+        && !function.has_return_type()
+    {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            message: format!("function `{}` has no return type", function.key()),
+            location: Some(context.location(span)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                message: "function has no return type".into(),
+                location: Some(context.location(function.name_span)),
+            }],
+        });
+        return Err(ValidateError);
+    }
+    Ok(())
 }
 
 pub(crate) fn check_ref(

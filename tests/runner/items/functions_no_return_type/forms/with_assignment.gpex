@@ -1,0 +1,5 @@
+var result = 0; // expected: 0
+
+pub fn set_result() {
+	result = 42;
+}

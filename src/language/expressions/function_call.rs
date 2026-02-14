@@ -125,6 +125,7 @@ impl FunctionCall {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         validators::item::check_found(self, self.span, &self.key(), context, indexes)?;
+        validators::expression::check_no_return_type(self, self.span, context, indexes)?;
         if let Some(constant_mark_span) = constant_mark_span {
             validators::expression::check_constant(
                 self.constant(indexes),

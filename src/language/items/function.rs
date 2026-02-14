@@ -33,9 +33,9 @@ pub(crate) struct FunctionDefinition {
     #[derive_where(skip)]
     name: String,
     #[derive_where(skip)]
-    arrow_span: Span,
+    arrow_span: Option<Span>,
     #[derive_where(skip)]
-    return_type: Expression,
+    return_type: Option<Expression>,
     #[derive_where(skip)]
     statements: Vec<Statement>,
     #[derive_where(skip)]
@@ -53,8 +53,12 @@ impl FunctionDefinition {
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
             Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;
-            let arrow_span = Span::parse_symbol(context, ARROW_SYMBOL)?;
-            let return_type = Expression::parse(context)?;
+            let (arrow_span, return_type) =
+                if let Ok(arrow_span) = Span::parse_symbol(context, ARROW_SYMBOL) {
+                    (Some(arrow_span), Some(Expression::parse(context)?))
+                } else {
+                    (None, None)
+                };
             Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
             let (statements, _) = context.parse_many(0, Statement::parse, None)?;
             let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
@@ -82,7 +86,9 @@ impl FunctionDefinition {
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
-        self.return_type.index(indexes);
+        if let Some(return_type) = &self.return_type {
+            return_type.index(indexes);
+        }
         for statement in &self.statements {
             statement.index(indexes);
         }
@@ -94,9 +100,11 @@ impl FunctionDefinition {
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        let mut dependencies = self
-            .return_type
-            .dependencies(type_, dependencies, indexes)?;
+        let mut dependencies = if let Some(return_type) = &self.return_type {
+            return_type.dependencies(type_, dependencies, indexes)?
+        } else {
+            dependencies
+        };
         for statement in &self.statements {
             dependencies = statement.dependencies(type_, dependencies, indexes)?;
         }
@@ -107,7 +115,8 @@ impl FunctionDefinition {
         &self,
         indexes: &Indexes<'index>,
     ) -> Option<&'index StructDefinition> {
-        let constant = self.return_type.constant(indexes);
+        let return_type = self.return_type.as_ref()?;
+        let constant = return_type.constant(indexes);
         (constant != Constant::RuntimeValue)
             .then(|| constant.type_ref())
             .flatten()
@@ -144,26 +153,30 @@ impl FunctionDefinition {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        let typeref_type = indexes.search_prelude_type("typeref");
-        self.return_type
-            .validate(Some(self.arrow_span), context, indexes)?;
-        validators::expression::check_types(
-            self.return_type.span(),
-            self.return_type.type_(indexes),
-            None,
-            Some(typeref_type),
-            context,
-        )?;
-        validators::identifier::check_char_count(self.name_span, context);
-        let may_return_typeref = self
-            .type_(indexes)
-            .is_none_or(|type_| type_ == typeref_type);
-        let allowed_cases: &[Case] = if may_return_typeref {
-            &[Case::Snake, Case::Pascal]
+        if let (Some(arrow_span), Some(return_type)) = (self.arrow_span, &self.return_type) {
+            let typeref_type = indexes.search_prelude_type("typeref");
+            return_type.validate(Some(arrow_span), context, indexes)?;
+            validators::expression::check_types(
+                return_type.span(),
+                return_type.type_(indexes),
+                None,
+                Some(typeref_type),
+                context,
+            )?;
+            validators::identifier::check_char_count(self.name_span, context);
+            let may_return_typeref = self
+                .type_(indexes)
+                .is_none_or(|type_| type_ == typeref_type);
+            let allowed_cases: &[Case] = if may_return_typeref {
+                &[Case::Snake, Case::Pascal]
+            } else {
+                &[Case::Snake]
+            };
+            validators::identifier::check_case(self.name_span, allowed_cases, context);
         } else {
-            &[Case::Snake]
-        };
-        validators::identifier::check_case(self.name_span, allowed_cases, context);
+            validators::identifier::check_char_count(self.name_span, context);
+            validators::identifier::check_case(self.name_span, &[Case::Snake], context);
+        }
         Ok(())
     }
 
@@ -183,29 +196,38 @@ impl FunctionDefinition {
                 )?;
             }
         }
-        let return_statement = validators::statement::check_missing_return(
-            &self.statements,
-            self.body_end_span,
-            self.return_type.span(),
-            context,
-        )?;
-        validators::expression::check_types(
-            return_statement.value.span(),
-            return_statement.value.type_(indexes),
-            Some(self.return_type.span()),
-            self.type_(indexes),
-            context,
-        )?;
+        if let Some(return_type) = &self.return_type {
+            let return_statement = validators::statement::check_missing_return(
+                &self.statements,
+                self.body_end_span,
+                return_type.span(),
+                context,
+            )?;
+            validators::expression::check_types(
+                return_statement.value.span(),
+                return_statement.value.type_(indexes),
+                Some(return_type.span()),
+                self.type_(indexes),
+                context,
+            )?;
+        } else {
+            validators::statement::check_disallowed_return(
+                &self.statements,
+                self.name_span,
+                context,
+            )?;
+            validators::statement::check_empty_body(&self.statements, self.body_end_span, context);
+        }
         Ok(())
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         let id = self.id;
-        let return_type = self
-            .type_(indexes)
-            .unwrap_or_else(|| unreachable!("return type validated before"))
-            .transpile_name();
-        _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
+        if let Some(return_type) = self.type_(indexes).map(StructDefinition::transpile_name) {
+            _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
+        } else {
+            _ = write!(shader, "fn _{id}() {{ ");
+        }
         for statement in &self.statements {
             statement.transpile(shader, indexes);
         }
@@ -214,6 +236,10 @@ impl FunctionDefinition {
 
     pub(crate) fn transpile_ref(&self, shader: &mut String) {
         _ = write!(shader, "_{}()", self.id);
+    }
+
+    pub(crate) fn has_return_type(&self) -> bool {
+        self.return_type.is_some()
     }
 
     fn return_statement(&self) -> Option<&ReturnStatement> {
