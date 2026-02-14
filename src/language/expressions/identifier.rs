@@ -1,8 +1,8 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::items::ItemRef;
-use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{NodeRef, SearchConfig, Visibility};
@@ -95,11 +95,11 @@ impl Identifier {
         }
     }
 
-    pub(crate) fn type_<'index>(
-        &self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
-        indexes.sources.get(&self.id)?.type_(indexes)
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
+        match indexes.sources.get(&self.id) {
+            Some(source) => source.type_(indexes),
+            None => Type::Unknown,
+        }
     }
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {

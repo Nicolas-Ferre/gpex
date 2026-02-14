@@ -1,5 +1,6 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
@@ -111,15 +112,16 @@ impl FunctionDefinition {
         Ok(dependencies)
     }
 
-    pub(crate) fn type_<'index>(
-        &self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
-        let return_type = self.return_type.as_ref()?;
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
+        let Some(return_type) = self.return_type.as_ref() else {
+            return Type::NoReturn;
+        };
         let constant = return_type.constant(indexes);
-        (constant != Constant::RuntimeValue)
-            .then(|| constant.type_ref())
-            .flatten()
+        if let Some(struct_) = constant.type_ref() {
+            Type::Struct(struct_)
+        } else {
+            Type::Unknown
+        }
     }
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
@@ -160,12 +162,13 @@ impl FunctionDefinition {
                 return_type.span(),
                 return_type.type_(indexes),
                 None,
-                Some(typeref_type),
+                Type::Struct(typeref_type),
                 context,
             )?;
             validators::identifier::check_char_count(self.name_span, context);
             let may_return_typeref = self
                 .type_(indexes)
+                .struct_ref()
                 .is_none_or(|type_| type_ == typeref_type);
             let allowed_cases: &[Case] = if may_return_typeref {
                 &[Case::Snake, Case::Pascal]
@@ -223,7 +226,11 @@ impl FunctionDefinition {
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         let id = self.id;
-        if let Some(return_type) = self.type_(indexes).map(StructDefinition::transpile_name) {
+        if let Some(return_type) = self
+            .type_(indexes)
+            .struct_ref()
+            .map(StructDefinition::transpile_name)
+        {
             _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
         } else {
             _ = write!(shader, "fn _{id}() {{ ");

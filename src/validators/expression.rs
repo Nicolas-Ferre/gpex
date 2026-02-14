@@ -1,8 +1,8 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
-use crate::language::items::struct_::StructDefinition;
 use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -10,13 +10,13 @@ use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_types(
     actual_span: Span,
-    actual_type: Option<&StructDefinition>,
+    actual_type: Type<'_>,
     expected_span: Option<Span>,
-    expected_type: Option<&StructDefinition>,
+    expected_type: Type<'_>,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if let Some(expected_type) = expected_type
-        && let Some(actual_type) = actual_type
+    if let Type::Struct(expected_type) = expected_type
+        && let Type::Struct(actual_type) = actual_type
     {
         if actual_type == expected_type {
             Ok(())

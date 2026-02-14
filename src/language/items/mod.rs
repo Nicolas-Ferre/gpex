@@ -4,6 +4,7 @@ pub(crate) mod struct_;
 pub(crate) mod variable;
 
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::items::constant::ConstantDefinition;
 use crate::language::items::function::FunctionDefinition;
@@ -80,14 +81,11 @@ impl ItemRef<'_> {
         }
     }
 
-    pub(crate) fn type_<'index>(
-        self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
+    pub(crate) fn type_<'index>(self, indexes: &Indexes<'index>) -> Type<'index> {
         match self {
             ItemRef::Variable(node) => node.type_(indexes),
             ItemRef::Constant(node) => node.type_(indexes),
-            ItemRef::Struct(_) => Some(StructDefinition::type_(indexes)),
+            ItemRef::Struct(_) => Type::Struct(StructDefinition::type_(indexes)),
             ItemRef::Function(node) => node.type_(indexes),
         }
     }

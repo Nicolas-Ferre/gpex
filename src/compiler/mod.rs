@@ -3,6 +3,7 @@ pub(crate) mod constants;
 pub(crate) mod indexes;
 pub(crate) mod prelude;
 pub(crate) mod transpilation;
+pub(crate) mod types;
 
 use crate::compiler::transpilation::Program;
 use crate::utils::logs::Log;

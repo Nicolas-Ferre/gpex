@@ -1,10 +1,10 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::expressions::function_call::FunctionCall;
 use crate::language::expressions::literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
 use crate::language::items::ItemRef;
-use crate::language::items::struct_::StructDefinition;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -82,15 +82,12 @@ impl Expression {
         }
     }
 
-    pub(crate) fn type_<'index>(
-        &self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
         match self {
-            Self::F32Literal(_) => Some(F32Literal::type_(indexes)),
-            Self::U32Literal(_) => Some(U32Literal::type_(indexes)),
-            Self::I32Literal(_) => Some(I32Literal::type_(indexes)),
-            Self::BoolLiteral(_) => Some(BoolLiteral::type_(indexes)),
+            Self::F32Literal(_) => Type::Struct(F32Literal::type_(indexes)),
+            Self::U32Literal(_) => Type::Struct(U32Literal::type_(indexes)),
+            Self::I32Literal(_) => Type::Struct(I32Literal::type_(indexes)),
+            Self::BoolLiteral(_) => Type::Struct(BoolLiteral::type_(indexes)),
             Self::FunctionCall(node) => node.type_(indexes),
             Self::Identifier(node) => node.type_(indexes),
         }

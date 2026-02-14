@@ -65,6 +65,7 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
             let path = format!("{}:{}", dot_path, variable.name);
             let type_ = variable
                 .type_(indexes)
+                .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"));
             let field = BufferField {
                 type_id: type_.id,
@@ -95,6 +96,7 @@ fn main_buffer_next_field_offset(
     if let Some(next_variable) = fields.get(current_field_index + 1) {
         let next_variable_type = next_variable
             .type_(indexes)
+            .struct_ref()
             .unwrap_or_else(|| unreachable!("variable type should be validated before"));
         round_up(
             next_variable_type.alignment(),
@@ -111,6 +113,7 @@ fn main_buffer_alignment(indexes: &Indexes<'_>, variables: &[&VariableDefinition
         .map(|variable| {
             variable
                 .type_(indexes)
+                .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"))
                 .alignment()
         })
@@ -134,6 +137,7 @@ fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashM
         .chain(variables.iter().map(|variable| {
             variable
                 .type_(indexes)
+                .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"))
         }))
         .map(|type_| (type_.id, type_.dot_path()))
