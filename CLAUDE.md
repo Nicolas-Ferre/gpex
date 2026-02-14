@@ -3,7 +3,7 @@
 GPEx is a GPU programming language written in Rust that compiles to WGSL (WebGPU Shading Language)
 and runs on the GPU via wgpu. The CLI provides `compile` and `run` subcommands.
 
-## Build & Development Commands
+## Build & development commands
 
 ```bash
 cargo build                                    # Build
@@ -15,17 +15,15 @@ cargo clippy --all-targets --no-deps -- -D warnings  # Lint (strict: all+pedanti
 
 Minimum Rust version: 1.92.0 (edition 2024).
 
-## Code Style & Lint Rules
+## Documentation
 
-Clippy is configured very strictly (all+pedantic+nursery+cargo at warn, `-D warnings` in CI).
-Notable rules from `clippy.toml`:
+Detailed documentation is available in `doc/`. Read the relevant file when working on the
+corresponding area:
 
-- **Naming**: No abbreviations like `err`, `ctx`, `var`, `semi`, `loc`. No full names like `ident`,
-  `reference`, `argument` when abbreviation is preferred. Min identifier length is 2 chars.
-- **Allowed short identifiers**: `'_`, `_`, `io`, `Io`, `fs`, `id`
-- **Forbidden patterns**: `unwrap_used`, `expect_used`, `todo`, `unimplemented`, `dbg_macro`,
-  `print_stdout`
-- **Formatting**: Unix line endings, field init shorthand (`rustfmt.toml`)
-
-GPEx language conventions: `snake_case` for functions (except those returning `typeref` which may be
-`PascalCase`), `PascalCase` for structs.
+- @doc/architecture.md — Compiler pipeline and project structure. Read when modifying `src/` or
+  understanding the compilation process.
+- @doc/testing.md — Test organization, conventions and harnesses. Read when adding or modifying
+  tests.
+- @doc/maintenance.md — Code conventions and style rules. Read when writing or reviewing code.
+- @clippy.toml — Naming rules (abbreviations, full names, allowed short identifiers). Read when
+  naming variables, functions or types.
