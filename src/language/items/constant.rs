@@ -77,7 +77,7 @@ impl ConstantDefinition {
         self.value.type_(indexes)
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
         self.value.constant(indexes)
     }
 

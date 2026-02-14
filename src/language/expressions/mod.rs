@@ -66,7 +66,9 @@ impl Expression {
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        if type_ == DependencyType::Transpilation && self.constant(indexes).is_some() {
+        if type_ == DependencyType::Transpilation
+            && self.constant(indexes) != Constant::RuntimeValue
+        {
             Ok(dependencies)
         } else {
             match self {
@@ -94,12 +96,12 @@ impl Expression {
         }
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
         match self {
-            Self::F32Literal(node) => Some(node.constant()),
-            Self::U32Literal(node) => Some(node.constant()),
-            Self::I32Literal(node) => Some(node.constant()),
-            Self::BoolLiteral(node) => Some(node.constant()),
+            Self::F32Literal(node) => node.constant(),
+            Self::U32Literal(node) => node.constant(),
+            Self::I32Literal(node) => node.constant(),
+            Self::BoolLiteral(node) => node.constant(),
             Self::FunctionCall(node) => node.constant(indexes),
             Self::Identifier(node) => node.constant(indexes),
         }
@@ -133,9 +135,8 @@ impl Expression {
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        if let Some(constant) = self.constant(indexes) {
-            constant.transpile(shader);
-        } else {
+        let constant = self.constant(indexes);
+        if constant == Constant::RuntimeValue {
             match self {
                 Self::FunctionCall(node) => node.transpile(shader, indexes),
                 Self::Identifier(node) => node.transpile(shader, indexes),
@@ -144,6 +145,8 @@ impl Expression {
                 | Self::I32Literal(_)
                 | Self::BoolLiteral(_) => unreachable!("literals should be constant"),
             }
+        } else {
+            constant.transpile(shader);
         }
     }
 }

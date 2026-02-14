@@ -2,7 +2,7 @@ use crate::language::items::struct_::StructDefinition;
 use crate::utils::formatting;
 use std::fmt::Write;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) enum Constant<'item> {
     TypeRef(&'item StructDefinition),
     I32(i32),
@@ -10,6 +10,7 @@ pub(crate) enum Constant<'item> {
     F32(f32),
     Bool(bool),
     Unknown,
+    RuntimeValue,
 }
 
 impl<'item> Constant<'item> {
@@ -20,7 +21,7 @@ impl<'item> Constant<'item> {
             Self::U32(value) => _ = write!(shader, "u32({value})"),
             Self::F32(value) => _ = write!(shader, "f32({})", formatting::f32_to_string(*value)),
             Self::Bool(value) => _ = write!(shader, "u32({})", u32::from(*value)),
-            Self::Unknown => unreachable!("unknown constants should not be transpiled"),
+            Self::Unknown | Self::RuntimeValue => unreachable!("non-constant cannot be transpiled"),
         }
     }
 

@@ -37,14 +37,12 @@ pub(crate) fn check_types(
 }
 
 pub(crate) fn check_constant(
-    constant_value: Option<Constant<'_>>,
+    constant_value: Constant<'_>,
     span: Span,
     constant_mark_span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if constant_value.is_some() {
-        Ok(())
-    } else {
+    if constant_value == Constant::RuntimeValue {
         context.logs.push(Log {
             level: LogLevel::Error,
             message: "expression not constant".into(),
@@ -56,6 +54,8 @@ pub(crate) fn check_constant(
             }],
         });
         Err(ValidateError)
+    } else {
+        Ok(())
     }
 }
 

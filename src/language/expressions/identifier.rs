@@ -102,13 +102,13 @@ impl Identifier {
         indexes.sources.get(&self.id)?.type_(indexes)
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
         match indexes.sources.get(&self.id) {
-            Some(ItemRef::Variable(_)) => None,
+            Some(ItemRef::Variable(_)) => Constant::RuntimeValue,
             Some(ItemRef::Constant(node)) => node.constant(indexes),
-            Some(ItemRef::Struct(node)) => Some(Constant::TypeRef(node)),
+            Some(ItemRef::Struct(node)) => Constant::TypeRef(node),
             Some(ItemRef::Function(_)) => unreachable!("identifier should not refer to a function"),
-            None => Some(Constant::Unknown),
+            None => Constant::Unknown,
         }
     }
 

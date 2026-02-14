@@ -107,17 +107,20 @@ impl FunctionDefinition {
         &self,
         indexes: &Indexes<'index>,
     ) -> Option<&'index StructDefinition> {
-        self.return_type.constant(indexes)?.type_ref()
+        let constant = self.return_type.constant(indexes);
+        (constant != Constant::RuntimeValue)
+            .then(|| constant.type_ref())
+            .flatten()
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
-        self.const_keyword_span.and_then(|_| {
-            if let Some(return_) = self.return_statement() {
-                return_.value.constant(indexes)
-            } else {
-                Some(Constant::Unknown)
-            }
-        })
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
+        if self.const_keyword_span.is_none() {
+            Constant::RuntimeValue
+        } else if let Some(return_) = self.return_statement() {
+            return_.value.constant(indexes)
+        } else {
+            Constant::Unknown
+        }
     }
 
     pub(crate) fn validate(
