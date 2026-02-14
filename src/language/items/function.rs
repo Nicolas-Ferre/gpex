@@ -161,10 +161,11 @@ impl FunctionDefinition {
 
     fn validate_name(&self, indexes: &Indexes<'_>, context: &mut ValidateContext<'_>) {
         let typeref_type = indexes.search_prelude_type("typeref");
-        let may_return_typeref = self
-            .type_(indexes)
-            .struct_ref()
-            .is_none_or(|type_| type_ == typeref_type);
+        let may_return_typeref = match self.type_(indexes) {
+            Type::Struct(struct_ref) => struct_ref == typeref_type,
+            Type::Unknown => true,
+            Type::NoReturn => false,
+        };
         let allowed_cases: &[Case] = if may_return_typeref {
             &[Case::Snake, Case::Pascal]
         } else {

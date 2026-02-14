@@ -8,6 +8,6 @@ fn _camelCase() {
     anchor = 0;
 }
 
-fn _PascalCase() -> i32 {
-    return 0;
+fn _PascalCase() {
+    anchor = 0;
 }
