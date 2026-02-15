@@ -26,4 +26,4 @@ corresponding area:
   tests.
 - @doc/maintenance.md — Code conventions and style rules. Read when writing or reviewing code.
 - @clippy.toml — Naming rules (abbreviations, full names, allowed short identifiers). Read when
-  naming variables, functions or types. Can be updated if needed.
+  naming variables, functions or types. It can be updated if needed.

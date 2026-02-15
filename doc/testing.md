@@ -18,7 +18,7 @@ Only create a dimension subdirectory when it contains multiple entries. When a f
 dimension, place files directly under the feature directory. Each test file should cover a distinct
 behavior — avoid redundant tests that overlap in what they verify.
 
-It is important to make sure tests remains as exhaustive as possible (i.e. covers all kind of cases
+It is important to make sure tests remain as exhaustive as possible (i.e. cover all kinds of cases
 in each dimension).
 
 ## Compiler integration tests (`tests/lib/`)

@@ -21,4 +21,4 @@
     - `use` statements should be placed after `mod` statements.
     - Favor `_ = value;` over `let _ = value;`.
     - Within a same file, functions should be defined after their call sites, so that the file goes
-      from high level functions to lower level functions.
+      from high-level functions to lower-level functions.
