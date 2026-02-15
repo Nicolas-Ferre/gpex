@@ -116,6 +116,17 @@ impl Expression {
         }
     }
 
+    pub(crate) fn is_global_variable_modified(&self, indexes: &Indexes<'_>) -> bool {
+        match self {
+            Self::FunctionCall(node) => node.is_global_variable_modified(indexes),
+            Self::F32Literal(_)
+            | Self::U32Literal(_)
+            | Self::I32Literal(_)
+            | Self::BoolLiteral(_)
+            | Self::Identifier(_) => false,
+        }
+    }
+
     pub(crate) fn validate(
         &self,
         constant_mark_span: Option<Span>,

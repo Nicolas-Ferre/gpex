@@ -118,6 +118,14 @@ impl FunctionCall {
         }
     }
 
+    pub(crate) fn is_global_variable_modified(&self, indexes: &Indexes<'_>) -> bool {
+        if let Some(&ItemRef::Function(function)) = indexes.sources.get(&self.id) {
+            function.is_global_variable_modified(indexes)
+        } else {
+            false
+        }
+    }
+
     pub(crate) fn validate(
         &self,
         constant_mark_span: Option<Span>,

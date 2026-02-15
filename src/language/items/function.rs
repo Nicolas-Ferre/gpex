@@ -142,6 +142,12 @@ impl FunctionDefinition {
         }
     }
 
+    pub(crate) fn is_global_variable_modified(&self, indexes: &Indexes<'_>) -> bool {
+        self.statements
+            .iter()
+            .any(|statement| statement.is_global_variable_modified(indexes))
+    }
+
     pub(crate) fn validate(
         &self,
         context: &mut ValidateContext<'_>,
@@ -231,6 +237,7 @@ impl FunctionDefinition {
                 context,
             )?;
             validators::statement::check_empty_block(&self.statements, self.body_span, context);
+            validators::item::check_no_side_effect(self, context, indexes);
         }
         Ok(())
     }

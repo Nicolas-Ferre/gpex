@@ -49,6 +49,10 @@ impl ReturnStatement {
         Ok(())
     }
 
+    pub(crate) fn is_global_variable_modified(&self, indexes: &Indexes<'_>) -> bool {
+        self.value.is_global_variable_modified(indexes)
+    }
+
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         *shader += "return ";
         self.value.transpile(shader, indexes);

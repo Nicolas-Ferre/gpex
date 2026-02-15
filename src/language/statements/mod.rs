@@ -57,6 +57,13 @@ impl Statement {
         }
     }
 
+    pub(crate) fn is_global_variable_modified(&self, indexes: &Indexes<'_>) -> bool {
+        match self {
+            Self::Assignment(_) => true,
+            Self::Return(node) => node.is_global_variable_modified(indexes),
+        }
+    }
+
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         match self {
             Self::Return(node) => node.transpile(shader, indexes),

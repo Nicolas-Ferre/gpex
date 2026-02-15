@@ -1,6 +1,7 @@
 use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
+use crate::language::items::function::FunctionDefinition;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, Visibility};
 use crate::utils::parsing::{Span, SpanProperties};
@@ -166,5 +167,23 @@ pub(crate) fn check_found(
             },
         });
         Err(ValidateError)
+    }
+}
+
+pub(crate) fn check_no_side_effect(
+    function: &FunctionDefinition,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) {
+    if !function.is_global_variable_modified(indexes) {
+        context.logs.push(Log {
+            level: LogLevel::Warning,
+            message: format!(
+                "function `{}` with no return type but also no side effect",
+                function.key()
+            ),
+            location: Some(context.location(function.name_span)),
+            inner: vec![],
+        });
     }
 }
