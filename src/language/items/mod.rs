@@ -1,5 +1,6 @@
 pub(crate) mod constant;
 pub(crate) mod function;
+pub(crate) mod repeat;
 pub(crate) mod struct_;
 pub(crate) mod variable;
 

@@ -244,10 +244,8 @@ impl FunctionDefinition {
         {
             _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
         } else {
-            // coverage: off (functions without return types are not yet transpiled)
             _ = write!(shader, "fn _{id}() {{ ");
         }
-        // coverage: on
         for statement in &self.statements {
             statement.transpile(shader, indexes);
         }

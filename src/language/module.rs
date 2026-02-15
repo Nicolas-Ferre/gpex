@@ -2,6 +2,7 @@ use crate::compiler::indexes::Indexes;
 use crate::language::import::Import;
 use crate::language::items::constant::ConstantDefinition;
 use crate::language::items::function::FunctionDefinition;
+use crate::language::items::repeat::RepeatDefinition;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::items::variable::VariableDefinition;
 use crate::utils::parsing::{ParseContext, ParseError};
@@ -84,6 +85,16 @@ impl Module {
             }
         })
     }
+
+    pub(crate) fn repeats(&self) -> impl Iterator<Item = &RepeatDefinition> {
+        self.items.iter().filter_map(|item| {
+            if let Item::Repeat(repeat) = item {
+                Some(repeat)
+            } else {
+                None
+            }
+        })
+    }
 }
 
 #[derive(Debug)]
@@ -93,6 +104,7 @@ pub(crate) enum Item {
     Constant(ConstantDefinition),
     Struct(StructDefinition),
     Function(FunctionDefinition),
+    Repeat(RepeatDefinition),
 }
 
 impl Item {
@@ -105,19 +117,24 @@ impl Item {
             |context| ConstantDefinition::parse(context).map(Self::Constant),
             |context| StructDefinition::parse(context).map(Self::Struct),
             |context| FunctionDefinition::parse(context).map(Self::Function),
+            |context| RepeatDefinition::parse(context).map(Self::Repeat),
         ])
     }
 
     pub(crate) fn index_imports<'index>(&'index self, indexes: &mut Indexes<'index>) {
         match self {
             Self::Import(item) => item.index(indexes),
-            Self::Variable(_) | Self::Constant(_) | Self::Struct(_) | Self::Function(_) => (),
+            Self::Variable(_)
+            | Self::Constant(_)
+            | Self::Struct(_)
+            | Self::Function(_)
+            | Self::Repeat(_) => (),
         }
     }
 
     pub(crate) fn index_items<'index>(&'index self, indexes: &mut Indexes<'index>) {
         match self {
-            Self::Import(_) => (),
+            Self::Import(_) | Self::Repeat(_) => (),
             Self::Variable(item) => item.index_item(indexes),
             Self::Constant(item) => item.index_item(indexes),
             Self::Struct(item) => item.index_item(indexes),
@@ -130,6 +147,7 @@ impl Item {
             Self::Variable(item) => item.index_refs(indexes),
             Self::Constant(item) => item.index_refs(indexes),
             Self::Function(item) => item.index_refs(indexes),
+            Self::Repeat(item) => item.index_refs(indexes),
             Self::Import(_) | Self::Struct(_) => (),
         }
     }
@@ -145,6 +163,7 @@ impl Item {
             Self::Constant(item) => item.validate(context, indexes),
             Self::Struct(item) => item.validate(context),
             Self::Function(item) => item.validate(context, indexes),
+            Self::Repeat(item) => item.validate(context, indexes),
         }
     }
 }

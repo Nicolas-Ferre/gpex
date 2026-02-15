@@ -86,12 +86,14 @@ async fn run_program(program: Program, args: &RunArgs) {
             std::process::exit(1);
         }
     };
-    runner.run_step();
-    for variable_path in &args.variable_paths {
-        if let Some(value) = runner.read_variable(variable_path) {
-            println!("info: {variable_path} = `{value}`");
-        } else {
-            println!("warning: `{variable_path}` variable not found");
+    loop {
+        runner.run_step();
+        for variable_path in &args.variable_paths {
+            if let Some(value) = runner.read_variable(variable_path) {
+                println!("info: {variable_path} = `{value}`");
+            } else {
+                println!("warning: `{variable_path}` variable not found");
+            }
         }
     }
 }

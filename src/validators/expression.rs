@@ -85,6 +85,30 @@ pub(crate) fn check_no_return_type(
     Ok(())
 }
 
+pub(crate) fn check_has_return_type(
+    node: impl NodeRef,
+    span: Span,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) -> Result<(), ValidateError> {
+    if let Some(&ItemRef::Function(function)) = indexes.sources.get(&node.id())
+        && function.return_type.is_some()
+    {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            message: format!("repeated function `{}` with a return type", function.key()),
+            location: Some(context.location(span)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                message: "function has a return type".into(),
+                location: Some(context.location(function.signature_span)),
+            }],
+        });
+        return Err(ValidateError);
+    }
+    Ok(())
+}
+
 pub(crate) fn check_ref(
     expression: &Expression,
     context: &mut ValidateContext<'_>,

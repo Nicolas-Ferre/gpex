@@ -8,6 +8,7 @@ use crate::language::items::ItemRef;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
+use crate::validators;
 use identifier::Identifier;
 
 pub(crate) mod function_call;
@@ -126,7 +127,10 @@ impl Expression {
             Self::U32Literal(node) => node.validate(context),
             Self::I32Literal(node) => node.validate(context),
             Self::BoolLiteral(_) => Ok(()),
-            Self::FunctionCall(node) => node.validate(constant_mark_span, context, indexes),
+            Self::FunctionCall(node) => {
+                validators::expression::check_no_return_type(node, node.span, context, indexes)?;
+                node.validate(constant_mark_span, context, indexes)
+            }
             Self::Identifier(node) => node.validate(constant_mark_span, context, indexes),
         }
     }
