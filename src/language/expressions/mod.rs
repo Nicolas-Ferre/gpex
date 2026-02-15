@@ -1,10 +1,10 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::expressions::function_call::FunctionCall;
 use crate::language::expressions::literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
 use crate::language::items::ItemRef;
-use crate::language::items::struct_::StructDefinition;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -66,7 +66,9 @@ impl Expression {
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        if type_ == DependencyType::Transpilation && self.constant(indexes).is_some() {
+        if type_ == DependencyType::Transpilation
+            && self.constant(indexes) != Constant::RuntimeValue
+        {
             Ok(dependencies)
         } else {
             match self {
@@ -80,26 +82,23 @@ impl Expression {
         }
     }
 
-    pub(crate) fn type_<'index>(
-        &self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
         match self {
-            Self::F32Literal(_) => Some(F32Literal::type_(indexes)),
-            Self::U32Literal(_) => Some(U32Literal::type_(indexes)),
-            Self::I32Literal(_) => Some(I32Literal::type_(indexes)),
-            Self::BoolLiteral(_) => Some(BoolLiteral::type_(indexes)),
+            Self::F32Literal(_) => Type::Struct(F32Literal::type_(indexes)),
+            Self::U32Literal(_) => Type::Struct(U32Literal::type_(indexes)),
+            Self::I32Literal(_) => Type::Struct(I32Literal::type_(indexes)),
+            Self::BoolLiteral(_) => Type::Struct(BoolLiteral::type_(indexes)),
             Self::FunctionCall(node) => node.type_(indexes),
             Self::Identifier(node) => node.type_(indexes),
         }
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
         match self {
-            Self::F32Literal(node) => Some(node.constant()),
-            Self::U32Literal(node) => Some(node.constant()),
-            Self::I32Literal(node) => Some(node.constant()),
-            Self::BoolLiteral(node) => Some(node.constant()),
+            Self::F32Literal(node) => node.constant(),
+            Self::U32Literal(node) => node.constant(),
+            Self::I32Literal(node) => node.constant(),
+            Self::BoolLiteral(node) => node.constant(),
             Self::FunctionCall(node) => node.constant(indexes),
             Self::Identifier(node) => node.constant(indexes),
         }
@@ -133,9 +132,8 @@ impl Expression {
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        if let Some(constant) = self.constant(indexes) {
-            constant.transpile(shader);
-        } else {
+        let constant = self.constant(indexes);
+        if constant == Constant::RuntimeValue {
             match self {
                 Self::FunctionCall(node) => node.transpile(shader, indexes),
                 Self::Identifier(node) => node.transpile(shader, indexes),
@@ -144,6 +142,8 @@ impl Expression {
                 | Self::I32Literal(_)
                 | Self::BoolLiteral(_) => unreachable!("literals should be constant"),
             }
+        } else {
+            constant.transpile(shader);
         }
     }
 }

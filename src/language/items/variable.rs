@@ -1,9 +1,9 @@
 use crate::compiler::indexes::Indexes;
 use crate::compiler::transpilation::MAIN_BUFFER_NAME;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
-use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL, VAR_KEYWORD};
 use crate::utils::dependencies::Dependencies;
@@ -69,10 +69,7 @@ impl VariableDefinition {
             .dependencies(type_, dependencies, indexes)
     }
 
-    pub(crate) fn type_<'index>(
-        &self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
         self.default_value.type_(indexes)
     }
 
@@ -96,6 +93,7 @@ impl VariableDefinition {
     pub(crate) fn transpile_buffer_field(&self, shader: &mut String, indexes: &Indexes<'_>) {
         let type_ = self
             .type_(indexes)
+            .struct_ref()
             .unwrap_or_else(|| unreachable!("variable type should be validated before"));
         _ = write!(shader, "v{}: {}, ", self.id, type_.transpile_name());
     }

@@ -1,5 +1,6 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
@@ -29,15 +30,19 @@ pub(crate) struct FunctionDefinition {
     #[derive_where(skip)]
     pub(crate) const_keyword_span: Option<Span>,
     #[derive_where(skip)]
-    pub(crate) name_span: Span,
-    #[derive_where(skip)]
     name: String,
     #[derive_where(skip)]
-    arrow_span: Span,
+    pub(crate) name_span: Span,
     #[derive_where(skip)]
-    return_type: Expression,
+    pub(crate) signature_span: Span,
+    #[derive_where(skip)]
+    arrow_span: Option<Span>,
+    #[derive_where(skip)]
+    pub(crate) return_type: Option<Expression>,
     #[derive_where(skip)]
     statements: Vec<Statement>,
+    #[derive_where(skip)]
+    body_span: Span,
     #[derive_where(skip)]
     body_end_span: Span,
 }
@@ -52,10 +57,16 @@ impl FunctionDefinition {
             Span::parse_symbol(context, FN_KEYWORD)?;
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
-            Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;
-            let arrow_span = Span::parse_symbol(context, ARROW_SYMBOL)?;
-            let return_type = Expression::parse(context)?;
-            Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
+            let parenthesis_close_span = Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;
+            let (arrow_span, return_type, signature_end_span) =
+                if let Ok(arrow_span) = Span::parse_symbol(context, ARROW_SYMBOL) {
+                    let expression = Expression::parse(context)?;
+                    let span = expression.span();
+                    (Some(arrow_span), Some(expression), span)
+                } else {
+                    (None, None, parenthesis_close_span)
+                };
+            let body_start_span = Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
             let (statements, _) = context.parse_many(0, Statement::parse, None)?;
             let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
@@ -65,9 +76,11 @@ impl FunctionDefinition {
                 const_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),
+                signature_span: name_span.until(signature_end_span),
                 arrow_span,
                 return_type,
                 statements,
+                body_span: body_start_span.until(body_end_span),
                 body_end_span,
             })
         })
@@ -82,7 +95,9 @@ impl FunctionDefinition {
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
-        self.return_type.index(indexes);
+        if let Some(return_type) = &self.return_type {
+            return_type.index(indexes);
+        }
         for statement in &self.statements {
             statement.index(indexes);
         }
@@ -94,30 +109,37 @@ impl FunctionDefinition {
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        let mut dependencies = self
-            .return_type
-            .dependencies(type_, dependencies, indexes)?;
+        let mut dependencies = if let Some(return_type) = &self.return_type {
+            return_type.dependencies(type_, dependencies, indexes)?
+        } else {
+            dependencies
+        };
         for statement in &self.statements {
             dependencies = statement.dependencies(type_, dependencies, indexes)?;
         }
         Ok(dependencies)
     }
 
-    pub(crate) fn type_<'index>(
-        &self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
-        self.return_type.constant(indexes)?.type_ref()
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
+        let Some(return_type) = self.return_type.as_ref() else {
+            return Type::NoReturn;
+        };
+        let constant = return_type.constant(indexes);
+        if let Some(struct_) = constant.type_ref() {
+            Type::Struct(struct_)
+        } else {
+            Type::Unknown
+        }
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
-        self.const_keyword_span.and_then(|_| {
-            if let Some(return_) = self.return_statement() {
-                return_.value.constant(indexes)
-            } else {
-                Some(Constant::Unknown)
-            }
-        })
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
+        if self.const_keyword_span.is_none() {
+            Constant::RuntimeValue
+        } else if let Some(return_) = self.return_statement() {
+            return_.value.constant(indexes)
+        } else {
+            Constant::Unknown
+        }
     }
 
     pub(crate) fn validate(
@@ -131,37 +153,45 @@ impl FunctionDefinition {
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
         validators::item::check_usage(ref_, context, indexes);
-        let signature_result = self.validate_signature(context, indexes);
+        let return_type_result = self.validate_return_type(context, indexes);
+        self.validate_name(indexes, context);
         let statements_result = self.validate_statements(context, indexes);
-        signature_result.and(statements_result)
+        return_type_result.and(statements_result)
     }
 
-    fn validate_signature(
-        &self,
-        context: &mut ValidateContext<'_>,
-        indexes: &Indexes<'_>,
-    ) -> Result<(), ValidateError> {
+    fn validate_name(&self, indexes: &Indexes<'_>, context: &mut ValidateContext<'_>) {
         let typeref_type = indexes.search_prelude_type("typeref");
-        self.return_type
-            .validate(Some(self.arrow_span), context, indexes)?;
-        validators::expression::check_types(
-            self.return_type.span(),
-            self.return_type.type_(indexes),
-            None,
-            Some(typeref_type),
-            context,
-        )?;
-        validators::identifier::check_char_count(self.name_span, context);
-        let may_return_typeref = self
-            .type_(indexes)
-            .is_none_or(|type_| type_ == typeref_type);
+        let may_return_typeref = match self.type_(indexes) {
+            Type::Struct(struct_ref) => struct_ref == typeref_type,
+            Type::Unknown => true,
+            Type::NoReturn => false,
+        };
         let allowed_cases: &[Case] = if may_return_typeref {
             &[Case::Snake, Case::Pascal]
         } else {
             &[Case::Snake]
         };
         validators::identifier::check_case(self.name_span, allowed_cases, context);
-        Ok(())
+        validators::identifier::check_char_count(self.name_span, context);
+    }
+
+    fn validate_return_type(
+        &self,
+        context: &mut ValidateContext<'_>,
+        indexes: &Indexes<'_>,
+    ) -> Result<(), ValidateError> {
+        let (Some(arrow_span), Some(return_type)) = (self.arrow_span, &self.return_type) else {
+            return Ok(());
+        };
+        let typeref_type = indexes.search_prelude_type("typeref");
+        return_type.validate(Some(arrow_span), context, indexes)?;
+        validators::expression::check_types(
+            return_type.span(),
+            return_type.type_(indexes),
+            None,
+            Type::Struct(typeref_type),
+            context,
+        )
     }
 
     fn validate_statements(
@@ -180,29 +210,44 @@ impl FunctionDefinition {
                 )?;
             }
         }
-        let return_statement = validators::statement::check_missing_return(
-            &self.statements,
-            self.body_end_span,
-            self.return_type.span(),
-            context,
-        )?;
-        validators::expression::check_types(
-            return_statement.value.span(),
-            return_statement.value.type_(indexes),
-            Some(self.return_type.span()),
-            self.type_(indexes),
-            context,
-        )?;
+        if let Some(return_type) = &self.return_type {
+            let return_statement = validators::statement::check_missing_return(
+                &self.statements,
+                self.body_end_span,
+                return_type.span(),
+                context,
+            )?;
+            validators::expression::check_types(
+                return_statement.value.span(),
+                return_statement.value.type_(indexes),
+                Some(return_type.span()),
+                self.type_(indexes),
+                context,
+            )?;
+        } else {
+            validators::statement::check_disallowed_return(
+                &self.statements,
+                self.name_span,
+                context,
+            )?;
+            validators::statement::check_empty_block(&self.statements, self.body_span, context);
+        }
         Ok(())
     }
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         let id = self.id;
-        let return_type = self
+        if let Some(return_type) = self
             .type_(indexes)
-            .unwrap_or_else(|| unreachable!("return type validated before"))
-            .transpile_name();
-        _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
+            .struct_ref()
+            .map(StructDefinition::transpile_name)
+        {
+            _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
+        } else {
+            // coverage: off (functions without return types are not yet transpiled)
+            _ = write!(shader, "fn _{id}() {{ ");
+        }
+        // coverage: on
         for statement in &self.statements {
             statement.transpile(shader, indexes);
         }

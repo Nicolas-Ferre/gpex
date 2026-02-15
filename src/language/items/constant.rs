@@ -1,9 +1,9 @@
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
+use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
-use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{CONST_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL};
 use crate::utils::dependencies::Dependencies;
@@ -70,14 +70,11 @@ impl ConstantDefinition {
         self.value.dependencies(type_, dependencies, indexes)
     }
 
-    pub(crate) fn type_<'index>(
-        &self,
-        indexes: &Indexes<'index>,
-    ) -> Option<&'index StructDefinition> {
+    pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
         self.value.type_(indexes)
     }
 
-    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Option<Constant<'index>> {
+    pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
         self.value.constant(indexes)
     }
 
@@ -95,6 +92,7 @@ impl ConstantDefinition {
         validators::identifier::check_char_count(self.name_span, context);
         let may_return_typeref = self
             .type_(indexes)
+            .struct_ref()
             .is_none_or(|type_| type_ == indexes.search_prelude_type("typeref"));
         let allowed_cases: &[Case] = if may_return_typeref {
             &[Case::ScreamingSnake, Case::Pascal]

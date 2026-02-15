@@ -46,3 +46,42 @@ pub(crate) fn check_missing_return<'statement>(
         Err(ValidateError)
     }
 }
+
+pub(crate) fn check_disallowed_return(
+    statements: &[Statement],
+    function_name_span: Span,
+    context: &mut ValidateContext<'_>,
+) -> Result<(), ValidateError> {
+    let mut result = Ok(());
+    for statement in statements {
+        if let Statement::Return(return_statement) = statement {
+            context.logs.push(Log {
+                level: LogLevel::Error,
+                message: "`return` statement in function with no return type".into(),
+                location: Some(context.location(return_statement.span)),
+                inner: vec![LogInner {
+                    level: LogLevel::Info,
+                    message: "function has no return type".into(),
+                    location: Some(context.location(function_name_span)),
+                }],
+            });
+            result = Err(ValidateError);
+        }
+    }
+    result
+}
+
+pub(crate) fn check_empty_block(
+    statements: &[Statement],
+    body_span: Span,
+    context: &mut ValidateContext<'_>,
+) {
+    if statements.is_empty() {
+        context.logs.push(Log {
+            level: LogLevel::Warning,
+            message: "empty statement block".into(),
+            location: Some(context.location(body_span)),
+            inner: vec![],
+        });
+    }
+}

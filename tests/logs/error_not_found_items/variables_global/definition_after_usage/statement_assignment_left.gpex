@@ -1,6 +1,5 @@
-fn _function() -> bool {
+fn _function() {
     _after = 123;
-    return true;
 }
 
 var _after = 0;

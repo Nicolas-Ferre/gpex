@@ -1,8 +1,7 @@
 var assigned = 0;
 
-fn _function() -> bool {
+fn _function() {
     assigned = _after;
-    return true;
 }
 
 var _after = 0;

@@ -1,4 +1,5 @@
 warning: `CONSTANT` item unused (at tests/logs/warning_unused/constants_global/private.gpex:1:7)
+warning: empty statement block (at tests/logs/warning_unused/functions/empty_body.gpex:1:16)
 warning: `function()` item unused (at tests/logs/warning_unused/functions/private.gpex:1:4)
 warning: `~.imported` import unused (at tests/logs/warning_unused/imports/duplicated.gpex:1:1)
 warning: module importing itself (at tests/logs/warning_unused/imports/itself.gpex:1:5)

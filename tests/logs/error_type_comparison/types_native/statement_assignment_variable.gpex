@@ -1,8 +1,5 @@
 var result = 0;
 
-fn execute() -> bool {
+fn _execute() {
 	result = i32;
-	return true;
 }
-
-var _ = execute();

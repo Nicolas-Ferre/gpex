@@ -1,0 +1,5 @@
+var result = 0; // expected: 0
+
+fn _function() {
+	result = 42;
+}
