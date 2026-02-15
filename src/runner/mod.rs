@@ -38,6 +38,7 @@ pub struct Runner {
     queue: Queue,
     buffer: Option<Buffer>,
     init_shader: Option<ComputeShader>,
+    update_shader: Option<ComputeShader>,
 }
 
 impl Runner {
@@ -54,12 +55,16 @@ impl Runner {
         let init_shader = buffer
             .as_ref()
             .map(|buffer| ComputeShader::new(&device, buffer, &program.init_shader));
+        let update_shader = buffer
+            .as_ref()
+            .map(|buffer| ComputeShader::new(&device, buffer, &program.update_shader));
         Ok(Self {
             program,
             device,
             queue,
             buffer,
             init_shader,
+            update_shader,
         })
     }
 
@@ -109,6 +114,10 @@ impl Runner {
         if let Some(shader) = &mut self.init_shader
             && !shader.is_init_done
         {
+            let mut pass = utils::start_compute_pass(&mut encoder);
+            shader.run(&mut pass);
+        }
+        if let Some(shader) = &mut self.update_shader {
             let mut pass = utils::start_compute_pass(&mut encoder);
             shader.run(&mut pass);
         }

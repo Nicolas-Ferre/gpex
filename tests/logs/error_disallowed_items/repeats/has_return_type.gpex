@@ -1,0 +1,5 @@
+fn called_function() -> i32 {
+	return 0;
+}
+
+repeat called_function();

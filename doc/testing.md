@@ -2,26 +2,24 @@
 
 Three integration test suites, each with its own `main.rs` harness.
 
-## Test organization: multiple dimensions
+## Test organization
 
-Some tests are defined in multiple dimensions. Here is an example.
-
-Both `runner/` and `logs/` use a two-axis convention for combinatorial coverage:
+Tests for `runner/` and `logs/` can be organized along multiple dimensions. Two common ones are:
 
 - **`locations/`** — Tests the same construct in every valid syntactic position. Each file is named
   after the position (e.g. `variable_global.gpex`, `statement_return.gpex`, ...).
 
 - **`forms/`** — Tests different variants or shapes of the same construct. For literals this means
   different values (e.g. `zero.gpex`, `max.gpex`, ...). For items that can be imported, this
-  includes
-  multi-file scenarios (subdirectories with their own `main.gpex` + `imported.gpex`).
+  includes multi-file scenarios (e.g. subdirectories with their own `main.gpex` + `imported.gpex`,
+  in these scenarios, `main.gpex` imports `imported.gpex` — not the other way around).
 
-When adding a new language feature, follow this pattern: create a `locations/` subdirectory covering
-every syntactic position the feature can appear in, and a `forms/` subdirectory covering its value
-variants and import scenarios.
+Only create a dimension subdirectory when it contains multiple entries. When a feature has only one
+dimension, place files directly under the feature directory. Each test file should cover a distinct
+behavior — avoid redundant tests that overlap in what they verify.
 
-Depending on the case (e.g. when there is one item only for a dimension), it might not
-be needed to create subdirectories.
+It is important to make sure tests remain as exhaustive as possible (i.e. cover all kinds of cases
+in each dimension).
 
 ## Compiler integration tests (`tests/lib/`)
 
