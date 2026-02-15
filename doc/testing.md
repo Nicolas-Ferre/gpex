@@ -38,7 +38,7 @@ Some tests rely on `.gpex` examples:
 Compiles `.gpex` fixtures, runs them on the GPU, then verifies variable values. Test expectations
 are embedded in the source files as comments:
 
-```
+```gpex
 var _result = 2_147_483_647; // expected: 2147483647
 ```
 
