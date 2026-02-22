@@ -1,4 +1,4 @@
-# Maintenance
+# Coding conventions
 
 - The CI workflow enforces the main conventions (e.g., by Clippy and rustfmt). See `clippy.toml`
   and `rustfmt.toml` for details.
