@@ -1,5 +1,0 @@
-import ~.imported;
-
-fn _function() {
-    IMPORTED = 123;
-}
