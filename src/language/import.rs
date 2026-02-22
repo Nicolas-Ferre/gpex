@@ -49,7 +49,7 @@ impl Import {
                 |context| Span::parse_symbol(context, TILDE_SYMBOL).map(ImportSegment::Parent),
                 Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
             )
-            .unwrap_or_else(|_| unreachable!("tilde parsing is optional and so should not fail"));
+            .unwrap_or_else(|_| unreachable!("tilde parsing should not fail as it is optional"));
         if !segments.is_empty() {
             Span::parse_symbol(context, DOT_SYMBOL)?;
         }

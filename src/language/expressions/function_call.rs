@@ -48,11 +48,13 @@ impl FunctionCall {
     ) -> Result<Self, ParseError<'context>> {
         let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
         Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
-        let (args, _) = context.parse_many(
-            0,
-            Expression::parse,
-            Some(|context| Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())),
-        )?;
+        let (args, _) = context
+            .parse_many(
+                0,
+                Expression::parse,
+                Some(|context| Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())),
+            )
+            .unwrap_or_else(|_| unreachable!("argument parsing should not fail as it is optional"));
         let end_span = Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;
         Ok(Self {
             id: context.next_id(),
