@@ -53,7 +53,7 @@ impl Module {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        let mut is_module_invalid = false;
+        let mut is_module_valid = true;
         let mut are_imports_finished = false;
         for item in &self.items {
             if let Item::Import(import) = item {
@@ -61,13 +61,13 @@ impl Module {
                     .validate(!are_imports_finished, context, indexes)
                     .is_err()
                 {
-                    is_module_invalid = true;
+                    is_module_valid = false;
                 }
             } else {
                 are_imports_finished = true;
             }
         }
-        if is_module_invalid {
+        if !is_module_valid {
             return Err(ValidateError);
         }
         for item in &self.items {

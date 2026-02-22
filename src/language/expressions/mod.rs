@@ -1,3 +1,7 @@
+pub(crate) mod function_call;
+pub(crate) mod identifier;
+pub(crate) mod literals;
+
 use crate::compiler::constants::Constant;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
@@ -10,10 +14,6 @@ use crate::utils::parsing::{ParseContext, ParseError, Span};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 use identifier::Identifier;
-
-pub(crate) mod function_call;
-pub(crate) mod identifier;
-pub(crate) mod literals;
 
 #[derive(Debug)]
 pub(crate) enum Expression {
