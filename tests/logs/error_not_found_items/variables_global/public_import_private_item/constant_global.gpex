@@ -1,3 +1,0 @@
-import ~.imported;
-
-const _CONSTANT = imported;
