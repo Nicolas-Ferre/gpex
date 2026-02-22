@@ -71,6 +71,10 @@ pub(crate) const BRACE_CLOSE_SYMBOL: Symbol = Symbol {
     name: "`}`",
     slice: "}",
 };
+pub(crate) const COMMA_SYMBOL: Symbol = Symbol {
+    name: "`,`",
+    slice: ",",
+};
 pub(crate) const DOT_SYMBOL: Symbol = Symbol {
     name: "`.`",
     slice: ".",

@@ -150,18 +150,6 @@ fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashM
         .collect()
 }
 
-fn transpile_buffer_header(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
-    *shader += "struct Buffer { ";
-    for module in modules {
-        for variable in module.global_variables() {
-            variable.transpile_buffer_field(shader, indexes);
-        }
-    }
-    *shader += "} @group(0) @binding(0) var<storage, read_write> ";
-    *shader += MAIN_BUFFER_NAME;
-    *shader += ": Buffer; ";
-}
-
 fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
     let mut dependencies = Dependencies::new();
     for module in modules {
@@ -215,6 +203,18 @@ fn transpile_shader<'item>(
     *shader += " @compute @workgroup_size(1, 1, 1) fn main() { ";
     transpile_body(shader);
     *shader += "}";
+}
+
+fn transpile_buffer_header(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
+    *shader += "struct Buffer { ";
+    for module in modules {
+        for variable in module.global_variables() {
+            variable.transpile_buffer_field(shader, indexes);
+        }
+    }
+    *shader += "} @group(0) @binding(0) var<storage, read_write> ";
+    *shader += MAIN_BUFFER_NAME;
+    *shader += ": Buffer; ";
 }
 
 fn sorted_global_variables<'item>(

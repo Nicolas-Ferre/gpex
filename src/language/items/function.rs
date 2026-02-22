@@ -87,7 +87,7 @@ impl FunctionDefinition {
     }
 
     pub(crate) fn key(&self) -> String {
-        format!("{}()", self.name)
+        format!("{}(0)", self.name)
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
