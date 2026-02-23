@@ -18,6 +18,7 @@ impl ReturnStatement {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         let return_keyword_span = Span::parse_symbol(context, RETURN_KEYWORD)?;
+        context.force_parse_any_error();
         let value = Expression::parse(context)?;
         let semicolon_keyword_span = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self {

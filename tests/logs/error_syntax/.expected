@@ -1,5 +1,5 @@
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false` or identifier (at tests/logs/error_syntax/choice_not_matching.gpex:1:13)
-error: expected `;` (at tests/logs/error_syntax/function_argument_invalid.gpex:1:21)
+error: expected `)` (at tests/logs/error_syntax/function_argument_invalid.gpex:1:23)
 error: expected identifier (at tests/logs/error_syntax/identifier_incomplete.gpex:1:4)
 error: expected identifier (at tests/logs/error_syntax/identifier_invalid.gpex:1:5)
 error: expected identifier (at tests/logs/error_syntax/keyword_eof.gpex:1:4)

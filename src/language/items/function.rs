@@ -55,6 +55,7 @@ impl FunctionDefinition {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             let const_keyword_span = Span::parse_symbol(context, CONST_KEYWORD).ok();
             Span::parse_symbol(context, FN_KEYWORD)?;
+            context.force_parse_any_error();
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
             let parenthesis_close_span = Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;

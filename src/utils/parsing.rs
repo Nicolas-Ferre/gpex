@@ -13,6 +13,7 @@ pub(crate) struct ParseContext<'config> {
     pub(crate) file: &'config ReadFile,
     pub(crate) file_index: usize,
     pub(crate) files: &'config [ReadFile],
+    is_parse_any_error_forced: bool,
     offset: usize,
     scope: Vec<u64>,
     next_id: u64,
@@ -43,11 +44,18 @@ impl<'config> ParseContext<'config> {
             file,
             file_index,
             files,
+            is_parse_any_error_forced: false,
             offset: 0,
             scope: vec![],
             next_id,
             comment_prefix,
         }
+    }
+
+    /// Forces any parsing error in the current `parse_any()` branch
+    /// instead of testing alternative branches.
+    pub(crate) fn force_parse_any_error(&mut self) {
+        self.is_parse_any_error_forced = true;
     }
 
     pub(crate) fn scope(&self) -> &[u64] {
@@ -76,14 +84,23 @@ impl<'config> ParseContext<'config> {
         let mut errors = vec![];
         let previous_context = self.clone();
         for parser in parsers {
+            self.is_parse_any_error_forced = false;
             match parser(self) {
-                Ok(node) => return Ok(node),
+                Ok(node) => {
+                    self.is_parse_any_error_forced = previous_context.is_parse_any_error_forced;
+                    return Ok(node);
+                }
+                Err(error) if self.is_parse_any_error_forced => {
+                    self.is_parse_any_error_forced = previous_context.is_parse_any_error_forced;
+                    return Err(error);
+                }
                 Err(error) => {
                     errors.push(error);
                     self.clone_from(&previous_context);
                 }
             }
         }
+        self.is_parse_any_error_forced = previous_context.is_parse_any_error_forced;
         Err(ParseError::merge(&errors))
     }
 

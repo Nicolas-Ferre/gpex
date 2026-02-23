@@ -15,6 +15,7 @@ impl RepeatDefinition {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         Span::parse_symbol(context, REPEAT_KEYWORD)?;
+        context.force_parse_any_error();
         let function_call = FunctionCall::parse(context)?;
         Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self { function_call })

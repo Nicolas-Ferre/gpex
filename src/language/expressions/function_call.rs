@@ -48,6 +48,7 @@ impl FunctionCall {
     ) -> Result<Self, ParseError<'context>> {
         let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
         Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
+        context.force_parse_any_error();
         let (args, _) = context
             .parse_many(
                 0,

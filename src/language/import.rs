@@ -25,6 +25,7 @@ impl Import {
     ) -> Result<Self, ParseError<'context>> {
         let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
         let import = Span::parse_symbol(context, IMPORT_KEYWORD)?;
+        context.force_parse_any_error();
         let segments = Self::parse_segments(context)?;
         let semicolon = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self {
