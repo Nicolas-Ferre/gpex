@@ -68,7 +68,9 @@ impl FunctionDefinition {
                     (None, None, parenthesis_close_span)
                 };
             let body_start_span = Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
-            let (statements, _) = context.parse_many(0, Statement::parse, None)?;
+            let statements = context.parse_many(0, Statement::parse, None, |context| {
+                Span::parse_symbol(context, BRACE_CLOSE_SYMBOL).map(|_| ())
+            })?;
             let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
                 id,

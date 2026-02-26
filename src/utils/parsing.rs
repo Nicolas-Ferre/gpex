@@ -76,6 +76,19 @@ impl<'config> ParseContext<'config> {
         id
     }
 
+    pub(crate) fn parse_end_of_file(&mut self) -> Result<(), ParseError<'config>> {
+        self.parse_whitespaces_and_comments();
+        if self.remaining_code().is_empty() {
+            Ok(())
+        } else {
+            Err(ParseError {
+                file: self.file,
+                offset: self.offset,
+                expected_tokens: vec!["end of file"],
+            })
+        }
+    }
+
     pub(crate) fn parse_any<T>(
         &mut self,
         parsers: &[Parser<'config, T>],
@@ -109,36 +122,63 @@ impl<'config> ParseContext<'config> {
         min: usize,
         item_parser: Parser<'config, T>,
         separator_parser: Option<Parser<'config, ()>>,
-    ) -> Result<(Vec<T>, Option<ParseError<'config>>), ParseError<'config>> {
+        stop_excluded_parser: Parser<'config, ()>,
+    ) -> Result<Vec<T>, ParseError<'config>> {
         debug_assert!(min <= 1); // if removed, separator parsing error should be handled the same way as item parsing error
         let mut items = vec![];
         let mut item_index = 0;
+        let initial_context = self.clone();
         loop {
-            Span::parse_whitespaces_and_comments(self);
-            if self.remaining_code().is_empty() {
-                break Ok((items, None));
-            }
-            let previous_context = self.clone();
+            let mut previous_context = self.clone();
             if item_index > 0
                 && let Some(separator) = separator_parser
                 && let Err(error) = separator(self)
             {
-                *self = previous_context;
-                break Ok((items, Some(error)));
+                break if let Err(stop_error) = stop_excluded_parser(&mut previous_context) {
+                    *self = initial_context;
+                    Err(ParseError::merge(&[error, stop_error]))
+                } else {
+                    Ok(items)
+                };
             }
+            let stop_result = stop_excluded_parser(&mut self.clone());
             match item_parser(self) {
                 Ok(parsed) => items.push(parsed),
                 Err(error) => {
-                    *self = previous_context;
-                    break if item_index < min {
+                    break if item_index < min || (stop_result.is_err() && item_index > 0) {
+                        *self = initial_context;
                         Err(error)
+                    } else if let Err(stop_error) = stop_result
+                        && item_index == 0
+                    {
+                        *self = initial_context;
+                        Err(ParseError::merge(&[error, stop_error]))
                     } else {
-                        Ok((items, Some(error)))
+                        Ok(items)
                     };
                 }
             }
             item_index += 1;
         }
+    }
+
+    fn parse_whitespaces_and_comments(&mut self) {
+        loop {
+            if self.remaining_code().starts_with(self.comment_prefix) {
+                let code = self.remaining_code();
+                let next_break_line_offset = code.find('\n').unwrap_or(code.len());
+                self.offset += next_break_line_offset;
+            }
+            self.parse_whitespaces();
+            if !self.remaining_code().starts_with(self.comment_prefix) {
+                break;
+            }
+        }
+    }
+
+    fn parse_whitespaces(&mut self) {
+        let trimmed_code = self.remaining_code().trim_start();
+        self.offset += self.remaining_code().len() - trimmed_code.len();
     }
 
     fn remaining_code(&self) -> &str {
@@ -248,7 +288,7 @@ impl Span {
         context: &mut ParseContext<'context>,
         symbol: Symbol,
     ) -> Result<Self, ParseError<'context>> {
-        Self::parse_whitespaces_and_comments(context);
+        context.parse_whitespaces_and_comments();
         if context.remaining_code().starts_with(symbol.slice) {
             let range = context.offset..context.offset + symbol.slice.len();
             let is_keyword = symbol.slice.chars().all(Self::is_char_keyword);
@@ -273,7 +313,7 @@ impl Span {
         context: &mut ParseContext<'context>,
         pattern: Pattern,
     ) -> Result<Self, ParseError<'context>> {
-        Self::parse_whitespaces_and_comments(context);
+        context.parse_whitespaces_and_comments();
         let error = || ParseError {
             file: context.file,
             offset: context.offset,
@@ -316,25 +356,6 @@ impl Span {
             }
         }
         Ok(len)
-    }
-
-    fn parse_whitespaces_and_comments(context: &mut ParseContext<'_>) {
-        loop {
-            if context.remaining_code().starts_with(context.comment_prefix) {
-                let code = context.remaining_code();
-                let next_break_line_offset = code.find('\n').unwrap_or(code.len());
-                context.offset += next_break_line_offset;
-            }
-            Self::parse_whitespaces(context);
-            if !context.remaining_code().starts_with(context.comment_prefix) {
-                break;
-            }
-        }
-    }
-
-    fn parse_whitespaces(context: &mut ParseContext<'_>) {
-        let trimmed_code = context.remaining_code().trim_start();
-        context.offset += context.remaining_code().len() - trimmed_code.len();
     }
 
     fn is_char_keyword(char: char) -> bool {
