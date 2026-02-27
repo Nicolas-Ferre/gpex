@@ -46,8 +46,12 @@ impl Import {
     ) -> Result<Vec<ImportSegment>, ParseError<'context>> {
         let mut segments = context.parse_many(
             0,
-            |context| Span::parse_symbol(context, TILDE_SYMBOL).map(ImportSegment::Parent),
-            Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
+            |context| {
+                let tilde = Span::parse_symbol(context, TILDE_SYMBOL)?;
+                Span::parse_symbol(context, DOT_SYMBOL)?;
+                Ok(ImportSegment::Parent(tilde))
+            },
+            None,
             |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(|_| ()),
         )?;
         let name_segments = context.parse_many(

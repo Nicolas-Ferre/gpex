@@ -145,7 +145,10 @@ impl<'config> ParseContext<'config> {
             match item_parser(self) {
                 Ok(parsed) => items.push(parsed),
                 Err(error) => {
-                    break if item_index < min || (stop_result.is_err() && item_index > 0) {
+                    break if item_index < min
+                        || stop_result.is_err() && item_index > 0
+                        || stop_result.is_ok() && separator_parser.is_some() && item_index > 0
+                    {
                         *self = initial_context;
                         Err(error)
                     } else if let Err(stop_error) = stop_result
