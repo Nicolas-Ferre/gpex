@@ -119,39 +119,42 @@ impl<'config> ParseContext<'config> {
 
     pub(crate) fn parse_many<T>(
         &mut self,
-        min: usize,
         item_parser: Parser<'config, T>,
         separator_parser: Option<Parser<'config, ()>>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> Result<Vec<T>, ParseError<'config>> {
-        debug_assert!(min <= 1); // if removed, separator parsing and item parsing will have to be adapted
         let initial_context = self.clone();
-        let mut items = vec![match self.parse_first_item(
-            &initial_context,
-            min == 0,
-            item_parser,
-            stop_excluded_parser,
-        ) {
-            ParseManyStepResult::Item(item) => item,
-            ParseManyStepResult::Error(error) => return Err(error),
-            ParseManyStepResult::End => return Ok(vec![]),
-        }];
+        let mut items = vec![
+            match self.parse_first_item(item_parser, stop_excluded_parser) {
+                ParseManyStepResult::Item(item) => item,
+                ParseManyStepResult::End => return Ok(vec![]),
+                ParseManyStepResult::Error(error) => {
+                    *self = initial_context;
+                    return Err(error);
+                }
+            },
+        ];
         loop {
-            match self.parse_separator(&initial_context, separator_parser, stop_excluded_parser) {
+            match self.parse_separator(separator_parser, stop_excluded_parser) {
                 ParseManyStepResult::Item(()) => {}
-                ParseManyStepResult::Error(error) => break Err(error),
                 ParseManyStepResult::End => break Ok(items),
+                ParseManyStepResult::Error(error) => {
+                    *self = initial_context;
+                    break Err(error);
+                }
             }
             items.push(
                 match self.parse_next_item(
-                    &initial_context,
                     separator_parser.is_some(),
                     item_parser,
                     stop_excluded_parser,
                 ) {
                     ParseManyStepResult::Item(item) => item,
-                    ParseManyStepResult::Error(error) => break Err(error),
                     ParseManyStepResult::End => break Ok(items),
+                    ParseManyStepResult::Error(error) => {
+                        *self = initial_context;
+                        break Err(error);
+                    }
                 },
             );
         }
@@ -159,67 +162,59 @@ impl<'config> ParseContext<'config> {
 
     fn parse_first_item<T>(
         &mut self,
-        initial_context: &Self,
-        is_optional: bool,
         item_parser: Parser<'config, T>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> ParseManyStepResult<'config, T> {
-        match (stop_excluded_parser(&mut self.clone()), item_parser(self)) {
-            (_, Ok(item)) => ParseManyStepResult::Item(item),
-            (Err(stop_error), Err(item_error)) => {
-                self.clone_from(initial_context);
+        let previous_context = self.clone();
+        let item_error = match item_parser(self) {
+            Ok(item) => return ParseManyStepResult::Item(item),
+            Err(item_error) => item_error,
+        };
+        *self = previous_context;
+        match stop_excluded_parser(&mut self.clone()) {
+            Ok(()) => ParseManyStepResult::End,
+            Err(stop_error) => {
                 ParseManyStepResult::Error(ParseError::merge(&[item_error, stop_error]))
-            }
-            (Ok(()), Err(item_error)) if !is_optional => {
-                self.clone_from(initial_context);
-                ParseManyStepResult::Error(item_error)
-            }
-            (Ok(()), Err(_)) => {
-                self.clone_from(initial_context);
-                ParseManyStepResult::End
             }
         }
     }
 
     fn parse_separator(
         &mut self,
-        initial_context: &Self,
         separator_parser: Option<Parser<'config, ()>>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> ParseManyStepResult<'config, ()> {
-        let mut previous_context = self.clone();
-        if let Some(separator) = separator_parser
-            && let Err(error) = separator(self)
-        {
-            if let Err(stop_error) = stop_excluded_parser(&mut previous_context) {
-                self.clone_from(initial_context);
-                ParseManyStepResult::Error(ParseError::merge(&[error, stop_error]))
-            } else {
-                ParseManyStepResult::End
-            }
+        let Some(separator_parser) = separator_parser else {
+            return ParseManyStepResult::Item(());
+        };
+        let previous_context = self.clone();
+        let Err(separator_error) = separator_parser(self) else {
+            return ParseManyStepResult::Item(());
+        };
+        *self = previous_context;
+        if let Err(stop_error) = stop_excluded_parser(&mut self.clone()) {
+            ParseManyStepResult::Error(ParseError::merge(&[separator_error, stop_error]))
         } else {
-            ParseManyStepResult::Item(())
+            ParseManyStepResult::End
         }
     }
 
     fn parse_next_item<T>(
         &mut self,
-        initial_context: &Self,
         has_separator: bool,
         item_parser: Parser<'config, T>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> ParseManyStepResult<'config, T> {
-        match (stop_excluded_parser(&mut self.clone()), item_parser(self)) {
-            (_, Ok(parsed)) => ParseManyStepResult::Item(parsed),
-            (Err(_), Err(item_error)) => {
-                self.clone_from(initial_context);
-                ParseManyStepResult::Error(item_error)
-            }
-            (Ok(()), Err(item_error)) if has_separator => {
-                self.clone_from(initial_context);
-                ParseManyStepResult::Error(item_error)
-            }
-            (_, Err(_)) => ParseManyStepResult::End,
+        let previous_context = self.clone();
+        let item_error = match item_parser(self) {
+            Ok(item) => return ParseManyStepResult::Item(item),
+            Err(error) => error,
+        };
+        *self = previous_context;
+        match stop_excluded_parser(&mut self.clone()) {
+            Ok(()) if has_separator => ParseManyStepResult::Error(item_error),
+            Ok(()) => ParseManyStepResult::End,
+            Err(_) => ParseManyStepResult::Error(item_error),
         }
     }
 
@@ -257,8 +252,8 @@ impl<'config> ParseContext<'config> {
 
 enum ParseManyStepResult<'config, T> {
     Item(T),
-    Error(ParseError<'config>),
     End,
+    Error(ParseError<'config>),
 }
 
 #[derive(Debug)]

@@ -50,7 +50,6 @@ impl FunctionCall {
         Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
         context.force_parse_any_error();
         let args = context.parse_many(
-            0,
             Expression::parse,
             Some(|context| Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())),
             |context| Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL).map(|_| ()),

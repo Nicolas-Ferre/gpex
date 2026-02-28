@@ -45,7 +45,6 @@ impl Import {
         context: &mut ParseContext<'context>,
     ) -> Result<Vec<ImportSegment>, ParseError<'context>> {
         let mut segments = context.parse_many(
-            0,
             |context| {
                 let tilde = Span::parse_symbol(context, TILDE_SYMBOL)?;
                 Span::parse_symbol(context, DOT_SYMBOL)?;
@@ -55,7 +54,6 @@ impl Import {
             |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(|_| ()),
         )?;
         let name_segments = context.parse_many(
-            1,
             |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(ImportSegment::Name),
             Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
             |context| Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ()),

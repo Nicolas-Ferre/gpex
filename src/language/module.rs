@@ -20,7 +20,7 @@ impl Module {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
-        let items = context.parse_many(0, Item::parse, None, ParseContext::parse_end_of_file)?;
+        let items = context.parse_many(Item::parse, None, ParseContext::parse_end_of_file)?;
         Ok(Self {
             items,
             file_index: context.file_index,
