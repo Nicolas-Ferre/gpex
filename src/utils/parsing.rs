@@ -95,25 +95,25 @@ impl<'config> ParseContext<'config> {
     ) -> Result<T, ParseError<'config>> {
         debug_assert!(!parsers.is_empty());
         let mut errors = vec![];
-        let previous_context = self.clone();
+        let initial_context = self.clone();
         for parser in parsers {
             self.is_parse_any_error_forced = false;
             match parser(self) {
                 Ok(node) => {
-                    self.is_parse_any_error_forced = previous_context.is_parse_any_error_forced;
+                    self.is_parse_any_error_forced = initial_context.is_parse_any_error_forced;
                     return Ok(node);
                 }
                 Err(error) if self.is_parse_any_error_forced => {
-                    self.is_parse_any_error_forced = previous_context.is_parse_any_error_forced;
+                    *self = initial_context;
                     return Err(error);
                 }
                 Err(error) => {
+                    self.clone_from(&initial_context);
                     errors.push(error);
-                    self.clone_from(&previous_context);
                 }
             }
         }
-        self.is_parse_any_error_forced = previous_context.is_parse_any_error_forced;
+        self.clone_from(&initial_context);
         Err(ParseError::merge(&errors))
     }
 
@@ -124,44 +124,102 @@ impl<'config> ParseContext<'config> {
         separator_parser: Option<Parser<'config, ()>>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> Result<Vec<T>, ParseError<'config>> {
-        debug_assert!(min <= 1); // if removed, separator parsing error should be handled the same way as item parsing error
-        let mut items = vec![];
-        let mut item_index = 0;
+        debug_assert!(min <= 1); // if removed, separator parsing and item parsing will have to be adapted
         let initial_context = self.clone();
+        let mut items = vec![match self.parse_first_item(
+            &initial_context,
+            min == 0,
+            item_parser,
+            stop_excluded_parser,
+        ) {
+            ParseManyStepResult::Item(item) => item,
+            ParseManyStepResult::Error(error) => return Err(error),
+            ParseManyStepResult::End => return Ok(vec![]),
+        }];
         loop {
-            let mut previous_context = self.clone();
-            if item_index > 0
-                && let Some(separator) = separator_parser
-                && let Err(error) = separator(self)
-            {
-                break if let Err(stop_error) = stop_excluded_parser(&mut previous_context) {
-                    *self = initial_context;
-                    Err(ParseError::merge(&[error, stop_error]))
-                } else {
-                    Ok(items)
-                };
+            match self.parse_separator(&initial_context, separator_parser, stop_excluded_parser) {
+                ParseManyStepResult::Item(()) => {}
+                ParseManyStepResult::Error(error) => break Err(error),
+                ParseManyStepResult::End => break Ok(items),
             }
-            let stop_result = stop_excluded_parser(&mut self.clone());
-            match item_parser(self) {
-                Ok(parsed) => items.push(parsed),
-                Err(error) => {
-                    break if item_index < min
-                        || stop_result.is_err() && item_index > 0
-                        || stop_result.is_ok() && separator_parser.is_some() && item_index > 0
-                    {
-                        *self = initial_context;
-                        Err(error)
-                    } else if let Err(stop_error) = stop_result
-                        && item_index == 0
-                    {
-                        *self = initial_context;
-                        Err(ParseError::merge(&[error, stop_error]))
-                    } else {
-                        Ok(items)
-                    };
-                }
+            items.push(
+                match self.parse_next_item(
+                    &initial_context,
+                    separator_parser.is_some(),
+                    item_parser,
+                    stop_excluded_parser,
+                ) {
+                    ParseManyStepResult::Item(item) => item,
+                    ParseManyStepResult::Error(error) => break Err(error),
+                    ParseManyStepResult::End => break Ok(items),
+                },
+            );
+        }
+    }
+
+    fn parse_first_item<T>(
+        &mut self,
+        initial_context: &Self,
+        is_optional: bool,
+        item_parser: Parser<'config, T>,
+        stop_excluded_parser: Parser<'config, ()>,
+    ) -> ParseManyStepResult<'config, T> {
+        match (stop_excluded_parser(&mut self.clone()), item_parser(self)) {
+            (_, Ok(item)) => ParseManyStepResult::Item(item),
+            (Err(stop_error), Err(item_error)) => {
+                self.clone_from(initial_context);
+                ParseManyStepResult::Error(ParseError::merge(&[item_error, stop_error]))
             }
-            item_index += 1;
+            (Ok(()), Err(item_error)) if !is_optional => {
+                self.clone_from(initial_context);
+                ParseManyStepResult::Error(item_error)
+            }
+            (Ok(()), Err(_)) => {
+                self.clone_from(initial_context);
+                ParseManyStepResult::End
+            }
+        }
+    }
+
+    fn parse_separator(
+        &mut self,
+        initial_context: &Self,
+        separator_parser: Option<Parser<'config, ()>>,
+        stop_excluded_parser: Parser<'config, ()>,
+    ) -> ParseManyStepResult<'config, ()> {
+        let mut previous_context = self.clone();
+        if let Some(separator) = separator_parser
+            && let Err(error) = separator(self)
+        {
+            if let Err(stop_error) = stop_excluded_parser(&mut previous_context) {
+                self.clone_from(initial_context);
+                ParseManyStepResult::Error(ParseError::merge(&[error, stop_error]))
+            } else {
+                ParseManyStepResult::End
+            }
+        } else {
+            ParseManyStepResult::Item(())
+        }
+    }
+
+    fn parse_next_item<T>(
+        &mut self,
+        initial_context: &Self,
+        has_separator: bool,
+        item_parser: Parser<'config, T>,
+        stop_excluded_parser: Parser<'config, ()>,
+    ) -> ParseManyStepResult<'config, T> {
+        match (stop_excluded_parser(&mut self.clone()), item_parser(self)) {
+            (_, Ok(parsed)) => ParseManyStepResult::Item(parsed),
+            (Err(_), Err(item_error)) => {
+                self.clone_from(initial_context);
+                ParseManyStepResult::Error(item_error)
+            }
+            (Ok(()), Err(item_error)) if has_separator => {
+                self.clone_from(initial_context);
+                ParseManyStepResult::Error(item_error)
+            }
+            (_, Err(_)) => ParseManyStepResult::End,
         }
     }
 
@@ -195,6 +253,12 @@ impl<'config> ParseContext<'config> {
             &self.file.content[offset..]
         }
     }
+}
+
+enum ParseManyStepResult<'config, T> {
+    Item(T),
+    Error(ParseError<'config>),
+    End,
 }
 
 #[derive(Debug)]
