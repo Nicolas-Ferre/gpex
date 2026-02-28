@@ -25,6 +25,7 @@ impl Import {
     ) -> Result<Self, ParseError<'context>> {
         let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
         let import = Span::parse_symbol(context, IMPORT_KEYWORD)?;
+        context.force_parse_any_error();
         let segments = Self::parse_segments(context)?;
         let semicolon = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self {
@@ -43,20 +44,19 @@ impl Import {
     fn parse_segments<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Vec<ImportSegment>, ParseError<'context>> {
-        let (mut segments, _) = context
-            .parse_many(
-                0,
-                |context| Span::parse_symbol(context, TILDE_SYMBOL).map(ImportSegment::Parent),
-                Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
-            )
-            .unwrap_or_else(|_| unreachable!("tilde parsing should not fail as it is optional"));
-        if !segments.is_empty() {
-            Span::parse_symbol(context, DOT_SYMBOL)?;
-        }
-        let (name_segments, _) = context.parse_many(
-            1,
+        let mut segments = context.parse_many(
+            |context| {
+                let tilde = Span::parse_symbol(context, TILDE_SYMBOL)?;
+                Span::parse_symbol(context, DOT_SYMBOL)?;
+                Ok(ImportSegment::Parent(tilde))
+            },
+            None,
+            |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(|_| ()),
+        )?;
+        let name_segments = context.parse_many(
             |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(ImportSegment::Name),
             Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
+            |context| Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ()),
         )?;
         segments.extend(name_segments);
         Ok(segments)

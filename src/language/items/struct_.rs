@@ -38,6 +38,7 @@ impl StructDefinition {
         context.define_scope(|context, id| {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             Span::parse_symbol(context, STRUCT_KEYWORD)?;
+            context.force_parse_any_error();
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
             Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;

@@ -24,7 +24,6 @@ pub struct Program {
     /// The shader used to initialize all global variables.
     pub init_shader: String,
     /// The shader used to update application at each frame.
-    #[serde(default)]
     pub update_shader: String,
 }
 

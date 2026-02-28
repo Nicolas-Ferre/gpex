@@ -20,6 +20,7 @@ impl AssignmentStatement {
     ) -> Result<Self, ParseError<'context>> {
         let assigned = Expression::parse(context)?;
         Span::parse_symbol(context, EQUAL_SYMBOL)?;
+        context.force_parse_any_error();
         let value = Expression::parse(context)?;
         Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self { assigned, value })
