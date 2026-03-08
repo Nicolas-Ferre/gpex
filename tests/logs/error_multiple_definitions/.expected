@@ -1,7 +1,5 @@
 error: `_CONSTANT` item defined multiple times (at tests/logs/error_multiple_definitions/constant_constant.gpex:2:7)
   --> info: item also defined here (at tests/logs/error_multiple_definitions/constant_constant.gpex:1:7)
-error: `_function(0)` item defined multiple times (at tests/logs/error_multiple_definitions/function_function.gpex:5:4)
-  --> info: item also defined here (at tests/logs/error_multiple_definitions/function_function.gpex:1:4)
 error: `_variable` item defined multiple times (at tests/logs/error_multiple_definitions/variable_constant.gpex:2:7)
   --> info: item also defined here (at tests/logs/error_multiple_definitions/variable_constant.gpex:1:5)
 error: `_variable` item defined multiple times (at tests/logs/error_multiple_definitions/variable_variable.gpex:2:5)

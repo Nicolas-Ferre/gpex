@@ -9,31 +9,36 @@ use std::{fs, io};
 
 #[tokio::test]
 async fn run_with_empty_program() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/empty")).await
+    compile_and_run(Path::new("tests/runner/empty"), true).await
 }
 
 #[tokio::test]
 async fn run_with_syntax_specificities() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/syntax")).await
+    compile_and_run(Path::new("tests/runner/syntax"), true).await
 }
 
 #[tokio::test]
 async fn run_with_expressions() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/expressions")).await
+    compile_and_run(Path::new("tests/runner/expressions"), true).await
 }
 
 #[tokio::test]
 async fn run_with_items() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/items")).await
+    compile_and_run(Path::new("tests/runner/items"), true).await
+}
+
+#[tokio::test]
+async fn run_with_aliasing() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/aliasing"), false).await
 }
 
 #[tokio::test]
 async fn run_with_prelude() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/prelude")).await
+    compile_and_run(Path::new("tests/runner/prelude"), true).await
 }
 
-async fn compile_and_run(path: &Path) -> Result<(), Error> {
-    let (program, _) = gpex::compile(path, true).map_err(Error::Gpex)?;
+async fn compile_and_run(path: &Path, is_warning_treated_as_error: bool) -> Result<(), Error> {
+    let (program, _) = gpex::compile(path, is_warning_treated_as_error).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
     runner.run_step();
     check_global_vars(path, path, &runner)?;

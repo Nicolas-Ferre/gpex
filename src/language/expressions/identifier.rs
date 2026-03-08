@@ -5,7 +5,7 @@ use crate::language::DependencyType;
 use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::utils::dependencies::Dependencies;
-use crate::utils::indexing::{NodeRef, SearchConfig, Visibility};
+use crate::utils::indexing::{NodeRef, SearchConfig, SearchParameters, Visibility};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -51,25 +51,21 @@ impl Identifier {
     }
 
     pub(crate) fn index(&self, indexes: &mut Indexes<'_>) {
-        let imports = &mut indexes.imports;
-        if let Some(source) = indexes.items.search(
-            &self.slice,
-            self,
-            imports,
-            Visibility::Ignored,
-            SEARCH_CONFIG,
-        ) {
-            indexes.private_sources.insert(self.id, source);
-        }
-        if let Some(source) = indexes.items.search(
-            &self.slice,
-            self,
-            imports,
-            Visibility::Enforced,
-            SEARCH_CONFIG,
-        ) {
-            imports.mark_as_used(self.file_index(), source.file_index());
+        let search_parameters = SearchParameters {
+            key: &self.slice,
+            location: self,
+            imports: &indexes.imports,
+            config: SEARCH_CONFIG,
+        };
+        let matching_value = indexes
+            .items
+            .search(search_parameters, Visibility::Enforced)
+            .next();
+        if let Some(source) = matching_value {
             indexes.sources.insert(self.id, source);
+            indexes
+                .imports
+                .mark_as_used(self.file_index(), source.file_index());
             indexes
                 .item_first_refs
                 .entry(source.id())
@@ -77,6 +73,12 @@ impl Identifier {
             if let ItemRef::Struct(struct_) = source {
                 struct_.index_ref(indexes);
             }
+        } else if let Some(source) = indexes
+            .items
+            .search(search_parameters, Visibility::Ignored)
+            .next()
+        {
+            indexes.private_sources.insert(self.id, source);
         }
     }
 
@@ -126,7 +128,7 @@ impl Identifier {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        validators::item::check_found(self, self.span, &self.slice, context, indexes)?;
+        validators::item::check_found(self, self.span, &self.slice, &self.slice, context, indexes)?;
         if let Some(constant_mark_span) = constant_mark_span {
             validators::expression::check_constant(
                 self.constant(indexes),

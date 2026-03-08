@@ -72,7 +72,10 @@ pub(crate) fn check_no_return_type(
     {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("called function `{}` with no return type", function.key()),
+            message: format!(
+                "called function `{}` with no return type",
+                function.displayed_key(indexes)
+            ),
             location: Some(context.location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
@@ -96,7 +99,10 @@ pub(crate) fn check_has_return_type(
     {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("repeated function `{}` with a return type", function.key()),
+            message: format!(
+                "repeated function `{}` with a return type",
+                function.displayed_key(indexes)
+            ),
             location: Some(context.location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,

@@ -2,6 +2,6 @@ fn called_function() -> i32 {
     return 123;
 }
 
-const fn _function() -> i32 {
-    return called_function();
+const fn _function() -> called_function() {
+    return 0;
 }

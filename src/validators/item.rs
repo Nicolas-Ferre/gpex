@@ -2,7 +2,7 @@ use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
 use crate::utils::dependencies::Dependencies;
-use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, Visibility};
+use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParameters, Visibility};
 use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -50,17 +50,20 @@ pub(crate) fn check_unique_definition(
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let key = item.key();
-    let search_config = SearchConfig {
-        can_be_after: false,
-        can_be_parent_node: false,
+    let search_parameters = SearchParameters {
+        key: &key,
+        location: item,
+        imports: &indexes.imports,
+        config: SearchConfig {
+            can_be_after: false,
+            can_be_parent_node: false,
+        },
     };
-    if let Some(duplicated_item) = indexes.items.search(
-        &key,
-        item,
-        &indexes.imports,
-        Visibility::Enforced,
-        search_config,
-    ) && duplicated_item.file_index() == item.file_index()
+    if let Some(duplicated_item) = indexes
+        .items
+        .search(search_parameters, Visibility::Enforced)
+        .next()
+        && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
@@ -97,6 +100,7 @@ pub(crate) fn check_prelude_location(
 
 pub(crate) fn check_usage(
     item: ItemRef<'_>,
+    displayed_key: &str,
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
@@ -109,7 +113,7 @@ pub(crate) fn check_usage(
     if ref_span.is_none() && !name.starts_with('_') {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{}` item unused", item.key()),
+            message: format!("`{displayed_key}` item unused"),
             location: Some(context.location(name_span)),
             inner: vec![],
         });
@@ -118,7 +122,7 @@ pub(crate) fn check_usage(
     {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{}` item used but name starting with `_`", item.key()),
+            message: format!("`{displayed_key}` item used but name starting with `_`"),
             location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
@@ -133,6 +137,7 @@ pub(crate) fn check_found(
     node: impl NodeRef,
     span: Span,
     key: &str,
+    displayed_key: &str,
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
@@ -141,7 +146,7 @@ pub(crate) fn check_found(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{key}` item not found"),
+            message: format!("`{displayed_key}` item not found"),
             location: Some(context.location(span)),
             inner: if let Some(private_source) = indexes.private_sources.get(&node.id()) {
                 vec![LogInner {

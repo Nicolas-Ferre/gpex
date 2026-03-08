@@ -7,6 +7,7 @@ use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{CONST_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD, SEMICOLON_SYMBOL};
 use crate::utils::dependencies::Dependencies;
+use crate::utils::indexing::ItemNodeRef;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
@@ -89,7 +90,7 @@ impl ConstantDefinition {
             self.dependencies(DependencyType::CycleDetection, Dependencies::new(), indexes);
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         validators::item::check_unique_definition(ref_, context, indexes)?;
-        validators::item::check_usage(ref_, context, indexes);
+        validators::item::check_usage(ref_, &ref_.key(), context, indexes);
         validators::identifier::check_char_count(self.name_span, context);
         let may_return_typeref = self
             .type_(indexes)

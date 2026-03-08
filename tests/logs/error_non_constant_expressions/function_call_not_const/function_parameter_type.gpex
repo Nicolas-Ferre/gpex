@@ -1,0 +1,7 @@
+fn called_function() -> i32 {
+    return 123;
+}
+
+const fn _function(_parameter: called_function()) -> i32 {
+    return 123;
+}
