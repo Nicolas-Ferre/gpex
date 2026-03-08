@@ -7,10 +7,11 @@ use crate::language::items::ItemRef;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::symbols::{COMMA_SYMBOL, PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL};
 use crate::utils::dependencies::Dependencies;
-use crate::utils::indexing::{NodeRef, SearchConfig, Visibility};
+use crate::utils::indexing::{NodeRef, SearchConfig, SearchParameters, Visibility};
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
+use itertools::Itertools;
 
 const SEARCH_CONFIG: SearchConfig = SearchConfig {
     can_be_after: true,
@@ -68,33 +69,45 @@ impl FunctionCall {
         format!("{}({})", self.name, self.args.len())
     }
 
+    fn displayed_key(&self, indexes: &Indexes<'_>) -> String {
+        let function_name = &self.name;
+        let arg_types = self
+            .args
+            .iter()
+            .map(|arg| arg.type_(indexes).name())
+            .join(", ");
+        format!("{function_name}({arg_types})")
+    }
+
     pub(crate) fn index(&self, indexes: &mut Indexes<'_>) {
         for arg in &self.args {
             arg.index(indexes);
         }
-        let imports = &mut indexes.imports;
-        if let Some(source) = indexes.items.search(
-            &self.key(),
-            self,
-            imports,
-            Visibility::Ignored,
-            SEARCH_CONFIG,
-        ) {
-            indexes.private_sources.insert(self.id, source);
-        }
-        if let Some(source) = indexes.items.search(
-            &self.key(),
-            self,
-            imports,
-            Visibility::Enforced,
-            SEARCH_CONFIG,
-        ) {
-            imports.mark_as_used(self.file_index(), source.file_index());
+        let search_parameters = SearchParameters {
+            key: &self.key(),
+            location: self,
+            imports: &indexes.imports,
+            config: SEARCH_CONFIG,
+        };
+        let matching_function = indexes
+            .items
+            .search(search_parameters, Visibility::Enforced)
+            .find(|item| item.has_same_parameter_types_as(&self.args, indexes));
+        if let Some(source) = matching_function {
             indexes.sources.insert(self.id, source);
+            indexes
+                .imports
+                .mark_as_used(self.file_index(), source.file_index());
             indexes
                 .item_first_refs
                 .entry(source.id())
                 .or_insert_with(|| self.span);
+        } else if let Some(source) = indexes
+            .items
+            .search(search_parameters, Visibility::Ignored)
+            .find(|item| item.has_same_parameter_types_as(&self.args, indexes))
+        {
+            indexes.private_sources.insert(self.id, source);
         }
     }
 
@@ -142,7 +155,14 @@ impl FunctionCall {
         for arg in &self.args {
             arg.validate(constant_mark_span, context, indexes)?;
         }
-        validators::item::check_found(self, self.span, &self.key(), context, indexes)?;
+        validators::item::check_found(
+            self,
+            self.span,
+            &self.key(),
+            &self.displayed_key(indexes),
+            context,
+            indexes,
+        )?;
         if let Some(constant_mark_span) = constant_mark_span {
             validators::expression::check_constant(
                 self.constant(indexes),
@@ -156,7 +176,15 @@ impl FunctionCall {
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         match indexes.sources[&self.id] {
-            ItemRef::Function(node) => node.transpile_ref(shader),
+            ItemRef::Function(node) => {
+                node.transpile_name(shader);
+                *shader += "(";
+                for arg in &self.args {
+                    arg.transpile(shader, indexes);
+                    *shader += ", ";
+                }
+                *shader += ")";
+            }
             ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_) => {
                 unreachable!("function calls cannot reference values")
             }

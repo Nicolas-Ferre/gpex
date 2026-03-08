@@ -1,0 +1,5 @@
+fn function(_parameter: f32) -> f32 {
+    return 123.456;
+}
+
+var _result = function(123.456);  // expected: 123.456

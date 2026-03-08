@@ -4,19 +4,20 @@ use crate::compiler::types::Type;
 use crate::language::DependencyType;
 use crate::language::expressions::Expression;
 use crate::language::items::ItemRef;
+use crate::language::items::parameter::ParameterGroup;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::patterns::IDENTIFIER_PATTERN;
 use crate::language::statements::Statement;
 use crate::language::statements::return_::ReturnStatement;
 use crate::language::symbols::{
-    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, FN_KEYWORD,
-    PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL, PUB_KEYWORD,
+    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, FN_KEYWORD, PUB_KEYWORD,
 };
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 use crate::validators::identifier::Case;
+use itertools::Itertools;
 use std::fmt::Write;
 
 #[derive(Debug)]
@@ -35,6 +36,8 @@ pub(crate) struct FunctionDefinition {
     pub(crate) name_span: Span,
     #[derive_where(skip)]
     pub(crate) signature_span: Span,
+    #[derive_where(skip)]
+    pub(crate) parameters: ParameterGroup,
     #[derive_where(skip)]
     arrow_span: Option<Span>,
     #[derive_where(skip)]
@@ -57,15 +60,14 @@ impl FunctionDefinition {
             Span::parse_symbol(context, FN_KEYWORD)?;
             context.force_parse_any_error();
             let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
-            Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
-            let parenthesis_close_span = Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;
+            let parameters = ParameterGroup::parse(context)?;
             let (arrow_span, return_type, signature_end_span) =
                 if let Ok(arrow_span) = Span::parse_symbol(context, ARROW_SYMBOL) {
                     let expression = Expression::parse(context)?;
                     let span = expression.span();
                     (Some(arrow_span), Some(expression), span)
                 } else {
-                    (None, None, parenthesis_close_span)
+                    (None, None, parameters.span)
                 };
             let body_start_span = Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
             let statements = context.parse_many(Statement::parse, None, |context| {
@@ -80,6 +82,7 @@ impl FunctionDefinition {
                 name_span,
                 name: context.slice(name_span).into(),
                 signature_span: name_span.until(signature_end_span),
+                parameters,
                 arrow_span,
                 return_type,
                 statements,
@@ -90,17 +93,21 @@ impl FunctionDefinition {
     }
 
     pub(crate) fn key(&self) -> String {
-        format!("{}(0)", self.name)
+        format!("{}({})", self.name, self.parameters.parameters.len())
     }
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
         indexes.items.register(ItemRef::Function(self));
     }
 
-    pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
+    pub(crate) fn index_signatures(&self, indexes: &mut Indexes<'_>) {
+        self.parameters.index_refs(indexes);
         if let Some(return_type) = &self.return_type {
             return_type.index(indexes);
         }
+    }
+
+    pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
         for statement in &self.statements {
             statement.index(indexes);
         }
@@ -109,14 +116,13 @@ impl FunctionDefinition {
     pub(crate) fn dependencies<'index>(
         &self,
         type_: DependencyType,
-        dependencies: Dependencies<ItemRef<'index>>,
+        mut dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        let mut dependencies = if let Some(return_type) = &self.return_type {
-            return_type.dependencies(type_, dependencies, indexes)?
-        } else {
-            dependencies
-        };
+        dependencies = self.parameters.dependencies(type_, dependencies, indexes)?;
+        if let Some(return_type) = &self.return_type {
+            dependencies = return_type.dependencies(type_, dependencies, indexes)?;
+        }
         for statement in &self.statements {
             dependencies = statement.dependencies(type_, dependencies, indexes)?;
         }
@@ -133,6 +139,27 @@ impl FunctionDefinition {
         } else {
             Type::Unknown
         }
+    }
+
+    pub(crate) fn displayed_key(&self, indexes: &Indexes<'_>) -> String {
+        let function_name = &self.name;
+        let parameter_types = self
+            .parameters
+            .parameters
+            .iter()
+            .map(|parameter| parameter.type_(indexes).name())
+            .join(", ");
+        format!("{function_name}({parameter_types})")
+    }
+
+    fn return_statement(&self) -> Option<&ReturnStatement> {
+        self.statements.iter().find_map(|statement| {
+            if let Statement::Return(statement) = statement {
+                Some(statement)
+            } else {
+                None
+            }
+        })
     }
 
     pub(crate) fn constant<'index>(&self, indexes: &Indexes<'index>) -> Constant<'index> {
@@ -154,8 +181,8 @@ impl FunctionDefinition {
         let dependencies =
             self.dependencies(DependencyType::CycleDetection, Dependencies::new(), indexes);
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
-        validators::item::check_unique_definition(ref_, context, indexes)?;
-        validators::item::check_usage(ref_, context, indexes);
+        self.parameters.validate(context, indexes)?;
+        validators::item::check_usage(ref_, &self.displayed_key(indexes), context, indexes);
         let return_type_result = self.validate_return_type(context, indexes);
         self.validate_name(indexes, context);
         let statements_result = self.validate_statements(context, indexes);
@@ -186,15 +213,15 @@ impl FunctionDefinition {
         let (Some(arrow_span), Some(return_type)) = (self.arrow_span, &self.return_type) else {
             return Ok(());
         };
-        let typeref_type = indexes.search_prelude_type("typeref");
         return_type.validate(Some(arrow_span), context, indexes)?;
         validators::expression::check_types(
             return_type.span(),
             return_type.type_(indexes),
             None,
-            Type::Struct(typeref_type),
+            Type::Struct(indexes.search_prelude_type("typeref")),
             context,
-        )
+        )?;
+        Ok(())
     }
 
     fn validate_statements(
@@ -240,14 +267,16 @@ impl FunctionDefinition {
 
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         let id = self.id;
+        _ = write!(shader, "fn _{id}");
+        self.parameters.transpile(shader, indexes);
         if let Some(return_type) = self
             .type_(indexes)
             .struct_ref()
             .map(StructDefinition::transpile_name)
         {
-            _ = write!(shader, "fn _{id}() -> {return_type} {{ ");
+            _ = write!(shader, " -> {return_type} {{ ");
         } else {
-            _ = write!(shader, "fn _{id}() {{ ");
+            _ = write!(shader, " {{ ");
         }
         for statement in &self.statements {
             statement.transpile(shader, indexes);
@@ -255,17 +284,8 @@ impl FunctionDefinition {
         _ = write!(shader, " }}");
     }
 
-    pub(crate) fn transpile_ref(&self, shader: &mut String) {
-        _ = write!(shader, "_{}()", self.id);
-    }
-
-    fn return_statement(&self) -> Option<&ReturnStatement> {
-        self.statements.iter().find_map(|statement| {
-            if let Statement::Return(statement) = statement {
-                Some(statement)
-            } else {
-                None
-            }
-        })
+    pub(crate) fn transpile_name(&self, shader: &mut String) {
+        let id = self.id;
+        _ = write!(shader, "_{id}");
     }
 }

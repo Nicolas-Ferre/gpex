@@ -1,0 +1,3 @@
+fn _function(_parameter: true) -> i32 {
+    return 123;
+}

@@ -1,0 +1,9 @@
+const fn CalledFunction() -> typeref {
+    return i32;
+}
+
+fn function(_parameter: CalledFunction()) -> i32 {
+    return 123;
+}
+
+var _result = function(0); // expected: 123

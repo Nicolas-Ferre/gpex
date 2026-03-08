@@ -1,5 +1,6 @@
 pub(crate) mod constant;
 pub(crate) mod function;
+pub(crate) mod parameter;
 pub(crate) mod repeat;
 pub(crate) mod struct_;
 pub(crate) mod variable;
@@ -7,6 +8,7 @@ pub(crate) mod variable;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
+use crate::language::expressions::Expression;
 use crate::language::items::constant::ConstantDefinition;
 use crate::language::items::function::FunctionDefinition;
 use crate::language::items::struct_::StructDefinition;
@@ -47,7 +49,7 @@ impl NodeRef for ItemRef<'_> {
             Self::Variable(node) => &node.scope,
             Self::Constant(node) => &node.scope,
             Self::Struct(node) => &node.scope,
-            Self::Function(node) => &node.scope,
+            Self::Function(_) => unreachable!("function calls should ignore source scope"),
         }
     }
 }
@@ -82,13 +84,23 @@ impl ItemRef<'_> {
         }
     }
 
-    pub(crate) fn type_<'index>(self, indexes: &Indexes<'index>) -> Type<'index> {
-        match self {
-            ItemRef::Variable(node) => node.type_(indexes),
-            ItemRef::Constant(node) => node.type_(indexes),
-            ItemRef::Struct(_) => Type::Struct(StructDefinition::type_(indexes)),
-            ItemRef::Function(node) => node.type_(indexes),
-        }
+    pub(crate) fn has_same_parameter_types_as(
+        &self,
+        args: &[Expression],
+        indexes: &Indexes<'_>,
+    ) -> bool {
+        let parameters = match self {
+            ItemRef::Function(node) => &node.parameters,
+            ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_) => {
+                unreachable!("only functions can have parameters")
+            }
+        };
+        debug_assert_eq!(parameters.parameters.len(), args.len());
+        parameters
+            .parameters
+            .iter()
+            .zip(args)
+            .all(|(parameter, arg)| parameter.type_(indexes) == arg.type_(indexes))
     }
 
     pub(crate) fn dependencies<'index>(
@@ -102,6 +114,15 @@ impl ItemRef<'_> {
             Self::Constant(node) => node.dependencies(type_, dependencies, indexes),
             Self::Struct(_) => Ok(dependencies),
             Self::Function(node) => node.dependencies(type_, dependencies, indexes),
+        }
+    }
+
+    pub(crate) fn type_<'index>(self, indexes: &Indexes<'index>) -> Type<'index> {
+        match self {
+            ItemRef::Variable(node) => node.type_(indexes),
+            ItemRef::Constant(node) => node.type_(indexes),
+            ItemRef::Struct(_) => Type::Struct(StructDefinition::type_(indexes)),
+            ItemRef::Function(node) => node.type_(indexes),
         }
     }
 

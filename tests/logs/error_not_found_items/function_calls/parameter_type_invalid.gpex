@@ -1,0 +1,5 @@
+var _variable = _called_function(123);
+
+fn _called_function(_parameter: Unknown) -> i32 {
+    return 0;
+}

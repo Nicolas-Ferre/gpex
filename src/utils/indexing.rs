@@ -137,18 +137,17 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
 
     pub(crate) fn search(
         &self,
-        key: &str,
-        location: impl NodeRef,
-        imports: &ImportIndex,
+        parameters: SearchParameters<'_, impl NodeRef>,
         visibility: Visibility,
-        config: SearchConfig,
-    ) -> Option<Item> {
-        imports.imports[location.file_index()]
+    ) -> impl Iterator<Item = Item> {
+        parameters.imports.imports[parameters.location.file_index()]
             .iter()
-            .filter_map(|import| self.items[import.file_index].get(key))
+            .filter_map(|import| self.items[import.file_index].get(parameters.key))
             .flatten()
             .rev()
-            .find(|&&item| Self::is_item_visible(item, location, visibility, config))
+            .filter(move |&&item| {
+                Self::is_item_visible(item, parameters.location, visibility, parameters.config)
+            })
             .copied()
     }
 
@@ -181,6 +180,14 @@ pub(crate) trait ItemNodeRef: NodeRef {
     fn is_public(&self) -> bool;
 
     fn key(&self) -> String;
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct SearchParameters<'import, L: NodeRef> {
+    pub(crate) key: &'import str,
+    pub(crate) location: L,
+    pub(crate) imports: &'import ImportIndex,
+    pub(crate) config: SearchConfig,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
