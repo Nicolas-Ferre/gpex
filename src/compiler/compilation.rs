@@ -42,6 +42,9 @@ pub(crate) fn index(modules: &[Module]) -> Indexes<'_> {
         module.index_items(&mut indexes);
     }
     for module in modules {
+        module.index_signatures(&mut indexes);
+    }
+    for module in modules {
         module.index_refs(&mut indexes);
     }
     indexes

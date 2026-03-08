@@ -39,6 +39,12 @@ impl Module {
         }
     }
 
+    pub(crate) fn index_signatures(&self, indexes: &mut Indexes<'_>) {
+        for item in &self.items {
+            item.index_signatures(indexes);
+        }
+    }
+
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
         for item in &self.items {
             item.index_refs(indexes);
@@ -136,6 +142,17 @@ impl Item {
             Self::Constant(item) => item.index_item(indexes),
             Self::Struct(item) => item.index_item(indexes),
             Self::Function(item) => item.index_item(indexes),
+        }
+    }
+
+    pub(crate) fn index_signatures(&self, indexes: &mut Indexes<'_>) {
+        match self {
+            Self::Function(item) => item.index_signatures(indexes),
+            Self::Import(_)
+            | Self::Variable(_)
+            | Self::Constant(_)
+            | Self::Struct(_)
+            | Self::Repeat(_) => (),
         }
     }
 

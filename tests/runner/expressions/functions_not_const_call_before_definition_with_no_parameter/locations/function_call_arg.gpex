@@ -1,3 +1,5 @@
+var _result = function(called_function()); // expected: 123
+
 fn function(_parameter: i32) -> i32 {
     return 123;
 }
@@ -5,5 +7,3 @@ fn function(_parameter: i32) -> i32 {
 fn called_function() -> i32 {
     return 123;
 }
-
-var _result = function(called_function()); // expected: 123

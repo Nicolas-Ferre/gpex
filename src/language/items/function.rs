@@ -100,11 +100,14 @@ impl FunctionDefinition {
         indexes.items.register(ItemRef::Function(self));
     }
 
-    pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
+    pub(crate) fn index_signatures(&self, indexes: &mut Indexes<'_>) {
         self.parameters.index_refs(indexes);
         if let Some(return_type) = &self.return_type {
             return_type.index(indexes);
         }
+    }
+
+    pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
         for statement in &self.statements {
             statement.index(indexes);
         }
