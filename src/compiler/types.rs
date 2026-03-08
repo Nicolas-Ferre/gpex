@@ -14,8 +14,8 @@ impl<'item> Type<'item> {
     pub(crate) fn name(self) -> &'item str {
         match self {
             Type::Struct(struct_) => &struct_.name,
-            Type::NoReturn => "<no return>",
-            Type::Unknown => "<unknown>",
+            Type::NoReturn => unreachable!("no-type expression is not allowed as argument"),
+            Type::Unknown => unreachable!("unknown-type expression is not allowed as argument"),
         }
     }
 
