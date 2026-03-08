@@ -49,7 +49,7 @@ impl NodeRef for ItemRef<'_> {
             Self::Variable(node) => &node.scope,
             Self::Constant(node) => &node.scope,
             Self::Struct(node) => &node.scope,
-            Self::Function(node) => &node.scope,
+            Self::Function(_) => unreachable!("function calls should ignore source scope"),
         }
     }
 }
