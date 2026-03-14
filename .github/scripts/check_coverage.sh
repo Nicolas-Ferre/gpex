@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xeuo pipefail
+set -euo pipefail
 
 coverage=$(grep "<coverage" coverage.xml | grep -oP 'line-rate="\K[0-9.]+' | head -1)
 failure=$(echo "$coverage < 1.0" | bc)

@@ -3,7 +3,6 @@
 - The CI workflow enforces the main conventions (e.g., by Clippy and rustfmt). See `clippy.toml`
   and `rustfmt.toml` for details.
 - Additional rules:
-    - `impl Trait for Type` blocks should be placed before `impl Type` block of the same type.
     - Use full names instead of abbreviations (e.g. `VariableDefinition` instead of `VarDef`). Only
       exceptions are abbreviations widely used in Rust programming (e.g. `id` instead of
       `identifier`). `clippy.toml` maintains the lists of known abbreviations, full names and
