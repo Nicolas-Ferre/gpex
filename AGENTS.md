@@ -1,4 +1,4 @@
-# AGENTS.md
+# Summary for agents
 
 GPEx is a GPU programming language written in Rust that compiles to WGSL (WebGPU Shading Language)
 and runs on the GPU via wgpu. The CLI provides `compile` and `run` subcommands.
