@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+# Keep only string of form "<type>" or "<trait> for <type>", without generics.
+# It is considered that the code is formatted with Rustfmt.
 strip_impl_line() {
     sed \
         -e ":a" \
