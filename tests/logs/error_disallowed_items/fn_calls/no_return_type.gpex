@@ -1,0 +1,7 @@
+var value = 0;
+
+fn called_fn() {
+	value = 1;
+}
+
+var _result = called_fn();

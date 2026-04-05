@@ -1,0 +1,5 @@
+fn _fn() {
+    _AFTER = 123;
+}
+
+const _AFTER = i32;

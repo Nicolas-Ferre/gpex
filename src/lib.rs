@@ -6,7 +6,7 @@ mod runner;
 mod utils;
 mod validators;
 
-pub use compiler::compile;
+pub use compiler::compile_program;
 pub use compiler::save_compiled;
 pub use compiler::transpilation::Buffer;
 pub use compiler::transpilation::BufferField;

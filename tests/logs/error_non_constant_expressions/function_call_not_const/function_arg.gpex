@@ -1,5 +1,0 @@
-fn called_function() -> i32 {
-    return 123;
-}
-
-const _RESULT = function(called_function());

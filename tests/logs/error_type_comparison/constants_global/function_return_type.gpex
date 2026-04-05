@@ -1,5 +1,0 @@
-const CONSTANT = 0;
-
-fn _function() -> CONSTANT {
-    return 123;
-}

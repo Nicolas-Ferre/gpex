@@ -1,5 +1,0 @@
-fn function(_parameter: bool) -> bool {
-    return true;
-}
-
-var _result = function(true);  // expected: true

@@ -1,7 +1,7 @@
 use crate::utils::logs::{Log, LogLocation};
-use crate::utils::parsing::{Span, SpanProperties};
 use crate::utils::reading::ReadFile;
 use std::path::Path;
+use crate::utils::parsing::span::{Span, SpanProps};
 
 #[derive(Debug)]
 pub(crate) struct ValidateContext<'config> {
@@ -10,7 +10,7 @@ pub(crate) struct ValidateContext<'config> {
     files: &'config [ReadFile],
 }
 
-impl SpanProperties for ValidateContext<'_> {
+impl SpanProps for ValidateContext<'_> {
     fn slice(&self, span: Span) -> &str {
         &self.files[span.file_index].content[span.start..span.end]
     }

@@ -1,9 +1,9 @@
 import ~.imported2;
 
-pub fn function1() -> i32 {
+pub fn fn1() -> i32 {
     return cyclic1;
 }
 
-pub fn function2() -> i32 {
+pub fn fn2() -> i32 {
     return cyclic2;
 }

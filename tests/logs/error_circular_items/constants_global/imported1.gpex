@@ -1,4 +1,0 @@
-import ~.imported2;
-
-pub const CONSTANT1 = cyclic1;
-pub const CONSTANT2 = cyclic2;

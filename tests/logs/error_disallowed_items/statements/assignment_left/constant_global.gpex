@@ -1,6 +1,0 @@
-const CONSTANT = 0;
-
-fn _function() -> bool {
-    CONSTANT = 1;
-    return true;
-}

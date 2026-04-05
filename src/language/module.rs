@@ -1,11 +1,12 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::import::Import;
-use crate::language::items::constant::ConstantDefinition;
-use crate::language::items::function::FunctionDefinition;
+use crate::language::items::const_::ConstDefinition;
+use crate::language::items::fn_::FnDefinition;
 use crate::language::items::repeat::RepeatDefinition;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::items::variable::VariableDefinition;
-use crate::utils::parsing::{ParseContext, ParseError};
+use crate::language::items::var::VarDefinition;
+use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::error::ParseError;
 use crate::utils::validation::{ValidateContext, ValidateError};
 
 #[derive(Debug)]
@@ -79,10 +80,10 @@ impl Module {
         Ok(())
     }
 
-    pub(crate) fn global_variables(&self) -> impl Iterator<Item = &VariableDefinition> {
+    pub(crate) fn global_vars(&self) -> impl Iterator<Item = &VarDefinition> {
         self.items.iter().filter_map(|item| {
-            if let Item::Variable(variable) = item {
-                Some(variable)
+            if let Item::Variable(var) = item {
+                Some(var)
             } else {
                 None
             }
@@ -103,10 +104,10 @@ impl Module {
 #[derive(Debug)]
 pub(crate) enum Item {
     Import(Import),
-    Variable(VariableDefinition),
-    Constant(ConstantDefinition),
+    Variable(VarDefinition),
+    Constant(ConstDefinition),
     Struct(StructDefinition),
-    Function(FunctionDefinition),
+    Function(FnDefinition),
     Repeat(RepeatDefinition),
 }
 
@@ -116,10 +117,10 @@ impl Item {
     ) -> Result<Self, ParseError<'context>> {
         context.parse_any(&[
             |context| Import::parse(context).map(Self::Import),
-            |context| VariableDefinition::parse(context).map(Self::Variable),
-            |context| ConstantDefinition::parse(context).map(Self::Constant),
+            |context| VarDefinition::parse(context).map(Self::Variable),
+            |context| ConstDefinition::parse(context).map(Self::Constant),
             |context| StructDefinition::parse(context).map(Self::Struct),
-            |context| FunctionDefinition::parse(context).map(Self::Function),
+            |context| FnDefinition::parse(context).map(Self::Function),
             |context| RepeatDefinition::parse(context).map(Self::Repeat),
         ])
     }

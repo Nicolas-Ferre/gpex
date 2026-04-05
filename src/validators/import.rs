@@ -1,6 +1,6 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::import::ImportSegment;
-use crate::utils::parsing::{Span, SpanProperties};
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 use itertools::Itertools;
@@ -21,11 +21,11 @@ pub(crate) fn check_found(
         let segments_span = first_segment.span().until(last_segment.span());
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{dot_path}` module not found"),
+            msg: format!("`{dot_path}` module not found"),
             location: Some(context.location(segments_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                message: format!("cannot read \"{}\"", fs_path.display()),
+                msg: format!("cannot read \"{}\"", fs_path.display()),
                 location: None,
             }],
         });
@@ -43,11 +43,11 @@ pub(crate) fn check_top(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: "`import` statement not at the top of the module".into(),
+            msg: "`import` statement not at the top of the module".into(),
             location: Some(context.location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                message: "`import` statements should appear before anything else".into(),
+                msg: "`import` statements should appear before anything else".into(),
                 location: None,
             }],
         });
@@ -65,7 +65,7 @@ pub(crate) fn check_self_import(
     {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: "module importing itself".into(),
+            msg: "module importing itself".into(),
             location: Some(context.location(span)),
             inner: vec![],
         });
@@ -76,17 +76,17 @@ pub(crate) fn check_usage(
     import_id: u64,
     imported_file_index: Option<usize>,
     span: Span,
-    is_public: bool,
+    is_pub: bool,
     segments: &[ImportSegment],
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
     let is_self_import = imported_file_index == Some(span.file_index);
-    if !is_self_import && !is_public && !indexes.imports.is_used(span.file_index, import_id) {
+    if !is_self_import && !is_pub && !indexes.imports.is_used(span.file_index, import_id) {
         let dot_path = dot_path_from_segments(segments, context);
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{dot_path}` import unused"),
+            msg: format!("`{dot_path}` import unused"),
             location: Some(context.location(span)),
             inner: vec![],
         });

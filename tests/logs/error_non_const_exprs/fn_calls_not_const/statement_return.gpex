@@ -1,0 +1,7 @@
+fn called_fn() -> i32 {
+    return 123;
+}
+
+const fn _fn() -> i32 {
+    return called_fn();
+}

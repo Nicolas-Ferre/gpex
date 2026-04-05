@@ -28,7 +28,7 @@ pub(crate) async fn create_adapter(instance: &Instance) -> Result<Adapter, Vec<L
         // coverage: off (difficult to test)
         vec![Log {
             level: LogLevel::Error,
-            message: format!("no supported graphic adapter found: {error}"),
+            msg: format!("no supported graphic adapter found: {error}"),
             location: None,
             inner: vec![],
         }]
@@ -49,7 +49,7 @@ pub(crate) async fn create_device(adapter: &Adapter) -> Result<(Device, Queue), 
         // coverage: off (difficult to test)
         vec![Log {
             level: LogLevel::Error,
-            message: format!("cannot retrieve graphic device: {error}"),
+            msg: format!("cannot retrieve graphic device: {error}"),
             location: None,
             inner: vec![],
         }]
@@ -95,6 +95,37 @@ pub(crate) fn create_bind_group_layout(
     })
 }
 
+pub(crate) fn read_buffer(
+    device: &Device,
+    queue: &Queue,
+    buffer: &Buffer,
+    offset: u64,
+    size: u64,
+) -> Vec<u8> {
+    let read_buffer = device.create_buffer(/* fn_check: off */ &BufferDescriptor {
+        label: Some("gpex:buffer:storage_read"),
+        size,
+        usage: BufferUsages::MAP_READ | BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
+    let mut encoder = create_encoder(device);
+    encoder.copy_buffer_to_buffer(buffer, offset, &read_buffer, 0, Some(size));
+    let submission_index = queue.submit(Some(encoder.finish()));
+    let slice = read_buffer.slice(..);
+    slice.map_async(MapMode::Read, |_| ());
+    device
+        .poll(PollType::Wait {
+            submission_index: Some(submission_index),
+            timeout: None,
+        })
+        .unwrap_or_else(|_| unreachable!("GPU poll should never fail"));
+    let view = slice.get_mapped_range();
+    let content = view.to_vec();
+    drop(view);
+    read_buffer.unmap();
+    content
+}
+
 pub(crate) fn create_encoder(device: &Device) -> CommandEncoder {
     device.create_command_encoder(&CommandEncoderDescriptor {
         label: Some("gpex:encoder"),
@@ -128,35 +159,4 @@ pub(crate) fn create_compute_pipeline(
         compilation_options: PipelineCompilationOptions::default(),
         cache: None,
     })
-}
-
-pub(crate) fn read_buffer(
-    device: &Device,
-    queue: &Queue,
-    buffer: &Buffer,
-    offset: u64,
-    size: u64,
-) -> Vec<u8> {
-    let read_buffer = device.create_buffer(&BufferDescriptor {
-        label: Some("gpex:buffer:storage_read"),
-        size,
-        usage: BufferUsages::MAP_READ | BufferUsages::COPY_DST,
-        mapped_at_creation: false,
-    });
-    let mut encoder = create_encoder(device);
-    encoder.copy_buffer_to_buffer(buffer, offset, &read_buffer, 0, Some(size));
-    let submission_index = queue.submit(Some(encoder.finish()));
-    let slice = read_buffer.slice(..);
-    slice.map_async(MapMode::Read, |_| ());
-    device
-        .poll(PollType::Wait {
-            submission_index: Some(submission_index),
-            timeout: None,
-        })
-        .unwrap_or_else(|_| unreachable!("GPU poll should never fail"));
-    let view = slice.get_mapped_range();
-    let content = view.to_vec();
-    drop(view);
-    read_buffer.unmap();
-    content
 }

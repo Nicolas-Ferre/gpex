@@ -1,0 +1,5 @@
+var _var = _called_fn(123, 456u);
+
+fn _called_fn() -> i32 {
+    return 0;
+}

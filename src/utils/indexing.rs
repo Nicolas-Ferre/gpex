@@ -1,4 +1,4 @@
-use crate::utils::parsing::Span;
+use crate::utils::parsing::span::Span;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::iter;
@@ -21,13 +21,13 @@ impl ImportIndex {
         span: Option<Span>,
         file_index: usize,
         imported_file_index: usize,
-        is_import_public: bool,
+        is_import_pub: bool,
     ) {
         self.imports[file_index].push(ImportItem {
             source_import_id: import_item_id,
             span,
             file_index: imported_file_index,
-            is_public: is_import_public,
+            is_pub: is_import_pub,
             is_used: false,
         });
     }
@@ -55,7 +55,7 @@ impl ImportIndex {
                 source_import_id: None,
                 span: None,
                 file_index,
-                is_public: true,
+                is_pub: true,
                 is_used: false,
             }];
             let mut unique_file_indexes = iter::once(file_index).collect();
@@ -86,12 +86,12 @@ impl ImportIndex {
             source_import_id,
             span: new_import.span,
             file_index: new_import.file_index,
-            is_public: new_import.is_public,
+            is_pub: new_import.is_pub,
             is_used: new_import.is_used,
         });
         unique_file_indexes.insert(new_import.file_index);
         for inner_import in self.imports[new_import.file_index].iter().rev() {
-            if inner_import.is_public {
+            if inner_import.is_pub {
                 self.expand_imports(imports, unique_file_indexes, inner_import, source_import_id);
             }
         }
@@ -103,7 +103,7 @@ pub(crate) struct ImportItem {
     pub(crate) source_import_id: Option<u64>,
     pub(crate) span: Option<Span>,
     pub(crate) file_index: usize,
-    pub(crate) is_public: bool,
+    pub(crate) is_pub: bool,
     pub(crate) is_used: bool,
 }
 
@@ -137,16 +137,16 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
 
     pub(crate) fn search(
         &self,
-        parameters: SearchParameters<'_, impl NodeRef>,
+        params: SearchParams<'_, impl NodeRef>,
         visibility: Visibility,
     ) -> impl Iterator<Item = Item> {
-        parameters.imports.imports[parameters.location.file_index()]
+        params.imports.imports[params.location.file_index()]
             .iter()
-            .filter_map(|import| self.items[import.file_index].get(parameters.key))
+            .filter_map(|import| self.items[import.file_index].get(params.key))
             .flatten()
             .rev()
             .filter(move |&&item| {
-                Self::is_item_visible(item, parameters.location, visibility, parameters.config)
+                Self::is_item_visible(item, params.location, visibility, params.config)
             })
             .copied()
     }
@@ -159,11 +159,11 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
     ) -> bool {
         let is_same_file = location.file_index() == item.file_index();
         let is_visible_locally = config.can_be_after || item.id() <= location.id();
-        let is_item_public = match visibility {
-            Visibility::Enforced => item.is_public(),
+        let is_pub_item = match visibility {
+            Visibility::Enforced => item.is_pub(),
             Visibility::Ignored => true,
         };
-        ((is_same_file && is_visible_locally) || (!is_same_file && is_item_public))
+        ((is_same_file && is_visible_locally) || (!is_same_file && is_pub_item))
             && (config.can_be_parent_node || item.scope() != location.scope())
     }
 }
@@ -177,13 +177,13 @@ pub(crate) trait NodeRef: Clone + Copy {
 }
 
 pub(crate) trait ItemNodeRef: NodeRef {
-    fn is_public(&self) -> bool;
+    fn is_pub(&self) -> bool;
 
     fn key(&self) -> String;
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct SearchParameters<'import, L: NodeRef> {
+pub(crate) struct SearchParams<'import, L: NodeRef> {
     pub(crate) key: &'import str,
     pub(crate) location: L,
     pub(crate) imports: &'import ImportIndex,

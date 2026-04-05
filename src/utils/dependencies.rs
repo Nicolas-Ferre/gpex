@@ -1,4 +1,4 @@
-use crate::utils::parsing::Span;
+use crate::utils::parsing::span::Span;
 use std::collections::HashSet;
 use std::hash::Hash;
 use std::mem;

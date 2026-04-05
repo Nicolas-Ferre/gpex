@@ -1,0 +1,5 @@
+fn fn_() -> f32 {
+    return 123.456;
+}
+
+var _result = fn_();  // expected: 123.456

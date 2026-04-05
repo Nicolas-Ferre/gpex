@@ -9,7 +9,7 @@ pub struct Log {
     /// The log level.
     pub level: LogLevel,
     /// The log message.
-    pub message: String,
+    pub msg: String,
     /// A reference to the source code.
     pub location: Option<LogLocation>,
     /// Inner logs.
@@ -17,12 +17,12 @@ pub struct Log {
 }
 
 impl Display for Log {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(
-            f,
+            formatter,
             "{}: {}{}",
             self.level,
-            self.message,
+            self.msg,
             if let Some(location) = &self.location {
                 format!(" (at {location})")
             } else {
@@ -30,17 +30,17 @@ impl Display for Log {
             }
         )?; // no-coverage (difficult to test)
         for inner in &self.inner {
-            write!(f, "{inner}")?;
+            write!(formatter, "{inner}")?;
         }
         Ok(())
     }
 }
 
 impl Log {
-    pub(crate) fn from_io_error(error: io::Error, path: &Path, message_prefix: &str) -> Self {
+    pub(crate) fn from_io_error(error: io::Error, path: &Path, msg_prefix: &str) -> Self {
         Self {
             level: LogLevel::Error,
-            message: format!("{} \"{}\": {}", message_prefix, path.display(), error),
+            msg: format!("{msg_prefix} \"{}\": {error}", path.display()),
             location: None,
             inner: vec![],
         }
@@ -53,18 +53,18 @@ pub struct LogInner {
     /// The log level.
     pub level: LogLevel,
     /// The log message.
-    pub message: String,
+    pub msg: String,
     /// A reference to the source code.
     pub location: Option<LogLocation>,
 }
 
 impl Display for LogInner {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(
-            f,
+            formatter,
             "  --> {}: {}{}",
             self.level,
-            self.message,
+            self.msg,
             if let Some(location) = &self.location {
                 format!(" (at {location})")
             } else {
@@ -86,7 +86,7 @@ pub struct LogLocation {
 }
 
 impl Display for LogLocation {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         let mut line = 1;
         let mut column = 1;
         for (offset, char) in self.code.char_indices() {
@@ -99,7 +99,7 @@ impl Display for LogLocation {
                 column += 1;
             }
         }
-        write!(f, "{}:{line}:{column}", self.path.display())
+        write!(formatter, "{}:{line}:{column}", self.path.display())
     }
 }
 
@@ -115,11 +115,11 @@ pub enum LogLevel {
 }
 
 impl Display for LogLevel {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Error => write!(f, "error"),
-            Self::Warning => write!(f, "warning"),
-            Self::Info => write!(f, "info"),
+            Self::Error => write!(formatter, "error"),
+            Self::Warning => write!(formatter, "warning"),
+            Self::Info => write!(formatter, "info"),
         }
     }
 }

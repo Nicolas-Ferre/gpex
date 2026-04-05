@@ -1,4 +1,4 @@
-fn _function() -> bool {
+fn _fn() -> bool {
     0 = 1;
     return true;
 }
