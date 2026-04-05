@@ -1,7 +1,7 @@
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::ValidateContext;
 use crate::{Log, LogLevel};
 use itertools::Itertools;
-use crate::utils::parsing::span::{Span, SpanProps};
 
 pub(crate) fn check_char_count(span: Span, context: &mut ValidateContext<'_>) {
     let slice = context.slice(span);

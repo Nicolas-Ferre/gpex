@@ -10,10 +10,7 @@ async fn run_program() -> Result<(), Vec<Log>> {
         runner.read_var("inner.inner2.inner:_inner_value"),
         Some(GpuValue::I32(1))
     );
-    assert_eq!(
-        runner.read_var("root:_root_value"),
-        Some(GpuValue::I32(2))
-    );
+    assert_eq!(runner.read_var("root:_root_value"), Some(GpuValue::I32(2)));
     assert_eq!(runner.read_var("module:invalid"), None);
     Ok(())
 }

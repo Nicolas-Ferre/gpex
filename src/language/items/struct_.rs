@@ -7,12 +7,12 @@ use crate::language::symbols::{
     STRUCT_KEYWORD,
 };
 use crate::utils::endianness;
+use crate::utils::parsing::context::ParseContext;
 use crate::utils::parsing::error::ParseError;
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 use std::fmt::Write;
-use crate::utils::parsing::context::ParseContext;
-use crate::utils::parsing::span::{Span, SpanProps};
 
 const TYPEREF_SIZE: u32 = 8;
 const F32_SIZE: u32 = 4;

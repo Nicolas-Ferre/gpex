@@ -1,7 +1,7 @@
 use crate::utils::logs::{Log, LogLocation};
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::reading::ReadFile;
 use std::path::Path;
-use crate::utils::parsing::span::{Span, SpanProps};
 
 #[derive(Debug)]
 pub(crate) struct ValidateContext<'config> {

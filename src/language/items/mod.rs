@@ -84,11 +84,7 @@ impl ItemRef<'_> {
         }
     }
 
-    pub(crate) fn has_same_param_types_as(
-        &self,
-        args: &[Expr],
-        indexes: &Indexes<'_>,
-    ) -> bool {
+    pub(crate) fn has_same_param_types_as(&self, args: &[Expr], indexes: &Indexes<'_>) -> bool {
         let params = match self {
             ItemRef::Fn(node) => &node.params,
             ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_) => {
