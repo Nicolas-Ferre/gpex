@@ -16,7 +16,7 @@ exit_code=0
 while read -r -d '' file; do
     split_path=' '$(echo "$file" |
         sed -E 's/([a-z])([A-Z])/\1 \2/g' |
-        tr '_-/' ' ' |
+        tr '_/-' ' ' |
         tr '[:upper:]' '[:lower:]')' '
     for word in "${FORBIDDEN_WORDS[@]}"; do
         if [[ $split_path =~ [[:space:]]"$word"[[:space:]] ]]; then
