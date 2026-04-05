@@ -145,7 +145,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt update && sudo apt install -y moreutils shellcheck
       - name: Lint Bash scripts
-        run: shellcheck .github/scripts/*.sh --shell bash --severity style
+        run: shellcheck .github/scripts/*.sh --shell bash --severity style --external-sources
       - name: Install shfmt
         run: curl -sS https://webi.sh/shfmt | sh; source ~/.config/envman/PATH.env
       - name: Check Bash script formatting

@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+# shellcheck disable=SC1091
 source "$(dirname "$0")/config.sh"
 
 # It is considered that the analyzed code is compiling and formatted with Rustfmt.

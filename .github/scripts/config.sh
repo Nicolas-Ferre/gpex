@@ -1,5 +1,5 @@
 # General rule: if acronym is not idiomatic in Rust or plural doesn't seem natural, then don't use it.
-FORBIDDEN_WORDS=(
+export FORBIDDEN_WORDS=(
     "identifier"     # "ident" or "id" is preferred
     "reference"      # "ref" is preferred
     "argument"       # "arg" is preferred
