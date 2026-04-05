@@ -1,41 +1,41 @@
 # General rule: if acronym is not idiomatic in Rust or plural doesn't seem natural, then don't use it.
 export FORBIDDEN_WORDS=(
-    "identifier"     # "ident" or "id" is preferred
-    "reference"      # "ref" is preferred
-    "argument"       # "arg" is preferred
-    "parameter"      # "param" is preferred
-    "expression"     # "expr" is preferred
-    "character"      # "char" is preferred
-    "initialize"     # "init" is preferred
-    "initialization" # "init" is preferred
-    "length"         # "len" is preferred
-    "file_system"    # "fs" is preferred
-    "configuration"  # "config" is preferred
-    "constant"       # "const" is preferred
-    "variable"       # "var" is preferred
-    "function"       # "fn" is preferred
-    "func"           # "fn" is preferred
-    "directory"      # "dir" is preferred
-    "folder"         # "dir" is preferred
-    "public"         # "pub" is preferred
-    "private"        # "priv" is preferred
-    "extension"      # "ext" is preferred
-    "properties"     # "props" is preferred
-    "property"       # "prop" is preferred
-    "message"        # "msg" is preferred
-    "err"            # "error" is preferred
-    "ctx"            # "context" is preferred
-    "semi"           # "semicolon" is preferred
-    "loc"            # "location" is preferred
-    "def"            # "definition" is preferred
-    "dep"            # "dependency" is preferred
-    "deps"           # "dependencies" is preferred
-    "sym"            # "symbol" is preferred
-    "req"            # "required" or "request" is preferred
-    "kw"             # "keyword" is preferred
-    "lag"            # "language" is preferred
-    "sig"            # "signature" is preferred
-    "stmt"           # "statement" is preferred
-    "lit"            # "literal" is preferred
-    "prev"           # "previous" is preferred
+    "identifier"     # use "ident" or "id" instead
+    "reference"      # use "ref" instead
+    "argument"       # use "arg" instead
+    "parameter"      # use "param" instead
+    "expression"     # use "expr" instead
+    "character"      # use "char" instead
+    "initialize"     # use "init" instead
+    "initialization" # use "init" instead
+    "length"         # use "len" instead
+    "file_system"    # use "fs" instead
+    "configuration"  # use "config" instead
+    "constant"       # use "const" instead
+    "variable"       # use "var" instead
+    "function"       # use "fn" instead
+    "func"           # use "fn" instead
+    "directory"      # use "dir" instead
+    "folder"         # use "dir" instead
+    "public"         # use "pub" instead
+    "private"        # use "priv" instead
+    "extension"      # use "ext" instead
+    "properties"     # use "props" instead
+    "property"       # use "prop" instead
+    "message"        # use "msg" instead
+    "err"            # use "error" instead
+    "ctx"            # use "context" instead
+    "semi"           # use "semicolon" instead
+    "loc"            # use "location" instead
+    "def"            # use "definition" instead
+    "dep"            # use "dependency" instead
+    "deps"           # use "dependencies" instead
+    "sym"            # use "symbol" instead
+    "req"            # use "required" or "request" instead
+    "kw"             # use "keyword" instead
+    "lag"            # use "language" instead
+    "sig"            # use "signature" instead
+    "stmt"           # use "statement" instead
+    "lit"            # use "literal" instead
+    "prev"           # use "previous" instead
 )

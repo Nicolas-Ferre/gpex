@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-IFS=
 
 # It is considered that the analyzed code is compiling and formatted with Rustfmt.
 
@@ -21,7 +20,7 @@ is_empty_line() {
 while read -r -d '' file; do
     is_not_mod_item_found=false
     line_number=1
-    while read -r line; do
+    while IFS= read -r line; do
         if ! is_mod_statement && ! is_comment && ! is_empty_line; then
             is_not_mod_item_found=true
         elif is_mod_statement && [[ $is_not_mod_item_found == true ]]; then

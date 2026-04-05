@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-IFS=
 # shellcheck disable=SC1091
 source "$(dirname "$0")/utils.sh"
 
@@ -22,7 +21,7 @@ exit_code=0
 
 while read -r -d '' file; do
     not_trait_impl_block_types=()
-    while read -r line; do
+    while IFS= read -r line; do
         type=$(echo "$line" | grep -oe "\w*$")
         is_trait_impl=$(echo "$line" | grep -o " for " || true)
         if is_item_in_array "${not_trait_impl_block_types[@]-}" "$type"; then

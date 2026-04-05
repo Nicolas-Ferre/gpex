@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-IFS=
 
 # It is considered that the analyzed code is compiling and formatted with Rustfmt.
 
@@ -14,7 +13,7 @@ while read -r -d '' file; do
     is_in_function=false
     function_indent=""
     line_number=1
-    while read -r line; do
+    while IFS= read -r line; do
         if [[ $line =~ $FUNCTION_START_REGEX ]]; then
             is_in_function=true
             function_indent="${BASH_REMATCH[1]}"

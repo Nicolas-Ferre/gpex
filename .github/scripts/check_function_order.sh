@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-IFS=
 # shellcheck disable=SC1091
 source "$(dirname "$0")/utils.sh"
 
@@ -38,7 +37,7 @@ while read -r -d '' file; do
     current_function_name=""
     current_function_indent=""
     line_number=1
-    while read -r line; do
+    while IFS= read -r line; do
         if [[ $line =~ $EXCLUSION_REGEX ]]; then
             continue
         elif [[ $line =~ $FUNCTION_DEFINITION_START_REGEX ]]; then
