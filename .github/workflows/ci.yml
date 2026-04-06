@@ -117,6 +117,8 @@ jobs:
           fail_ci_if_error: true
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y libxml2-utils
       - name: Check coverage threshold
         run: bash -x .github/scripts/check_coverage.sh
 
