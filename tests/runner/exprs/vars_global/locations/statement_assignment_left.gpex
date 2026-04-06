@@ -1,0 +1,7 @@
+var result = 0; // expected: 123
+
+fn execute() {
+	result = 123;
+}
+
+repeat execute();

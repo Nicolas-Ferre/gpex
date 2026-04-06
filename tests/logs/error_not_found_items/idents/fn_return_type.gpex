@@ -1,0 +1,3 @@
+fn _fn() -> identifier {
+    return 0;
+}

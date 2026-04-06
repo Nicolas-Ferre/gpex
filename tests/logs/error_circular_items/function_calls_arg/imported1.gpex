@@ -1,4 +1,0 @@
-import ~.imported2;
-
-pub var variable1 = function(cyclic1);
-pub var variable2 = function(cyclic2);

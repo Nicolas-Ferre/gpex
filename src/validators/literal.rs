@@ -1,4 +1,4 @@
-use crate::utils::parsing::Span;
+use crate::utils::parsing::span::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogLevel};
 
@@ -13,7 +13,7 @@ pub(crate) fn check_bounds(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{type_name}` literal out of bounds"),
+            msg: format!("`{type_name}` literal out of bounds"),
             location: Some(context.location(span)),
             inner: vec![],
         });

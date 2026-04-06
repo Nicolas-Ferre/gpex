@@ -1,0 +1,5 @@
+var var_ = i32;
+
+fn _fn() -> var_ {
+    return 123;
+}

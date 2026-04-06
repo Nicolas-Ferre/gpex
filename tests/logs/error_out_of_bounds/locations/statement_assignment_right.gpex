@@ -1,0 +1,5 @@
+var value = 0;
+
+fn _fn() {
+    value = 9999999999;
+}

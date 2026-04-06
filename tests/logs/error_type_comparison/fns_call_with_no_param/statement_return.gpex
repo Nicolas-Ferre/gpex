@@ -1,0 +1,11 @@
+const fn ExpectedType() -> typeref {
+    return u32;
+}
+
+fn called_fn() -> i32 {
+    return 123;
+}
+
+fn _fn() -> ExpectedType() {
+    return called_fn();
+}

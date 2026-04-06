@@ -1,2 +1,0 @@
-// public items shouldn't be considered as unused
-pub var variable = 0;

@@ -1,0 +1,3 @@
+import ~.imported;
+
+var _var = IMPORTED;

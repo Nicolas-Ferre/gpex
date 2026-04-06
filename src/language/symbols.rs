@@ -1,4 +1,4 @@
-use crate::utils::parsing::Symbol;
+use crate::utils::parsing::span::Symbol;
 
 pub(crate) const KEYWORDS: &[&str] = &[
     COMPILERIMPL_KEYWORD.slice,

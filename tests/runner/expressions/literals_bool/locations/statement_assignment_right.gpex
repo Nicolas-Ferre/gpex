@@ -1,8 +1,0 @@
-var result = false; // expected: true
-
-fn execute() -> bool {
-	result = true;
-	return true;
-}
-
-var _ = execute();

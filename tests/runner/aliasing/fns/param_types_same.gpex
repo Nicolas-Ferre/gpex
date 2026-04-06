@@ -1,0 +1,9 @@
+fn fn_(_param: i32) -> bool {
+    return false;
+}
+
+fn fn_(_param: i32) -> bool {
+    return true;
+}
+
+var _result = fn_(123); // expected: true

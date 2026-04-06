@@ -1,4 +1,4 @@
-pub(crate) mod expressions;
+pub(crate) mod exprs;
 pub(crate) mod import;
 pub(crate) mod items;
 pub(crate) mod module;

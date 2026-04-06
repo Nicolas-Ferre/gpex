@@ -1,7 +1,0 @@
-const RESULT = called_function();
-
-const fn called_function() -> i32 {
-    return 123;
-}
-
-var _result = RESULT; // expected: 123

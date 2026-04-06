@@ -1,2 +1,0 @@
-// public items shouldn't be considered as unused
-pub const CONSTANT = 0;

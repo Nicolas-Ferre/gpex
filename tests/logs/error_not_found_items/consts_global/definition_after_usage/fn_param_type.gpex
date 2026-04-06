@@ -1,0 +1,5 @@
+fn _fn(_param: _AFTER) -> i32 {
+    return 0;
+}
+
+const _AFTER = i32;

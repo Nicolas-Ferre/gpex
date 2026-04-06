@@ -1,5 +1,0 @@
-var variable = 123;
-
-const fn _function() {
-    variable = 456;
-}

@@ -1,4 +1,4 @@
-fn _function() -> i32 {
+fn _fn() -> i32 {
     return 0;
     return 1;
 }

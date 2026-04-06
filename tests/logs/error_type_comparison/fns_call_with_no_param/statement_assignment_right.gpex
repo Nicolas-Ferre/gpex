@@ -1,0 +1,9 @@
+var result = 0;
+
+const fn called_fn() -> u32 {
+    return 123u;
+}
+
+fn _execute() {
+	result = called_fn();
+}

@@ -1,0 +1,5 @@
+fn fn_() -> u32 {
+    return 123u;
+}
+
+var _result = fn_();  // expected: 123u

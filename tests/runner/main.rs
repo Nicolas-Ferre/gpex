@@ -18,8 +18,8 @@ async fn run_with_syntax_specificities() -> Result<(), Error> {
 }
 
 #[tokio::test]
-async fn run_with_expressions() -> Result<(), Error> {
-    compile_and_run(Path::new("tests/runner/expressions"), true).await
+async fn run_with_exprs() -> Result<(), Error> {
+    compile_and_run(Path::new("tests/runner/exprs"), true).await
 }
 
 #[tokio::test]
@@ -38,16 +38,17 @@ async fn run_with_prelude() -> Result<(), Error> {
 }
 
 async fn compile_and_run(path: &Path, is_warning_treated_as_error: bool) -> Result<(), Error> {
-    let (program, _) = gpex::compile(path, is_warning_treated_as_error).map_err(Error::Gpex)?;
+    let (program, _) =
+        gpex::compile_program(path, is_warning_treated_as_error).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
     runner.run_step();
     check_global_vars(path, path, &runner)?;
     Ok(())
 }
 
-fn check_global_vars(folder_path: &Path, root_path: &Path, runner: &Runner) -> Result<(), Error> {
+fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Result<(), Error> {
     let expected_regex = Regex::new(r"var (\w+) = .* // expected: (.+)").map_err(Error::Regex)?;
-    for entry in folder_path.read_dir().map_err(Error::Io)? {
+    for entry in dir_path.read_dir().map_err(Error::Io)? {
         let entry = entry.map_err(Error::Io)?;
         let path = entry.path();
         let file_type = entry.file_type().map_err(Error::Io)?;
@@ -60,7 +61,7 @@ fn check_global_vars(folder_path: &Path, root_path: &Path, runner: &Runner) -> R
                 let var_name = &capture[1];
                 let expected_value = &capture[2];
                 let var_path = format!("{dot_path}:{var_name}");
-                let actual_value = runner.read_variable(&var_path);
+                let actual_value = runner.read_var(&var_path);
                 assert_eq!(
                     Some(expected_value.into()),
                     actual_value.map(|value| value.to_string()),

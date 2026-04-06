@@ -1,0 +1,5 @@
+var _var = _called_fn(123);
+
+fn _called_fn(_param: Unknown) -> i32 {
+    return 0;
+}

@@ -1,3 +1,0 @@
-pub const fn called_function() -> i32 {
-    return 123;
-}

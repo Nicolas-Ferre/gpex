@@ -1,5 +1,0 @@
-fn function(_parameter: u32) -> u32 {
-    return 123u;
-}
-
-var _result = function(123u);  // expected: 123u

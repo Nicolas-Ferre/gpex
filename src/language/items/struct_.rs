@@ -1,13 +1,15 @@
 use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
-use crate::language::patterns::IDENTIFIER_PATTERN;
+use crate::language::patterns::IDENT_PATTERN;
 use crate::language::symbols::{
     BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, COMPILERIMPL_KEYWORD, EQUAL_SYMBOL, PUB_KEYWORD,
     STRUCT_KEYWORD,
 };
 use crate::utils::endianness;
-use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
+use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::error::ParseError;
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
 use std::fmt::Write;
@@ -39,7 +41,7 @@ impl StructDefinition {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             Span::parse_symbol(context, STRUCT_KEYWORD)?;
             context.force_parse_any_error();
-            let name_span = Span::parse_pattern(context, IDENTIFIER_PATTERN)?;
+            let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
             Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
             Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;

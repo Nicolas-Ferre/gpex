@@ -1,5 +1,0 @@
-fn _function(_parameter: _AFTER) -> i32 {
-    return 0;
-}
-
-const _AFTER = i32;

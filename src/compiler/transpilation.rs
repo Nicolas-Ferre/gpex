@@ -2,7 +2,7 @@ use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
 use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
-use crate::language::items::variable::VariableDefinition;
+use crate::language::items::var::VarDefinition;
 use crate::language::module::Module;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::reading::ReadFile;
@@ -49,7 +49,11 @@ pub struct BufferField {
     pub offset: u32,
 }
 
-pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexes<'_>) -> Program {
+pub(crate) fn transpile_all(
+    files: &[ReadFile],
+    modules: &[Module],
+    indexes: &Indexes<'_>,
+) -> Program {
     let mut init_shader = String::with_capacity(100);
     transpile_init(&mut init_shader, modules, indexes);
     let mut update_shader = String::with_capacity(100);
@@ -57,8 +61,8 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
     let mut offset = 0;
     let variables: Vec<_> = modules
         .iter()
-        .flat_map(Module::global_variables)
-        .sorted_unstable_by_key(|variable| variable.id)
+        .flat_map(Module::global_vars)
+        .sorted_unstable_by_key(|var| var.id)
         .collect();
     let buffer_alignment = main_buffer_alignment(indexes, &variables);
     let fields = variables
@@ -93,18 +97,18 @@ pub(crate) fn transpile(files: &[ReadFile], modules: &[Module], indexes: &Indexe
 
 fn main_buffer_next_field_offset(
     indexes: &Indexes<'_>,
-    fields: &[&VariableDefinition],
+    fields: &[&VarDefinition],
     current_field_index: usize,
     current_field_offset: u32,
     current_field_type: &StructDefinition,
 ) -> u32 {
-    if let Some(next_variable) = fields.get(current_field_index + 1) {
-        let next_variable_type = next_variable
+    if let Some(next_var) = fields.get(current_field_index + 1) {
+        let next_var_type = next_var
             .type_(indexes)
             .struct_ref()
             .unwrap_or_else(|| unreachable!("variable type should be validated before"));
         round_up(
-            next_variable_type.alignment(),
+            next_var_type.alignment(),
             current_field_offset + current_field_type.size(),
         )
     } else {
@@ -112,12 +116,10 @@ fn main_buffer_next_field_offset(
     }
 }
 
-fn main_buffer_alignment(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> u32 {
-    variables
-        .iter()
-        .map(|variable| {
-            variable
-                .type_(indexes)
+fn main_buffer_alignment(indexes: &Indexes<'_>, vars: &[&VarDefinition]) -> u32 {
+    vars.iter()
+        .map(|var| {
+            var.type_(indexes)
                 .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"))
                 .alignment()
@@ -134,14 +136,13 @@ fn round_up(rounded_to: u32, value: u32) -> u32 {
     }
 }
 
-fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashMap<u64, String> {
+fn type_paths(indexes: &Indexes<'_>, vars: &[&VarDefinition]) -> HashMap<u64, String> {
     indexes
         .types
         .iter()
         .copied()
-        .chain(variables.iter().map(|variable| {
-            variable
-                .type_(indexes)
+        .chain(vars.iter().map(|var| {
+            var.type_(indexes)
                 .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"))
         }))
@@ -152,8 +153,8 @@ fn type_paths(indexes: &Indexes<'_>, variables: &[&VariableDefinition]) -> HashM
 fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
     let mut dependencies = Dependencies::new();
     for module in modules {
-        for variable in module.global_variables() {
-            dependencies = variable
+        for var in module.global_vars() {
+            dependencies = var
                 .dependencies(DependencyType::Transpilation, dependencies, indexes)
                 .unwrap_or_else(|_| {
                     unreachable!("circular dependencies should be validated before")
@@ -161,8 +162,8 @@ fn transpile_init(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>
         }
     }
     transpile_shader(shader, modules, indexes, dependencies, |shader| {
-        for variable in sorted_global_variables(modules, indexes) {
-            variable.transpile_buffer_init(shader, indexes);
+        for var in sorted_global_vars(modules, indexes) {
+            var.transpile_buffer_init(shader, indexes);
         }
     });
 }
@@ -172,7 +173,7 @@ fn transpile_repeat(shader: &mut String, modules: &[Module], indexes: &Indexes<'
     for module in modules {
         for repeat in module.repeats() {
             dependencies = repeat
-                .function_call
+                .fn_call
                 .dependencies(DependencyType::Transpilation, dependencies, indexes)
                 .unwrap_or_else(|_| {
                     unreachable!("circular dependencies should be validated before")
@@ -207,8 +208,8 @@ fn transpile_shader<'item>(
 fn transpile_buffer_header(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
     *shader += "struct Buffer { ";
     for module in modules {
-        for variable in module.global_variables() {
-            variable.transpile_buffer_field(shader, indexes);
+        for var in module.global_vars() {
+            var.transpile_buffer_field(shader, indexes);
         }
     }
     *shader += "} @group(0) @binding(0) var<storage, read_write> ";
@@ -216,19 +217,19 @@ fn transpile_buffer_header(shader: &mut String, modules: &[Module], indexes: &In
     *shader += ": Buffer; ";
 }
 
-fn sorted_global_variables<'item>(
+fn sorted_global_vars<'item>(
     modules: &'item [Module],
     indexes: &Indexes<'item>,
-) -> Vec<&'item VariableDefinition> {
-    let mut dependency_graph = DiGraphMap::<&VariableDefinition, ()>::new();
-    for variable in modules.iter().flat_map(Module::global_variables) {
-        dependency_graph.add_node(variable);
-        let dependencies = variable
+) -> Vec<&'item VarDefinition> {
+    let mut dependency_graph = DiGraphMap::<&VarDefinition, ()>::new();
+    for var in modules.iter().flat_map(Module::global_vars) {
+        dependency_graph.add_node(var);
+        let dependencies = var
             .dependencies(DependencyType::Transpilation, Dependencies::new(), indexes)
             .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"));
         for dependency in dependencies.into_iter() {
             if let ItemRef::Variable(dependency) = dependency {
-                dependency_graph.add_edge(dependency, variable, ());
+                dependency_graph.add_edge(dependency, var, ());
             }
         }
     }

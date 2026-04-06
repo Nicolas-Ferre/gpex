@@ -1,0 +1,11 @@
+var result = 0; // expected: 123
+
+fn value() -> i32 {
+    return 123;
+}
+
+fn execute() {
+	result = value();
+}
+
+repeat execute();

@@ -1,11 +1,11 @@
 import ~.imported2;
 
-pub fn function1() -> bool {
+pub fn fn1() -> bool {
     cyclic1 = 0;
     return true;
 }
 
-pub fn function2() -> bool {
+pub fn fn2() -> bool {
     cyclic2 = 0;
     return true;
 }

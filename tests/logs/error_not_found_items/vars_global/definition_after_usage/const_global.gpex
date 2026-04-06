@@ -1,0 +1,2 @@
+const _CONST = _after;
+var _after = 0;

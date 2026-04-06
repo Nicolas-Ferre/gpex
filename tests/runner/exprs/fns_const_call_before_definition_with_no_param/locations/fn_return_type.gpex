@@ -1,0 +1,9 @@
+fn fn_() -> CalledFn() {
+    return 123;
+}
+
+const fn CalledFn() -> typeref {
+    return i32;
+}
+
+var _result = fn_(); // expected: 123

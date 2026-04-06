@@ -1,0 +1,3 @@
+import ~.imported;
+
+var _result = called_fn(); // expected: 123

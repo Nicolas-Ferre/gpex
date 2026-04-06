@@ -1,5 +1,0 @@
-var variable = i32;
-
-fn _function() -> variable {
-    return 123;
-}

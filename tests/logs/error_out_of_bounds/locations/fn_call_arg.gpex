@@ -1,0 +1,3 @@
+fn called_fn(param: i32) {}
+
+repeat called_fn(9999999999);

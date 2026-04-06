@@ -1,5 +1,0 @@
-fn function(_parameter: typeref) -> typeref {
-    return i32;
-}
-
-var _result = function(i32);  // expected: i32

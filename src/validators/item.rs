@@ -2,8 +2,8 @@ use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
 use crate::utils::dependencies::Dependencies;
-use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParameters, Visibility};
-use crate::utils::parsing::{Span, SpanProperties};
+use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, Visibility};
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 
@@ -21,14 +21,14 @@ pub(crate) fn check_circular_dependencies(
         }
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{name}` item has circular dependencies"),
+            msg: format!("`{name}` item has circular dependencies"),
             location: Some(context.location(name_span)),
             inner: stack
                 .iter()
                 .enumerate()
                 .map(|(index, ref_)| LogInner {
                     level: LogLevel::Info,
-                    message: if index == stack.len() - 1 {
+                    msg: if index == stack.len() - 1 {
                         "depends on itself".into()
                     } else {
                         "depends on this item".into()
@@ -50,7 +50,7 @@ pub(crate) fn check_unique_definition(
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let key = item.key();
-    let search_parameters = SearchParameters {
+    let search_params = SearchParams {
         key: &key,
         location: item,
         imports: &indexes.imports,
@@ -61,17 +61,17 @@ pub(crate) fn check_unique_definition(
     };
     if let Some(duplicated_item) = indexes
         .items
-        .search(search_parameters, Visibility::Enforced)
+        .search(search_params, Visibility::Enforced)
         .next()
         && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{key}` item defined multiple times"),
+            msg: format!("`{key}` item defined multiple times"),
             location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                message: "item also defined here".into(),
+                msg: "item also defined here".into(),
                 location: Some(context.location(duplicated_item.name_span())),
             }],
         });
@@ -90,7 +90,7 @@ pub(crate) fn check_prelude_location(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: "forbidden `compilerimpl` item outside prelude".into(),
+            msg: "forbidden `compilerimpl` item outside prelude".into(),
             location: Some(context.location(item.name_span())),
             inner: vec![],
         });
@@ -104,7 +104,7 @@ pub(crate) fn check_usage(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
-    if item.is_public() {
+    if item.is_pub() {
         return;
     }
     let name_span = item.name_span();
@@ -113,7 +113,7 @@ pub(crate) fn check_usage(
     if ref_span.is_none() && !name.starts_with('_') {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{displayed_key}` item unused"),
+            msg: format!("`{displayed_key}` item unused"),
             location: Some(context.location(name_span)),
             inner: vec![],
         });
@@ -122,11 +122,11 @@ pub(crate) fn check_usage(
     {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: format!("`{displayed_key}` item used but name starting with `_`"),
+            msg: format!("`{displayed_key}` item used but name starting with `_`"),
             location: Some(context.location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                message: "item used here".into(),
+                msg: "item used here".into(),
                 location: Some(context.location(ref_span)),
             }],
         });
@@ -146,22 +146,22 @@ pub(crate) fn check_found(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: format!("`{displayed_key}` item not found"),
+            msg: format!("`{displayed_key}` item not found"),
             location: Some(context.location(span)),
-            inner: if let Some(private_source) = indexes.private_sources.get(&node.id()) {
+            inner: if let Some(priv_source) = indexes.priv_sources.get(&node.id()) {
                 vec![LogInner {
                     level: LogLevel::Info,
-                    message: "item not qualified with `pub`".into(),
-                    location: Some(context.location(private_source.name_span())),
+                    msg: "item not qualified with `pub`".into(),
+                    location: Some(context.location(priv_source.name_span())),
                 }]
             } else {
                 indexes
                     .items
                     .iter_by_key(key)
-                    .filter(ItemNodeRef::is_public)
+                    .filter(ItemNodeRef::is_pub)
                     .map(|item| LogInner {
                         level: LogLevel::Info,
-                        message: format!(
+                        msg: format!(
                             "item can be imported from `{}`",
                             context.dot_path(item.file_index())
                         ),
