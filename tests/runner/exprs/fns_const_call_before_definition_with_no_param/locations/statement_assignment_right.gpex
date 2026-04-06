@@ -1,12 +1,11 @@
 var result = 0; // expected: 123
 
-fn execute() -> bool {
+fn execute() {
 	result = value();
-	return true;
 }
 
 const fn value() -> i32 {
     return 123;
 }
 
-var _ = execute();
+repeat execute();

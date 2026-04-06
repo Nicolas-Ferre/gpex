@@ -1,0 +1,7 @@
+fn called_fn(param: i32) -> typeref {
+    return i32;
+}
+
+fn _fn() -> called_fn(9999999999) {
+    return 0;
+}
