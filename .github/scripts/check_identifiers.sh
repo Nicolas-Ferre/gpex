@@ -1,9 +1,10 @@
 #!/bin/bash
 set -euo pipefail
-# shellcheck disable=SC1091
-source "$(dirname "$0")/config.sh"
 
 # It is considered that the analyzed code is compiling and formatted with Rustfmt.
+
+# shellcheck disable=SC1091
+source "$(dirname "$0")/config.sh"
 
 LIFETIME_REGEX="\'([A-Za-z_][A-Za-z0-9_]*)[^']"
 LET_REGEX="let[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]"
@@ -25,7 +26,7 @@ TYPE_REGEX="type[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]?[=;]"
 MODULE_REGEX="mod[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]?[;{]"
 MACRO_REGEX="macro_rules![[:space:]]([A-Za-z_][A-Za-z0-9_]*)"
 # Only lower case to avoid matching generic types, because one-letter generic types are allowed:
-BINDING_REGEX="[(,|{][[:space:]]?([a-z_][a-z0-9_]*)[[:space:]]?[\),\|}]"
+BINDING_REGEX="[(,|{][[:space:]]?([a-z_][a-z0-9_]*)[[:space:]]?[),|}]"
 FOR_LOOP_VARIABLE_REGEX="for[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]"
 
 is_comment_line() {
@@ -82,7 +83,6 @@ show_error() {
 }
 
 exit_code=0
-
 while read -r -d '' file; do
     line_number=0
     while IFS= read -r line; do
@@ -115,5 +115,4 @@ while read -r -d '' file; do
         check_identifier "$FOR_LOOP_VARIABLE_REGEX" "for loop variable" "$check_single_letter"
     done <"$file"
 done < <(find src/ tests/ \( -name "*.rs" -o -name "*.gpex" \) -type f -print0)
-
 exit "$exit_code"
