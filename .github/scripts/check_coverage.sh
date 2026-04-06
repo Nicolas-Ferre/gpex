@@ -17,7 +17,7 @@ coverage=$(xmllint --xpath 'string(//coverage/@line-rate)' coverage.xml)
     echo "Could not extract coverage from coverage.xml."
     exit 1
 }
-[[ "$coverage" =~ ^[0-1]\.[0-9]+$ ]] || {
+[[ "$coverage" =~ ^[0-1](\.[0-9]+)?$ ]] || {
     echo "Invalid coverage value: '$coverage'."
     exit 1
 }
