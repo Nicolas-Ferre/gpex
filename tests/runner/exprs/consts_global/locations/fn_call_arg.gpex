@@ -1,0 +1,7 @@
+const CONSTANT = 123;
+
+fn fn_(_param: i32) -> i32 {
+    return 123;
+}
+
+var _result = fn_(CONSTANT); // expected: 123

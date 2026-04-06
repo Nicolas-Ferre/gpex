@@ -1,0 +1,5 @@
+fn fn_() -> typeref {
+    return i32;
+}
+
+var _result = fn_();  // expected: i32

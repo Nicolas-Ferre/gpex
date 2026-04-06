@@ -1,16 +1,18 @@
 use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
-use crate::language::expressions::Expression;
+use crate::language::exprs::Expr;
 use crate::language::items::ItemRef;
 use crate::language::symbols::{RETURN_KEYWORD, SEMICOLON_SYMBOL};
 use crate::utils::dependencies::Dependencies;
-use crate::utils::parsing::{ParseContext, ParseError, Span};
+use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::error::ParseError;
+use crate::utils::parsing::span::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 
 #[derive(Debug)]
 pub(crate) struct ReturnStatement {
     pub(crate) span: Span,
-    pub(crate) value: Expression,
+    pub(crate) value: Expr,
 }
 
 impl ReturnStatement {
@@ -19,7 +21,7 @@ impl ReturnStatement {
     ) -> Result<Self, ParseError<'context>> {
         let return_keyword_span = Span::parse_symbol(context, RETURN_KEYWORD)?;
         context.force_parse_any_error();
-        let value = Expression::parse(context)?;
+        let value = Expr::parse(context)?;
         let semicolon_keyword_span = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self {
             span: return_keyword_span.until(semicolon_keyword_span),
@@ -42,11 +44,11 @@ impl ReturnStatement {
 
     pub(crate) fn validate(
         &self,
-        constant_mark_span: Option<Span>,
+        const_mark_span: Option<Span>,
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        self.value.validate(constant_mark_span, context, indexes)?;
+        self.value.validate(const_mark_span, context, indexes)?;
         Ok(())
     }
 

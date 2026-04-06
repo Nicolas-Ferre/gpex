@@ -1,13 +1,15 @@
-use crate::compiler::EXTENSION;
+use crate::compiler::EXT;
 use crate::compiler::indexes::Indexes;
-use crate::language::patterns::IDENTIFIER_PATTERN;
+use crate::language::patterns::IDENT_PATTERN;
 use crate::language::symbols::{
     DOT_SYMBOL, IMPORT_KEYWORD, PUB_KEYWORD, SEMICOLON_SYMBOL, TILDE_SYMBOL,
 };
-use crate::utils::parsing::{ParseContext, ParseError, Span, SpanProperties};
+use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::error::ParseError;
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::validators;
-use crate::validators::identifier::Case;
+use crate::validators::ident::Case;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug)]
@@ -51,10 +53,10 @@ impl Import {
                 Ok(ImportSegment::Parent(tilde))
             },
             None,
-            |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(|_| ()),
+            |context| Span::parse_pattern(context, IDENT_PATTERN).map(|_| ()),
         )?;
         let name_segments = context.parse_many(
-            |context| Span::parse_pattern(context, IDENTIFIER_PATTERN).map(ImportSegment::Name),
+            |context| Span::parse_pattern(context, IDENT_PATTERN).map(ImportSegment::Name),
             Some(|context| Span::parse_symbol(context, DOT_SYMBOL).map(|_| ())),
             |context| Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ()),
         )?;
@@ -75,13 +77,13 @@ impl Import {
 
     pub(crate) fn index<'index>(&'index self, indexes: &mut Indexes<'index>) {
         if let Some(file_index) = self.imported_file_index {
-            let is_public = self.pub_keyword_span.is_some();
+            let is_pub = self.pub_keyword_span.is_some();
             indexes.imports.register(
                 Some(self.id),
                 Some(self.span),
                 self.span.file_index,
                 file_index,
-                is_public,
+                is_pub,
             );
         }
     }
@@ -93,7 +95,7 @@ impl Import {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let is_found = self.imported_file_index.is_some();
-        let is_public = self.pub_keyword_span.is_some();
+        let is_pub = self.pub_keyword_span.is_some();
         validators::import::check_found(is_found, &self.segments, context)?;
         validators::import::check_top(is_top_import, self.span, context)?;
         validators::import::check_self_import(self.imported_file_index, self.span, context);
@@ -101,14 +103,14 @@ impl Import {
             self.id,
             self.imported_file_index,
             self.span,
-            is_public,
+            is_pub,
             &self.segments,
             context,
             indexes,
         );
         for &segment in &self.segments {
             if let ImportSegment::Name(span) = segment {
-                validators::identifier::check_case(span, &[Case::Snake], context);
+                validators::ident::check_case(span, &[Case::Snake], context);
             }
         }
         Ok(())
@@ -129,17 +131,17 @@ impl ImportSegment {
 
     pub(crate) fn fs_path(
         segments: &[Self],
-        span_properties: &impl SpanProperties,
+        span_props: &impl SpanProps,
         root_path: &Path,
     ) -> PathBuf {
         let mut parent_segment_count = 0;
         let mut path = match segments[0] {
             Self::Name(_) => root_path.to_path_buf(),
-            Self::Parent(_) => span_properties.fs_path(segments[0].span()).to_path_buf(),
+            Self::Parent(_) => span_props.fs_path(segments[0].span()).to_path_buf(),
         };
         for &segment in segments {
             match segment {
-                Self::Name(span) => path.push(span_properties.slice(span)),
+                Self::Name(span) => path.push(span_props.slice(span)),
                 Self::Parent(_) => {
                     if parent_segment_count < path.iter().count()
                         && let Some(parent) = path.parent()
@@ -152,6 +154,6 @@ impl ImportSegment {
                 }
             }
         }
-        path.with_extension(EXTENSION)
+        path.with_extension(EXT)
     }
 }

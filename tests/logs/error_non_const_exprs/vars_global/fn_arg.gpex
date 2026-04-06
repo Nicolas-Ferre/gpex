@@ -1,0 +1,2 @@
+var var_ = 123;
+const _RESULT = fn_(var_);

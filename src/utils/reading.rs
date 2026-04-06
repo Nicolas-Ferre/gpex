@@ -15,19 +15,19 @@ pub(crate) struct ReadFile {
 }
 
 #[expect(clippy::absurd_extreme_comparisons)]
-pub(crate) fn read(path: &Path, extension: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
-    let mut files = read_folder(path, path, extension)?;
+pub(crate) fn read(path: &Path, ext: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
+    let mut files = read_dir(path, path, ext)?;
     debug_assert!(files.len() >= PRELUDE_FILE_INDEX);
     files.insert(PRELUDE_FILE_INDEX, prelude::file());
     Ok(files)
 }
 
-fn read_folder(path: &Path, root_path: &Path, extension: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
+fn read_dir(path: &Path, root_path: &Path, ext: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
     let mut files = vec![];
     let mut errors = vec![];
     for entry in fs::read_dir(path).map_err(|error| to_log(error, path))? {
         let entry = entry.map_err(|error| to_log(error, path))?;
-        match read_entry(entry, root_path, extension) {
+        match read_entry(entry, root_path, ext) {
             Ok(new_files) => files.extend(new_files),
             Err(new_errors) => errors.extend(new_errors), // no-coverage (difficult to test)
         }
@@ -40,16 +40,12 @@ fn read_folder(path: &Path, root_path: &Path, extension: &str) -> Result<Vec<Rea
     }
 }
 
-fn read_entry(
-    entry: DirEntry,
-    root_path: &Path,
-    extension: &str,
-) -> Result<Vec<ReadFile>, Vec<Log>> {
+fn read_entry(entry: DirEntry, root_path: &Path, ext: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
     let path = entry.path();
     let file_type = entry.file_type().map_err(|error| to_log(error, &path))?;
     if file_type.is_dir() {
-        read_folder(&path, root_path, extension)
-    } else if path.extension() == Some(OsStr::new(extension)) {
+        read_dir(&path, root_path, ext) // fn_check: off (recursivity)
+    } else if path.extension() == Some(OsStr::new(ext)) {
         let content = fs::read_to_string(&path).map_err(|error| to_log(error, &path))?;
         Ok(vec![ReadFile {
             content,

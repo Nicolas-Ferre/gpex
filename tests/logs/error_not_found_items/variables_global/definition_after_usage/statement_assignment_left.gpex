@@ -1,5 +1,0 @@
-fn _function() {
-    _after = 123;
-}
-
-var _after = 0;

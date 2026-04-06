@@ -36,8 +36,8 @@ fn compile_with_multiple_definitions_errors() -> io::Result<()> {
 }
 
 #[test]
-fn compile_with_non_constant_expression_errors() -> io::Result<()> {
-    compile_and_check_logs(Path::new("tests/logs/error_non_constant_expressions"))
+fn compile_with_non_const_expr_errors() -> io::Result<()> {
+    compile_and_check_logs(Path::new("tests/logs/error_non_const_exprs"))
 }
 
 #[test]
@@ -56,7 +56,7 @@ fn compile_with_naming_warnings() -> io::Result<()> {
 }
 
 fn compile_and_check_logs(path: &Path) -> io::Result<()> {
-    let logs = gpex::compile(path, true).err().unwrap_or_default();
+    let logs = gpex::compile_program(path, true).err().unwrap_or_default();
     let actual = logs.iter().map(Log::to_string).join("");
     let expected_path = path.join(".expected");
     if let Ok(expected) = fs::read_to_string(&expected_path) {

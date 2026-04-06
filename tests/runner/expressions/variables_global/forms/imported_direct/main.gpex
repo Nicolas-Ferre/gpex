@@ -1,3 +1,0 @@
-import ~.imported;
-
-var _result = variable; // expected: 123

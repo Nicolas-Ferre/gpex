@@ -1,0 +1,4 @@
+import ~.imported2;
+
+pub var var1 = fn_(cyclic1);
+pub var var2 = fn_(cyclic2);

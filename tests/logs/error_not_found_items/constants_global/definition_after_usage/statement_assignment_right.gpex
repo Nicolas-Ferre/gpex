@@ -1,7 +1,0 @@
-var assigned = 0;
-
-fn _function() {
-    assigned = _AFTER;
-}
-
-const _AFTER = i32;

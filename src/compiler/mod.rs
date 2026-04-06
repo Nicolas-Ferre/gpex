@@ -1,5 +1,5 @@
 pub(crate) mod compilation;
-pub(crate) mod constants;
+pub(crate) mod consts;
 pub(crate) mod indexes;
 pub(crate) mod prelude;
 pub(crate) mod transpilation;
@@ -11,18 +11,18 @@ use crate::utils::reading;
 use std::fs;
 use std::path::Path;
 
-pub(crate) const EXTENSION: &str = "gpex";
+pub(crate) const EXT: &str = "gpex";
 
 /// Compiles a `GPEx` project folder.
 ///
 /// # Errors
 ///
 /// An error is returned in case compilation fails.
-pub fn compile(
+pub fn compile_program(
     root_path: &Path,
     is_warning_treated_as_error: bool,
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
-    let files = reading::read(root_path, EXTENSION)?;
+    let files = reading::read(root_path, EXT)?;
     let modules = compilation::parse(root_path, &files)?;
     let indexes = compilation::index(&modules);
     let errors = compilation::validate(
@@ -32,7 +32,7 @@ pub fn compile(
         &indexes,
         is_warning_treated_as_error,
     )?;
-    let program = transpilation::transpile(&files, &modules, &indexes);
+    let program = transpilation::transpile_all(&files, &modules, &indexes);
     Ok((program, errors))
 }
 

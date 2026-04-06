@@ -4,7 +4,7 @@ use std::path::Path;
 
 #[test]
 fn save_and_load_program() -> Result<(), Vec<Log>> {
-    let (program, _) = gpex::compile(Path::new("tests/lib/valid"), false)?;
+    let (program, _) = gpex::compile_program(Path::new("tests/lib/valid"), false)?;
     let out_path = Path::new("tests/lib/out1.json");
     gpex::save_compiled(&program, out_path)?;
     let result = gpex::load_compiled(out_path);
@@ -17,8 +17,8 @@ fn save_and_load_program() -> Result<(), Vec<Log>> {
 
 #[test]
 #[expect(clippy::expect_used)]
-fn save_in_non_existing_folder() -> Result<(), Vec<Log>> {
-    let (program, _) = gpex::compile(Path::new("tests/lib/valid"), false)?;
+fn save_in_non_existing_dir() -> Result<(), Vec<Log>> {
+    let (program, _) = gpex::compile_program(Path::new("tests/lib/valid"), false)?;
     let result = gpex::save_compiled(&program, Path::new("tests/missing/out.json"));
     let errors = result.expect_err("saving should generate errors");
     assert_eq!(errors.len(), 1);

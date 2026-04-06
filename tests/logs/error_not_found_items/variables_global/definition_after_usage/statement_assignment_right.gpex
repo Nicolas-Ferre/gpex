@@ -1,7 +1,0 @@
-var assigned = 0;
-
-fn _function() {
-    assigned = _after;
-}
-
-var _after = 0;

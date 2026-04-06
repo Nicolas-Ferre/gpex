@@ -7,7 +7,9 @@ use crate::language::items::ItemRef;
 use crate::language::statements::assignment::AssignmentStatement;
 use crate::language::statements::return_::ReturnStatement;
 use crate::utils::dependencies::Dependencies;
-use crate::utils::parsing::{ParseContext, ParseError, Span};
+use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::error::ParseError;
+use crate::utils::parsing::span::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 
 #[derive(Debug)]
@@ -47,13 +49,13 @@ impl Statement {
 
     pub(crate) fn validate(
         &self,
-        constant_mark_span: Option<Span>,
+        const_mark_span: Option<Span>,
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         match self {
-            Self::Return(node) => node.validate(constant_mark_span, context, indexes),
-            Self::Assignment(node) => node.validate(constant_mark_span, context, indexes),
+            Self::Return(node) => node.validate(const_mark_span, context, indexes),
+            Self::Assignment(node) => node.validate(const_mark_span, context, indexes),
         }
     }
 

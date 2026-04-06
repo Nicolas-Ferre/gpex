@@ -1,3 +1,0 @@
-fn _function() -> identifier {
-    return 0;
-}

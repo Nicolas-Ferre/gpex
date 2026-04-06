@@ -1,5 +1,0 @@
-const CONSTANT = 0;
-
-fn _function(_parameter: CONSTANT) -> i32 {
-    return 123;
-}

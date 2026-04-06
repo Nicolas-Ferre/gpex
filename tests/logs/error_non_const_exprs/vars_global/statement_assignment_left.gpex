@@ -1,0 +1,5 @@
+var var_ = 123;
+
+const fn _fn() {
+    var_ = 456;
+}

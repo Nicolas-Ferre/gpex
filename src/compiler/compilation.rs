@@ -2,7 +2,7 @@ use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::module::Module;
 use crate::utils::logs::{Log, LogLevel};
-use crate::utils::parsing::ParseContext;
+use crate::utils::parsing::context::ParseContext;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::ValidateContext;
 use std::path::Path;

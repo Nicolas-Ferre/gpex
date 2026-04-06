@@ -1,6 +1,6 @@
 use crate::language::statements::Statement;
 use crate::language::statements::return_::ReturnStatement;
-use crate::utils::parsing::Span;
+use crate::utils::parsing::span::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 
@@ -16,7 +16,7 @@ pub(crate) fn check_return_before_end(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: "`return` statement not at the end of the block".into(),
+            msg: "`return` statement not at the end of the block".into(),
             location: Some(context.location(span)),
             inner: vec![],
         });
@@ -35,11 +35,11 @@ pub(crate) fn check_missing_return<'statement>(
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,
-            message: "missing `return` statement".into(),
+            msg: "missing `return` statement".into(),
             location: Some(context.location(block_end_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                message: "function has a return type".into(),
+                msg: "function has a return type".into(),
                 location: Some(context.location(return_type_span)),
             }],
         });
@@ -49,7 +49,7 @@ pub(crate) fn check_missing_return<'statement>(
 
 pub(crate) fn check_disallowed_return(
     statements: &[Statement],
-    function_name_span: Span,
+    fn_name_span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
     let mut result = Ok(());
@@ -57,12 +57,12 @@ pub(crate) fn check_disallowed_return(
         if let Statement::Return(return_statement) = statement {
             context.logs.push(Log {
                 level: LogLevel::Error,
-                message: "`return` statement in function with no return type".into(),
+                msg: "`return` statement in function with no return type".into(),
                 location: Some(context.location(return_statement.span)),
                 inner: vec![LogInner {
                     level: LogLevel::Info,
-                    message: "function has no return type".into(),
-                    location: Some(context.location(function_name_span)),
+                    msg: "function has no return type".into(),
+                    location: Some(context.location(fn_name_span)),
                 }],
             });
             result = Err(ValidateError);
@@ -79,7 +79,7 @@ pub(crate) fn check_empty_block(
     if statements.is_empty() {
         context.logs.push(Log {
             level: LogLevel::Warning,
-            message: "empty statement block".into(),
+            msg: "empty statement block".into(),
             location: Some(context.location(body_span)),
             inner: vec![],
         });

@@ -1,0 +1,6 @@
+var var_ = 123;
+
+const fn _fn() -> i32 {
+    return var_;
+}
+

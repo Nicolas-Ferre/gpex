@@ -21,7 +21,7 @@ pub fn load_compiled(path: &Path) -> Result<Program, Vec<Log>> {
         Ok(content) => Ok(serde_json::from_str(&content).map_err(|_| {
             vec![Log {
                 level: LogLevel::Error,
-                message: format!("invalid compiled program \"{}\"", path.display()),
+                msg: format!("invalid compiled program \"{}\"", path.display()),
                 location: None,
                 inner: vec![],
             }]
@@ -74,7 +74,7 @@ impl Runner {
     /// (e.g. `inner.module:my_buffer`).
     ///
     /// If the buffer doesn't exist, an empty vector is returned.
-    pub fn read_variable(&self, path: &str) -> Option<GpuValue> {
+    pub fn read_var(&self, path: &str) -> Option<GpuValue> {
         if let Some(buffer) = self.buffer.as_ref()
             && let Some(field) = self.program.buffer.fields.get(path)
         {
@@ -142,14 +142,14 @@ pub enum GpuValue {
 }
 
 impl Display for GpuValue {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::TypeRef(path) => write!(f, "{path}"),
-            Self::I32(value) => write!(f, "{value}"),
-            Self::U32(value) => write!(f, "{value}u"),
-            Self::F32(value) => write!(f, "{}", formatting::f32_to_string(*value)),
+            Self::TypeRef(path) => write!(formatter, "{path}"),
+            Self::I32(value) => write!(formatter, "{value}"),
+            Self::U32(value) => write!(formatter, "{value}u"),
+            Self::F32(value) => write!(formatter, "{}", formatting::f32_to_string(*value)),
             Self::Bool(value) => write!(
-                f,
+                formatter,
                 "{}",
                 if *value {
                     TRUE_KEYWORD.slice

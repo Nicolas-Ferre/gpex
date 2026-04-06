@@ -3,7 +3,7 @@ use std::path::Path;
 
 #[test]
 fn compile_valid_project() -> Result<(), Vec<Log>> {
-    let (program, logs) = gpex::compile(Path::new("tests/lib/valid"), false)?;
+    let (program, logs) = gpex::compile_program(Path::new("tests/lib/valid"), false)?;
     assert!(logs.is_empty());
     assert_eq!(program.buffer.size, 8);
     let fields = &program.buffer.fields;
@@ -15,7 +15,7 @@ fn compile_valid_project() -> Result<(), Vec<Log>> {
 
 #[test]
 fn compile_with_warning() -> Result<(), Vec<Log>> {
-    let (_, logs) = gpex::compile(Path::new("tests/lib/warning"), false)?;
+    let (_, logs) = gpex::compile_program(Path::new("tests/lib/warning"), false)?;
     assert_eq!(logs.len(), 1);
     assert_eq!(logs[0].level, LogLevel::Warning);
     Ok(())
@@ -24,7 +24,7 @@ fn compile_with_warning() -> Result<(), Vec<Log>> {
 #[test]
 #[expect(clippy::expect_used)]
 fn compile_with_warning_as_error() {
-    let result = gpex::compile(Path::new("tests/lib/warning"), true);
+    let result = gpex::compile_program(Path::new("tests/lib/warning"), true);
     let errors = result.expect_err("compilation should generate logs");
     assert_eq!(errors.len(), 1);
     assert_eq!(errors[0].level, LogLevel::Warning);
@@ -33,7 +33,7 @@ fn compile_with_warning_as_error() {
 #[test]
 #[expect(clippy::expect_used)]
 fn compile_with_error() {
-    let result = gpex::compile(Path::new("tests/lib/error"), false);
+    let result = gpex::compile_program(Path::new("tests/lib/error"), false);
     let errors = result.expect_err("compilation should generate logs");
     assert_eq!(errors.len(), 1);
     assert_eq!(errors[0].level, LogLevel::Error);
@@ -41,8 +41,8 @@ fn compile_with_error() {
 
 #[test]
 #[expect(clippy::expect_used)]
-fn compile_missing_folder() {
-    let result = gpex::compile(Path::new("tests/lib/missing"), false);
+fn compile_missing_dir() {
+    let result = gpex::compile_program(Path::new("tests/lib/missing"), false);
     let errors = result.expect_err("compilation should generate logs");
     assert_eq!(errors.len(), 1);
     assert_eq!(errors[0].level, LogLevel::Error);
