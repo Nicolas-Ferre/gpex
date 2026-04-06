@@ -1,8 +1,7 @@
 var result = 0u; // expected: 123u
 
-fn execute() -> bool {
+fn execute() {
 	result = 123u;
-	return true;
 }
 
-var _ = execute();
+repeat execute();

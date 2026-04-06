@@ -1,0 +1,5 @@
+fn called_fn(param: i32) -> i32 {
+    return 0;
+}
+
+repeat called_fn(9999999999);
