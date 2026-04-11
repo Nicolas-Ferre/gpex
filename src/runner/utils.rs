@@ -3,18 +3,19 @@ use wgpu::{
     Adapter, BackendOptions, Backends, BindGroupLayout, BindGroupLayoutEntry, BindingType, Buffer,
     BufferBindingType, BufferDescriptor, BufferUsages, CommandEncoder, CommandEncoderDescriptor,
     ComputePass, ComputePassDescriptor, ComputePipeline, ComputePipelineDescriptor, Device,
-    DeviceDescriptor, ExperimentalFeatures, Features, Instance, InstanceFlags, Limits, MapMode,
-    MemoryBudgetThresholds, MemoryHints, PipelineCompilationOptions, PipelineLayoutDescriptor,
-    PollType, PowerPreference, Queue, RequestAdapterOptions, ShaderModuleDescriptor, ShaderStages,
-    Trace,
+    DeviceDescriptor, ExperimentalFeatures, Features, Instance, InstanceDescriptor, InstanceFlags,
+    Limits, MapMode, MemoryBudgetThresholds, MemoryHints, PipelineCompilationOptions,
+    PipelineLayoutDescriptor, PollType, PowerPreference, Queue, RequestAdapterOptions,
+    ShaderModuleDescriptor, ShaderStages, Trace,
 };
 
 pub(crate) fn create_instance() -> Instance {
-    Instance::new(&wgpu::InstanceDescriptor {
+    Instance::new(InstanceDescriptor {
         backends: Backends::from_env().unwrap_or_else(Backends::all),
         flags: InstanceFlags::default(),
         memory_budget_thresholds: MemoryBudgetThresholds::default(),
         backend_options: BackendOptions::default(),
+        display: None,
     })
 }
 
@@ -148,7 +149,7 @@ pub(crate) fn create_compute_pipeline(
         label: Some("gpex:compute_pipeline"),
         layout: Some(&device.create_pipeline_layout(&PipelineLayoutDescriptor {
             label: Some("gpex:compute_pipeline_layout"),
-            bind_group_layouts: &[layout],
+            bind_group_layouts: &[Some(layout)],
             immediate_size: 0,
         })),
         module: &device.create_shader_module(ShaderModuleDescriptor {
