@@ -1,7 +1,7 @@
 use crate::compiler::indexes::Indexes;
-use crate::language::import::Import;
 use crate::language::items::const_::ConstDefinition;
 use crate::language::items::fn_::FnDefinition;
+use crate::language::items::import::Import;
 use crate::language::items::repeat::RepeatDefinition;
 use crate::language::items::struct_::StructDefinition;
 use crate::language::items::var::VarDefinition;

@@ -3,13 +3,12 @@ use crate::language::items::ItemRef;
 use crate::language::items::struct_::StructDefinition;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct Indexes<'item> {
     pub(crate) imports: ImportIndex,
     pub(crate) items: NodeIndex<ItemRef<'item>>,
-    pub(crate) types: HashSet<&'item StructDefinition>,
     pub(crate) sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
@@ -20,7 +19,6 @@ impl<'item> Indexes<'item> {
         Self {
             imports: ImportIndex::new(file_count),
             items: NodeIndex::new(file_count),
-            types: HashSet::default(),
             sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),

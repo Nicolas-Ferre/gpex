@@ -85,7 +85,7 @@ pub(crate) fn transpile_all(
         })
         .collect::<HashMap<_, _>>();
     Program {
-        type_paths: type_paths(indexes, &variables),
+        type_paths: type_paths(indexes),
         buffer: Buffer {
             size: round_up(buffer_alignment, offset),
             fields,
@@ -136,17 +136,17 @@ fn round_up(rounded_to: u32, value: u32) -> u32 {
     }
 }
 
-fn type_paths(indexes: &Indexes<'_>, vars: &[&VarDefinition]) -> HashMap<u64, String> {
+fn type_paths(indexes: &Indexes<'_>) -> HashMap<u64, String> {
     indexes
-        .types
+        .items
         .iter()
-        .copied()
-        .chain(vars.iter().map(|var| {
-            var.type_(indexes)
-                .struct_ref()
-                .unwrap_or_else(|| unreachable!("variable type should be validated before"))
-        }))
-        .map(|type_| (type_.id, type_.dot_path()))
+        .filter_map(|item| {
+            if let ItemRef::Struct(type_) = item {
+                Some((type_.id, type_.dot_path()))
+            } else {
+                None
+            }
+        })
         .collect()
 }
 
@@ -173,7 +173,7 @@ fn transpile_repeat(shader: &mut String, modules: &[Module], indexes: &Indexes<'
     for module in modules {
         for repeat in module.repeats() {
             dependencies = repeat
-                .fn_call
+                .call
                 .dependencies(DependencyType::Transpilation, dependencies, indexes)
                 .unwrap_or_else(|_| {
                     unreachable!("circular dependencies should be validated before")

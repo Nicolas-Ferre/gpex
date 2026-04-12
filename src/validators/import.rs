@@ -1,5 +1,5 @@
 use crate::compiler::indexes::Indexes;
-use crate::language::import::ImportSegment;
+use crate::language::items::import::ImportSegment;
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};

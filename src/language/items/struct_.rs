@@ -60,10 +60,6 @@ impl StructDefinition {
         indexes.items.register(ItemRef::Struct(self));
     }
 
-    pub(crate) fn index_ref<'index>(&'index self, indexes: &mut Indexes<'index>) {
-        indexes.types.insert(self);
-    }
-
     pub(crate) fn type_<'index>(indexes: &Indexes<'index>) -> &'index Self {
         indexes.search_prelude_type("typeref")
     }
