@@ -7,7 +7,7 @@ set -euo pipefail
 source "$(dirname "$0")/utils.sh"
 
 IGNORED_FUNCTIONS=(
-    "new" # very common function name
+    "new"  # very common function name
     "iter" # very common function name
 )
 EXCLUSION_REGEX="fn_check:[[:space:]]off"
