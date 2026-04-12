@@ -195,8 +195,8 @@ impl FnDefinition {
         let typeref_type = indexes.search_prelude_type("typeref");
         let may_return_typeref = match self.type_(indexes) {
             Type::Struct(struct_ref) => struct_ref == typeref_type,
-            Type::Unknown => true,
             Type::NoReturn => false,
+            Type::Unknown => unreachable!("return type should be validated before"),
         };
         let allowed_cases: &[Case] = if may_return_typeref {
             &[Case::Snake, Case::Pascal]
