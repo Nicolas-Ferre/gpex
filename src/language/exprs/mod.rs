@@ -1,4 +1,4 @@
-pub(crate) mod fn_call;
+pub(crate) mod call;
 pub(crate) mod ident;
 pub(crate) mod literals;
 
@@ -6,7 +6,7 @@ use crate::compiler::consts::ConstValue;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
-use crate::language::exprs::fn_call::FnCall;
+use crate::language::exprs::call::Call;
 use crate::language::exprs::literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
 use crate::language::items::ItemRef;
 use crate::utils::dependencies::Dependencies;
@@ -23,7 +23,7 @@ pub(crate) enum Expr {
     U32Literal(U32Literal),
     I32Literal(I32Literal),
     BoolLiteral(BoolLiteral),
-    FunctionCall(FnCall),
+    Call(Call),
     Identifier(Ident),
 }
 
@@ -36,7 +36,7 @@ impl Expr {
             |context| U32Literal::parse(context).map(Self::U32Literal),
             |context| I32Literal::parse(context).map(Self::I32Literal),
             |context| BoolLiteral::parse(context).map(Self::BoolLiteral),
-            |context| FnCall::parse(context).map(Self::FunctionCall),
+            |context| Call::parse(context).map(Self::Call),
             |context| Ident::parse(context).map(Self::Identifier),
         ])
     }
@@ -47,7 +47,7 @@ impl Expr {
             Self::U32Literal(node) => node.span,
             Self::I32Literal(node) => node.span,
             Self::BoolLiteral(node) => node.span,
-            Self::FunctionCall(node) => node.span,
+            Self::Call(node) => node.span,
             Self::Identifier(node) => node.span,
         }
     }
@@ -58,7 +58,7 @@ impl Expr {
             | Self::U32Literal(_)
             | Self::I32Literal(_)
             | Self::BoolLiteral(_) => (),
-            Self::FunctionCall(node) => node.index(indexes),
+            Self::Call(node) => node.index(indexes),
             Self::Identifier(node) => node.index(indexes),
         }
     }
@@ -79,7 +79,7 @@ impl Expr {
                 | Self::U32Literal(_)
                 | Self::I32Literal(_)
                 | Self::BoolLiteral(_) => Ok(dependencies),
-                Self::FunctionCall(node) => node.dependencies(type_, dependencies, indexes),
+                Self::Call(node) => node.dependencies(type_, dependencies, indexes),
                 Self::Identifier(node) => node.dependencies(type_, dependencies, indexes),
             }
         }
@@ -91,7 +91,7 @@ impl Expr {
             Self::U32Literal(_) => Type::Struct(U32Literal::type_(indexes)),
             Self::I32Literal(_) => Type::Struct(I32Literal::type_(indexes)),
             Self::BoolLiteral(_) => Type::Struct(BoolLiteral::type_(indexes)),
-            Self::FunctionCall(node) => node.type_(indexes),
+            Self::Call(node) => node.type_(indexes),
             Self::Identifier(node) => node.type_(indexes),
         }
     }
@@ -102,7 +102,7 @@ impl Expr {
             Self::U32Literal(node) => node.const_value(),
             Self::I32Literal(node) => node.const_value(),
             Self::BoolLiteral(node) => node.const_value(),
-            Self::FunctionCall(node) => node.const_value(indexes),
+            Self::Call(node) => node.const_value(indexes),
             Self::Identifier(node) => node.const_value(indexes),
         }
     }
@@ -113,7 +113,7 @@ impl Expr {
             | Self::U32Literal(_)
             | Self::I32Literal(_)
             | Self::BoolLiteral(_)
-            | Self::FunctionCall(_) => Some(false),
+            | Self::Call(_) => Some(false),
             Self::Identifier(node) => node.is_ref(indexes),
         }
     }
@@ -129,7 +129,7 @@ impl Expr {
             Self::U32Literal(node) => node.validate(context),
             Self::I32Literal(node) => node.validate(context),
             Self::BoolLiteral(_) => Ok(()),
-            Self::FunctionCall(node) => {
+            Self::Call(node) => {
                 validators::expr::check_no_return_type(node, node.span, context, indexes)?;
                 node.validate(const_mark_span, context, indexes)
             }
@@ -141,7 +141,7 @@ impl Expr {
         let value = self.const_value(indexes);
         if value == ConstValue::RuntimeValue {
             match self {
-                Self::FunctionCall(node) => node.transpile(shader, indexes),
+                Self::Call(node) => node.transpile(shader, indexes),
                 Self::Identifier(node) => node.transpile(shader, indexes),
                 Self::F32Literal(_)
                 | Self::U32Literal(_)

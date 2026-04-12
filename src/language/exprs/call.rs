@@ -21,7 +21,7 @@ const SEARCH_CONFIG: SearchConfig = SearchConfig {
 };
 
 #[derive(Debug)]
-pub(crate) struct FnCall {
+pub(crate) struct Call {
     id: u64,
     scope: Vec<u64>,
     pub(crate) span: Span,
@@ -29,7 +29,7 @@ pub(crate) struct FnCall {
     args: Vec<Expr>,
 }
 
-impl NodeRef for &FnCall {
+impl NodeRef for &Call {
     fn file_index(&self) -> usize {
         self.span.file_index
     }
@@ -45,7 +45,7 @@ impl NodeRef for &FnCall {
     // coverage: on
 }
 
-impl FnCall {
+impl Call {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {

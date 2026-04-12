@@ -127,6 +127,14 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
             .push(item);
     }
 
+    pub(crate) fn iter(&self) -> impl Iterator<Item = Item> {
+        self.items
+            .iter()
+            .flat_map(HashMap::values)
+            .flatten()
+            .copied()
+    }
+
     pub(crate) fn iter_by_key(&self, key: &str) -> impl Iterator<Item = Item> {
         self.items
             .iter()

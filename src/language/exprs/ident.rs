@@ -72,9 +72,6 @@ impl Ident {
                 .item_first_refs
                 .entry(source.id())
                 .or_insert_with(|| self.span);
-            if let ItemRef::Struct(struct_) = source {
-                struct_.index_ref(indexes);
-            }
         } else if let Some(source) = indexes
             .items
             .search(search_params, Visibility::Ignored)
