@@ -1,5 +1,7 @@
 error: `_CONST` item defined multiple times (at tests/logs/error_multiple_definitions/const_const.gpex:2:7)
   --> info: item also defined here (at tests/logs/error_multiple_definitions/const_const.gpex:1:7)
+error: `param1` parameter defined multiple times (at tests/logs/error_multiple_definitions/fn_param_fn_param.gpex:1:34)
+  --> info: parameter also defined here (at tests/logs/error_multiple_definitions/fn_param_fn_param.gpex:1:8)
 error: `_var` item defined multiple times (at tests/logs/error_multiple_definitions/var_const.gpex:2:7)
   --> info: item also defined here (at tests/logs/error_multiple_definitions/var_const.gpex:1:5)
 error: `_var` item defined multiple times (at tests/logs/error_multiple_definitions/var_var.gpex:2:5)

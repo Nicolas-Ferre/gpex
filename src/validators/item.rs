@@ -1,6 +1,7 @@
 use crate::compiler::indexes::Indexes;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::language::items::ItemRef;
+use crate::language::items::param::Param;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::{Span, SpanProps};
@@ -79,6 +80,32 @@ pub(crate) fn check_unique_definition(
     } else {
         Ok(())
     }
+}
+
+pub(crate) fn check_unique_params(
+    params: &[Param],
+    context: &mut ValidateContext<'_>,
+) -> Result<(), ValidateError> {
+    let mut is_error = false;
+    for (param_index, param) in params.iter().enumerate() {
+        let duplicated_param = params[..param_index]
+            .iter()
+            .find(|other_param| other_param.name == param.name);
+        if let Some(duplicated_param) = duplicated_param {
+            context.logs.push(Log {
+                level: LogLevel::Error,
+                msg: format!("`{}` parameter defined multiple times", param.name),
+                location: Some(context.location(param.name_span)),
+                inner: vec![LogInner {
+                    level: LogLevel::Info,
+                    msg: "parameter also defined here".into(),
+                    location: Some(context.location(duplicated_param.name_span)),
+                }],
+            });
+            is_error = true;
+        }
+    }
+    if is_error { Err(ValidateError) } else { Ok(()) }
 }
 
 pub(crate) fn check_prelude_location(

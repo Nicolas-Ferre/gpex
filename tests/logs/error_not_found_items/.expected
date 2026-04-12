@@ -15,6 +15,7 @@ warning: `IMPORTED` item unused (at tests/logs/error_not_found_items/consts_glob
 warning: `~.imported` import unused (at tests/logs/error_not_found_items/consts_global/pub_import_priv_item/main.gpex:1:1)
 error: `IMPORTED` item not found (at tests/logs/error_not_found_items/consts_global/pub_import_priv_item/main.gpex:3:12)
   --> info: item not qualified with `pub` (at tests/logs/error_not_found_items/consts_global/pub_import_priv_item/imported.gpex:1:7)
+error: `unknown()` item not found (at tests/logs/error_not_found_items/fn_calls/called_fn_with_invalid_return_type_fn_call.gpex:3:25)
 error: `_called_fn(i32, u32)` item not found (at tests/logs/error_not_found_items/fn_calls/different_arity.gpex:1:12)
 error: `called_fn()` item not found (at tests/logs/error_not_found_items/fn_calls/missing/const_global.gpex:1:16)
 error: `called_fn()` item not found (at tests/logs/error_not_found_items/fn_calls/missing/fn_call_arg.gpex:1:16)

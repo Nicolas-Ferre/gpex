@@ -61,13 +61,14 @@ impl ParamGroup {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        let mut is_param_valid = true;
+        let mut are_params_valid = true;
         for param in &self.params {
             if param.validate(context, indexes).is_err() {
-                is_param_valid = false;
+                are_params_valid = false;
             }
         }
-        if is_param_valid {
+        validators::item::check_unique_params(&self.params, context)?;
+        if are_params_valid {
             Ok(())
         } else {
             Err(ValidateError)
@@ -89,7 +90,7 @@ impl ParamGroup {
 pub(crate) struct Param {
     pub(crate) id: u64,
     #[derive_where(skip)]
-    name: String,
+    pub(crate) name: String,
     #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]

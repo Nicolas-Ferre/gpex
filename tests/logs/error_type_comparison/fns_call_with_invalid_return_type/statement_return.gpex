@@ -1,7 +1,7 @@
-fn called_fn() -> i32 {
+fn called_fn() -> 0 {
     return 123;
 }
 
-fn _fn() -> u32 {
+fn _fn() -> i32 {
     return called_fn();
 }
