@@ -184,11 +184,11 @@ impl FnDefinition {
             self.dependencies(DependencyType::CycleDetection, Dependencies::new(), indexes);
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         self.params.validate(context, indexes)?;
-        validators::item::check_usage(ref_, &self.displayed_key(indexes), context, indexes);
-        let return_type_result = self.validate_return_type(context, indexes);
+        self.validate_return_type(context, indexes)?;
+        self.validate_statements(context, indexes)?;
         self.validate_name(indexes, context);
-        let statements_result = self.validate_statements(context, indexes);
-        return_type_result.and(statements_result)
+        validators::item::check_usage(ref_, &self.displayed_key(indexes), context, indexes);
+        Ok(())
     }
 
     fn validate_name(&self, indexes: &Indexes<'_>, context: &mut ValidateContext<'_>) {
