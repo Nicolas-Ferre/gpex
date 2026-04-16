@@ -37,7 +37,8 @@ impl StructDefinition {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
-        context.define_scope(|context, id| {
+        let scope = context.scope().to_vec();
+        context.define_scope(move |context, id| {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             Span::parse_symbol(context, STRUCT_KEYWORD)?;
             context.force_parse_any_error();
@@ -48,7 +49,7 @@ impl StructDefinition {
             Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
                 id,
-                scope: context.scope().to_vec(),
+                scope,
                 pub_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),

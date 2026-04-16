@@ -1,3 +1,4 @@
+use crate::compiler::consts::ConstContext;
 use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
 use crate::language::exprs::Expr;
@@ -82,10 +83,15 @@ impl AssignmentStatement {
         Ok(())
     }
 
-    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        self.assigned.transpile(shader, indexes);
+    pub(crate) fn transpile<'index>(
+        &self,
+        shader: &mut String,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) {
+        self.assigned.transpile(shader, indexes, context);
         *shader += " = ";
-        self.value.transpile(shader, indexes);
+        self.value.transpile(shader, indexes, context);
         *shader += ";";
     }
 }

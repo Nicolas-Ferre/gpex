@@ -1,4 +1,4 @@
-use crate::compiler::consts::ConstValue;
+use crate::compiler::consts::{ConstContext, ConstValue};
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
@@ -56,6 +56,7 @@ impl FnDefinition {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
+        let scope = context.scope().to_vec();
         context.define_scope(|context, id| {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             let const_keyword_span = Span::parse_symbol(context, CONST_KEYWORD).ok();
@@ -78,7 +79,7 @@ impl FnDefinition {
             let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
                 id,
-                scope: context.scope().to_vec(),
+                scope,
                 pub_keyword_span,
                 const_keyword_span,
                 name_span,
@@ -100,6 +101,7 @@ impl FnDefinition {
 
     pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
         indexes.items.register(ItemRef::Fn(self));
+        self.params.index_item(indexes);
     }
 
     pub(crate) fn index_signatures(&self, indexes: &mut Indexes<'_>) {
@@ -135,7 +137,7 @@ impl FnDefinition {
         let Some(return_type) = self.return_type.as_ref() else {
             return Type::NoReturn;
         };
-        let value = return_type.const_value(indexes);
+        let value = return_type.const_value(indexes, &mut ConstContext::default());
         if let Some(struct_) = value.type_ref() {
             Type::Struct(struct_)
         } else {
@@ -164,11 +166,15 @@ impl FnDefinition {
         })
     }
 
-    pub(crate) fn const_value<'index>(&self, indexes: &Indexes<'index>) -> ConstValue<'index> {
+    pub(crate) fn const_value<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) -> ConstValue<'index> {
         if self.const_keyword_span.is_none() {
             ConstValue::RuntimeValue
         } else if let Some(return_) = self.return_statement() {
-            return_.value.const_value(indexes)
+            return_.value.const_value(indexes, context)
         } else {
             ConstValue::Unknown
         }
@@ -267,7 +273,12 @@ impl FnDefinition {
         Ok(())
     }
 
-    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
+    pub(crate) fn transpile<'index>(
+        &self,
+        shader: &mut String,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) {
         let id = self.id;
         _ = write!(shader, "fn _{id}");
         self.params.transpile(shader, indexes);
@@ -281,7 +292,7 @@ impl FnDefinition {
             _ = write!(shader, " {{ ");
         }
         for statement in &self.statements {
-            statement.transpile(shader, indexes);
+            statement.transpile(shader, indexes, context);
         }
         _ = write!(shader, " }}");
     }

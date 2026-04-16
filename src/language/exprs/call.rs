@@ -1,4 +1,4 @@
-use crate::compiler::consts::ConstValue;
+use crate::compiler::consts::{ConstContext, ConstValue};
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
@@ -138,10 +138,32 @@ impl Call {
         }
     }
 
-    pub(crate) fn const_value<'index>(&self, indexes: &Indexes<'index>) -> ConstValue<'index> {
+    pub(crate) fn is_const(&self, indexes: &Indexes<'_>) -> bool {
+        indexes
+            .sources
+            .get(&self.id)
+            .is_some_and(|source| source.is_const())
+    }
+
+    pub(crate) fn const_value<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) -> ConstValue<'index> {
         match indexes.sources.get(&self.id) {
-            Some(ItemRef::Fn(node)) => node.const_value(indexes),
-            Some(ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_)) => {
+            Some(ItemRef::Fn(source)) => context.run_scoped(|context| {
+                for (arg, param) in self.args.iter().zip(&source.params.params) {
+                    let value = arg.const_value(indexes, context);
+                    context.add_value(param.id, value);
+                }
+                source.const_value(indexes, context)
+            }),
+            Some(
+                ItemRef::Variable(_)
+                | ItemRef::Constant(_)
+                | ItemRef::Struct(_)
+                | ItemRef::Param(_),
+            ) => {
                 unreachable!("identifier should not refer to a value")
             }
             None => ConstValue::Unknown,
@@ -167,7 +189,7 @@ impl Call {
         )?;
         if let Some(const_mark_span) = const_mark_span {
             validators::expr::check_const_value(
-                self.const_value(indexes),
+                indexes.sources[&self.id],
                 self.span,
                 const_mark_span,
                 context,
@@ -176,18 +198,26 @@ impl Call {
         Ok(())
     }
 
-    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
+    pub(crate) fn transpile<'index>(
+        &self,
+        shader: &mut String,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) {
         match indexes.sources[&self.id] {
             ItemRef::Fn(node) => {
                 node.transpile_name(shader);
                 *shader += "(";
                 for arg in &self.args {
-                    arg.transpile(shader, indexes);
+                    arg.transpile(shader, indexes, context);
                     *shader += ", ";
                 }
                 *shader += ")";
             }
-            ItemRef::Variable(_) | ItemRef::Constant(_) | ItemRef::Struct(_) => {
+            ItemRef::Variable(_)
+            | ItemRef::Constant(_)
+            | ItemRef::Struct(_)
+            | ItemRef::Param(_) => {
                 unreachable!("function calls cannot reference values")
             }
         }

@@ -1,6 +1,7 @@
 pub(crate) mod assignment;
 pub(crate) mod return_;
 
+use crate::compiler::consts::ConstContext;
 use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
 use crate::language::items::ItemRef;
@@ -59,10 +60,15 @@ impl Statement {
         }
     }
 
-    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
+    pub(crate) fn transpile<'index>(
+        &self,
+        shader: &mut String,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) {
         match self {
-            Self::Return(node) => node.transpile(shader, indexes),
-            Self::Assignment(node) => node.transpile(shader, indexes),
+            Self::Return(node) => node.transpile(shader, indexes, context),
+            Self::Assignment(node) => node.transpile(shader, indexes, context),
         }
     }
 }

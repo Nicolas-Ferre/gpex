@@ -1,3 +1,4 @@
+use crate::compiler::consts::{ConstContext, ConstValue};
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
@@ -36,6 +37,12 @@ impl ParamGroup {
             params,
             span: start_span.until(end_span),
         })
+    }
+
+    pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
+        for param in &self.params {
+            param.index_item(indexes);
+        }
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
@@ -90,6 +97,8 @@ impl ParamGroup {
 pub(crate) struct Param {
     pub(crate) id: u64,
     #[derive_where(skip)]
+    pub(crate) scope: Vec<u64>,
+    #[derive_where(skip)]
     pub(crate) name: String,
     #[derive_where(skip)]
     pub(crate) name_span: Span,
@@ -101,18 +110,21 @@ pub(crate) struct Param {
 
 impl Param {
     fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
-        context.define_scope(|context, id| {
-            let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
-            let colon_span = Span::parse_symbol(context, COLON_SYMBOL)?;
-            let type_ = Expr::parse(context)?;
-            Ok(Self {
-                id,
-                name_span,
-                name: context.slice(name_span).into(),
-                colon_span,
-                type_,
-            })
+        let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
+        let colon_span = Span::parse_symbol(context, COLON_SYMBOL)?;
+        let type_ = Expr::parse(context)?;
+        Ok(Self {
+            id: context.next_id(),
+            scope: context.scope().to_vec(),
+            name_span,
+            name: context.slice(name_span).into(),
+            colon_span,
+            type_,
         })
+    }
+
+    pub(crate) fn index_item<'index>(&'index self, indexes: &mut Indexes<'index>) {
+        indexes.items.register(ItemRef::Param(self));
     }
 
     pub(crate) fn index_refs(&self, indexes: &mut Indexes<'_>) {
@@ -129,11 +141,19 @@ impl Param {
     }
 
     pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
-        if let Some(struct_) = self.type_.const_value(indexes).type_ref() {
+        if let Some(struct_) = self
+            .type_
+            .const_value(indexes, &mut ConstContext::default())
+            .type_ref()
+        {
             Type::Struct(struct_)
         } else {
             Type::Unknown
         }
+    }
+
+    pub(crate) fn const_value<'index>(&self, context: &ConstContext<'index>) -> ConstValue<'index> {
+        context.value(self.id)
     }
 
     pub(crate) fn validate(
@@ -161,5 +181,10 @@ impl Param {
             .unwrap_or_else(|| unreachable!("parameter type should be validated before"))
             .transpile_name();
         _ = write!(shader, "_{id}: {type_name}");
+    }
+
+    pub(crate) fn transpile_ref(&self, shader: &mut String) {
+        let id = self.id;
+        _ = write!(shader, "_{id}");
     }
 }

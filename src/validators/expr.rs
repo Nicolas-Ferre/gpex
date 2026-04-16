@@ -1,4 +1,3 @@
-use crate::compiler::consts::ConstValue;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::exprs::Expr;
@@ -39,12 +38,14 @@ pub(crate) fn check_types(
 }
 
 pub(crate) fn check_const_value(
-    const_value: ConstValue<'_>,
+    source: ItemRef<'_>,
     span: Span,
     const_mark_span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if const_value == ConstValue::RuntimeValue {
+    if source.is_const() {
+        Ok(())
+    } else {
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: "expression not constant".into(),
@@ -56,8 +57,6 @@ pub(crate) fn check_const_value(
             }],
         });
         Err(ValidateError)
-    } else {
-        Ok(())
     }
 }
 

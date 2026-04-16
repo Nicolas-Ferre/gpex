@@ -165,14 +165,28 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
         visibility: Visibility,
         config: SearchConfig,
     ) -> bool {
+        if item.id() == location.id() {
+            return false;
+        }
         let is_same_file = location.file_index() == item.file_index();
-        let is_visible_locally = config.can_be_after || item.id() <= location.id();
+        if is_same_file && !config.can_be_after && item.id() > location.id() {
+            return false;
+        }
         let is_pub_item = match visibility {
             Visibility::Enforced => item.is_pub(),
             Visibility::Ignored => true,
         };
-        ((is_same_file && is_visible_locally) || (!is_same_file && is_pub_item))
-            && (config.can_be_parent_node || item.scope() != location.scope())
+        if !is_same_file && !is_pub_item {
+            return false;
+        }
+        let item_scope = item.scope();
+        let location_scope = item.scope();
+        let is_location_parent = item_scope.len() > location_scope.len()
+            && &item_scope[..location_scope.len()] == location_scope;
+        if !config.can_be_parent_node && is_location_parent {
+            return false;
+        }
+        true
     }
 }
 

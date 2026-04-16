@@ -1,4 +1,4 @@
-use crate::compiler::consts::ConstValue;
+use crate::compiler::consts::{ConstContext, ConstValue};
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
@@ -37,6 +37,7 @@ impl ConstDefinition {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
+        let scope = context.scope().to_vec();
         context.define_scope(|context, id| {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             let const_keyword_span = Span::parse_symbol(context, CONST_KEYWORD)?;
@@ -47,7 +48,7 @@ impl ConstDefinition {
             Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
             Ok(Self {
                 id,
-                scope: context.scope().to_vec(),
+                scope,
                 pub_keyword_span,
                 const_keyword_span,
                 name_span,
@@ -79,7 +80,8 @@ impl ConstDefinition {
     }
 
     pub(crate) fn const_value<'index>(&self, indexes: &Indexes<'index>) -> ConstValue<'index> {
-        self.value.const_value(indexes)
+        self.value
+            .const_value(indexes, &mut ConstContext::default())
     }
 
     pub(crate) fn validate(

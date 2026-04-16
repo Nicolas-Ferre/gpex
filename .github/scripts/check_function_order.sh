@@ -10,6 +10,7 @@ IGNORED_FUNCTIONS=(
     "new"  # very common function name
     "iter" # very common function name
 )
+IGNORED_PATHS_REGEX="src/language"
 EXCLUSION_REGEX="fn_check:[[:space:]]off"
 FUNCTION_DEFINITION_START_REGEX="^([[:space:]]*).*fn[[:space:]]([a-zA-Z0-9_]+)[^;]*$"
 FUNCTION_END="}"
@@ -30,7 +31,7 @@ check_function_call() {
 
 exit_code=0
 while read -r -d '' file; do
-    if [[ $file =~ src/language ]]; then
+    if [[ $file =~ $IGNORED_PATHS_REGEX ]]; then
         continue
     fi
     defined_functions=()
