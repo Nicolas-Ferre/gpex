@@ -165,33 +165,40 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
         visibility: Visibility,
         config: SearchConfig,
     ) -> bool {
-        if item.id() == location.id() {
-            return false;
+        item.id() != location.id()
+            && (config.can_be_after || !Self::is_item_after(item, location))
+            && (config.can_be_parent_node || !Self::is_item_location_parent(item, location))
+            && Self::is_item_visible_from_location(item, location, visibility)
+            && !Self::is_item_location_child(item, location)
+    }
+
+    fn is_item_after(item: Item, location: impl NodeRef) -> bool {
+        location.file_index() == item.file_index() && item.id() > location.id()
+    }
+
+    fn is_item_visible_from_location(
+        item: Item,
+        location: impl NodeRef,
+        visibility: Visibility,
+    ) -> bool {
+        location.file_index() == item.file_index()
+            || match visibility {
+                Visibility::Enforced => item.is_pub(),
+                Visibility::Ignored => true,
+            }
+    }
+
+    fn is_item_location_child(item: Item, location: impl NodeRef) -> bool {
+        item.scope().len() > location.scope().len() && item.scope().starts_with(location.scope())
+    }
+
+    fn is_item_location_parent(item: Item, location: impl NodeRef) -> bool {
+        let is_item_root = item.scope().is_empty();
+        if is_item_root {
+            location.scope().first() == Some(&item.id())
+        } else {
+            location.scope().len() > item.scope().len()
         }
-        let is_same_file = location.file_index() == item.file_index();
-        if is_same_file && !config.can_be_after && item.id() > location.id() {
-            return false;
-        }
-        let is_pub_item = match visibility {
-            Visibility::Enforced => item.is_pub(),
-            Visibility::Ignored => true,
-        };
-        if !is_same_file && !is_pub_item {
-            return false;
-        }
-        let item_scope = item.scope();
-        let location_scope = location.scope();
-        let is_in_item_own_scope = location_scope.starts_with(item_scope)
-            && location_scope.get(item_scope.len()) == Some(&item.id());
-        if is_in_item_own_scope {
-            return false;
-        }
-        let is_location_parent = item_scope.len() > location_scope.len()
-            && &item_scope[..location_scope.len()] == location_scope;
-        if !config.can_be_parent_node && is_location_parent {
-            return false;
-        }
-        true
     }
 }
 
