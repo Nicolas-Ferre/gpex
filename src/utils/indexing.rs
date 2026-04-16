@@ -180,7 +180,12 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
             return false;
         }
         let item_scope = item.scope();
-        let location_scope = item.scope();
+        let location_scope = location.scope();
+        let is_in_item_own_scope = location_scope.starts_with(item_scope)
+            && location_scope.get(item_scope.len()) == Some(&item.id());
+        if is_in_item_own_scope {
+            return false;
+        }
         let is_location_parent = item_scope.len() > location_scope.len()
             && &item_scope[..location_scope.len()] == location_scope;
         if !config.can_be_parent_node && is_location_parent {
