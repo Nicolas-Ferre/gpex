@@ -207,7 +207,7 @@ impl Call {
         for arg in &self.args {
             arg.validate(const_mark_span, context, indexes)?;
         }
-        validators::item::check_found(
+        let source = validators::item::check_found(
             self,
             self.span,
             &self.key(),
@@ -216,12 +216,7 @@ impl Call {
             indexes,
         )?;
         if let Some(const_mark_span) = const_mark_span {
-            validators::expr::check_const_value(
-                indexes.sources[&self.id],
-                self.span,
-                const_mark_span,
-                context,
-            )?;
+            validators::expr::check_const_value(source, self.span, const_mark_span, context)?;
         }
         Ok(())
     }

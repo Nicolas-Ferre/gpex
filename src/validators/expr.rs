@@ -43,7 +43,10 @@ pub(crate) fn check_const_value(
     const_mark_span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if source.is_const(true) {
+    // This validator function is always called from a `const` context,
+    // so we cannot be inside a non-`const` function.
+    let is_in_const_fn = true;
+    if source.is_const(is_in_const_fn) {
         Ok(())
     } else {
         context.logs.push(Log {

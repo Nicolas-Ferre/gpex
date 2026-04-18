@@ -96,7 +96,8 @@ impl Ident {
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         if let Some(&source) = indexes.sources.get(&self.id) {
             dependencies.register(self.span, source, |dependencies| {
-                source.dependencies(is_in_const_fn, true, type_, dependencies, indexes)
+                let are_args_const = true; // unused as identifiers never refer to a function
+                source.dependencies(is_in_const_fn, are_args_const, type_, dependencies, indexes)
             })
         } else {
             Ok(dependencies)
@@ -146,14 +147,16 @@ impl Ident {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        validators::item::check_found(self, self.span, &self.slice, &self.slice, context, indexes)?;
+        let source = validators::item::check_found(
+            self,
+            self.span,
+            &self.slice,
+            &self.slice,
+            context,
+            indexes,
+        )?;
         if let Some(const_mark_span) = const_mark_span {
-            validators::expr::check_const_value(
-                indexes.sources[&self.id],
-                self.span,
-                const_mark_span,
-                context,
-            )?;
+            validators::expr::check_const_value(source, self.span, const_mark_span, context)?;
         }
         Ok(())
     }
