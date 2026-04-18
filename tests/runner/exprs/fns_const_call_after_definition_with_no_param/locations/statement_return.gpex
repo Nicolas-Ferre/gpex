@@ -1,9 +1,0 @@
-const fn called_fn() -> i32 {
-    return 123;
-}
-
-fn fn_() -> i32 {
-    return called_fn();
-}
-
-var _result = fn_(); // expected: 123

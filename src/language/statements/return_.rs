@@ -1,3 +1,4 @@
+use crate::compiler::consts::ConstContext;
 use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
 use crate::language::exprs::Expr;
@@ -35,11 +36,13 @@ impl ReturnStatement {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        self.value.dependencies(type_, dependencies, indexes)
+        self.value
+            .dependencies(is_in_const_fn, type_, dependencies, indexes)
     }
 
     pub(crate) fn validate(
@@ -52,9 +55,14 @@ impl ReturnStatement {
         Ok(())
     }
 
-    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
+    pub(crate) fn transpile<'index>(
+        &self,
+        shader: &mut String,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) {
         *shader += "return ";
-        self.value.transpile(shader, indexes);
+        self.value.transpile(shader, indexes, context);
         *shader += ";";
     }
 }

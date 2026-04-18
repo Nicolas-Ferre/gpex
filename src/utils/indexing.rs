@@ -165,14 +165,40 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
         visibility: Visibility,
         config: SearchConfig,
     ) -> bool {
-        let is_same_file = location.file_index() == item.file_index();
-        let is_visible_locally = config.can_be_after || item.id() <= location.id();
-        let is_pub_item = match visibility {
-            Visibility::Enforced => item.is_pub(),
-            Visibility::Ignored => true,
-        };
-        ((is_same_file && is_visible_locally) || (!is_same_file && is_pub_item))
-            && (config.can_be_parent_node || item.scope() != location.scope())
+        item.id() != location.id()
+            && (config.can_be_after || !Self::is_item_after(item, location))
+            && (config.can_be_parent_node || !Self::is_item_location_parent(item, location))
+            && Self::is_item_visible_from_location(item, location, visibility)
+            && !Self::is_item_location_child(item, location)
+    }
+
+    fn is_item_after(item: Item, location: impl NodeRef) -> bool {
+        location.file_index() == item.file_index() && item.id() > location.id()
+    }
+
+    fn is_item_visible_from_location(
+        item: Item,
+        location: impl NodeRef,
+        visibility: Visibility,
+    ) -> bool {
+        location.file_index() == item.file_index()
+            || match visibility {
+                Visibility::Enforced => item.is_pub(),
+                Visibility::Ignored => true,
+            }
+    }
+
+    fn is_item_location_child(item: Item, location: impl NodeRef) -> bool {
+        item.scope().len() > location.scope().len() && item.scope().starts_with(location.scope())
+    }
+
+    fn is_item_location_parent(item: Item, location: impl NodeRef) -> bool {
+        let is_item_root = item.scope().is_empty();
+        if is_item_root {
+            location.scope().first() == Some(&item.id())
+        } else {
+            location.scope().len() > item.scope().len()
+        }
     }
 }
 

@@ -50,7 +50,7 @@ impl<'config> ParseContext<'config> {
         &self.scope
     }
 
-    pub(crate) fn define_scope<O>(&mut self, mut scoped: impl FnMut(&mut Self, u64) -> O) -> O {
+    pub(crate) fn define_scope<O>(&mut self, scoped: impl FnOnce(&mut Self, u64) -> O) -> O {
         let id = self.next_id();
         self.scope.push(id);
         let output = scoped(self, id);

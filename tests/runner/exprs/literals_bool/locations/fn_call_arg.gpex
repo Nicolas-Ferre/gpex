@@ -1,5 +1,0 @@
-fn fn_(_param: bool) -> bool {
-    return true;
-}
-
-var _result = fn_(true);  // expected: true

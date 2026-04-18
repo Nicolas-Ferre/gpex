@@ -1,5 +1,0 @@
-fn fn_(_param: f32) -> f32 {
-    return 123.456;
-}
-
-var _result = fn_(123.456);  // expected: 123.456

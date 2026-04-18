@@ -1,3 +1,4 @@
+use crate::compiler::consts::ConstContext;
 use crate::compiler::indexes::Indexes;
 use crate::language::exprs::call::Call;
 use crate::language::symbols::{REPEAT_KEYWORD, SEMICOLON_SYMBOL};
@@ -38,7 +39,8 @@ impl RepeatDefinition {
     }
 
     pub(crate) fn transpile_call(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        self.call.transpile(shader, indexes);
+        self.call
+            .transpile(shader, indexes, &mut ConstContext::default());
         *shader += "; ";
     }
 }

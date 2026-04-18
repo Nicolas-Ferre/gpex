@@ -2,7 +2,7 @@ pub(crate) mod call;
 pub(crate) mod ident;
 pub(crate) mod literals;
 
-use crate::compiler::consts::ConstValue;
+use crate::compiler::consts::{ConstContext, ConstValue};
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
@@ -63,15 +63,25 @@ impl Expr {
         }
     }
 
+    fn is_const(&self, is_in_const_fn: bool, indexes: &Indexes<'_>) -> bool {
+        match self {
+            Self::F32Literal(_)
+            | Self::U32Literal(_)
+            | Self::I32Literal(_)
+            | Self::BoolLiteral(_) => true,
+            Self::Call(node) => node.is_const(is_in_const_fn, indexes),
+            Self::Identifier(node) => node.is_const(is_in_const_fn, indexes),
+        }
+    }
+
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        if type_ == DependencyType::Transpilation
-            && self.const_value(indexes) != ConstValue::RuntimeValue
-        {
+        if type_ == DependencyType::Transpilation && self.is_const(is_in_const_fn, indexes) {
             Ok(dependencies)
         } else {
             match self {
@@ -79,8 +89,10 @@ impl Expr {
                 | Self::U32Literal(_)
                 | Self::I32Literal(_)
                 | Self::BoolLiteral(_) => Ok(dependencies),
-                Self::Call(node) => node.dependencies(type_, dependencies, indexes),
-                Self::Identifier(node) => node.dependencies(type_, dependencies, indexes),
+                Self::Call(node) => node.dependencies(is_in_const_fn, type_, dependencies, indexes),
+                Self::Identifier(node) => {
+                    node.dependencies(is_in_const_fn, type_, dependencies, indexes)
+                }
             }
         }
     }
@@ -96,14 +108,18 @@ impl Expr {
         }
     }
 
-    pub(crate) fn const_value<'index>(&self, indexes: &Indexes<'index>) -> ConstValue<'index> {
+    pub(crate) fn const_value<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) -> ConstValue<'index> {
         match self {
             Self::F32Literal(node) => node.const_value(),
             Self::U32Literal(node) => node.const_value(),
             Self::I32Literal(node) => node.const_value(),
             Self::BoolLiteral(node) => node.const_value(),
-            Self::Call(node) => node.const_value(indexes),
-            Self::Identifier(node) => node.const_value(indexes),
+            Self::Call(node) => node.const_value(indexes, context),
+            Self::Identifier(node) => node.const_value(indexes, context),
         }
     }
 
@@ -137,11 +153,16 @@ impl Expr {
         }
     }
 
-    pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
-        let value = self.const_value(indexes);
+    pub(crate) fn transpile<'index>(
+        &self,
+        shader: &mut String,
+        indexes: &Indexes<'index>,
+        context: &mut ConstContext<'index>,
+    ) {
+        let value = self.const_value(indexes, context);
         if value == ConstValue::RuntimeValue {
             match self {
-                Self::Call(node) => node.transpile(shader, indexes),
+                Self::Call(node) => node.transpile(shader, indexes, context),
                 Self::Identifier(node) => node.transpile(shader, indexes),
                 Self::F32Literal(_)
                 | Self::U32Literal(_)

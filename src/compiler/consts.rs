@@ -1,6 +1,34 @@
 use crate::language::items::struct_::StructDefinition;
 use crate::utils::formatting;
+use std::collections::HashMap;
 use std::fmt::Write;
+
+#[derive(Debug, Default)]
+pub(crate) struct ConstContext<'item> {
+    scope_values: Vec<HashMap<u64, ConstValue<'item>>>,
+}
+
+impl<'item> ConstContext<'item> {
+    pub(crate) fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
+        self.scope_values.push(HashMap::new());
+        let output = callback(self);
+        self.scope_values.pop();
+        output
+    }
+
+    pub(crate) fn value(&self, id: u64) -> ConstValue<'item> {
+        self.scope_values
+            .last()
+            .and_then(|values| values.get(&id))
+            .cloned()
+            .unwrap_or(ConstValue::RuntimeValue)
+    }
+
+    pub(crate) fn add_value(&mut self, id: u64, value: ConstValue<'item>) {
+        let current_scope_index = self.scope_values.len() - 1;
+        self.scope_values[current_scope_index].insert(id, value);
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum ConstValue<'item> {

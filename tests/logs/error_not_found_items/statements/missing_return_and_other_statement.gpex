@@ -1,0 +1,7 @@
+const fn ReturnType(param: i32) -> typeref {
+    param = 0;
+}
+
+fn fn_() -> ReturnType(0) {
+    return i32;
+}

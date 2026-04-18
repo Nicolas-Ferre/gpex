@@ -160,16 +160,16 @@ pub(crate) fn check_usage(
     }
 }
 
-pub(crate) fn check_found(
+pub(crate) fn check_found<'index>(
     node: impl NodeRef,
     span: Span,
     key: &str,
     displayed_key: &str,
     context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
-) -> Result<(), ValidateError> {
-    if indexes.sources.contains_key(&node.id()) {
-        Ok(())
+    indexes: &Indexes<'index>,
+) -> Result<ItemRef<'index>, ValidateError> {
+    if let Some(source) = indexes.sources.get(&node.id()) {
+        Ok(*source)
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,

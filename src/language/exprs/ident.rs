@@ -1,4 +1,4 @@
-use crate::compiler::consts::ConstValue;
+use crate::compiler::consts::{ConstContext, ConstValue};
 use crate::compiler::indexes::Indexes;
 use crate::compiler::types::Type;
 use crate::language::DependencyType;
@@ -75,7 +75,13 @@ impl Ident {
         } else if let Some(source) = indexes
             .items
             .search(search_params, Visibility::Ignored)
-            .next()
+            .find(|source| match source {
+                ItemRef::Param(_) => false,
+                ItemRef::Variable(_)
+                | ItemRef::Constant(_)
+                | ItemRef::Struct(_)
+                | ItemRef::Fn(_) => true,
+            })
         {
             indexes.priv_sources.insert(self.id, source);
         }
@@ -83,13 +89,15 @@ impl Ident {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         if let Some(&source) = indexes.sources.get(&self.id) {
             dependencies.register(self.span, source, |dependencies| {
-                source.dependencies(type_, dependencies, indexes)
+                let are_args_const = true; // unused as identifiers never refer to a function
+                source.dependencies(is_in_const_fn, are_args_const, type_, dependencies, indexes)
             })
         } else {
             Ok(dependencies)
@@ -103,11 +111,23 @@ impl Ident {
         }
     }
 
-    pub(crate) fn const_value<'index>(&self, indexes: &Indexes<'index>) -> ConstValue<'index> {
+    pub(crate) fn is_const(&self, is_in_const_fn: bool, indexes: &Indexes<'_>) -> bool {
+        indexes
+            .sources
+            .get(&self.id)
+            .is_some_and(|source| source.is_const(is_in_const_fn))
+    }
+
+    pub(crate) fn const_value<'index>(
+        &self,
+        indexes: &Indexes<'index>,
+        context: &ConstContext<'index>,
+    ) -> ConstValue<'index> {
         match indexes.sources.get(&self.id) {
             Some(ItemRef::Variable(_)) => ConstValue::RuntimeValue,
             Some(ItemRef::Constant(node)) => node.const_value(indexes),
             Some(ItemRef::Struct(node)) => ConstValue::TypeRef(node),
+            Some(ItemRef::Param(node)) => node.const_value(context),
             Some(ItemRef::Fn(_)) => unreachable!("identifier should not refer to a function"),
             None => ConstValue::Unknown,
         }
@@ -116,7 +136,7 @@ impl Ident {
     pub(crate) fn is_ref(&self, indexes: &Indexes<'_>) -> Option<bool> {
         Some(match indexes.sources.get(&self.id)? {
             ItemRef::Variable(_) => true,
-            ItemRef::Constant(_) | ItemRef::Struct(_) => false,
+            ItemRef::Constant(_) | ItemRef::Struct(_) | ItemRef::Param(_) => false,
             ItemRef::Fn(_) => unreachable!("identifier should not refer to a function"),
         })
     }
@@ -127,14 +147,16 @@ impl Ident {
         context: &mut ValidateContext<'_>,
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
-        validators::item::check_found(self, self.span, &self.slice, &self.slice, context, indexes)?;
+        let source = validators::item::check_found(
+            self,
+            self.span,
+            &self.slice,
+            &self.slice,
+            context,
+            indexes,
+        )?;
         if let Some(const_mark_span) = const_mark_span {
-            validators::expr::check_const_value(
-                self.const_value(indexes),
-                self.span,
-                const_mark_span,
-                context,
-            )?;
+            validators::expr::check_const_value(source, self.span, const_mark_span, context)?;
         }
         Ok(())
     }
@@ -142,6 +164,7 @@ impl Ident {
     pub(crate) fn transpile(&self, shader: &mut String, indexes: &Indexes<'_>) {
         match indexes.sources[&self.id] {
             ItemRef::Variable(node) => node.transpile_ref(shader),
+            ItemRef::Param(node) => node.transpile_ref(shader),
             ItemRef::Fn(_) => unreachable!("identifiers cannot reference functions"),
             ItemRef::Constant(_) | ItemRef::Struct(_) => {
                 unreachable!("constant item should be transpiled in `Expression::transpile`")

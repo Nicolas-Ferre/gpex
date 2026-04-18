@@ -1,3 +1,4 @@
+use crate::compiler::consts::ConstContext;
 use crate::compiler::indexes::Indexes;
 use crate::compiler::transpilation::MAIN_BUFFER_NAME;
 use crate::compiler::types::Type;
@@ -36,6 +37,7 @@ impl VarDefinition {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
+        let scope = context.scope().to_vec();
         context.define_scope(|context, id| {
             let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
             Span::parse_symbol(context, VAR_KEYWORD)?;
@@ -46,7 +48,7 @@ impl VarDefinition {
             Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
             Ok(Self {
                 id,
-                scope: context.scope().to_vec(),
+                scope,
                 pub_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),
@@ -70,7 +72,7 @@ impl VarDefinition {
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         self.default_value
-            .dependencies(type_, dependencies, indexes)
+            .dependencies(false, type_, dependencies, indexes)
     }
 
     pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {
@@ -105,7 +107,8 @@ impl VarDefinition {
     pub(crate) fn transpile_buffer_init(&self, shader: &mut String, indexes: &Indexes<'_>) {
         self.transpile_ref(shader);
         *shader += " = ";
-        self.default_value.transpile(shader, indexes);
+        self.default_value
+            .transpile(shader, indexes, &mut ConstContext::default());
         *shader += "; ";
     }
 

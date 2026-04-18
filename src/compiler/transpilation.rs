@@ -1,3 +1,4 @@
+use crate::compiler::consts::ConstContext;
 use crate::compiler::indexes::Indexes;
 use crate::language::DependencyType;
 use crate::language::items::ItemRef;
@@ -174,7 +175,7 @@ fn transpile_repeat(shader: &mut String, modules: &[Module], indexes: &Indexes<'
         for repeat in module.repeats() {
             dependencies = repeat
                 .call
-                .dependencies(DependencyType::Transpilation, dependencies, indexes)
+                .dependencies(false, DependencyType::Transpilation, dependencies, indexes)
                 .unwrap_or_else(|_| {
                     unreachable!("circular dependencies should be validated before")
                 });
@@ -198,7 +199,7 @@ fn transpile_shader<'item>(
 ) {
     transpile_buffer_header(shader, modules, indexes);
     for dependency in dependencies.into_iter() {
-        dependency.transpile(shader, indexes);
+        dependency.transpile(shader, indexes, &mut ConstContext::default());
     }
     *shader += " @compute @workgroup_size(1, 1, 1) fn main() { ";
     transpile_body(shader);
