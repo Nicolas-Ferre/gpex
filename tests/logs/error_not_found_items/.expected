@@ -60,6 +60,9 @@ error: `~.~.~.~.~.~.missing` module not found (at tests/logs/error_not_found_ite
   --> info: cannot read "../missing.gpex"
 error: missing `return` statement (at tests/logs/error_not_found_items/statements/missing_return.gpex:2:1)
   --> info: function has a return type (at tests/logs/error_not_found_items/statements/missing_return.gpex:1:13)
+error: expression is not a reference (at tests/logs/error_not_found_items/statements/missing_return_and_other_statement.gpex:2:5)
+error: missing `return` statement (at tests/logs/error_not_found_items/statements/missing_return_and_other_statement.gpex:3:1)
+  --> info: function has a return type (at tests/logs/error_not_found_items/statements/missing_return_and_other_statement.gpex:1:36)
 error: expression not constant (at tests/logs/error_not_found_items/statements/missing_return_used_as_const.gpex:4:5)
   --> info: expression must be constant (at tests/logs/error_not_found_items/statements/missing_return_used_as_const.gpex:3:1)
 error: missing `return` statement (at tests/logs/error_not_found_items/statements/missing_return_used_in_fn_signature.gpex:5:35)
