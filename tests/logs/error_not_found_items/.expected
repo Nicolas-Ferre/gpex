@@ -38,6 +38,7 @@ warning: `imported()` item unused (at tests/logs/error_not_found_items/fn_calls/
 warning: `~.imported` import unused (at tests/logs/error_not_found_items/fn_calls/pub_import_priv_item/main.gpex:1:1)
 error: `imported()` item not found (at tests/logs/error_not_found_items/fn_calls/pub_import_priv_item/main.gpex:3:12)
   --> info: item not qualified with `pub` (at tests/logs/error_not_found_items/fn_calls/pub_import_priv_item/imported.gpex:1:4)
+error: `param` item not found (at tests/logs/error_not_found_items/fn_params/fn_param_type.gpex:1:15)
 warning: `~.imported` import unused (at tests/logs/error_not_found_items/fn_params/imported_fn_with_matching_param_name/main.gpex:1:1)
 error: `param` item not found (at tests/logs/error_not_found_items/fn_params/imported_fn_with_matching_param_name/main.gpex:3:12)
 error: `identifier` item not found (at tests/logs/error_not_found_items/idents/const_global.gpex:1:16)
