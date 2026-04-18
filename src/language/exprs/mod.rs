@@ -63,24 +63,25 @@ impl Expr {
         }
     }
 
-    fn is_const(&self, indexes: &Indexes<'_>) -> bool {
+    fn is_const(&self, is_in_const_fn: bool, indexes: &Indexes<'_>) -> bool {
         match self {
             Self::F32Literal(_)
             | Self::U32Literal(_)
             | Self::I32Literal(_)
             | Self::BoolLiteral(_) => true,
-            Self::Call(node) => node.is_const(indexes),
-            Self::Identifier(node) => node.is_const(indexes),
+            Self::Call(node) => node.is_const(is_in_const_fn, indexes),
+            Self::Identifier(node) => node.is_const(is_in_const_fn, indexes),
         }
     }
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        if type_ == DependencyType::Transpilation && self.is_const(indexes) {
+        if type_ == DependencyType::Transpilation && self.is_const(is_in_const_fn, indexes) {
             Ok(dependencies)
         } else {
             match self {
@@ -88,8 +89,10 @@ impl Expr {
                 | Self::U32Literal(_)
                 | Self::I32Literal(_)
                 | Self::BoolLiteral(_) => Ok(dependencies),
-                Self::Call(node) => node.dependencies(type_, dependencies, indexes),
-                Self::Identifier(node) => node.dependencies(type_, dependencies, indexes),
+                Self::Call(node) => node.dependencies(is_in_const_fn, type_, dependencies, indexes),
+                Self::Identifier(node) => {
+                    node.dependencies(is_in_const_fn, type_, dependencies, indexes)
+                }
             }
         }
     }

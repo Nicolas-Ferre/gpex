@@ -113,18 +113,31 @@ impl Call {
         }
     }
 
+    fn are_args_const(&self, is_in_const_fn: bool, indexes: &Indexes<'_>) -> bool {
+        self.args
+            .iter()
+            .all(|arg| arg.is_const(is_in_const_fn, indexes))
+    }
+
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         mut dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         for arg in &self.args {
-            dependencies = arg.dependencies(type_, dependencies, indexes)?;
+            dependencies = arg.dependencies(is_in_const_fn, type_, dependencies, indexes)?;
         }
         if let Some(&source) = indexes.sources.get(&self.id) {
             dependencies.register(self.span, source, |dependencies| {
-                source.dependencies(type_, dependencies, indexes)
+                source.dependencies(
+                    is_in_const_fn,
+                    self.are_args_const(is_in_const_fn, indexes),
+                    type_,
+                    dependencies,
+                    indexes,
+                )
             })
         } else {
             Ok(dependencies)
@@ -138,11 +151,12 @@ impl Call {
         }
     }
 
-    pub(crate) fn is_const(&self, indexes: &Indexes<'_>) -> bool {
+    pub(crate) fn is_const(&self, is_in_const_fn: bool, indexes: &Indexes<'_>) -> bool {
         indexes
             .sources
             .get(&self.id)
-            .is_some_and(|source| source.is_const())
+            .is_some_and(|source| source.is_const(is_in_const_fn))
+            && self.are_args_const(is_in_const_fn, indexes)
     }
 
     pub(crate) fn const_value<'index>(
@@ -151,13 +165,28 @@ impl Call {
         context: &mut ConstContext<'index>,
     ) -> ConstValue<'index> {
         match indexes.sources.get(&self.id) {
-            Some(ItemRef::Fn(source)) => context.run_scoped(|context| {
-                for (arg, param) in self.args.iter().zip(&source.params.params) {
-                    let value = arg.const_value(indexes, context);
-                    context.add_value(param.id, value);
-                }
-                source.const_value(indexes, context)
-            }),
+            Some(ItemRef::Fn(source)) => {
+                let param_args = self
+                    .args
+                    .iter()
+                    .zip(&source.params.params)
+                    .map(|(arg, param)| (param.id, arg.const_value(indexes, context)))
+                    .collect::<Vec<_>>();
+                context.run_scoped(|context| {
+                    for (param_id, arg_value) in param_args {
+                        match arg_value {
+                            ConstValue::Unknown => return ConstValue::Unknown,
+                            ConstValue::RuntimeValue => return ConstValue::RuntimeValue,
+                            ConstValue::TypeRef(_)
+                            | ConstValue::I32(_)
+                            | ConstValue::U32(_)
+                            | ConstValue::F32(_)
+                            | ConstValue::Bool(_) => context.add_value(param_id, arg_value),
+                        }
+                    }
+                    source.const_value(indexes, context)
+                })
+            }
             Some(
                 ItemRef::Variable(_)
                 | ItemRef::Constant(_)

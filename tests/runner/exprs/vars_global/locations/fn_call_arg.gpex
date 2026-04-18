@@ -1,7 +1,0 @@
-var var_ = 123;
-
-fn fn_(_param: i32) -> i32 {
-    return 123;
-}
-
-var _result = fn_(var_); // expected: 123

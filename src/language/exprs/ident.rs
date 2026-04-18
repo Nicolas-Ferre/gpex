@@ -83,13 +83,14 @@ impl Ident {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         if let Some(&source) = indexes.sources.get(&self.id) {
             dependencies.register(self.span, source, |dependencies| {
-                source.dependencies(type_, dependencies, indexes)
+                source.dependencies(is_in_const_fn, true, type_, dependencies, indexes)
             })
         } else {
             Ok(dependencies)
@@ -103,11 +104,11 @@ impl Ident {
         }
     }
 
-    pub(crate) fn is_const(&self, indexes: &Indexes<'_>) -> bool {
+    pub(crate) fn is_const(&self, is_in_const_fn: bool, indexes: &Indexes<'_>) -> bool {
         indexes
             .sources
             .get(&self.id)
-            .is_some_and(|source| source.is_const())
+            .is_some_and(|source| source.is_const(is_in_const_fn))
     }
 
     pub(crate) fn const_value<'index>(

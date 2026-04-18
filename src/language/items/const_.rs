@@ -72,7 +72,7 @@ impl ConstDefinition {
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        self.value.dependencies(type_, dependencies, indexes)
+        self.value.dependencies(false, type_, dependencies, indexes)
     }
 
     pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {

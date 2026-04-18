@@ -175,7 +175,7 @@ fn transpile_repeat(shader: &mut String, modules: &[Module], indexes: &Indexes<'
         for repeat in module.repeats() {
             dependencies = repeat
                 .call
-                .dependencies(DependencyType::Transpilation, dependencies, indexes)
+                .dependencies(false, DependencyType::Transpilation, dependencies, indexes)
                 .unwrap_or_else(|_| {
                     unreachable!("circular dependencies should be validated before")
                 });

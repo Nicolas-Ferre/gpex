@@ -38,13 +38,16 @@ impl Statement {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         match self {
-            Self::Return(node) => node.dependencies(type_, dependencies, indexes),
-            Self::Assignment(node) => node.dependencies(type_, dependencies, indexes),
+            Self::Return(node) => node.dependencies(is_in_const_fn, type_, dependencies, indexes),
+            Self::Assignment(node) => {
+                node.dependencies(is_in_const_fn, type_, dependencies, indexes)
+            }
         }
     }
 

@@ -1,0 +1,5 @@
+var _result = fn_(i32);  // expected: i32
+
+const fn fn_(param: typeref) -> typeref {
+    return param;
+}

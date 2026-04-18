@@ -119,16 +119,21 @@ impl FnDefinition {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        are_args_const: bool,
         type_: DependencyType,
         mut dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        dependencies = self.params.dependencies(type_, dependencies, indexes)?;
+        let is_in_const_fn = are_args_const && self.const_keyword_span.is_some();
+        dependencies = self
+            .params
+            .dependencies(is_in_const_fn, type_, dependencies, indexes)?;
         if let Some(return_type) = &self.return_type {
-            dependencies = return_type.dependencies(type_, dependencies, indexes)?;
+            dependencies =
+                return_type.dependencies(is_in_const_fn, type_, dependencies, indexes)?;
         }
         for statement in &self.statements {
-            dependencies = statement.dependencies(type_, dependencies, indexes)?;
+            dependencies = statement.dependencies(is_in_const_fn, type_, dependencies, indexes)?;
         }
         Ok(dependencies)
     }
@@ -186,8 +191,12 @@ impl FnDefinition {
         indexes: &Indexes<'_>,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Fn(self);
-        let dependencies =
-            self.dependencies(DependencyType::CycleDetection, Dependencies::new(), indexes);
+        let dependencies = self.dependencies(
+            false,
+            DependencyType::CycleDetection,
+            Dependencies::new(),
+            indexes,
+        );
         validators::item::check_circular_dependencies(ref_, dependencies, context)?;
         self.params.validate(context, indexes)?;
         self.validate_return_type(context, indexes)?;

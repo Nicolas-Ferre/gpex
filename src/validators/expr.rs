@@ -43,7 +43,7 @@ pub(crate) fn check_const_value(
     const_mark_span: Span,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if source.is_const() {
+    if source.is_const(true) {
         Ok(())
     } else {
         context.logs.push(Log {

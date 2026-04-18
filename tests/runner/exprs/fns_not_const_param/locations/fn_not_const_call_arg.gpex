@@ -1,0 +1,11 @@
+var result = 0; // expected: 123
+
+repeat fn_(123);
+
+fn fn_(param: i32) {
+    result = called_fn(param);
+}
+
+fn called_fn(param: i32) -> i32 {
+    return param;
+}

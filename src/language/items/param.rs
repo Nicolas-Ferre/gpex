@@ -53,12 +53,13 @@ impl ParamGroup {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         mut dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
         for param in &self.params {
-            dependencies = param.dependencies(type_, dependencies, indexes)?;
+            dependencies = param.dependencies(is_in_const_fn, type_, dependencies, indexes)?;
         }
         Ok(dependencies)
     }
@@ -133,11 +134,13 @@ impl Param {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        self.type_.dependencies(type_, dependencies, indexes)
+        self.type_
+            .dependencies(is_in_const_fn, type_, dependencies, indexes)
     }
 
     pub(crate) fn type_<'index>(&self, indexes: &Indexes<'index>) -> Type<'index> {

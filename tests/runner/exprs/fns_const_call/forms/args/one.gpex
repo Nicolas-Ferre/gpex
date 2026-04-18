@@ -1,0 +1,6 @@
+const RESULT = called_fn(123);
+var _result = RESULT; // expected: 123
+
+const fn called_fn(param: i32) -> i32 {
+    return param;
+}

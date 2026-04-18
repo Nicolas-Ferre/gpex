@@ -1,0 +1,11 @@
+const CONSTANT = 123;
+const RESULT = fn_(CONSTANT);
+var _result = RESULT; // expected: 123
+
+const fn fn_(param: i32) -> i32 {
+    return called_fn(param);
+}
+
+const fn called_fn(param: i32) -> i32 {
+    return param;
+}

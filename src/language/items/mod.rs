@@ -114,6 +114,8 @@ impl ItemRef<'_> {
 
     pub(crate) fn dependencies<'index>(
         self,
+        is_in_const_fn: bool,
+        are_args_const: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
@@ -122,8 +124,8 @@ impl ItemRef<'_> {
             Self::Variable(node) => node.dependencies(type_, dependencies, indexes),
             Self::Constant(node) => node.dependencies(type_, dependencies, indexes),
             Self::Struct(_) => Ok(dependencies),
-            Self::Fn(node) => node.dependencies(type_, dependencies, indexes),
-            Self::Param(node) => node.dependencies(type_, dependencies, indexes),
+            Self::Fn(node) => node.dependencies(are_args_const, type_, dependencies, indexes),
+            Self::Param(node) => node.dependencies(is_in_const_fn, type_, dependencies, indexes),
         }
     }
 
@@ -137,11 +139,12 @@ impl ItemRef<'_> {
         }
     }
 
-    pub(crate) fn is_const(self) -> bool {
+    pub(crate) fn is_const(self, is_in_const_fn: bool) -> bool {
         match self {
             Self::Variable(_) => false,
-            Self::Constant(_) | Self::Struct(_) | Self::Param(_) => true,
+            Self::Constant(_) | Self::Struct(_) => true,
             Self::Fn(node) => node.const_keyword_span.is_some(),
+            Self::Param(_) => is_in_const_fn,
         }
     }
 

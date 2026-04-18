@@ -36,12 +36,16 @@ impl AssignmentStatement {
 
     pub(crate) fn dependencies<'index>(
         &self,
+        is_in_const_fn: bool,
         type_: DependencyType,
         dependencies: Dependencies<ItemRef<'index>>,
         indexes: &Indexes<'index>,
     ) -> Result<Dependencies<ItemRef<'index>>, Vec<Span>> {
-        let dependencies = self.assigned.dependencies(type_, dependencies, indexes)?;
-        self.value.dependencies(type_, dependencies, indexes)
+        let dependencies =
+            self.assigned
+                .dependencies(is_in_const_fn, type_, dependencies, indexes)?;
+        self.value
+            .dependencies(is_in_const_fn, type_, dependencies, indexes)
     }
 
     pub(crate) fn validate(

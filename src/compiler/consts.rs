@@ -9,7 +9,7 @@ pub(crate) struct ConstContext<'item> {
 }
 
 impl<'item> ConstContext<'item> {
-    pub(crate) fn run_scoped<O>(&mut self, mut callback: impl FnMut(&mut Self) -> O) -> O {
+    pub(crate) fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
         self.scope_values.push(HashMap::new());
         let output = callback(self);
         self.scope_values.pop();
