@@ -75,7 +75,13 @@ impl Ident {
         } else if let Some(source) = indexes
             .items
             .search(search_params, Visibility::Ignored)
-            .next()
+            .find(|source| match source {
+                ItemRef::Param(_) => false,
+                ItemRef::Variable(_)
+                | ItemRef::Constant(_)
+                | ItemRef::Struct(_)
+                | ItemRef::Fn(_) => true,
+            })
         {
             indexes.priv_sources.insert(self.id, source);
         }

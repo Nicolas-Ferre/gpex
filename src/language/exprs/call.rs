@@ -175,13 +175,12 @@ impl Call {
                 context.run_scoped(|context| {
                     for (param_id, arg_value) in param_args {
                         match arg_value {
-                            ConstValue::Unknown => return ConstValue::Unknown,
-                            ConstValue::RuntimeValue => return ConstValue::RuntimeValue,
                             ConstValue::TypeRef(_)
                             | ConstValue::I32(_)
                             | ConstValue::U32(_)
                             | ConstValue::F32(_)
                             | ConstValue::Bool(_) => context.add_value(param_id, arg_value),
+                            ConstValue::Unknown | ConstValue::RuntimeValue => return arg_value,
                         }
                     }
                     source.const_value(indexes, context)

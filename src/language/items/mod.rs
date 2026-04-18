@@ -90,7 +90,7 @@ impl ItemRef<'_> {
             Self::Constant(node) => node.name_span,
             Self::Struct(node) => node.name_span,
             Self::Fn(node) => node.name_span,
-            Self::Param(node) => node.name_span,
+            Self::Param(_) => unreachable!("parameter item span should not be used"),
         }
     }
 

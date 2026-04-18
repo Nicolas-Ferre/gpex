@@ -44,6 +44,8 @@ error: expression with invalid type `bool` (at tests/logs/error_type_comparison/
   --> info: expected `i32` type (at tests/logs/error_type_comparison/literals_bool_true/statement_return.gpex:1:13)
 error: expression with invalid type `f32` (at tests/logs/error_type_comparison/literals_f32/fn_param_type.gpex:1:16)
   --> info: expected `typeref` type
+error: `_fn(i32)` item not found (at tests/logs/error_type_comparison/literals_f32/fn_param_type_out_of_bound.gpex:1:8)
+error: `f32` literal out of bounds (at tests/logs/error_type_comparison/literals_f32/fn_param_type_out_of_bound.gpex:3:11)
 error: expression with invalid type `f32` (at tests/logs/error_type_comparison/literals_f32/fn_return_type.gpex:1:13)
   --> info: expected `typeref` type
 error: expression with invalid type `f32` (at tests/logs/error_type_comparison/literals_f32/statement_assignment_right.gpex:4:11)
@@ -52,6 +54,8 @@ error: expression with invalid type `f32` (at tests/logs/error_type_comparison/l
   --> info: expected `bool` type (at tests/logs/error_type_comparison/literals_f32/statement_return.gpex:1:13)
 error: expression with invalid type `i32` (at tests/logs/error_type_comparison/literals_i32/fn_param_type.gpex:1:16)
   --> info: expected `typeref` type
+error: `_fn(i32)` item not found (at tests/logs/error_type_comparison/literals_i32/fn_param_type_out_of_bound.gpex:1:8)
+error: `i32` literal out of bounds (at tests/logs/error_type_comparison/literals_i32/fn_param_type_out_of_bound.gpex:3:11)
 error: expression with invalid type `i32` (at tests/logs/error_type_comparison/literals_i32/fn_return_type.gpex:1:13)
   --> info: expected `typeref` type
 error: expression with invalid type `i32` (at tests/logs/error_type_comparison/literals_i32/statement_assignment_right.gpex:4:11)
@@ -60,6 +64,8 @@ error: expression with invalid type `i32` (at tests/logs/error_type_comparison/l
   --> info: expected `u32` type (at tests/logs/error_type_comparison/literals_i32/statement_return.gpex:1:13)
 error: expression with invalid type `u32` (at tests/logs/error_type_comparison/literals_u32/fn_param_type.gpex:1:16)
   --> info: expected `typeref` type
+error: `_fn(i32)` item not found (at tests/logs/error_type_comparison/literals_u32/fn_param_type_out_of_bound.gpex:1:8)
+error: `u32` literal out of bounds (at tests/logs/error_type_comparison/literals_u32/fn_param_type_out_of_bound.gpex:3:11)
 error: expression with invalid type `u32` (at tests/logs/error_type_comparison/literals_u32/fn_return_type.gpex:1:13)
   --> info: expected `typeref` type
 error: expression with invalid type `u32` (at tests/logs/error_type_comparison/literals_u32/statement_assignment_right.gpex:4:11)
