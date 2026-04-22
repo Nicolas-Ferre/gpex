@@ -5,7 +5,7 @@ dimensions:
     cases:
       before:
         code: |
-          {{other_item.qualifier}} param = 0;
+          {{other_item.code}}
           fn fn_(param: i32) -> i32 {
               return param;
           }
@@ -14,11 +14,13 @@ dimensions:
           fn fn_(param: i32) -> i32 {
               return param;
           }
-          {{other_item.qualifier}} param = 0;
+          {{other_item.code}}
 
   - id: other_item
     cases:
       const_global:
-        qualifier: const
+        code: const param = 0;
       var_global:
-        qualifier: var
+        code: var param = 0;
+      fn:
+        code: fn param() -> i32 { return 0; }

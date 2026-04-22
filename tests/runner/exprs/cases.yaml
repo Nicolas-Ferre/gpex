@@ -29,6 +29,13 @@ dimensions:
               return {{expr.form}};
           }
           var _result = output; // expected: {{expr.value}}
+      repeat_fn_arg:
+        code: |
+          var result = {{expr.type_default}}; // expected: {{expr.value}}
+          repeat fn_({{expr.form}});
+          fn fn_(param: {{expr.type}}) {
+              result = param;
+          }
       fn_param_type:
         code: |
           {{result.item_type}} output = called_fn(123);
@@ -75,6 +82,11 @@ dimensions:
         value: "123u"
         type: "u32"
         type_default: "0u"
+      literal_i32:
+        form: "123"
+        value: "123"
+        type: "i32"
+        type_default: "0"
       type_native:
         form: "i32"
         value: "i32"
@@ -124,7 +136,7 @@ dimensions:
 
   - id: expr_arg
     cases:
-      typeref:
+      type_native:
         form: "i32"
       var_global:
         form: "param_var"
@@ -145,7 +157,7 @@ exclusions:
   - expr_location: [ fn_param_type, fn_return_type ]
     result: [ var ]
 
-  - expr_location: [ value_global ]
+  - expr_location: [ value_global, repeat_fn_arg ]
     expr: [ fn_param ]
 
   - expr_location: [ statement_assignment_left ]
@@ -165,7 +177,7 @@ exclusions:
   - expr_location: [ fn_param_type, fn_return_type ]
     expr: [ literal_bool, literal_f32, literal_i32, literal_u32, fn_param ]
 
-  - expr_location: [ value_global ]
+  - expr_location: [ value_global, repeat_fn_arg ]
     expr_arg: [ fn_param ]
 
   - result: [ const ]

@@ -21,3 +21,9 @@ dimensions:
         args: "123"
         is_fn1_called: "true"
         is_fn2_called: "false"
+      different_param_count:
+        fn1_param: "param: i32"
+        fn2_param: ""
+        args: "123"
+        is_fn1_called: "true"
+        is_fn2_called: "false"

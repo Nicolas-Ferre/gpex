@@ -19,13 +19,13 @@ async fn run_empty() -> Result<(), Error> {
 }
 
 #[tokio::test]
-async fn run_expr_locations() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/expr_locations")).await
+async fn run_expr_sources() -> Result<(), Error> {
+    run_test_folder(Path::new("tests/runner/expr_sources")).await
 }
 
 #[tokio::test]
-async fn run_expr_sources() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/expr_sources")).await
+async fn run_exprs() -> Result<(), Error> {
+    run_test_folder(Path::new("tests/runner/exprs")).await
 }
 
 #[tokio::test]

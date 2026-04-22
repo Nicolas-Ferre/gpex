@@ -59,6 +59,14 @@ dimensions:
               return {{expr.form}};
           }
         expected: "{{global.expr_value}}"
+      repeat_fn_arg:
+        code_before: "var output = {{global.default_value}};"
+        code_after: |
+          repeat called_fn({{expr.form}});
+          fn called_fn(param: typeref) {
+              _result = param;
+          }
+        expected: "{{global.expr_value}}"
       fn_param_type:
         code_before: |
           var output = called_fn({{global.value_from_expr_as_type}});
@@ -107,7 +115,7 @@ exclusions:
   - expr_location: [ const_global, fn_param_type, fn_return_type ]
     expr: [ var_global ]
 
-  - expr_location: [ var_global, const_global, fn_param_type, fn_return_type ]
+  - expr_location: [ var_global, const_global, repeat_fn_arg, fn_param_type, fn_return_type ]
     expr: [ fn_param ]
 
   - expr_location: [ statement_assignment_left ]
