@@ -16,7 +16,7 @@ const CASE_KEY_PLACEHOLDER: &str = "$$";
 pub(crate) enum Error {
     Io(io::Error),
     Regex(regex::Error),
-    Yaml(serde_yml::Error),
+    Yaml(serde_norway::Error),
     Gpex(Vec<Log>),
 }
 
@@ -46,7 +46,7 @@ pub(crate) fn generate_cases(path: &Path) -> Result<PathBuf, Error> {
         let test_dir = env::temp_dir().join(path);
         _ = fs::remove_dir_all(&test_dir);
         let cases_file = File::open(cases_file).map_err(Error::Io)?;
-        let cases: Cases = serde_yml::from_reader(cases_file).map_err(Error::Yaml)?;
+        let cases: Cases = serde_norway::from_reader(cases_file).map_err(Error::Yaml)?;
         let case_combinations = case_combinations(&cases)
             .filter(|combination| !is_case_combination_excluded(&cases, combination))
             .collect::<Vec<_>>();
