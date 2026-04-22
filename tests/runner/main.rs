@@ -13,60 +13,60 @@ use std::path::{Path, PathBuf};
 
 #[tokio::test]
 async fn run_empty() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/empty")).await
+    run_test_dir(Path::new("tests/runner/empty")).await
 }
 
 #[tokio::test]
 async fn run_expr_sources() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/expr_sources")).await
+    run_test_dir(Path::new("tests/runner/expr_sources")).await
 }
 
 #[tokio::test]
 async fn run_exprs() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/exprs")).await
+    run_test_dir(Path::new("tests/runner/exprs")).await
 }
 
 #[tokio::test]
 async fn run_fn_param_aliasing() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/fn_param_aliasing")).await
+    run_test_dir(Path::new("tests/runner/fn_param_aliasing")).await
 }
 
 #[tokio::test]
 async fn run_fn_aliasing() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/fn_aliasing")).await
+    run_test_dir(Path::new("tests/runner/fn_aliasing")).await
 }
 
 #[tokio::test]
 async fn run_imports() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/imports")).await
+    run_test_dir(Path::new("tests/runner/imports")).await
 }
 
 #[tokio::test]
 async fn run_import_priority() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/import_priority")).await
+    run_test_dir(Path::new("tests/runner/import_priority")).await
 }
 
 #[tokio::test]
 async fn run_literals() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/literals")).await
+    run_test_dir(Path::new("tests/runner/literals")).await
 }
 
 #[tokio::test]
 async fn run_prelude_types() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/prelude_types")).await
+    run_test_dir(Path::new("tests/runner/prelude_types")).await
 }
 
 #[tokio::test]
 async fn run_repeats() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/repeats")).await
+    run_test_dir(Path::new("tests/runner/repeats")).await
 }
 
 #[tokio::test]
 async fn run_syntax() -> Result<(), Error> {
-    run_test_folder(Path::new("tests/runner/syntax")).await
+    run_test_dir(Path::new("tests/runner/syntax")).await
 }
 
-async fn run_test_folder(path: &Path) -> Result<(), Error> {
+async fn run_test_dir(path: &Path) -> Result<(), Error> {
     let generated_dir = common::generate_cases(path)?;
     let (program, _) = gpex::compile_program(&generated_dir, false).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
@@ -88,7 +88,7 @@ fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Resu
             let dot_path = to_dot_path(&path, root_path);
             for capture in expected_regex.captures_iter(&code) {
                 let var_name = &capture[1];
-                let expected_value = &capture[2];
+                let expected_value = capture[2].trim();
                 let var_path = format!("{dot_path}:{var_name}");
                 let actual_value = runner.read_var(&var_path);
                 assert_eq!(

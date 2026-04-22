@@ -77,8 +77,8 @@ fn case_combinations(cases: &Cases) -> MultiProduct<IntoIter<DimensionCase>> {
 
 fn is_case_combination_excluded(cases: &Cases, combination: &[DimensionCase]) -> bool {
     for exclusion in &cases.exclusions {
-        if exclusion.iter().all(|(dimension, cases)| {
-            cases.contains(find_case_from_dimension(combination, dimension))
+        if exclusion.iter().all(|(dimension, case_names)| {
+            case_names.contains(find_case_from_dimension(combination, dimension))
         }) {
             return true;
         }
@@ -86,13 +86,13 @@ fn is_case_combination_excluded(cases: &Cases, combination: &[DimensionCase]) ->
     false
 }
 
-fn find_case_from_dimension<'a>(
-    combination: &'a [DimensionCase],
-    dimension: &String,
-) -> &'a String {
+fn find_case_from_dimension<'case>(
+    combination: &'case [DimensionCase],
+    dimension: &str,
+) -> &'case String {
     &combination
         .iter()
-        .find(|case| &case.dimension == dimension)
+        .find(|case| case.dimension == dimension)
         .unwrap_or_else(|| panic!("cases.yaml: '{dimension}' dimension not found"))
         .name
 }
@@ -119,7 +119,7 @@ fn generate_file(file_path: &Path, cases: &[Vec<DimensionCase>]) -> Result<(), E
         fs::copy(file_path, &output_path).map_err(Error::Io)?;
         return Ok(());
     }
-    let placeholder_regex = Regex::new(r"\{\{.*}}").map_err(Error::Regex)?;
+    let placeholder_regex = Regex::new(r"\{\{[^}]*}}").map_err(Error::Regex)?;
     for case in cases {
         let case_name = case.iter().map(|dimension| &dimension.name).join("__");
         let mut content = fs::read_to_string(file_path)
