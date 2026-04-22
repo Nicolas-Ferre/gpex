@@ -1,0 +1,15 @@
+# Test access to all types defined in prelude.
+
+dimensions:
+  - id: type
+    cases:
+      bool:
+        name: "bool"
+      f32:
+        name: "f32"
+      i32:
+        name: "i32"
+      u32:
+        name: "u32"
+      typeref:
+        name: "typeref"

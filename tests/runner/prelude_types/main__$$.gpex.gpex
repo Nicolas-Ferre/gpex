@@ -1,0 +1,1 @@
+var _result = {{type.name}}; // expected: {{type.name}}

@@ -1,0 +1,3 @@
+import ~.imported_direct__$$;
+
+{{source_location.inline_code}}
