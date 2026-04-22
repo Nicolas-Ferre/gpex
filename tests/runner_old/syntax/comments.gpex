@@ -1,3 +1,0 @@
-// head comment
-var _value = 0; // expected: 0
-// foot comment

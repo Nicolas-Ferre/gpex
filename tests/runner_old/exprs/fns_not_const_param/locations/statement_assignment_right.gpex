@@ -1,7 +1,0 @@
-var result = 0; // expected: 123
-
-repeat fn_(123);
-
-fn fn_(param: i32) {
-    result = param;
-}

@@ -60,11 +60,21 @@ dimensions:
 
   - id: expr
     cases:
-      literal:
-        form: "123"
-        value: "123"
-        type: "i32"
-        type_default: "0"
+      literal_bool:
+        form: "true"
+        value: "true"
+        type: "bool"
+        type_default: "false"
+      literal_f32:
+        form: "1.23"
+        value: "1.23"
+        type: "f32"
+        type_default: "0.0"
+      literal_u32:
+        form: "123u"
+        value: "123u"
+        type: "u32"
+        type_default: "0u"
       type_native:
         form: "i32"
         value: "i32"
@@ -114,7 +124,7 @@ dimensions:
 
   - id: expr_arg
     cases:
-      literal:
+      typeref:
         form: "i32"
       var_global:
         form: "param_var"
@@ -140,7 +150,10 @@ exclusions:
 
   - expr_location: [ statement_assignment_left ]
     expr:
-      - literal
+      - literal_bool
+      - literal_f32
+      - literal_i32
+      - literal_u32
       - type_native
       - const_global
       - fn_call_not_const_no_args
@@ -150,7 +163,7 @@ exclusions:
       - fn_param
 
   - expr_location: [ fn_param_type, fn_return_type ]
-    expr: [ literal, fn_param ]
+    expr: [ literal_bool, literal_f32, literal_i32, literal_u32, fn_param ]
 
   - expr_location: [ value_global ]
     expr_arg: [ fn_param ]

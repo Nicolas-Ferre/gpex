@@ -29,8 +29,23 @@ async fn run_expr_sources() -> Result<(), Error> {
 }
 
 #[tokio::test]
+async fn run_fn_param_aliasing() -> Result<(), Error> {
+    run_test_folder(Path::new("tests/runner/fn_param_aliasing")).await
+}
+
+#[tokio::test]
+async fn run_fn_aliasing() -> Result<(), Error> {
+    run_test_folder(Path::new("tests/runner/fn_aliasing")).await
+}
+
+#[tokio::test]
 async fn run_imports() -> Result<(), Error> {
     run_test_folder(Path::new("tests/runner/imports")).await
+}
+
+#[tokio::test]
+async fn run_import_priority() -> Result<(), Error> {
+    run_test_folder(Path::new("tests/runner/import_priority")).await
 }
 
 #[tokio::test]
@@ -41,6 +56,11 @@ async fn run_literals() -> Result<(), Error> {
 #[tokio::test]
 async fn run_prelude_types() -> Result<(), Error> {
     run_test_folder(Path::new("tests/runner/prelude_types")).await
+}
+
+#[tokio::test]
+async fn run_repeats() -> Result<(), Error> {
+    run_test_folder(Path::new("tests/runner/repeats")).await
 }
 
 #[tokio::test]

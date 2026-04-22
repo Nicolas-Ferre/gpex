@@ -1,9 +1,0 @@
-fn fn_(_param: i32) -> bool {
-    return true;
-}
-
-fn fn_(_param: bool) -> bool {
-    return false;
-}
-
-var _result = fn_(123); // expected: true

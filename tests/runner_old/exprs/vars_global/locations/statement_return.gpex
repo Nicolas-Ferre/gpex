@@ -1,7 +1,0 @@
-var var_ = 123;
-
-fn fn_() -> i32 {
-    return var_;
-}
-
-var _result = fn_(); // expected: 123

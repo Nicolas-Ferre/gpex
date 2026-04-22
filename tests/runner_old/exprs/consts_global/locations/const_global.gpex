@@ -1,3 +1,0 @@
-const CONSTANT = 123;
-const RESULT = CONSTANT;
-var _result = RESULT; // expected: 123

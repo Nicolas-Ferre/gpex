@@ -1,6 +1,0 @@
-const RESULT = called_fn(123, 456, 789);
-var _result = RESULT; // expected: 456
-
-const fn called_fn(param1: i32, param2: i32, param3: i32) -> i32 {
-    return param2;
-}

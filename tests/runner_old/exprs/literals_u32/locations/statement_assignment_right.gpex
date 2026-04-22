@@ -1,7 +1,0 @@
-var result = 0u; // expected: 123u
-
-fn execute() {
-	result = 123u;
-}
-
-repeat execute();

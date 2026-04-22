@@ -1,7 +1,0 @@
-var result = false; // expected: true
-
-fn execute() {
-	result = true;
-}
-
-repeat execute();

@@ -1,0 +1,23 @@
+# Test aliasing of function names.
+
+dimensions:
+  - id: config
+    cases:
+      no_param:
+        fn1_param: ""
+        fn2_param: ""
+        args: ""
+        is_fn1_called: "false"
+        is_fn2_called: "true"
+      same_param_type:
+        fn1_param: "param: i32"
+        fn2_param: "param: i32"
+        args: "123"
+        is_fn1_called: "false"
+        is_fn2_called: "true"
+      different_param_type:
+        fn1_param: "param: i32"
+        fn2_param: "param: bool"
+        args: "123"
+        is_fn1_called: "true"
+        is_fn2_called: "false"

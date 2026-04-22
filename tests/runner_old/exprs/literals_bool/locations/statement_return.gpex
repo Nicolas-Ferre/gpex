@@ -1,5 +1,0 @@
-fn fn_() -> bool {
-    return true;
-}
-
-var _result = fn_();  // expected: true
