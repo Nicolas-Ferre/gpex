@@ -1,6 +1,0 @@
-const CONSTANT = i32;
-var _result = fn_(123); // expected: 123
-
-fn fn_(param: CONSTANT) -> i32 {
-    return param;
-}

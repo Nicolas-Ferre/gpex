@@ -1,5 +1,0 @@
-var _result = fn_(123u);  // expected: 123u
-
-fn fn_(param: u32) -> u32 {
-    return param;
-}

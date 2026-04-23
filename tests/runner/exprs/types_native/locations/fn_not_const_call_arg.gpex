@@ -1,5 +1,0 @@
-var _result = fn_(i32);  // expected: i32
-
-fn fn_(param: typeref) -> typeref {
-    return param;
-}

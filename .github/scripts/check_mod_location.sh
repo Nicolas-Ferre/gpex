@@ -11,6 +11,10 @@ is_comment() {
     [[ $line =~ ^[[:space:]]*// ]]
 }
 
+is_attribute() {
+    [[ $line =~ ^# ]]
+}
+
 is_empty_line() {
     [[ $line =~ ^[[:space:]]*$ ]]
 }
@@ -21,7 +25,7 @@ while read -r -d '' file; do
     line_number=0
     while IFS= read -r line; do
         line_number=$((line_number + 1))
-        if ! is_mod_statement && ! is_comment && ! is_empty_line; then
+        if ! is_mod_statement && ! is_comment && ! is_empty_line && ! is_attribute; then
             is_not_mod_item_found=true
         elif is_mod_statement && [[ $is_not_mod_item_found == true ]]; then
             echo "$file:$line_number: inline mod statements should be at the top of the file"

@@ -1,7 +1,0 @@
-const CONSTANT = 123;
-
-fn fn_() -> i32 {
-    return CONSTANT;
-}
-
-var _result = fn_(); // expected: 123

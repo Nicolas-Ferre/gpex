@@ -1,8 +1,0 @@
-const VALUE = 123;
-var result = 0; // expected: 123
-
-fn execute() {
-	result = VALUE;
-}
-
-repeat execute();

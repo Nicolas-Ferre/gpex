@@ -1,0 +1,26 @@
+# Test aliasing of parameter names.
+
+dimensions:
+  - id: other_item_location
+    cases:
+      before:
+        code: |
+          {{other_item.code}}
+          fn fn_(param: i32) -> i32 {
+              return param;
+          }
+      after:
+        code: |
+          fn fn_(param: i32) -> i32 {
+              return param;
+          }
+          {{other_item.code}}
+
+  - id: other_item
+    cases:
+      const_global:
+        code: const param = 0;
+      var_global:
+        code: var param = 0;
+      fn:
+        code: fn param() -> i32 { return 0; }

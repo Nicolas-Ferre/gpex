@@ -1,2 +1,0 @@
-const CONSTANT = 123.456;
-var _result = CONSTANT; // expected: 123.456

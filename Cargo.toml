@@ -25,6 +25,7 @@ wgpu = "29"
 
 [dev-dependencies]
 regex = "1"
+serde_norway = "0.9"
 
 [lints.rust]
 anonymous_parameters = "warn"

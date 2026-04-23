@@ -1,0 +1,148 @@
+# Test expressions with all possible source items placed at all possible locations.
+
+dimensions:
+  - id: source_location
+    cases:
+      after_expr:
+        imported_indirect_code: ""
+        imported_direct_code: ""
+        inline_code: |
+          {{expr_location.code_before}}
+          var _result = output; // expected: {{expr_location.expected}}
+          {{expr_location.code_after}}
+          {{expr.source}}
+      before_expr:
+        imported_indirect_code: ""
+        imported_direct_code: ""
+        inline_code: |
+          {{expr.source}}
+          {{expr_location.code_before}}
+          var _result = output; // expected: {{expr_location.expected}}
+          {{expr_location.code_after}}
+      imported_direct:
+        imported_indirect_code: ""
+        imported_direct_code: "{{expr.source}}"
+        inline_code: |
+          {{expr_location.code_before}}
+          var _result = output; // expected: {{expr_location.expected}}
+          {{expr_location.code_after}}
+      imported_indirect:
+        imported_indirect_code: "{{expr.source}}"
+        imported_direct_code: ""
+        inline_code: |
+          {{expr_location.code_before}}
+          var _result = output; // expected: {{expr_location.expected}}
+          {{expr_location.code_after}}
+
+  - id: expr_location
+    cases:
+      var_global:
+        code_before: "var output = {{expr.form}};"
+        code_after: ""
+        expected: "{{global.expr_value}}"
+      const_global:
+        code_before: "const output = {{expr.form}};"
+        code_after: ""
+        expected: "{{global.expr_value}}"
+      statement_assignment_left:
+        code_before: |
+          var output = called_fn({{global.default_value}});
+          fn called_fn(param: typeref) -> typeref {
+              {{expr.form}} = {{global.default_value}};
+              return {{expr.form}};
+          }
+        code_after: ""
+        expected: "{{global.default_value}}"
+      statement_assignment_right:
+        code_before: "var output = {{global.default_value}};"
+        code_after: |
+          repeat called_fn({{global.expr_value}});
+          fn called_fn(param: typeref) {
+              _result = {{expr.form}};
+          }
+        expected: "{{global.expr_value}}"
+      statement_return:
+        code_before: |
+          var output = called_fn({{global.expr_value}});
+          fn called_fn(param: typeref) -> typeref {
+              return {{expr.form}};
+          }
+        code_after: ""
+        expected: "{{global.expr_value}}"
+      repeat_fn_arg:
+        code_before: "var output = {{global.default_value}};"
+        code_after: |
+          repeat called_fn({{expr.form}});
+          fn called_fn(param: typeref) {
+              _result = param;
+          }
+        expected: "{{global.expr_value}}"
+      fn_param_type:
+        code_before: |
+          var output = called_fn({{global.value_from_expr_as_type}});
+          fn called_fn(param: {{expr.form}}) -> {{global.expr_value}} {
+              return param;
+          }
+        code_after: ""
+        expected: "{{global.value_from_expr_as_type}}"
+      fn_return_type:
+        code_before: |
+          var output = called_fn({{global.value_from_expr_as_type}});
+          fn called_fn(param: {{global.expr_value}}) -> {{expr.form}} {
+              return param;
+          }
+        code_after: ""
+        expected: "{{global.value_from_expr_as_type}}"
+
+  - id: expr
+    cases:
+      var_global:
+        form: "var_"
+        source: "pub var var_ = {{global.expr_value}};"
+      const_global:
+        form: "CONST"
+        source: "pub const CONST = {{global.expr_value}};"
+      fn_call_no_args:
+        form: "fn_()"
+        source: "pub const fn fn_() -> typeref { return {{global.expr_value}}; }"
+      fn_call_args:
+        form: "fn_(arg_fn())"
+        source: |
+          pub const fn arg_fn() -> typeref { return {{global.expr_value}}; }
+          pub const fn fn_(param: typeref) -> typeref { return param; }
+      fn_param:
+        form: "param"
+        source: ""
+
+  - id: global
+    cases:
+      default:
+        default_value: "bool"
+        expr_value: "i32"
+        value_from_expr_as_type: "123"
+
+exclusions:
+  - source_location: [ after_expr ]
+    expr: [ var_global, const_global, fn_param ]
+
+  - expr_location: [ const_global, fn_param_type, fn_return_type ]
+    expr: [ var_global ]
+
+  - expr_location: [ var_global, const_global, repeat_fn_arg, fn_param_type, fn_return_type ]
+    expr: [ fn_param ]
+
+  - expr_location: [ statement_assignment_left ]
+    expr: [ const_global, fn_call_no_args, fn_call_args, fn_param ]
+
+  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/106)
+  - source_location: [ after_expr ]
+    expr_location: [ fn_param_type ]
+    expr: [ fn_call_no_args ]
+
+  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/106)
+  - expr_location: [ fn_param_type ]
+    expr: [ fn_call_args ]
+
+  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/106)
+  - expr_location: [ fn_return_type ]
+    expr: [ fn_call_args ]
