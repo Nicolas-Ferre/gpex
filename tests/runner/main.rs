@@ -76,7 +76,7 @@ async fn run_test_dir(path: &Path) -> Result<(), Error> {
 }
 
 fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Result<(), Error> {
-    let expected_regex = Regex::new(r"var *(\w+) *=.*// expected: *(.+)").map_err(Error::Regex)?;
+    let expected_regex = Regex::new(r"var +(\w+) *=.*// expected: *(.+)").map_err(Error::Regex)?;
     for entry in dir_path.read_dir().map_err(Error::Io)? {
         let entry = entry.map_err(Error::Io)?;
         let path = entry.path();

@@ -57,7 +57,7 @@ dimensions:
         code_before: "var output = {{global.default_value}};"
         code_after: |
           repeat called_fn({{global.expr_value}});
-          fn called_fn(param: typeref) { 
+          fn called_fn(param: typeref) {
               _result = {{expr.form}};
           }
         expected: "{{global.expr_value}}"

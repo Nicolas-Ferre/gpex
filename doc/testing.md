@@ -25,17 +25,34 @@ The harness scans for `// expected: <value>` and asserts that the value stored o
 
 Tests are organized in folders, each containing either:
 
-- **Simple tests**: a static test folder with `.gpex` files (e.g., `syntax/`).
-- **Parametric tests**: a `cases.yaml` file defining test dimensions, plus `.gpex` template files.
+- Simple tests: a static test folder with `.gpex` files (e.g., `syntax/`).
+- Parametric tests: a `cases.yaml` file defining test dimensions, plus `.gpex` template files.
 
-The `.gpex` files of the parametric tests support the following placeholders:
+The parametric tests support the following placeholders:
 
-- `$$` in filenames: replaced by the unique name of the generated test.
+- `$$` in filenames and `.gpex`file content: replaced by the unique name of the generated test.
 - `{{dimension.key}}` in `.gpex` file content: replaced by a property of the generated case defined
   in `cases.yaml`.
 
 The test harness generates concrete test cases by taking the Cartesian product of all dimension
 cases and substituting placeholders.
+
+`cases.yaml` schema is the following:
+
+```yaml
+dimensions: # dimensions are applied in order for the replacement of placeholders 
+  - id: <dimension name>
+    cases:
+      <case name>:
+        <key1>: <value1> # {{<dimension name>.<key1>}} will be replaced by <value1> in .gpex files
+        ...
+  - ...
+
+exclusions:
+  # Don't generate tests for (<case A> OR <case B>) AND <case C>
+  - <dimension X>: [ "<case A>", "<case B>" ]
+    <dimension Y>: [ "<case C>" ]
+```
 
 ## Diagnostic snapshot tests (`tests/logs/`)
 

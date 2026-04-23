@@ -40,11 +40,13 @@ struct DimensionCase {
 }
 
 pub(crate) fn generate_cases(path: &Path) -> Result<PathBuf, Error> {
-    let cases_file = path.join("cases.yaml");
-    if cases_file.exists() {
+    let cases_path = path.join("cases.yaml");
+    if cases_path.exists() {
         let test_dir = env::temp_dir().join(path);
-        _ = fs::remove_dir_all(&test_dir);
-        let cases_file = File::open(cases_file).map_err(Error::Io)?;
+        if test_dir.exists() {
+            fs::remove_dir_all(&test_dir).map_err(Error::Io)?;
+        }
+        let cases_file = File::open(cases_path).map_err(Error::Io)?;
         let cases: Cases = serde_norway::from_reader(cases_file).map_err(Error::Yaml)?;
         let case_combinations = case_combinations(&cases)
             .filter(|combination| !is_case_combination_excluded(&cases, combination))
@@ -118,21 +120,20 @@ fn generate_file(file_path: &Path, cases: &[Vec<DimensionCase>]) -> Result<(), E
         fs::copy(file_path, &output_path).map_err(Error::Io)?;
         return Ok(());
     }
+    let content = fs::read_to_string(file_path).map_err(Error::Io)?;
     for case in cases {
         let case_name = case.iter().map(|dimension| &dimension.name).join("__");
-        let mut content = fs::read_to_string(file_path)
-            .map_err(Error::Io)?
-            .replace(CASE_KEY_PLACEHOLDER, &case_name);
+        let mut generated_content = content.replace(CASE_KEY_PLACEHOLDER, &case_name);
         for dimension in case {
             for (key, value) in &dimension.key_values {
-                content =
-                    content.replace(&format!("{{{{{}.{}}}}}", dimension.dimension, key), value);
+                generated_content = generated_content
+                    .replace(&format!("{{{{{}.{}}}}}", dimension.dimension, key), value);
             }
         }
         let output_path =
             env::temp_dir().join(replace_in_path(file_path, CASE_KEY_PLACEHOLDER, &case_name));
         fs::create_dir_all(path_parent(&output_path)).map_err(Error::Io)?;
-        fs::write(&output_path, &content).map_err(Error::Io)?;
+        fs::write(&output_path, &generated_content).map_err(Error::Io)?;
     }
     Ok(())
 }
