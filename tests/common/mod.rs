@@ -1,6 +1,5 @@
 use gpex::Log;
 use itertools::{Itertools, MultiProduct};
-use regex::Regex;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::ffi::OsStr;
@@ -119,7 +118,6 @@ fn generate_file(file_path: &Path, cases: &[Vec<DimensionCase>]) -> Result<(), E
         fs::copy(file_path, &output_path).map_err(Error::Io)?;
         return Ok(());
     }
-    let placeholder_regex = Regex::new(r"\{\{[^}]*}}").map_err(Error::Regex)?;
     for case in cases {
         let case_name = case.iter().map(|dimension| &dimension.name).join("__");
         let mut content = fs::read_to_string(file_path)
@@ -133,7 +131,6 @@ fn generate_file(file_path: &Path, cases: &[Vec<DimensionCase>]) -> Result<(), E
         }
         let output_path =
             env::temp_dir().join(replace_in_path(file_path, CASE_KEY_PLACEHOLDER, &case_name));
-        content = placeholder_regex.replace_all(&content, "").to_string();
         fs::create_dir_all(path_parent(&output_path)).map_err(Error::Io)?;
         fs::write(&output_path, &content).map_err(Error::Io)?;
     }

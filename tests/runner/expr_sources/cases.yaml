@@ -4,18 +4,23 @@ dimensions:
   - id: source_location
     cases:
       after_expr:
+        imported_indirect_code: ""
+        imported_direct_code: ""
         inline_code: |
           {{expr_location.code_before}}
           var _result = output; // expected: {{expr_location.expected}}
           {{expr_location.code_after}}
           {{expr.source}}
       before_expr:
+        imported_indirect_code: ""
+        imported_direct_code: ""
         inline_code: |
           {{expr.source}}
           {{expr_location.code_before}}
           var _result = output; // expected: {{expr_location.expected}}
           {{expr_location.code_after}}
       imported_direct:
+        imported_indirect_code: ""
         imported_direct_code: "{{expr.source}}"
         inline_code: |
           {{expr_location.code_before}}
@@ -23,6 +28,7 @@ dimensions:
           {{expr_location.code_after}}
       imported_indirect:
         imported_indirect_code: "{{expr.source}}"
+        imported_direct_code: ""
         inline_code: |
           {{expr_location.code_before}}
           var _result = output; // expected: {{expr_location.expected}}
@@ -32,9 +38,11 @@ dimensions:
     cases:
       var_global:
         code_before: "var output = {{expr.form}};"
+        code_after: ""
         expected: "{{global.expr_value}}"
       const_global:
         code_before: "const output = {{expr.form}};"
+        code_after: ""
         expected: "{{global.expr_value}}"
       statement_assignment_left:
         code_before: |
@@ -43,6 +51,7 @@ dimensions:
               {{expr.form}} = {{global.expr_value}};
               return {{expr.form}};
           }
+        code_after: ""
         expected: "{{global.expr_value}}"
       statement_assignment_right:
         code_before: "var output = {{global.default_value}};"
@@ -58,6 +67,7 @@ dimensions:
           fn called_fn(param: typeref) -> typeref {
               return {{expr.form}};
           }
+        code_after: ""
         expected: "{{global.expr_value}}"
       repeat_fn_arg:
         code_before: "var output = {{global.default_value}};"
@@ -73,6 +83,7 @@ dimensions:
           fn called_fn(param: {{expr.form}}) -> {{global.expr_value}} {
               return param;
           }
+        code_after: ""
         expected: "{{global.value_from_expr_as_type}}"
       fn_return_type:
         code_before: |
@@ -80,6 +91,7 @@ dimensions:
           fn called_fn(param: {{global.expr_value}}) -> {{expr.form}} {
               return param;
           }
+        code_after: ""
         expected: "{{global.value_from_expr_as_type}}"
 
   - id: expr
@@ -100,6 +112,7 @@ dimensions:
           pub const fn fn_(param: typeref) -> typeref { return param; }
       fn_param:
         form: "param"
+        source: ""
 
   - id: global
     cases:

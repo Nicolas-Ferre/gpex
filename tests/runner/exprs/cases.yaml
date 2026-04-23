@@ -72,26 +72,31 @@ dimensions:
         value: "true"
         type: "bool"
         type_default: "false"
+        source: ""
       literal_f32:
         form: "1.23"
         value: "1.23"
         type: "f32"
         type_default: "0.0"
+        source: ""
       literal_u32:
         form: "123u"
         value: "123u"
         type: "u32"
         type_default: "0u"
+        source: ""
       literal_i32:
         form: "123"
         value: "123"
         type: "i32"
         type_default: "0"
+        source: ""
       type_native:
         form: "i32"
         value: "i32"
         type: "typeref"
         type_default: "bool"
+        source: ""
       var_global:
         form: "var_"
         value: "i32"
@@ -133,11 +138,13 @@ dimensions:
         value: "i32"
         type: "typeref"
         type_default: "bool"
+        source: ""
 
   - id: expr_arg
     cases:
       type_native:
         form: "i32"
+        source: ""
       var_global:
         form: "param_var"
         source: "var param_var = i32;"
@@ -152,6 +159,7 @@ dimensions:
         source: "const fn param_fn() -> typeref { return i32; }"
       fn_param:
         form: "param"
+        source: ""
 
 exclusions:
   - expr_location: [ fn_param_type, fn_return_type ]
