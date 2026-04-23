@@ -48,11 +48,11 @@ dimensions:
         code_before: |
           var output = called_fn({{global.default_value}});
           fn called_fn(param: typeref) -> typeref {
-              {{expr.form}} = {{global.expr_value}};
+              {{expr.form}} = {{global.default_value}};
               return {{expr.form}};
           }
         code_after: ""
-        expected: "{{global.expr_value}}"
+        expected: "{{global.default_value}}"
       statement_assignment_right:
         code_before: "var output = {{global.default_value}};"
         code_after: |

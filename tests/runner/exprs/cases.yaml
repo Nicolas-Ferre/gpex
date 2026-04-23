@@ -11,10 +11,10 @@ dimensions:
         code: |
           {{result.item_type}} output = called_fn({{expr.type_default}});
           fn called_fn(param: {{expr.type}}) -> {{expr.type}} {
-              {{expr.form}} = {{expr.value}};
+              {{expr.form}} = {{expr.type_default}};
               return {{expr.form}};
           }
-          var _result = output; // expected: {{expr.value}}
+          var _result = output; // expected: {{expr.type_default}}
       statement_assignment_right:
         code: |
           var result = {{expr.type_default}}; // expected: {{expr.value}}

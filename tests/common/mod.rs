@@ -114,8 +114,10 @@ fn generate_dir(current_path: &Path, cases: &[Vec<DimensionCase>]) -> Result<(),
 
 fn generate_file(file_path: &Path, cases: &[Vec<DimensionCase>]) -> Result<(), Error> {
     if !is_path_containing(file_path, CASE_KEY_PLACEHOLDER) {
+        // A file containing a placeholder should have a $$ placeholder in its path.
+        // If not, an error will be triggered as the placeholders will not be replaced.
+        // This helps to avoid case files being unexpectedly erased by another case.
         let output_path = env::temp_dir().join(file_path);
-        // Helps to detect missing case placeholder in case the file includes key placeholders.
         fs::create_dir_all(path_parent(&output_path)).map_err(Error::Io)?;
         fs::copy(file_path, &output_path).map_err(Error::Io)?;
         return Ok(());
