@@ -1,9 +1,0 @@
-import ~.imported2;
-
-pub fn fn1() -> cyclic1 {
-    return 0;
-}
-
-pub fn fn2() -> cyclic2 {
-    return 0;
-}

@@ -1,0 +1,28 @@
+# Test usage of non-const expressions in const contexts.
+
+dimensions:
+  - id: const_expr_location
+    cases:
+      const_global:
+        code: "const _RESULT = {{non_const_item.ref}};"
+      statement_assignment_left:
+        code: "const fn _result() { {{non_const_item.ref}} = 123; }"
+      statement_assignment_right:
+        code: "const fn _result() { value = {{non_const_item.ref}}; }"
+      statement_return:
+        code: "const fn _result() -> i32 { return {{non_const_item.ref}}; }"
+      call_arg:
+        code: "const _RESULT = fn_({{non_const_item.ref}});"
+      fn_param_type:
+        code: "fn _result(_param: {{non_const_item.ref}}) -> i32 { return 123; }"
+      fn_return_type:
+        code: "fn _result() -> {{non_const_item.ref}} { return 123; }"
+
+  - id: non_const_item
+    cases:
+      var_global:
+        code: "var var_ = 123;"
+        ref: "var_"
+      fn:
+        code: "fn fn_() -> i32 { return 123; }"
+        ref: "fn_()"

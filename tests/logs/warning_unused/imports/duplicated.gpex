@@ -1,4 +1,0 @@
-import ~.imported;
-import ~.imported;
-
-const _IMPORTED = IMPORTED;

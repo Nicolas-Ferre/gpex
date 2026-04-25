@@ -1,7 +1,0 @@
-const fn called_fn() -> 0 {
-    return 123;
-}
-
-fn _fn(_param: called_fn()) -> i32 {
-    return 0;
-}

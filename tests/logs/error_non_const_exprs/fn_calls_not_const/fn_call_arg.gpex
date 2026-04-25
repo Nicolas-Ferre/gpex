@@ -1,5 +1,0 @@
-fn called_fn() -> i32 {
-    return 123;
-}
-
-const _RESULT = fn_(called_fn());

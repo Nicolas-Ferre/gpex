@@ -1,0 +1,41 @@
+# Test circular expression with all expression locations.
+
+dimensions:
+  - id: cycle_location
+    cases:
+      const_global:
+        item1: "pub const CONST1 = cyclic1;"
+        item1_ref: "CONST1"
+        item2: "pub const CONST2 = cyclic2;"
+        item2_ref: "CONST2"
+      var_global:
+        item1: "pub var var1 = cyclic1;"
+        item1_ref: "var1"
+        item2: "pub var var2 = cyclic2;"
+        item2_ref: "var2"
+      statement_assignment_left:
+        item1: "pub fn fn1() -> i32 { cyclic1 = 0; return true; }"
+        item1_ref: "fn1()"
+        item2: "pub fn fn2() -> i32 { cyclic2 = 0; return true; }"
+        item2_ref: "fn2()"
+      statement_assignment_right:
+        item1: "pub fn fn1() -> i32 { var_ = cyclic1; return true; }"
+        item1_ref: "fn1()"
+        item2: "pub fn fn2() -> i32 { var_ = cyclic2; return 0; }"
+        item2_ref: "fn2()"
+      statement_return:
+        item1: "pub fn fn1() -> i32 { return cyclic1; }"
+        item1_ref: "fn1()"
+        item2: "pub fn fn2() -> i32 { return cyclic2; }"
+        item2_ref: "fn2()"
+      call_arg:
+        item1: "pub var var1 = called(cyclic1);"
+        item1_ref: "var1"
+        item2: "pub var var2 = called(cyclic2);"
+        item2_ref: "var2"
+      fn_return_type:
+        item1: "pub fn fn1() -> cyclic1 { return 0; }"
+        item1_ref: "fn1()"
+        item2: "pub fn fn2() -> cyclic2 { return 0; }"
+        item2_ref: "fn2()"
+      # fn_param_type and repeat_fn_arg case are not defined as they never create circular dependencies.

@@ -1,0 +1,3 @@
+warning: `C` identifier is single character (at <root>/main__const_global.gpex:1:11)
+warning: `f` identifier is single character (at <root>/main__fn.gpex:1:8)
+warning: `v` identifier is single character (at <root>/main__var_global.gpex:1:9)

@@ -1,3 +1,0 @@
-fn _fn(_param: 0) -> i32 {
-    return 123;
-}

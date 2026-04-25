@@ -1,0 +1,65 @@
+# Test not found expression sources while the item is defined in the same file before.
+
+dimensions:
+  - id: expr_location
+    cases:
+      const_global:
+        code: "const _RESULT = {{expr.form}};"
+      var_global:
+        code: "var _result = {{expr.form}};"
+      statement_assignment_left:
+        code: |
+          fn _fn() {
+              {{expr.form}} = 123;
+          }
+      statement_assignment_right:
+        code: |
+          var result = 0;
+          fn _fn() {
+              result = {{expr.form}};
+          }
+      statement_return:
+        code: |
+          fn _fn() -> i32 {
+              return {{expr.form}};
+          }
+      repeat_fn_arg:
+        code: "repeat fn_({{expr.form}});"
+        code_unique_name: "repeat fn_({{expr.form_unique_name}});"
+      fn_param_type:
+        code: |
+          fn _fn(_param: {{expr.form}}) -> i32 {
+              return 123;
+          }
+      fn_return_type:
+        # function is `const` to increase test coverage
+        code: |
+          const fn fn_(_param: i32) -> {{expr.form}} {
+              return 123;
+          }
+          const _USAGE = fn_(0);
+
+  - id: expr
+    cases:
+      fn_call_with_mismatching_param_count:
+        form: "_called_fn()"
+        source: "fn _called_fn(param: i32) -> i32 { return param; }"
+      fn_call_with_mismatching_param_type:
+        form: "_called_fn(123u)"
+        source: "fn _called_fn(param: i32) -> i32 { return param; }"
+      fn_param_external:
+        form: "other_param"
+        source: "pub fn _other_fn(other_param: i32) -> i32 { return other_param; }"
+        assign_itself: ""
+
+exclusions:
+  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/115)
+  - expr_location:
+      - const_global
+      - var_global
+      - statement_assignment_left
+      - statement_assignment_right
+      - statement_return
+      - fn_param_type
+      - fn_return_type
+    expr: [ fn_param_external ]

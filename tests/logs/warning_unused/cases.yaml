@@ -1,0 +1,17 @@
+# Test unused items.
+
+dimensions:
+  - id: item
+    cases:
+      import_self:
+        code: "import priv_items__$$;"
+      import_unused:
+        code: "import unused;"
+      import_duplicated_used:
+        code: "import used; import used; var _result = IMPORTED;"
+      const_global:
+        code: "const CONST = 0;"
+      var_global:
+        code: "var var_ = 0;"
+      fn:
+        code: "fn fn_() -> i32 { return 0; }"

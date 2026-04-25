@@ -1,5 +1,0 @@
-fn _fn(_param: _after) -> i32 {
-    return 0;
-}
-
-var _after = i32;

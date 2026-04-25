@@ -1,0 +1,9 @@
+# Test not found sources because they are the parent of the expression locations.
+
+dimensions:
+  - id: item
+    cases:
+      const_global:
+        code: "const _ITSELF = _ITSELF;"
+      var_global:
+        code: "var _itself = _itself;"

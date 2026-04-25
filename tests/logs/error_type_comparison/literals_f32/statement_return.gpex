@@ -1,3 +1,0 @@
-fn _fn() -> bool {
-    return 123.456;
-}

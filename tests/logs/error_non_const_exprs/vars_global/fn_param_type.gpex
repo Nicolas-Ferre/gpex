@@ -1,5 +1,0 @@
-var var_ = i32;
-
-fn _fn(_param: var_) -> i32 {
-    return 123;
-}

@@ -1,0 +1,37 @@
+# Test expressions that are not valid references.
+
+dimensions:
+  - id: expr_location
+    cases:
+      statement_assignment_left:
+        code: |
+          fn _fn(_param: i32) {
+              {{expr.form}} = {{expr.form}};
+          }
+
+  - id: expr
+    cases:
+      literal_bool_false:
+        form: "false"
+        source: ""
+      literal_bool_true:
+        form: "true"
+        source: ""
+      literal_f32:
+        form: "0.0"
+        source: ""
+      literal_i32:
+        form: "0"
+        source: ""
+      literal_u32:
+        form: "0u"
+        source: ""
+      const_global:
+        form: "CONST"
+        source: "const CONST = 123;"
+      fn_call:
+        form: "fn_()"
+        source: "fn fn_() -> i32 { return 0; }"
+      fn_param:
+        form: "_param"
+        source: ""

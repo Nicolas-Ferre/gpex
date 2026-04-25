@@ -1,6 +1,0 @@
-const CONST = 0;
-
-fn _fn() -> bool {
-    CONST = 1;
-    return true;
-}

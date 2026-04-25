@@ -1,6 +1,0 @@
-const ExpectedType = u32;
-const CONST = 123;
-
-fn _fn() -> ExpectedType {
-    return CONST;
-}

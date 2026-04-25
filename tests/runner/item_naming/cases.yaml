@@ -1,0 +1,52 @@
+# Test incorrect case for item naming.
+
+dimensions:
+  - id: item
+    cases:
+      import:
+        code: "pub import {{case.name}}.{{case.name}};"
+      const_global_non_typeref:
+        code: "const {{case.name}} = 0;"
+      const_global_typeref:
+        code: "const {{case.name}} = i32;"
+      var_global:
+        code: "var {{case.name}} = 0;"
+      fn_no_return:
+        code: "var value = 0; fn {{case.name}}() { value = 0; }"
+      fn_non_typeref:
+        code: "fn {{case.name}}() -> i32 { return 0; }"
+      fn_typeref:
+        code: "fn {{case.name}}() -> typeref { return i32; }"
+
+  - id: case
+    cases:
+      screaming_snake_case:
+        name: "_SCREAMING_SNAKE_CASE"
+      snake_case:
+        name: "_snake_case"
+      camel_case:
+        name: "_camelCase"
+      pascal_case:
+        name: "_PascalCase"
+
+exclusions:
+  - item: [ import ]
+    case: [ screaming_snake_case, camel_case, pascal_case ]
+
+  - item: [ const_global_non_typeref ]
+    case: [ snake_case, camel_case, pascal_case ]
+
+  - item: [ const_global_typeref ]
+    case: [ snake_case, camel_case ]
+
+  - item: [ var_global ]
+    case: [ screaming_snake_case, camel_case, pascal_case ]
+
+  - item: [ fn_no_return ]
+    case: [ screaming_snake_case, camel_case, pascal_case ]
+
+  - item: [ fn_non_typeref ]
+    case: [ screaming_snake_case, camel_case, pascal_case ]
+
+  - item: [ fn_typeref ]
+    case: [ screaming_snake_case, camel_case ]

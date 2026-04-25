@@ -1,4 +1,0 @@
-// public items shouldn't be considered as unused
-pub fn fn_() -> i32 {
-    return 0;
-}

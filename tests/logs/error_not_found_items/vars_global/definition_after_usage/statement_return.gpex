@@ -1,5 +1,0 @@
-fn _fn() -> i32 {
-    return _after;
-}
-
-var _after = 0;

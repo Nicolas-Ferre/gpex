@@ -1,0 +1,4 @@
+import ~.imported1__$$;
+
+pub var cyclic1 = {{cycle_location.item2_ref}};
+pub var cyclic2 = {{cycle_location.item1_ref}};

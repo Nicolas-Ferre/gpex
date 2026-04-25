@@ -1,0 +1,2 @@
+// The test is not parametrized to avoid having dynamic paths in expected logs.
+import ~.~.~.~.~.imported;

@@ -1,4 +1,4 @@
-# Test all possible forms of imports
+# Test all forms of imports
 
 dimensions:
   - id: import
