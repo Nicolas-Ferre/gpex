@@ -1,4 +1,4 @@
-# Test incorrect case for item naming.
+# Test incorrect case for used item with leading underscore.
 
 dimensions:
   - id: item

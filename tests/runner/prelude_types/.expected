@@ -1,0 +1,42 @@
+// INIT SHADER
+
+struct Buffer {
+    v5_: vec2<u32>,
+    v7_: vec2<u32>,
+    v9_: vec2<u32>,
+    v11_: vec2<u32>,
+    v13_: vec2<u32>,
+}
+
+@group(0) @binding(0) 
+var<storage, read_write> b: Buffer;
+
+@compute @workgroup_size(1, 1, 1) 
+fn main() {
+    b.v13_ = vec2<u32>(0u, 2u);
+    b.v11_ = vec2<u32>(0u, 0u);
+    b.v9_ = vec2<u32>(0u, 1u);
+    b.v7_ = vec2<u32>(0u, 3u);
+    b.v5_ = vec2<u32>(0u, 4u);
+    return;
+}
+
+
+// UPDATE SHADER
+
+struct Buffer {
+    v5_: vec2<u32>,
+    v7_: vec2<u32>,
+    v9_: vec2<u32>,
+    v11_: vec2<u32>,
+    v13_: vec2<u32>,
+}
+
+@group(0) @binding(0) 
+var<storage, read_write> b: Buffer;
+
+@compute @workgroup_size(1, 1, 1) 
+fn main() {
+    return;
+}
+

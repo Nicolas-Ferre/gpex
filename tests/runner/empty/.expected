@@ -1,0 +1,15 @@
+// INIT SHADER
+
+@compute @workgroup_size(1, 1, 1) 
+fn main() {
+    return;
+}
+
+
+// UPDATE SHADER
+
+@compute @workgroup_size(1, 1, 1) 
+fn main() {
+    return;
+}
+

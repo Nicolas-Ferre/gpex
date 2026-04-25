@@ -17,6 +17,7 @@ pub(crate) enum Error {
     Regex(regex::Error),
     Yaml(serde_norway::Error),
     Gpex(Vec<Log>),
+    Other(Box<dyn std::error::Error>),
 }
 
 #[derive(Debug, Deserialize)]

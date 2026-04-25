@@ -1,0 +1,56 @@
+# Test `const` optimizations at transpilation time.
+
+dimensions:
+  - id: expr_location
+    cases:
+      var_global:
+        code: |
+          var var_ = {{expr.form}};
+          var _result = var_; // expected: {{expr.expected}}
+      const_global:
+        code: |
+          const RESULT = {{expr.form}};
+          var _result = RESULT; // expected: {{expr.expected}}
+      statement_assignment_right:
+        code: |
+          var result = 0; // expected: {{expr.expected}}
+          repeat called_fn();
+          fn called_fn() {
+              result = {{expr.form}};
+          }
+      statement_return:
+        code: |
+          fn called_fn() -> i32 {
+              return {{expr.form}};
+          }
+          var _result = called_fn(); // expected: {{expr.expected}}
+      repeat_fn_arg:
+        code: |
+          var result = 0; // expected: {{expr.expected}}
+          repeat called_fn({{expr.form}});
+          fn called_fn(param: i32) {
+              result = param;
+          }
+
+  - id: expr
+    cases:
+      const_global:
+        form: "CONST"
+        source: "const CONST = 123;"
+        expected: "123"
+      const_fn_without_param:
+        form: "fn_()"
+        source: "const fn fn_() -> i32 { return 123; }"
+        expected: "123"
+      const_fn_with_param_literal:
+        form: "fn_(123)"
+        source: "const fn fn_(param: i32) -> i32 { return param; }"
+        expected: "123"
+      const_fn_with_param_const:
+        form: "fn_(CONST)"
+        source: "const CONST = 123; const fn fn_(param: i32) -> i32 { return param; }"
+        expected: "123"
+      const_fn_with_param_fn:
+        form: "fn_(fn_(123))"
+        source: "const fn fn_(param: i32) -> i32 { return param; }"
+        expected: "123"
