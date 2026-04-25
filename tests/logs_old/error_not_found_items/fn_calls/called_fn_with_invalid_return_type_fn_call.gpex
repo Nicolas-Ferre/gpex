@@ -1,5 +1,0 @@
-const _RESULT = called_fn();
-
-const fn called_fn() -> unknown() {
-    return 123;
-}

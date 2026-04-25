@@ -9,109 +9,112 @@ use itertools::Itertools;
 use std::fs;
 use std::path::Path;
 
-// TODO: rename test names according to hierarchy
-
 #[test]
-fn compile_with_circular_items_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_circular_items"))
+fn compile_error_exprs_non_const() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_exprs_non_const"))
 }
 
 #[test]
-fn compile_with_disallowed_item_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_disallowed_items"))
+fn compile_error_exprs_not_ref() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_exprs_not_ref"))
 }
 
 #[test]
-fn compile_with_missing_statement_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_missing_statements"))
+fn compile_error_imports_not_found() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_imports_not_found"))
 }
 
 #[test]
-fn compile_with_multiple_definition_errors() -> Result<(), Error> {
+fn compile_error_imports_not_found_outside_project() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_imports_not_found_outside_project"))
+}
+
+#[test]
+fn compile_error_items_circular() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_items_circular"))
+}
+
+#[test]
+fn compile_error_items_disallowed() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_items_disallowed"))
+}
+
+#[test]
+fn compile_error_multiple_definitions() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_multiple_definitions"))
 }
 
 #[test]
-fn compile_with_non_const_expr_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_non_const_exprs"))
+fn compile_error_items_not_found_after_ref() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_items_not_found_after_ref"))
 }
 
 #[test]
-fn compile_with_not_found_import_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_not_found_imports"))
+fn compile_error_items_not_found_before_ref() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_items_not_found_before_ref"))
 }
 
 #[test]
-fn compile_with_not_found_item_after_ref_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_not_found_items_after_ref"))
+fn compile_error_items_not_found_parent() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_items_not_found_parent"))
 }
 
 #[test]
-fn compile_with_not_found_item_before_ref_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_not_found_items_before_ref"))
-}
-
-#[test]
-fn compile_with_not_found_parent_item_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_not_found_parent_items"))
-}
-
-#[test]
-fn compile_with_not_found_priv_item_in_pub_import_errors() -> Result<(), Error> {
+fn compile_error_items_not_found_priv_in_pub_import() -> Result<(), Error> {
     compile_and_check_logs(Path::new(
-        "tests/logs/error_not_found_priv_item_in_pub_import",
+        "tests/logs/error_items_not_found_priv_in_pub_import",
     ))
 }
 
 #[test]
-fn compile_with_not_found_pub_item_in_priv_import_errors() -> Result<(), Error> {
+fn compile_error_items_not_found_pub_in_priv_import() -> Result<(), Error> {
     compile_and_check_logs(Path::new(
-        "tests/logs/error_not_found_pub_item_in_priv_import",
+        "tests/logs/error_items_not_found_pub_in_priv_import",
     ))
 }
 
 #[test]
-fn compile_with_not_ref_expr_errors() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_not_ref_exprs"))
-}
-
-#[test]
-fn compile_with_out_of_bounds_errors() -> Result<(), Error> {
+fn compile_error_out_of_bounds() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_out_of_bounds"))
 }
 
 #[test]
-fn compile_with_syntax_errors() -> Result<(), Error> {
+fn compile_error_statements_missing() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_statements_missing"))
+}
+
+#[test]
+fn compile_error_syntax() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_syntax"))
 }
 
 #[test]
-fn compile_with_type_errors() -> Result<(), Error> {
+fn compile_error_type_comparison() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_type_comparison"))
 }
 
 #[test]
-fn compile_with_empty_warnings() -> Result<(), Error> {
+fn compile_warning_empty() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/warning_empty"))
 }
 
 #[test]
-fn compile_with_naming_case_warnings() -> Result<(), Error> {
+fn compile_warning_naming_case() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/warning_naming_case"))
 }
 
 #[test]
-fn compile_with_naming_single_letter_warnings() -> Result<(), Error> {
+fn compile_warning_naming_single_letter() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/warning_naming_single_letter"))
 }
 
 #[test]
-fn compile_with_unused_warnings() -> Result<(), Error> {
+fn compile_warning_unused() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/warning_unused"))
 }
 
 #[test]
-fn compile_with_used_with_underscore_prefix_warnings() -> Result<(), Error> {
+fn compile_warning_used_with_underscore_prefix() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/warning_used_with_underscore_prefix"))
 }
 

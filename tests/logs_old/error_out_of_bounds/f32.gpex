@@ -1,7 +1,0 @@
-const fn invalid_returned_const_literal() -> f32 {
-    return 400000000000000000000000000000000000000.0;
-}
-
-const fn _invalid_returned_const_literal_usage() -> f32 {
-    return invalid_returned_const_literal();
-}

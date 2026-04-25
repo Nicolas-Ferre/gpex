@@ -13,8 +13,10 @@ dimensions:
         code: "fn _result() -> i32 { return {{literal.form}}; }"
       repeat_fn_arg:
         code: "repeat called_fn({{literal.form}});"
-      fn_param_type:
+      fn_param_type_with_return_type:
         code: "fn _result(_param: {{literal.form}}) -> i32 { return 123; }"
+      fn_param_type_without_return_type:
+        code: "repeat result(0); fn result(_param: {{literal.form}}) -> i32 { return 123; }"
       fn_return_type:
         code: "fn _result() -> {{literal.form}} { return 123; }"
 

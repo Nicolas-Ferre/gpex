@@ -76,7 +76,7 @@ impl Ident {
             .items
             .search(search_params, Visibility::Ignored)
             .find(|source| match source {
-                ItemRef::Param(_) => false,
+                ItemRef::Param(_) => false, // coverage: off (will be covered with https://github.com/Nicolas-Ferre/gpex/issues/115)
                 ItemRef::Variable(_)
                 | ItemRef::Constant(_)
                 | ItemRef::Struct(_)

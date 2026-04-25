@@ -1,4 +1,4 @@
-# Test not found expression sources while the item is defined in the same file before.
+# Test not found expression sources while the item is defined in the same file after.
 
 dimensions:
   - id: expr_location
@@ -32,32 +32,45 @@ dimensions:
               return 123;
           }
       fn_return_type:
+        # function is `const` to increase test coverage
         code: |
-          fn _fn(_param: i32) -> {{expr.form}} {
+          const fn fn_(_param: i32) -> {{expr.form}} {
               return 123;
           }
+          const _USAGE = fn_(0);
 
   - id: expr
     cases:
+      const_global:
+        form: "_CONST"
+        source: "const _CONST = 0;"
+      var_global:
+        form: "_var"
+        source: "var _var = 0;"
       fn_call_with_mismatching_param_count:
         form: "_called_fn()"
         source: "fn _called_fn(param: i32) -> i32 { return param; }"
       fn_call_with_mismatching_param_type:
         form: "_called_fn(123u)"
         source: "fn _called_fn(param: i32) -> i32 { return param; }"
+      fn_param:
+        form: "_param"
+        source: ""
       fn_param_external:
         form: "other_param"
         source: "pub fn _other_fn(other_param: i32) -> i32 { return other_param; }"
         assign_itself: ""
 
 exclusions:
-  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/115)
   - expr_location:
       - const_global
       - var_global
       - statement_assignment_left
       - statement_assignment_right
       - statement_return
-      - fn_param_type
-      - fn_return_type
-    expr: [ fn_param_external ]
+      - repeat_fn_arg
+    expr: [ fn_param ]
+
+  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/114)
+  - expr_location: [ fn_return_type ]
+    expr: [ fn_param ]
