@@ -139,7 +139,8 @@ fn compile_and_check_logs(path: &Path) -> Result<(), Error> {
     }
     for case_name in &case_names {
         assert!(
-            actual.contains(case_name),
+            actual.contains(&format!("__{case_name}.gpex"))
+                || actual.contains(&format!("__{case_name}/")),
             "'{case_name}' case didn't generate any error"
         );
     }
