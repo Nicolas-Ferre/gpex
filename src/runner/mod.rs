@@ -68,6 +68,11 @@ impl Runner {
         })
     }
 
+    /// Returns information about the program.
+    pub fn program(&self) -> &Program {
+        &self.program
+    }
+
     /// Reads global variable value.
     ///
     /// Variable `path` is the dot path of the module and the variable name separated by a `:`

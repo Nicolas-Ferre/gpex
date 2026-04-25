@@ -81,23 +81,23 @@ async fn run_syntax() -> Result<(), Error> {
 
 async fn run_test_dir(
     path: &Path,
-    save_code: bool,
+    check_transpiled_code: bool,
     is_warning_treated_as_error: bool,
 ) -> Result<(), Error> {
     let (generated_dir, _) = common::generate_cases(path)?;
     let (program, _) =
         gpex::compile_program(&generated_dir, is_warning_treated_as_error).map_err(Error::Gpex)?;
-    let actual_code = format!(
-        "// INIT SHADER\n\n{}\n\n// UPDATE SHADER\n\n{}\n",
-        format_wgsl(&program.init_shader)?,
-        format_wgsl(&program.update_shader)?
-    );
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
     runner.run_step();
     check_global_vars(&generated_dir, &generated_dir, &runner)?;
-    if !save_code {
+    if !check_transpiled_code {
         return Ok(());
     }
+    let actual_code = format!(
+        "// INIT SHADER\n\n{}\n\n// UPDATE SHADER\n\n{}\n",
+        format_wgsl(&runner.program().init_shader)?,
+        format_wgsl(&runner.program().update_shader)?
+    );
     let expected_path = path.join(".expected");
     if let Ok(expected_code) = fs::read_to_string(&expected_path) {
         assert_eq!(actual_code, expected_code);
@@ -147,19 +147,15 @@ fn to_dot_path(file_path: &Path, root_path: &Path) -> String {
 }
 
 fn format_wgsl(code: &str) -> Result<String, Error> {
-    let module = wgsl::parse_str(code)
-        .map_err(|err| Box::new(err) as _)
-        .map_err(Error::Other)?;
+    let module = wgsl::parse_str(code).map_err(convert_error)?;
     let mut validator = Validator::new(ValidationFlags::all(), Capabilities::all());
-    let info = validator
-        .validate(&module)
-        .map_err(|err| Box::new(err) as _)
-        .map_err(Error::Other)?;
+    let info = validator.validate(&module).map_err(convert_error)?;
     let mut output = String::new();
     let mut writer = wgsl_back::Writer::new(&mut output, wgsl_back::WriterFlags::empty());
-    writer
-        .write(&module, &info)
-        .map_err(|err| Box::new(err) as _)
-        .map_err(Error::Other)?;
+    writer.write(&module, &info).map_err(convert_error)?;
     Ok(output)
+}
+
+fn convert_error(result: impl std::error::Error + 'static) -> Error {
+    Error::Other(Box::new(result) as _)
 }
