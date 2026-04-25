@@ -1,0 +1,35 @@
+# Test disallowed items.
+
+dimensions:
+  - id: item
+    cases:
+      import_after_item:
+        code: |
+          const _ITEM = 0;
+          import ~.imported;
+      compilerimpl_struct:
+        code: "struct MyType = compilerimpl {}"
+      fn_call_without_type:
+        code: |
+          var value = 0;
+          fn fn_() {
+          	  value = 1;
+          }
+          var _result = fn_();
+      repeat_with_returned_type:
+        code: |
+          fn fn_() -> i32 {
+              return 0;
+          }
+          repeat fn_();
+      statement_return_without_return_type:
+        code: |
+          fn fn_() {
+              return 0;
+          }
+      statement_return_duplicated:
+        code: |
+          fn fn_() -> i32 {
+              return 0;
+              return 1;
+          }

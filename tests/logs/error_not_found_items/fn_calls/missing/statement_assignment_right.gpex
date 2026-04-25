@@ -1,5 +1,0 @@
-var assigned = 0;
-
-fn _fn() {
-    assigned = called_fn();
-}

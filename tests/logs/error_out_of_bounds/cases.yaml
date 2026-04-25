@@ -1,0 +1,38 @@
+# Test out-of-bound literals.
+
+dimensions:
+  - id: expr_location
+    cases:
+      const_global:
+        code: "const _RESULT = {{literal.form}};"
+      var_global:
+        code: "var _result = {{literal.form}};"
+      statement_assignment_right:
+        code: "var value = 0; fn _result() { value = {{literal.form}}; }"
+      statement_return:
+        code: "fn _result() -> i32 { return {{literal.form}}; }"
+      repeat_fn_arg:
+        code: "repeat called_fn({{literal.form}});"
+      fn_param_type:
+        code: "fn _result(_param: {{literal.form}}) -> i32 { return 123; }"
+      fn_return_type:
+        code: "fn _result() -> {{literal.form}} { return 123; }"
+
+  - id: literal
+    cases:
+      f32_too_small:
+        form: "-400000000000000000000000000000000000000.0"
+      f32_too_big:
+        form: "400000000000000000000000000000000000000.0"
+      f32_very_long:
+        form: "99999999999999999999999999999999999999999999999999.99999999999999999999999999999999999999999999999999"
+      i32_too_small:
+        form: "-2_147_483_649"
+      i32_too_big:
+        form: "2_147_483_648"
+      i32_very_long:
+        form: "99999999999999999999999999999999999999999999999999"
+      u32_too_big:
+        form: "4_294_967_296u"
+      u32_very_long:
+        form: "99999999999999999999999999999999999999999999999999u"

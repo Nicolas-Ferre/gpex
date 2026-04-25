@@ -1,0 +1,8 @@
+error: expression is not a reference (at <root>/main__statement_assignment_left__const_global.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__fn_call.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__fn_param.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__literal_bool_false.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__literal_bool_true.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__literal_f32.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__literal_i32.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__literal_u32.gpex:3:5)

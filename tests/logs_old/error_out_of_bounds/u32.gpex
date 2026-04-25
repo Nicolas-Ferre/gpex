@@ -1,0 +1,7 @@
+const fn invalid_returned_const_literal() -> u32 {
+    return 4_294_967_296u;
+}
+
+const fn _invalid_returned_const_literal_usage() -> u32 {
+    return invalid_returned_const_literal();
+}

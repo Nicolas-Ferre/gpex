@@ -13,62 +13,68 @@ use std::path::{Path, PathBuf};
 
 #[tokio::test]
 async fn run_empty() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/empty")).await
+    run_test_dir(Path::new("tests/runner/empty"), true).await
 }
 
 #[tokio::test]
 async fn run_expr_sources() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/expr_sources")).await
+    run_test_dir(Path::new("tests/runner/expr_sources"), false).await
 }
 
 #[tokio::test]
 async fn run_exprs() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/exprs")).await
+    run_test_dir(Path::new("tests/runner/exprs"), false).await
 }
 
 #[tokio::test]
 async fn run_fn_param_aliasing() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/fn_param_aliasing")).await
+    run_test_dir(Path::new("tests/runner/fn_param_aliasing"), false).await
 }
 
 #[tokio::test]
 async fn run_fn_aliasing() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/fn_aliasing")).await
+    run_test_dir(Path::new("tests/runner/fn_aliasing"), false).await
 }
 
 #[tokio::test]
 async fn run_imports() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/imports")).await
+    run_test_dir(Path::new("tests/runner/imports"), true).await
+}
+
+#[tokio::test]
+async fn run_item_naming() -> Result<(), Error> {
+    run_test_dir(Path::new("tests/runner/item_naming"), true).await
 }
 
 #[tokio::test]
 async fn run_import_priority() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/import_priority")).await
+    run_test_dir(Path::new("tests/runner/import_priority"), true).await
 }
 
 #[tokio::test]
 async fn run_literals() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/literals")).await
+    run_test_dir(Path::new("tests/runner/literals"), true).await
 }
 
 #[tokio::test]
 async fn run_prelude_types() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/prelude_types")).await
+    run_test_dir(Path::new("tests/runner/prelude_types"), true).await
 }
 
 #[tokio::test]
 async fn run_repeats() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/repeats")).await
+    run_test_dir(Path::new("tests/runner/repeats"), true).await
 }
 
 #[tokio::test]
 async fn run_syntax() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/syntax")).await
+    run_test_dir(Path::new("tests/runner/syntax"), true).await
 }
 
-async fn run_test_dir(path: &Path) -> Result<(), Error> {
-    let generated_dir = common::generate_cases(path)?;
-    let (program, _) = gpex::compile_program(&generated_dir, false).map_err(Error::Gpex)?;
+async fn run_test_dir(path: &Path, is_warning_treated_as_error: bool) -> Result<(), Error> {
+    let (generated_dir, _) = common::generate_cases(path)?;
+    let (program, _) =
+        gpex::compile_program(&generated_dir, is_warning_treated_as_error).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
     runner.run_step();
     check_global_vars(&generated_dir, &generated_dir, &runner)?;

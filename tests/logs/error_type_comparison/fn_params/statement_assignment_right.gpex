@@ -1,5 +1,0 @@
-var result = 0;
-
-fn _execute(param: u32) {
-    result = param;
-}

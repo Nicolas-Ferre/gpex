@@ -1,3 +1,0 @@
-fn _fn(param: i32) -> u32 {
-    return param;
-}

@@ -1,0 +1,11 @@
+# Test incorrect case for item naming.
+
+dimensions:
+  - id: item
+    cases:
+      const_global:
+        code: "pub const C = 0;"
+      var_global:
+        code: "pub var v = 0;"
+      fn:
+        code: "pub fn f() -> i32 { return 0; }"

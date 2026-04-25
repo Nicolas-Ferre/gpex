@@ -1,0 +1,50 @@
+# Test not found expression sources while the item is private and in an imported file.
+
+dimensions:
+  - id: expr_location
+    cases:
+      const_global:
+        code: "const _RESULT = {{expr.form}};"
+      var_global:
+        code: "var _result = {{expr.form}};"
+      statement_assignment_left:
+        code: |
+          fn _fn() {
+              {{expr.form}} = 123;
+          }
+      statement_assignment_right:
+        code: |
+          var result = 0;
+          fn _fn() {
+              result = {{expr.form}};
+          }
+      statement_return:
+        code: |
+          fn _fn() -> i32 {
+              return {{expr.form}};
+          }
+      repeat_fn_arg:
+        code: "repeat fn_({{expr.form}});"
+        code_unique_name: "repeat fn_({{expr.form_unique_name}});"
+      fn_param_type:
+        code: |
+          fn _fn(_param: {{expr.form}}) -> i32 {
+              return 123;
+          }
+      fn_return_type:
+        code: |
+          fn _fn() -> {{expr.form}} {
+              return 123;
+          }
+
+  - id: expr
+    cases:
+      const_global:
+        form: "_CONST"
+        source: "const _CONST = 0;"
+      var_global:
+        form: "_var"
+        source: "var _var = 0;"
+      fn_call:
+        form: "_called_fn()"
+        source: "fn _called_fn() -> i32 { return 0; }"

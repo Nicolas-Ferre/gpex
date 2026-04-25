@@ -1,0 +1,105 @@
+# Test mismatching expression types.
+
+dimensions:
+  - id: expr_location
+    cases:
+      statement_assignment_right:
+        code: |
+          var result = {{expr.other_type_default}};
+          fn _fn({{expr.params}}) {
+              result = {{expr.form}};
+          }
+      statement_return:
+        code: |
+          fn _fn({{expr.params}}) -> {{expr.other_type}} { 
+              return {{expr.form}};
+          }
+      fn_param_type:
+        code: |
+          fn _fn(_param: {{expr.form}}) -> i32 {
+              return 123;
+          }
+      fn_return_type:
+        code: |
+          fn _fn() -> {{expr.form}} {
+              return 123;
+          }
+
+  - id: expr
+    cases:
+      literal_bool_true:
+        form: "true"
+        source: ""
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      literal_bool_false:
+        form: "false"
+        source: ""
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      literal_f32:
+        form: "1.23"
+        source: ""
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      literal_i32:
+        form: "123"
+        source: ""
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      literal_u32:
+        form: "123u"
+        source: ""
+        other_type: "i32"
+        other_type_default: "0"
+        params: ""
+      type_native:
+        form: "i32"
+        source: ""
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      const_global:
+        form: "ITEM"
+        source: "const ITEM = 0;"
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      var_global:
+        form: "item"
+        source: "var item = 0;"
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      fn_param:
+        form: "param"
+        source: ""
+        other_type: "u32"
+        other_type_default: "0u"
+        params: "param: i32"
+      fn_call_no_arg:
+        form: "called_fn()"
+        source: "const fn called_fn() -> i32 { return 0; }"
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      fn_call_args:
+        form: "called_fn(123u, 456)"
+        source: "const fn called_fn(_param1: u32, param2: i32) -> i32 { return param2; }"
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+      fn_call_with_invalid_return_type:
+        form: "called_fn()"
+        source: "const fn called_fn() -> 0 { return 0; }"
+        other_type: "u32"
+        other_type_default: "0u"
+        params: ""
+
+exclusions:
+  - expr_location: [ fn_param_type, fn_return_type ]
+    expr: [ var_global, type_native, fn_param ]

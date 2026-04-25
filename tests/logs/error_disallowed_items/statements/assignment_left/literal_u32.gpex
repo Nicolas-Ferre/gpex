@@ -1,4 +1,0 @@
-fn _fn() -> bool {
-    0u = 1u;
-    return true;
-}

@@ -1,4 +1,0 @@
-import ~.imported2;
-
-pub var var1 = cyclic1;
-pub var var2 = cyclic2;

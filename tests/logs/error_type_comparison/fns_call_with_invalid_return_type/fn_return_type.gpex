@@ -1,7 +1,0 @@
-const fn called_fn() -> 0 {
-    return 123;
-}
-
-fn _fn() -> called_fn() {
-    return 0;
-}

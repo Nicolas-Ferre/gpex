@@ -1,4 +1,4 @@
-# Test all possible forms of literals
+# Test all forms of literals
 
 dimensions:
   - id: literal

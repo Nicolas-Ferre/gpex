@@ -1,3 +1,0 @@
-fn imported() -> i32 {
-    return 0;
-}

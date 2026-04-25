@@ -1,0 +1,7 @@
+const fn fn_(param: i32) -> i32 {
+    param = 1;
+}
+
+const fn _usage() -> i32 {
+    return fn_(123);
+}

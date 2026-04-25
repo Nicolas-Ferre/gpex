@@ -1,5 +1,0 @@
-var var_ = 123;
-
-const fn _fn() {
-    other_var = var_;
-}

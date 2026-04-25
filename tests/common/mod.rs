@@ -39,7 +39,7 @@ struct DimensionCase {
     key_values: HashMap<String, String>,
 }
 
-pub(crate) fn generate_cases(path: &Path) -> Result<PathBuf, Error> {
+pub(crate) fn generate_cases(path: &Path) -> Result<(PathBuf, Vec<String>), Error> {
     let cases_path = path.join("cases.yaml");
     if cases_path.exists() {
         let test_dir = env::temp_dir().join(path);
@@ -52,9 +52,13 @@ pub(crate) fn generate_cases(path: &Path) -> Result<PathBuf, Error> {
             .filter(|combination| !is_case_combination_excluded(&cases, combination))
             .collect::<Vec<_>>();
         generate_dir(path, &case_combinations)?;
-        Ok(test_dir)
+        let case_names = case_combinations
+            .iter()
+            .map(|combination| case_name(combination))
+            .collect();
+        Ok((test_dir, case_names))
     } else {
-        Ok(path.to_path_buf())
+        Ok((path.to_path_buf(), vec![]))
     }
 }
 
@@ -124,20 +128,25 @@ fn generate_file(file_path: &Path, cases: &[Vec<DimensionCase>]) -> Result<(), E
     }
     let content = fs::read_to_string(file_path).map_err(Error::Io)?;
     for case in cases {
-        let case_name = case.iter().map(|dimension| &dimension.name).join("__");
-        let mut generated_content = content.replace(CASE_KEY_PLACEHOLDER, &case_name);
+        let mut generated_content = content.clone();
         for dimension in case {
             for (key, value) in &dimension.key_values {
                 generated_content = generated_content
                     .replace(&format!("{{{{{}.{}}}}}", dimension.dimension, key), value);
             }
         }
+        let case_name = case_name(case);
+        generated_content = generated_content.replace(CASE_KEY_PLACEHOLDER, &case_name);
         let output_path =
             env::temp_dir().join(replace_in_path(file_path, CASE_KEY_PLACEHOLDER, &case_name));
         fs::create_dir_all(path_parent(&output_path)).map_err(Error::Io)?;
         fs::write(&output_path, &generated_content).map_err(Error::Io)?;
     }
     Ok(())
+}
+
+fn case_name(case: &[DimensionCase]) -> String {
+    case.iter().map(|dimension| &dimension.name).join("__")
 }
 
 fn path_parent(path: &Path) -> &Path {

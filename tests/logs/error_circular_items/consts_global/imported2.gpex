@@ -1,4 +1,0 @@
-import ~.imported1;
-
-pub var cyclic1 = CONST2;
-pub var cyclic2 = CONST1;

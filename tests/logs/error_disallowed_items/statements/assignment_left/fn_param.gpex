@@ -1,3 +1,0 @@
-fn _fn(param: i32) {
-    param = 1;
-}

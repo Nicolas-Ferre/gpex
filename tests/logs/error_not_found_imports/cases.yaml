@@ -1,0 +1,13 @@
+# Test not found expression sources.
+
+dimensions:
+  - id: import
+    cases:
+      absolute_inner:
+        form: "imported.inner"
+      absolute_root:
+        form: "imported"
+      relative_direct:
+        form: "~.imported"
+      relative_indirect:
+        form: "~.~.imported"

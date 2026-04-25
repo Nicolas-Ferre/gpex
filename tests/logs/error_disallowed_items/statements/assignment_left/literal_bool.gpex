@@ -1,4 +1,0 @@
-fn _fn() -> bool {
-    true = false;
-    return true;
-}

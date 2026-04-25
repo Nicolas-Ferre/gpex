@@ -131,13 +131,10 @@ pub(crate) fn check_usage(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
-    if item.is_pub() {
-        return;
-    }
     let name_span = item.name_span();
     let name = context.slice(name_span);
     let ref_span = indexes.item_first_refs.get(&item.id());
-    if ref_span.is_none() && !name.starts_with('_') {
+    if !item.is_pub() && ref_span.is_none() && !name.starts_with('_') {
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item unused"),

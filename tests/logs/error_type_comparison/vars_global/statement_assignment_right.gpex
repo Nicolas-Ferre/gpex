@@ -1,6 +1,0 @@
-var value = 123u;
-var result = 0;
-
-fn _execute() {
-	result = value;
-}

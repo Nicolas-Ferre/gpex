@@ -1,9 +1,0 @@
-var var_ = 0;
-
-const fn fn_() -> i32 {
-    var_ = 1;
-}
-
-const fn _usage() -> i32 {
-    return fn_();
-}

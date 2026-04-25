@@ -1,6 +1,0 @@
-const VALUE = 123u;
-var result = 0;
-
-fn _execute() {
-	result = VALUE;
-}

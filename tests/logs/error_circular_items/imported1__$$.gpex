@@ -1,0 +1,4 @@
+import ~.imported2__$$;
+
+{{cycle_location.item1}}
+{{cycle_location.item2}}

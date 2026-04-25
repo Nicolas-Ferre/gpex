@@ -1,4 +1,4 @@
-# Test expressions with all possible source items placed at all possible locations.
+# Test expressions with all source items placed at all locations.
 
 dimensions:
   - id: source_location

@@ -1,5 +1,0 @@
-const CONST = 0;
-
-fn _fn() -> CONST {
-    return 123;
-}

@@ -1,4 +1,4 @@
-# Test access to all types defined in prelude.
+# Test access to types defined in prelude.
 
 dimensions:
   - id: type

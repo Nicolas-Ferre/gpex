@@ -1,4 +1,4 @@
-# Test expressions in all possible locations.
+# Test expressions in all locations.
 
 dimensions:
   - id: expr_location

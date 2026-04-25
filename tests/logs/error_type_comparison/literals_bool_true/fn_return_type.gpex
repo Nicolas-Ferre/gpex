@@ -1,3 +1,0 @@
-fn _fn() -> true {
-    return 123;
-}
