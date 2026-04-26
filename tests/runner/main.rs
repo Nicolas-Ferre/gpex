@@ -4,7 +4,7 @@
 mod common;
 
 use crate::common::Error;
-use gpex::Runner;
+use gpex::{Program, Runner};
 use itertools::Itertools;
 use naga::back::wgsl as wgsl_back;
 use naga::front::wgsl;
@@ -16,94 +16,168 @@ use std::path::{Path, PathBuf};
 
 #[tokio::test]
 async fn run_const_optimizations() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/const_optimizations"), true, true).await
+    run_test_dir(
+        Path::new("tests/runner/const_optimizations"),
+        TranspiledCodeAction::Checked,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_empty() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/empty"), true, true).await
+    run_test_dir(
+        Path::new("tests/runner/empty"),
+        TranspiledCodeAction::Checked,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_expr_sources() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/expr_sources"), false, false).await
+    run_test_dir(
+        Path::new("tests/runner/expr_sources"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Ignored,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_exprs() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/exprs"), false, false).await
+    run_test_dir(
+        Path::new("tests/runner/exprs"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Ignored,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_fn_param_aliasing() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/fn_param_aliasing"), false, false).await
+    run_test_dir(
+        Path::new("tests/runner/fn_param_aliasing"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Ignored,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_fn_aliasing() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/fn_aliasing"), false, false).await
+    run_test_dir(
+        Path::new("tests/runner/fn_aliasing"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Ignored,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_imports() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/imports"), false, true).await
+    run_test_dir(
+        Path::new("tests/runner/imports"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_item_naming() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/item_naming"), false, true).await
+    run_test_dir(
+        Path::new("tests/runner/item_naming"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_import_priority() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/import_priority"), false, true).await
+    run_test_dir(
+        Path::new("tests/runner/import_priority"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_literals() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/literals"), true, true).await
+    run_test_dir(
+        Path::new("tests/runner/literals"),
+        TranspiledCodeAction::Checked,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_prelude_types() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/prelude_types"), true, true).await
+    run_test_dir(
+        Path::new("tests/runner/prelude_types"),
+        TranspiledCodeAction::Checked,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_repeats() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/repeats"), false, true).await
+    run_test_dir(
+        Path::new("tests/runner/repeats"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 #[tokio::test]
 async fn run_syntax() -> Result<(), Error> {
-    run_test_dir(Path::new("tests/runner/syntax"), false, true).await
+    run_test_dir(
+        Path::new("tests/runner/syntax"),
+        TranspiledCodeAction::Ignored,
+        WarningAction::Failing,
+    )
+    .await
 }
 
 async fn run_test_dir(
     path: &Path,
-    check_transpiled_code: bool,
-    is_warning_treated_as_error: bool,
+    transpiled_code_action: TranspiledCodeAction,
+    warning_action: WarningAction,
 ) -> Result<(), Error> {
     let (generated_dir, _) = common::generate_cases(path)?;
+    let is_warning_treated_as_error = warning_action == WarningAction::Failing;
     let (program, _) =
         gpex::compile_program(&generated_dir, is_warning_treated_as_error).map_err(Error::Gpex)?;
     let mut runner = Runner::new(program).await.map_err(Error::Gpex)?;
     runner.run_step();
     check_global_vars(&generated_dir, &generated_dir, &runner)?;
-    if !check_transpiled_code {
-        return Ok(());
+    if transpiled_code_action == TranspiledCodeAction::Checked {
+        check_transpiled_code(path, runner.program())?;
     }
+    Ok(())
+}
+
+fn check_transpiled_code(path: &Path, program: &Program) -> Result<(), Error> {
     let actual_code = format!(
         "// INIT SHADER\n\n{}\n\n// UPDATE SHADER\n\n{}\n",
-        format_wgsl(&runner.program().init_shader)?,
-        format_wgsl(&runner.program().update_shader)?
+        format_wgsl(&program.init_shader)?,
+        format_wgsl(&program.update_shader)?
     );
     let expected_path = path.join(".expected");
-    if let Ok(expected_code) = fs::read_to_string(&expected_path) {
+    if expected_path.exists() {
+        let expected_code = fs::read_to_string(&expected_path).map_err(Error::Io)?;
         assert_eq!(actual_code, expected_code);
     } else {
-        fs::write(expected_path, actual_code).map_err(Error::Io)?;
-        panic!("expected transpiled code saved on disk");
+        fs::write(&expected_path, actual_code).map_err(Error::Io)?;
+        panic!(
+            "expected transpiled code saved on disk in {}",
+            expected_path.display()
+        );
     }
     Ok(())
 }
@@ -156,6 +230,18 @@ fn format_wgsl(code: &str) -> Result<String, Error> {
     Ok(output)
 }
 
-fn convert_error(result: impl std::error::Error + 'static) -> Error {
-    Error::Other(Box::new(result) as _)
+fn convert_error(error: impl std::error::Error + 'static) -> Error {
+    Error::Other(Box::new(error) as _)
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum TranspiledCodeAction {
+    Checked,
+    Ignored,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum WarningAction {
+    Failing,
+    Ignored,
 }
