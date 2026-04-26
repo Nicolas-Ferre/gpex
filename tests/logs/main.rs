@@ -131,11 +131,12 @@ fn compile_and_check_logs(path: &Path) -> Result<(), Error> {
         .join("")
         .replace(&generated_dir.display().to_string(), "<root>");
     let expected_path = path.join(".expected");
-    if let Ok(expected) = fs::read_to_string(&expected_path) {
+    if expected_path.exists() {
+        let expected = fs::read_to_string(&expected_path).map_err(Error::Io)?;
         assert_eq!(actual, expected);
     } else {
-        fs::write(expected_path, actual).map_err(Error::Io)?;
-        panic!("expected logs saved on disk");
+        fs::write(&expected_path, actual).map_err(Error::Io)?;
+        panic!("expected logs saved on disk in {}", expected_path.display());
     }
     for case_name in &case_names {
         assert!(

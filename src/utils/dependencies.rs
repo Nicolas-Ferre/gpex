@@ -1,4 +1,5 @@
 use crate::utils::parsing::span::Span;
+use itertools::Itertools;
 use std::collections::HashSet;
 use std::hash::Hash;
 use std::mem;
@@ -8,7 +9,7 @@ pub(crate) struct Dependencies<T> {
     stack: Vec<Span>,
 }
 
-impl<T: Eq + Hash + Copy> Dependencies<T> {
+impl<T: Eq + Hash + Copy + Ord> Dependencies<T> {
     pub(crate) fn new() -> Self {
         Self {
             registered: HashSet::default(),
@@ -33,6 +34,6 @@ impl<T: Eq + Hash + Copy> Dependencies<T> {
     }
 
     pub(crate) fn into_iter(self) -> impl Iterator<Item = T> {
-        self.registered.into_iter()
+        self.registered.into_iter().sorted_unstable()
     }
 }

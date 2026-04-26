@@ -94,7 +94,7 @@ impl ParamGroup {
 }
 
 #[derive(Debug)]
-#[derive_where::derive_where(PartialEq, Eq, Hash)]
+#[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct Param {
     pub(crate) id: u64,
     #[derive_where(skip)]

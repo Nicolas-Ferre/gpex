@@ -207,6 +207,14 @@ fn transpile_shader<'item>(
 }
 
 fn transpile_buffer_header(shader: &mut String, modules: &[Module], indexes: &Indexes<'_>) {
+    let is_buffer_empty = modules
+        .iter()
+        .flat_map(Module::global_vars)
+        .next()
+        .is_none();
+    if is_buffer_empty {
+        return;
+    }
     *shader += "struct Buffer { ";
     for module in modules {
         for var in module.global_vars() {

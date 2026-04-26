@@ -23,7 +23,7 @@ use itertools::Itertools;
 use std::fmt::Write;
 
 #[derive(Debug)]
-#[derive_where::derive_where(PartialEq, Eq, Hash)]
+#[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct FnDefinition {
     pub(crate) id: u64,
     #[derive_where(skip)]
