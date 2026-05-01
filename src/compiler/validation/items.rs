@@ -13,7 +13,7 @@ use crate::utils::validation::ValidateError;
 
 impl Validator<'_, '_> {
     pub(crate) fn validate_item(&mut self, node: &Item) -> Result<(), ValidateError> {
-        assert!(self.const_mark_span.is_none());
+        debug_assert!(self.const_mark_span.is_none());
         match node {
             Item::Import(_) => Ok(()), // validated during previous pass
             Item::Var(item) => self.validate_var(item),

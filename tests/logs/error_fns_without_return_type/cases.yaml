@@ -7,6 +7,8 @@ dimensions:
         code: "var _result = fn_();"
       const_global:
         code: "const _RESULT = fn_();"
+      statement_assignment_left:
+        code: "fn _result() { fn_() = 0; }"
       statement_assignment_right:
         code: "fn _result() { value = fn_(); }"
       statement_return:

@@ -133,6 +133,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
     }
 
     fn fn_call_value(&mut self, node: &Call, source: &FnDefinition) -> ConstValue<'item> {
+        debug_assert_eq!(node.args.len(), source.params.params.len());
         let param_args = node
             .args
             .iter()
