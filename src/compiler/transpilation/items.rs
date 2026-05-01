@@ -8,7 +8,6 @@ use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::compiler::transpilation::Transpiler;
 use std::fmt::Write;
 
-#[expect(clippy::multiple_inherent_impl)]
 impl Transpiler<'_, '_> {
     pub(crate) fn transpile_item(&mut self, node: ItemRef<'_>) {
         match node {

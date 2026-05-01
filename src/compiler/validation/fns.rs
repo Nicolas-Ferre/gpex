@@ -8,7 +8,6 @@ use crate::compiler::validation::{Validator, validators};
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 
-#[expect(clippy::multiple_inherent_impl)]
 impl Validator<'_, '_> {
     pub(super) fn validate_fn(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
         self.run_with_fn_constness(node.const_keyword_span.is_some(), |self_| {
@@ -121,14 +120,14 @@ impl Validator<'_, '_> {
     ) -> Result<(), ValidateError> {
         let previous_const_mark_span = self.const_mark_span;
         self.const_mark_span = const_mark_span;
-        match node {
+        let result = match node {
             Statement::Return(statement) => {
-                self.validate_expr(&statement.value, self.const_mark_span)?;
+                self.validate_expr(&statement.value, self.const_mark_span)
             }
-            Statement::Assignment(statement) => self.validate_assignment_statement(statement)?,
-        }
+            Statement::Assignment(statement) => self.validate_assignment_statement(statement),
+        };
         self.const_mark_span = previous_const_mark_span;
-        Ok(())
+        result
     }
 
     fn validate_assignment_statement(

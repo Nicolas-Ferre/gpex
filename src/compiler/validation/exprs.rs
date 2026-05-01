@@ -14,24 +14,22 @@ impl Validator<'_, '_> {
     ) -> Result<(), ValidateError> {
         let previous_const_mark_span = self.const_mark_span;
         self.const_mark_span = const_mark_span;
-        match node {
-            Expr::F32Literal(child) => self.validate_f32_literal(child)?,
-            Expr::U32Literal(child) => self.validate_u32_literal(child)?,
-            Expr::I32Literal(child) => self.validate_i32_literal(child)?,
-            Expr::BoolLiteral(_) => (),
-            Expr::Call(child) => {
-                validators::expr::check_no_return_type(
-                    child,
-                    child.span,
-                    &mut self.context,
-                    self.indexes,
-                )?;
-                self.validate_call(child)?;
-            }
-            Expr::Ident(child) => self.validate_ident(child)?,
-        }
+        let result = match node {
+            Expr::F32Literal(child) => self.validate_f32_literal(child),
+            Expr::U32Literal(child) => self.validate_u32_literal(child),
+            Expr::I32Literal(child) => self.validate_i32_literal(child),
+            Expr::BoolLiteral(_) => Ok(()),
+            Expr::Call(child) => validators::expr::check_no_return_type(
+                child,
+                child.span,
+                &mut self.context,
+                self.indexes,
+            )
+            .and_then(|()| self.validate_call(child)),
+            Expr::Ident(child) => self.validate_ident(child),
+        };
         self.const_mark_span = previous_const_mark_span;
-        Ok(())
+        result
     }
 
     pub(crate) fn validate_f32_literal(&mut self, node: &F32Literal) -> Result<(), ValidateError> {

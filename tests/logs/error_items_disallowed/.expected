@@ -1,6 +1,4 @@
 error: forbidden `compilerimpl` item outside prelude (at <root>/main__compilerimpl_struct.gpex:1:8)
-error: called function `fn_()` with no return type (at <root>/main__fn_call_without_type.gpex:5:15)
-  --> info: function has no return type (at <root>/main__fn_call_without_type.gpex:2:4)
 error: `import` statement not at the top of the module (at <root>/main__import_after_item.gpex:2:1)
   --> info: `import` statements should appear before anything else
 error: repeated function `fn_()` with a return type (at <root>/main__repeat_with_returned_type.gpex:4:8)

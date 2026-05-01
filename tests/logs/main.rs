@@ -20,6 +20,11 @@ fn compile_error_exprs_not_ref() -> Result<(), Error> {
 }
 
 #[test]
+fn compile_error_fns_without_return_type() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_fns_without_return_type"))
+}
+
+#[test]
 fn compile_error_imports_not_found() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_imports_not_found"))
 }

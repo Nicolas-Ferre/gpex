@@ -1,0 +1,19 @@
+# Test functions without return type called as expression.
+
+dimensions:
+  - id: fn_call_location
+    cases:
+      var_global:
+        code: "var _result = fn_();"
+      const_global:
+        code: "const _RESULT = fn_();"
+      statement_assignment_right:
+        code: "fn _result() { value = fn_(); }"
+      statement_return:
+        code: "fn _result() -> i32 { return fn_(); }"
+      repeat_fn_arg:
+        code: "repeat fn_(fn_());"
+      fn_param_type:
+        code: "fn _result(_param: fn_()) -> i32 { return 123; }"
+      fn_return_type:
+        code: "fn _result() -> fn_() { return 123; }"
