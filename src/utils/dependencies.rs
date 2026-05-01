@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::hash::Hash;
 use std::mem;
 
+#[derive(Debug, Clone)]
 pub(crate) struct Dependencies<T> {
     registered: HashSet<T>,
     stack: Vec<Span>,
@@ -17,23 +18,20 @@ impl<T: Eq + Hash + Copy + Ord> Dependencies<T> {
         }
     }
 
-    pub(crate) fn register(
-        mut self,
-        span: Span,
-        dependency: T,
-        mut inner_dependencies: impl FnMut(Self) -> Result<Self, Vec<Span>>,
-    ) -> Result<Self, Vec<Span>> {
+    pub(crate) fn enter_item(&mut self, span: Span, dependency: T) -> Result<(), Vec<Span>> {
         if self.stack.contains(&span) {
             return Err(mem::take(&mut self.stack));
         }
         self.stack.push(span);
         self.registered.insert(dependency);
-        let mut dependencies = inner_dependencies(self)?;
-        dependencies.stack.pop();
-        Ok(dependencies)
+        Ok(())
     }
 
-    pub(crate) fn into_iter(self) -> impl Iterator<Item = T> {
-        self.registered.into_iter().sorted_unstable()
+    pub(crate) fn exit_item(&mut self) {
+        self.stack.pop();
+    }
+
+    pub(crate) fn iter(&self) -> impl Iterator<Item = T> {
+        self.registered.iter().copied().sorted_unstable()
     }
 }

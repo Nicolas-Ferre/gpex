@@ -1,8 +1,8 @@
 mod resources;
 mod utils;
 
+use crate::compiler::parsing::symbols::{FALSE_KEYWORD, TRUE_KEYWORD};
 use crate::compiler::transpilation::Program;
-use crate::language::symbols::{FALSE_KEYWORD, TRUE_KEYWORD};
 use crate::runner::resources::ComputeShader;
 use crate::utils::{endianness, formatting};
 use crate::{Log, LogLevel};

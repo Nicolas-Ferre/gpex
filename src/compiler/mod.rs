@@ -1,11 +1,17 @@
-pub(crate) mod compilation;
 pub(crate) mod consts;
-pub(crate) mod indexes;
+pub(crate) mod dependencies;
+pub(crate) mod indexing;
+pub(crate) mod key_rendering;
+pub(crate) mod parsing;
 pub(crate) mod prelude;
+pub(crate) mod refs;
 pub(crate) mod transpilation;
 pub(crate) mod types;
+pub(crate) mod validation;
 
-use crate::compiler::transpilation::Program;
+use crate::compiler::indexing::indexer::Indexer;
+use crate::compiler::transpilation::{Program, Transpiler};
+use crate::compiler::validation::Validator;
 use crate::utils::logs::Log;
 use crate::utils::reading;
 use std::fs;
@@ -23,16 +29,11 @@ pub fn compile_program(
     is_warning_treated_as_error: bool,
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
     let files = reading::read(root_path, EXT)?;
-    let modules = compilation::parse(root_path, &files)?;
-    let indexes = compilation::index(&modules);
-    let errors = compilation::validate(
-        root_path,
-        &files,
-        &modules,
-        &indexes,
-        is_warning_treated_as_error,
-    )?;
-    let program = transpilation::transpile_all(&files, &modules, &indexes);
+    let modules = parsing::parse(root_path, &files)?;
+    let indexes = Indexer::run(&modules);
+    let errors = Validator::new(&files, root_path, &indexes)
+        .validate_modules(&modules, is_warning_treated_as_error)?;
+    let program = Transpiler::new(&indexes).transpile(&files, &modules);
     Ok((program, errors))
 }
 

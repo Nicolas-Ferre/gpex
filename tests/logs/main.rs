@@ -142,7 +142,7 @@ fn compile_and_check_logs(path: &Path) -> Result<(), Error> {
         assert!(
             actual.contains(&format!("__{case_name}.gpex"))
                 || actual.contains(&format!("__{case_name}/")),
-            "'{case_name}' case didn't generate any error"
+            "'{case_name}' case did not generate any error"
         );
     }
     Ok(())

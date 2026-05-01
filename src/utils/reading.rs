@@ -44,7 +44,7 @@ fn read_entry(entry: DirEntry, root_path: &Path, ext: &str) -> Result<Vec<ReadFi
     let path = entry.path();
     let file_type = entry.file_type().map_err(|error| to_log(error, &path))?;
     if file_type.is_dir() {
-        read_dir(&path, root_path, ext) // fn_check: off (recursivity)
+        read_dir(&path, root_path, ext) // no-fn-check (recursivity)
     } else if path.extension() == Some(OsStr::new(ext)) {
         let content = fs::read_to_string(&path).map_err(|error| to_log(error, &path))?;
         Ok(vec![ReadFile {
