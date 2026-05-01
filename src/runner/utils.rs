@@ -103,7 +103,7 @@ pub(crate) fn read_buffer(
     offset: u64,
     size: u64,
 ) -> Vec<u8> {
-    let read_buffer = device.create_buffer(/* fn_check: off */ &BufferDescriptor {
+    let read_buffer = device.create_buffer(/* no-fn-check */ &BufferDescriptor {
         label: Some("gpex:buffer:storage_read"),
         size,
         usage: BufferUsages::MAP_READ | BufferUsages::COPY_DST,

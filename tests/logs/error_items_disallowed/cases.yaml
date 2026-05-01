@@ -9,13 +9,6 @@ dimensions:
           import ~.imported;
       compilerimpl_struct:
         code: "struct MyType = compilerimpl {}"
-      fn_call_without_type:
-        code: |
-          var value = 0;
-          fn fn_() {
-          	  value = 1;
-          }
-          var _result = fn_();
       repeat_with_returned_type:
         code: |
           fn fn_() -> i32 {

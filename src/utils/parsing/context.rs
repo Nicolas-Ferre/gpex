@@ -233,8 +233,8 @@ impl<'config> ParseContext<'config> {
     }
 
     fn parse_whitespaces(&mut self) {
-        let trimmed_code = self.remaining_code().trim_start(); // fn_check: off (recursivity)
-        self.offset += self.remaining_code().len() - trimmed_code.len(); // fn_check: off (recursivity)
+        let trimmed_code = self.remaining_code().trim_start(); // no-fn-check (recursivity)
+        self.offset += self.remaining_code().len() - trimmed_code.len(); // no-fn-check (recursivity)
     }
 }
 

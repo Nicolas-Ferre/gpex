@@ -1,10 +1,8 @@
 //! `GPEx` CLI library.
 
 mod compiler;
-mod language;
 mod runner;
 mod utils;
-mod validators;
 
 pub use compiler::compile_program;
 pub use compiler::save_compiled;
