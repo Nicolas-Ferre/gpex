@@ -42,14 +42,14 @@ is_current_function_pub() {
 }
 
 exit_code=0
-current_function_name=""
-current_function_indent=""
-current_function_visibility=""
 
 while read -r -d '' file; do
     defined_pub_functions=()
     defined_priv_functions=()
     line_number=0
+    current_function_name=""
+    current_function_indent=""
+    current_function_visibility=""
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         if [[ $line =~ $EXCLUSION_REGEX ]]; then

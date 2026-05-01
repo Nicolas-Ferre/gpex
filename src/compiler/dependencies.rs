@@ -160,9 +160,11 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
         let previous_fn_config = self.fn_config;
         self.fn_config = config;
         self.const_checker
-            .set_is_in_const_fn(self.fn_config.is_fn_const);
+            .set_is_in_const_fn(self.fn_config.is_fn_const && self.fn_config.are_args_const);
         let output = callback(self);
         self.fn_config = previous_fn_config;
+        self.const_checker
+            .set_is_in_const_fn(self.fn_config.is_fn_const && self.fn_config.are_args_const);
         output
     }
 }

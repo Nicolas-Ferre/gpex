@@ -80,11 +80,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
         let init_shader = self.transpile_init(modules);
         let update_shader = self.transpile_repeats(modules);
         let mut offset = 0;
-        let variables: Vec<_> = modules
-            .iter()
-            .flat_map(Module::global_vars)
-            .sorted_unstable_by_key(|var| var.id)
-            .collect();
+        let variables: Vec<_> = Self::sorted_global_vars_for_definition(modules);
         let buffer_alignment = self.main_buffer_alignment(&variables);
         let fields = variables
             .iter()
@@ -174,7 +170,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
             .collect()
     }
 
-    pub(crate) fn transpile_init(&mut self, modules: &[Module]) -> String {
+    fn transpile_init(&mut self, modules: &[Module]) -> String {
         let mut dependency_resolver =
             DependencyResolver::new(DependencyType::Transpilation, self.indexes);
         for module in modules {
@@ -186,14 +182,14 @@ impl<'item, 'index> Transpiler<'item, 'index> {
         }
         self.dependencies = dependency_resolver.dependencies;
         self.transpile_shader(modules, |self_| {
-            for var in self_.sorted_global_vars(modules) {
+            for var in self_.sorted_global_vars_for_init(modules) {
                 self_.transpile_var_init(var);
             }
         });
         mem::take(&mut self.shader)
     }
 
-    pub(crate) fn transpile_repeats(&mut self, modules: &[Module]) -> String {
+    fn transpile_repeats(&mut self, modules: &[Module]) -> String {
         let mut dependency_resolver =
             DependencyResolver::new(DependencyType::Transpilation, self.indexes);
         for module in modules {
@@ -234,17 +230,15 @@ impl<'item, 'index> Transpiler<'item, 'index> {
             return;
         }
         self.shader += "struct Buffer { ";
-        for module in modules {
-            for var in module.global_vars() {
-                self.transpile_var_as_struct_field(var);
-            }
+        for var in Self::sorted_global_vars_for_definition(modules) {
+            self.transpile_var_as_struct_field(var);
         }
         self.shader += "} @group(0) @binding(0) var<storage, read_write> ";
         self.shader += MAIN_BUFFER_NAME;
         self.shader += ": Buffer; ";
     }
 
-    fn sorted_global_vars(&self, modules: &'item [Module]) -> Vec<&'item VarDefinition> {
+    fn sorted_global_vars_for_init(&self, modules: &'item [Module]) -> Vec<&'item VarDefinition> {
         let mut dependency_graph = DiGraphMap::<&VarDefinition, ()>::new();
         for var in modules.iter().flat_map(Module::global_vars) {
             dependency_graph.add_node(var);
@@ -261,5 +255,13 @@ impl<'item, 'index> Transpiler<'item, 'index> {
         }
         petgraph::algo::toposort(&dependency_graph, None)
             .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"))
+    }
+
+    fn sorted_global_vars_for_definition(modules: &[Module]) -> Vec<&VarDefinition> {
+        modules
+            .iter()
+            .flat_map(Module::global_vars)
+            .sorted_unstable_by_key(|var| var.id)
+            .collect()
     }
 }
