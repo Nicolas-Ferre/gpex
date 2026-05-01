@@ -57,6 +57,7 @@ pub struct BufferField {
     pub offset: u32,
 }
 
+#[derive(Debug)]
 pub(crate) struct Transpiler<'item, 'index> {
     indexes: &'index Indexes<'item>,
     shader: String,

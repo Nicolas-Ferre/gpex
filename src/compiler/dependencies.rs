@@ -18,6 +18,7 @@ pub(crate) enum DependencyType {
     Transpilation,
 }
 
+#[derive(Debug)]
 pub(crate) struct DependencyResolver<'item, 'index> {
     pub(crate) dependencies: Dependencies<ItemRef<'item>>,
     type_: DependencyType,

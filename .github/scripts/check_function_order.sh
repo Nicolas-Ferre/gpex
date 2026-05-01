@@ -57,10 +57,6 @@ while read -r -d '' file; do
         line_number=$((line_number + 1))
         if [[ $line =~ $EXCLUSION_REGEX ]]; then
             continue
-        elif [[ $line =~ $TRAIT_IMPL_BLOCK_START_REGEX ]]; then
-            is_in_trait_impl_block=true
-        elif [[ $line =~ $TRAIT_IMPL_BLOCK_END_REGEX ]]; then
-            is_in_trait_impl_block=false
         elif [[ $line =~ $FUNCTION_DEFINITION_START_REGEX ]]; then
             current_function_name="${BASH_REMATCH[3]}"
             current_function_visibility=${BASH_REMATCH[2]}
@@ -79,6 +75,11 @@ while read -r -d '' file; do
             current_function_visibility=""
         elif [[ -n $current_function_name ]]; then
             check_function_call "$FUNCTION_CALL_REGEX"
+        fi
+        if [[ $line =~ $TRAIT_IMPL_BLOCK_START_REGEX ]]; then
+            is_in_trait_impl_block=true
+        elif [[ $line =~ $TRAIT_IMPL_BLOCK_END_REGEX ]]; then
+            is_in_trait_impl_block=false
         fi
     done <"$file"
 done < <(find src/ tests/ -type f -name "*.rs" -print0)

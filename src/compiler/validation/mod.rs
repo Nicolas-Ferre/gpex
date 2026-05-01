@@ -19,6 +19,7 @@ use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogLevel};
 use std::path::Path;
 
+#[derive(Debug)]
 pub(crate) struct Validator<'item, 'index> {
     pub(crate) context: ValidateContext<'index>,
     indexes: &'index Indexes<'item>,

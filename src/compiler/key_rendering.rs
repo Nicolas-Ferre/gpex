@@ -4,6 +4,7 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::types::TypeResolver;
 use itertools::Itertools;
 
+#[derive(Debug)]
 pub(crate) struct KeyRenderer<'item, 'index> {
     type_resolver: TypeResolver<'item, 'index>,
 }

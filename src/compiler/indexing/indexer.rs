@@ -10,6 +10,7 @@ use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::utils::indexing::{NodeRef, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 
+#[derive(Debug)]
 pub(crate) struct Indexer<'item> {
     indexes: Indexes<'item>,
 }

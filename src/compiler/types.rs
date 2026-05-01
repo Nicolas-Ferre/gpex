@@ -8,6 +8,7 @@ use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use derive_where::derive_where;
 
+#[derive(Debug)]
 pub(crate) struct TypeResolver<'item, 'index> {
     indexes: &'index Indexes<'item>,
 }
