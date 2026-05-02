@@ -182,10 +182,7 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
         visibility: Visibility,
     ) -> bool {
         if location.file_index() == item.file_index() {
-            let min_scope_len = usize::min(item.scope().len(), location.scope().len());
-            let item_common_scope = &item.scope()[..min_scope_len];
-            let location_common_scope = &location.scope()[..min_scope_len];
-            item_common_scope == location_common_scope
+            location.scope().starts_with(item.scope())
         } else {
             match visibility {
                 Visibility::Enforced => item.is_pub(),

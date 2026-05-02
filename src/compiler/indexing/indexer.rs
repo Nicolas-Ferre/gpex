@@ -247,7 +247,7 @@ impl<'item> Indexer<'item> {
             .items
             .search(search_params, Visibility::Ignored)
             .find(|source| match source {
-                ItemRef::Param(_) => false, // coverage: off (will be covered with https://github.com/Nicolas-Ferre/gpex/issues/115)
+                ItemRef::Param(_) => false,
                 ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_) => true,
             })
     }

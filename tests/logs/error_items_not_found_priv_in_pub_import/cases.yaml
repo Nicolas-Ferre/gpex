@@ -48,3 +48,6 @@ dimensions:
       fn_call:
         form: "_called_fn()"
         source: "fn _called_fn() -> i32 { return 0; }"
+      fn_param:
+        form: "_param"
+        source: "pub fn _called_fn(_param: i32) -> i32 { return _param; }"
