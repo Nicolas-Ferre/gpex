@@ -1,4 +1,4 @@
 import ~.imported2__$$;
 
-{{cycle_location.item1}}
-{{cycle_location.item2}}
+{{cycle_location1.item1}}
+{{cycle_location1.item2}}

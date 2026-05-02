@@ -1,4 +1,4 @@
 import ~.imported1__$$;
 
-pub var cyclic1 = {{cycle_location.item2_ref}};
-pub var cyclic2 = {{cycle_location.item1_ref}};
+{{cycle_location2.item3}}
+{{cycle_location2.item4}}
