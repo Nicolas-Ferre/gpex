@@ -15,7 +15,6 @@ impl Validator<'_, '_> {
             let mut dependency_resolver =
                 DependencyResolver::new(DependencyType::CycleDetection, self_.indexes);
             let dependency_result = dependency_resolver.scan_fn(node);
-            self_.is_cyclic_dependency_found |= dependency_result.is_err();
             validators::item::check_circular_dependencies(
                 ref_,
                 dependency_result,

@@ -27,7 +27,6 @@ pub(crate) struct Validator<'item, 'index> {
     type_resolver: TypeResolver<'item, 'index>,
     key_renderer: KeyRenderer<'item, 'index>,
     const_checker: ConstChecker<'item, 'index>,
-    is_cyclic_dependency_found: bool,
 }
 
 impl<'item, 'index> Validator<'item, 'index> {
@@ -43,7 +42,6 @@ impl<'item, 'index> Validator<'item, 'index> {
             type_resolver: TypeResolver::new(indexes),
             key_renderer: KeyRenderer::new(indexes),
             const_checker: ConstChecker::new(indexes),
-            is_cyclic_dependency_found: false,
         }
     }
 
@@ -56,7 +54,9 @@ impl<'item, 'index> Validator<'item, 'index> {
         for module in modules {
             is_error_detected |= self.validate_module(module).is_err();
         }
-        if !is_error_detected && !self.is_cyclic_dependency_found {
+        if !is_error_detected {
+            // Import usage is checked in dedicated pass to avoid false positive
+            // in case of cyclic dependencies.
             for module in modules {
                 self.validate_module_import_usage(module);
             }
@@ -83,9 +83,7 @@ impl<'item, 'index> Validator<'item, 'index> {
         let mut are_imports_finished = false;
         for item in &node.items {
             if let Item::Import(import) = item {
-                if self.validate_import(import, !are_imports_finished).is_err() {
-                    is_module_valid = false;
-                }
+                is_module_valid &= self.validate_import(import, !are_imports_finished).is_ok();
             } else {
                 are_imports_finished = true;
             }
@@ -94,7 +92,10 @@ impl<'item, 'index> Validator<'item, 'index> {
             return Err(ValidateError);
         }
         for item in &node.items {
-            _ = self.validate_item(item);
+            is_module_valid &= self.validate_item(item).is_ok();
+        }
+        if !is_module_valid {
+            return Err(ValidateError);
         }
         Ok(())
     }

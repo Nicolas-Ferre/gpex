@@ -44,7 +44,6 @@ impl Validator<'_, '_> {
         let mut dependency_resolver =
             DependencyResolver::new(DependencyType::CycleDetection, self.indexes);
         let dependency_result = dependency_resolver.scan_var(node);
-        self.is_cyclic_dependency_found |= dependency_result.is_err();
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_unique_definition(ref_, &mut self.context, self.indexes)?;
         validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
@@ -59,7 +58,6 @@ impl Validator<'_, '_> {
         let mut dependency_resolver =
             DependencyResolver::new(DependencyType::CycleDetection, self.indexes);
         let dependency_result = dependency_resolver.scan_const(node);
-        self.is_cyclic_dependency_found |= dependency_result.is_err();
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_unique_definition(ref_, &mut self.context, self.indexes)?;
         validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
