@@ -185,7 +185,7 @@ exclusions:
   - expr_location: [ fn_param_type, fn_return_type ]
     expr: [ literal_bool, literal_f32, literal_i32, literal_u32, fn_param ]
 
-  - expr_location: [ value_global, repeat_fn_arg ]
+  - expr_location: [ value_global, repeat_fn_arg, fn_param_type, fn_return_type ]
     expr_arg: [ fn_param ]
 
   - result: [ const ]
@@ -202,8 +202,3 @@ exclusions:
 
   - fn: [ const ]
     expr_arg: [ var_global, fn_call_not_const ]
-
-  - expr_location: [ fn_param_type, fn_return_type ]
-    expr: [ fn_call_const_args, fn_call_not_const_args ]
-    expr_arg: [ fn_param ]
-
