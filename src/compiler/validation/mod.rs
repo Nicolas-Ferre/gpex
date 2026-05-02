@@ -50,8 +50,16 @@ impl<'item, 'index> Validator<'item, 'index> {
         modules: &[Module],
         is_warning_treated_as_error: bool,
     ) -> Result<Vec<Log>, Vec<Log>> {
+        let mut is_error_detected = false;
         for module in modules {
-            _ = self.validate_module(module);
+            is_error_detected |= self.validate_module(module).is_err();
+        }
+        if !is_error_detected {
+            // Import usage is checked in dedicated pass to avoid false positive
+            // in case of cyclic dependencies.
+            for module in modules {
+                self.validate_module_import_usage(module);
+            }
         }
         if self
             .context
@@ -75,9 +83,7 @@ impl<'item, 'index> Validator<'item, 'index> {
         let mut are_imports_finished = false;
         for item in &node.items {
             if let Item::Import(import) = item {
-                if self.validate_import(import, !are_imports_finished).is_err() {
-                    is_module_valid = false;
-                }
+                is_module_valid &= self.validate_import(import, !are_imports_finished).is_ok();
             } else {
                 are_imports_finished = true;
             }
@@ -86,14 +92,16 @@ impl<'item, 'index> Validator<'item, 'index> {
             return Err(ValidateError);
         }
         for item in &node.items {
-            _ = self.validate_item(item);
+            is_module_valid &= self.validate_item(item).is_ok();
+        }
+        if !is_module_valid {
+            return Err(ValidateError);
         }
         Ok(())
     }
 
     fn validate_import(&mut self, node: &Import, is_top_import: bool) -> Result<(), ValidateError> {
         let is_found = node.imported_file_index.is_some();
-        let is_pub = node.pub_keyword_span.is_some();
         validators::import::check_found(is_found, &node.segments, &mut self.context)?;
         validators::import::check_top(is_top_import, node.span, &mut self.context)?;
         validators::import::check_self_import(
@@ -101,20 +109,27 @@ impl<'item, 'index> Validator<'item, 'index> {
             node.span,
             &mut self.context,
         );
-        validators::import::check_usage(
-            node.id,
-            node.imported_file_index,
-            node.span,
-            is_pub,
-            &node.segments,
-            &mut self.context,
-            self.indexes,
-        );
         for &segment in &node.segments {
             if let ImportSegment::Name(span) = segment {
                 validators::ident::check_case(span, &[Case::Snake], &mut self.context);
             }
         }
         Ok(())
+    }
+
+    fn validate_module_import_usage(&mut self, node: &Module) {
+        for item in &node.items {
+            if let Item::Import(import) = item {
+                validators::import::check_usage(
+                    import.id,
+                    import.imported_file_index,
+                    import.span,
+                    import.pub_keyword_span.is_some(),
+                    &import.segments,
+                    &mut self.context,
+                    self.indexes,
+                );
+            }
+        }
     }
 }

@@ -1,41 +1,126 @@
 # Test circular expression with all expression locations.
 
 dimensions:
-  - id: cycle_location
+  - id: cycle_location1
     cases:
       const_global:
-        item1: "pub const CONST1 = cyclic1;"
-        item1_ref: "CONST1"
-        item2: "pub const CONST2 = cyclic2;"
-        item2_ref: "CONST2"
+        item1: "pub const CONST1 = {{cycle_location2.item3_ref}};"
+        item2: "pub const CONST2 = {{cycle_location2.item4_ref}};"
       var_global:
-        item1: "pub var var1 = cyclic1;"
-        item1_ref: "var1"
-        item2: "pub var var2 = cyclic2;"
-        item2_ref: "var2"
+        item1: "pub var var1 = {{cycle_location2.item3_ref}};"
+        item2: "pub var var2 = {{cycle_location2.item4_ref}};"
       statement_assignment_left:
-        item1: "pub fn fn1() -> i32 { cyclic1 = 0; return true; }"
-        item1_ref: "fn1()"
-        item2: "pub fn fn2() -> i32 { cyclic2 = 0; return true; }"
-        item2_ref: "fn2()"
+        item1: "pub fn fn1() -> i32 { {{cycle_location2.item3_ref}} = 0; return true; }"
+        item2: "pub fn fn2() -> i32 { {{cycle_location2.item4_ref}} = 0; return true; }"
       statement_assignment_right:
-        item1: "pub fn fn1() -> i32 { var_ = cyclic1; return true; }"
-        item1_ref: "fn1()"
-        item2: "pub fn fn2() -> i32 { var_ = cyclic2; return 0; }"
-        item2_ref: "fn2()"
+        item1: "pub fn fn1() -> i32 { var_ = {{cycle_location2.item3_ref}}; return true; }"
+        item2: "pub fn fn2() -> i32 { var_ = {{cycle_location2.item4_ref}}; return 0; }"
       statement_return:
-        item1: "pub fn fn1() -> i32 { return cyclic1; }"
-        item1_ref: "fn1()"
-        item2: "pub fn fn2() -> i32 { return cyclic2; }"
-        item2_ref: "fn2()"
+        item1: "pub fn fn1() -> i32 { return {{cycle_location2.item3_ref}}; }"
+        item2: "pub fn fn2() -> i32 { return {{cycle_location2.item4_ref}}; }"
       call_arg:
-        item1: "pub var var1 = called(cyclic1);"
-        item1_ref: "var1"
-        item2: "pub var var2 = called(cyclic2);"
-        item2_ref: "var2"
+        item1: "pub var var1 = called({{cycle_location2.item3_ref}});"
+        item2: "pub var var2 = called({{cycle_location2.item4_ref}});"
+      fn_param_type:
+        item1: "pub fn fn1(_param: {{cycle_location2.item3_ref}}) -> i32 { return 0; }"
+        item2: "pub fn fn2(_param: {{cycle_location2.item4_ref}}) -> i32 { return 0; }"
       fn_return_type:
-        item1: "pub fn fn1() -> cyclic1 { return 0; }"
-        item1_ref: "fn1()"
-        item2: "pub fn fn2() -> cyclic2 { return 0; }"
-        item2_ref: "fn2()"
-      # fn_param_type and repeat_fn_arg case are not defined as they never create circular dependencies.
+        item1: "pub fn fn1() -> {{cycle_location2.item3_ref}} { return 0; }"
+        item2: "pub fn fn2() -> {{cycle_location2.item4_ref}} { return 0; }"
+      # repeat_fn_arg case is not defined as it never creates circular dependencies.
+
+  - id: cycle_location2
+    cases:
+      const_global:
+        item3: "pub const CONST3 = {{cycle_location1_ref.item2}};"
+        item3_ref: "CONST3"
+        item4: "pub const CONST4 = {{cycle_location1_ref.item1}};"
+        item4_ref: "CONST4"
+      var_global:
+        item3: "pub var var3 = {{cycle_location1_ref.item2}};"
+        item3_ref: "var3"
+        item4: "pub var var4 = {{cycle_location1_ref.item1}};"
+        item4_ref: "var4"
+      statement_assignment_left:
+        item3: "pub fn fn3() -> i32 { {{cycle_location1_ref.item2}} = 0; return true; }"
+        item3_ref: "fn3()"
+        item4: "pub fn fn4() -> i32 { {{cycle_location1_ref.item1}} = 0; return true; }"
+        item4_ref: "fn4()"
+      statement_assignment_right:
+        item3: "pub fn fn3() -> i32 { var_ = {{cycle_location1_ref.item2}}; return true; }"
+        item3_ref: "fn3()"
+        item4: "pub fn fn4() -> i32 { var_ = {{cycle_location1_ref.item1}}; return 0; }"
+        item4_ref: "fn4()"
+      statement_return:
+        item3: "pub fn fn3() -> i32 { return {{cycle_location1_ref.item2}}; }"
+        item3_ref: "fn3()"
+        item4: "pub fn fn4() -> i32 { return {{cycle_location1_ref.item1}}; }"
+        item4_ref: "fn4()"
+      call_arg:
+        item3: "pub var var3 = called({{cycle_location1_ref.item2}});"
+        item3_ref: "var3"
+        item4: "pub var var4 = called({{cycle_location1_ref.item1}});"
+        item4_ref: "var4"
+      fn_param_type:
+        item3: "pub fn fn3(_param: {{cycle_location1_ref.item2}}) -> i32 { return 0; }"
+        item3_ref: "fn3(0)"
+        item4: "pub fn fn4(_param: {{cycle_location1_ref.item1}}) -> i32 { return 0; }"
+        item4_ref: "fn4(0)"
+      fn_return_type:
+        item3: "pub fn fn3() -> {{cycle_location1_ref.item2}} { return 0; }"
+        item3_ref: "fn3()"
+        item4: "pub fn fn4() -> {{cycle_location1_ref.item1}} { return 0; }"
+        item4_ref: "fn4()"
+      # repeat_fn_arg case is not defined as it never creates circular dependencies.
+
+  - id: cycle_location1_ref
+    cases:
+      const:
+        item1: "CONST1"
+        item2: "CONST2"
+      var:
+        item1: "var1"
+        item2: "var2"
+      fn_without_arg:
+        item1: "fn1()"
+        item2: "fn2()"
+      fn_with_arg:
+        item1: "fn1(0)"
+        item2: "fn2(0)"
+
+exclusions:
+  - cycle_location1:
+      - var_global
+      - statement_assignment_left
+      - statement_assignment_right
+      - statement_return
+      - call_arg
+      - fn_param_type
+      - fn_return_type
+    cycle_location1_ref: [ const ]
+
+  - cycle_location1:
+      - const_global
+      - statement_assignment_left
+      - statement_assignment_right
+      - statement_return
+      - fn_param_type
+      - fn_return_type
+    cycle_location1_ref: [ var ]
+
+  - cycle_location1:
+      - const_global
+      - var_global
+      - fn_param_type
+      - call_arg
+    cycle_location1_ref: [ fn_without_arg ]
+
+  - cycle_location1:
+      - const_global
+      - var_global
+      - statement_assignment_left
+      - statement_assignment_right
+      - statement_return
+      - call_arg
+      - fn_return_type
+    cycle_location1_ref: [ fn_with_arg ]

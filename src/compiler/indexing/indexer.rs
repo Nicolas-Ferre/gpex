@@ -11,6 +11,15 @@ use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::utils::indexing::{NodeRef, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 
+pub(crate) const FN_CALL_SEARCH_CONFIG: SearchConfig = SearchConfig {
+    can_be_after: true,
+    can_be_parent_node: true,
+};
+const IDENT_SEARCH_CONFIG: SearchConfig = SearchConfig {
+    can_be_after: false,
+    can_be_parent_node: false,
+};
+
 #[derive(Debug)]
 pub(crate) struct Indexer<'item> {
     indexes: Indexes<'item>,
@@ -171,10 +180,7 @@ impl<'item> Indexer<'item> {
             key: &call.key(),
             location: call,
             imports: &self.indexes.imports,
-            config: SearchConfig {
-                can_be_after: true,
-                can_be_parent_node: true,
-            },
+            config: FN_CALL_SEARCH_CONFIG,
         };
         if let Some(source) = self.search_accessible_call_source(call, search_params) {
             self.index_accessible_source(&call, call.span, source);
@@ -191,10 +197,7 @@ impl<'item> Indexer<'item> {
             key: &ident.slice,
             location: ident,
             imports: &self.indexes.imports,
-            config: SearchConfig {
-                can_be_after: false,
-                can_be_parent_node: false,
-            },
+            config: IDENT_SEARCH_CONFIG,
         };
         let matching_value = self.search_accessible_ident_source(search_params);
         if let Some(source) = matching_value {
