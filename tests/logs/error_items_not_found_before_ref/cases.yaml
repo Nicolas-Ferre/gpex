@@ -47,10 +47,12 @@ dimensions:
       fn_call_with_mismatching_param_type:
         form: "_called_fn(123u)"
         source: "fn _called_fn(param: i32) -> i32 { return param; }"
+      fn_call_with_unknown_arg_type:
+        form: "called(unknown_return_type())"
+        source: "pub const fn unknown_return_type() -> unknown { return 0; }"
       fn_param_external:
         form: "other_param"
         source: "pub fn _other_fn(other_param: i32) -> i32 { return other_param; }"
-        assign_itself: ""
 
 exclusions:
   # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/115)

@@ -48,12 +48,11 @@ impl Validator<'_, '_> {
         for arg in &node.args {
             self.validate_expr(arg, self.const_mark_span)?; // no-fn-check (recursivity)
         }
-        let fn_key = self.key_renderer.call_key(node);
         let source = validators::item::check_found(
             node,
             node.span,
             &node.key(),
-            &fn_key,
+            &self.key_renderer.call_key(node)?,
             &mut self.context,
             self.indexes,
         )?;
