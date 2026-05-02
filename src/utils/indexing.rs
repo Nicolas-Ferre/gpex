@@ -181,11 +181,17 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
         location: impl NodeRef,
         visibility: Visibility,
     ) -> bool {
-        location.file_index() == item.file_index()
-            || match visibility {
+        if location.file_index() == item.file_index() {
+            let min_scope_len = usize::min(item.scope().len(), location.scope().len());
+            let item_common_scope = &item.scope()[..min_scope_len];
+            let location_common_scope = &location.scope()[..min_scope_len];
+            item_common_scope == location_common_scope
+        } else {
+            match visibility {
                 Visibility::Enforced => item.is_pub(),
                 Visibility::Ignored => true,
             }
+        }
     }
 
     fn is_item_location_child(item: Item, location: impl NodeRef) -> bool {
