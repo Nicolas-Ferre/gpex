@@ -45,6 +45,15 @@ impl Log {
             inner: vec![],
         }
     }
+
+    pub(crate) fn sort_key(&self) -> (LogLevel, Option<(PathBuf, usize)>) {
+        (
+            self.level,
+            self.location
+                .as_ref()
+                .map(|location| (location.path.clone(), location.span.start)),
+        )
+    }
 }
 
 /// A compilation inner log.
@@ -104,7 +113,7 @@ impl Display for LogLocation {
 }
 
 /// The level of a compilation log.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LogLevel {
     /// An error.
     Error,
