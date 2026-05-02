@@ -24,7 +24,9 @@ impl Validator<'_, '_> {
             self_.validate_fn_return_type(node)?;
             self_.validate_fn_statements(node)?;
             self_.validate_fn_name(node);
-            let fn_key = self_.key_renderer.fn_key(node);
+            let Some(fn_key) = self_.key_renderer.fn_key(node) else {
+                return Err(ValidateError);
+            };
             validators::item::check_usage(ref_, &fn_key, &mut self_.context, self_.indexes);
             Ok(())
         })

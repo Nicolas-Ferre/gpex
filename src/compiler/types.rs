@@ -88,11 +88,11 @@ pub(crate) enum Type<'item> {
 }
 
 impl<'item> Type<'item> {
-    pub(crate) fn name(self) -> &'item str {
-        match self {
-            Type::Struct(struct_) => &struct_.name,
-            Type::NoReturn => unreachable!("no-type expression is not allowed as argument"),
-            Type::Unknown => unreachable!("unknown-type expression is not allowed as argument"),
+    pub(crate) fn name(self) -> Option<&'item str> {
+        if let Type::Struct(struct_) = self {
+            Some(&struct_.name)
+        } else {
+            None
         }
     }
 
