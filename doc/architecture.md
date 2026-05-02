@@ -18,7 +18,7 @@ Key directories and files:
 - `src/compiler/`: Compilation pipeline orchestration and definition of each pipeline stage:
     - `parsing/`: AST definitions and parsing: modules, imports, items (functions, variables,
       structs, ...), expressions, statements
-    - `indexing/`: Symbol table construction (imports, item references)
+    - `indexing/`: Symbol table construction (imports, item references, ...)
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...)
     - `transpilation/`: AST-to-WGSL conversion
