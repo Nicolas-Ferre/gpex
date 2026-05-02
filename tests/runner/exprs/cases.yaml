@@ -203,6 +203,7 @@ exclusions:
   - fn: [ const ]
     expr_arg: [ var_global, fn_call_not_const ]
 
-  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/106)
   - expr_location: [ fn_param_type, fn_return_type ]
-    expr: [ fn_call_const_args, fn_call_not_const_args, fn_call_const_no_args, fn_call_not_const_no_args ]
+    expr: [ fn_call_const_args, fn_call_not_const_args ]
+    expr_arg: [ fn_param ]
+

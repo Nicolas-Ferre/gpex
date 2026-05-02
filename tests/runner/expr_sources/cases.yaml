@@ -134,15 +134,3 @@ exclusions:
   - expr_location: [ statement_assignment_left ]
     expr: [ const_global, fn_call_no_args, fn_call_args, fn_param ]
 
-  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/106)
-  - source_location: [ after_expr ]
-    expr_location: [ fn_param_type ]
-    expr: [ fn_call_no_args ]
-
-  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/106)
-  - expr_location: [ fn_param_type ]
-    expr: [ fn_call_args ]
-
-  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/106)
-  - expr_location: [ fn_return_type ]
-    expr: [ fn_call_args ]
