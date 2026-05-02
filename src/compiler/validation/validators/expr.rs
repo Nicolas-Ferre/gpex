@@ -76,7 +76,7 @@ pub(crate) fn check_no_return_type(
         let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
         context.logs.push(Log {
             level: LogLevel::Error,
-            msg: format!("called function `{fn_key}` with no return type",),
+            msg: format!("called function `{fn_key}` with no return type"),
             location: Some(context.location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
@@ -101,7 +101,7 @@ pub(crate) fn check_has_return_type(
         let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
         context.logs.push(Log {
             level: LogLevel::Error,
-            msg: format!("repeated function `{fn_key}` with a return type",),
+            msg: format!("repeated function `{fn_key}` with a return type"),
             location: Some(context.location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
