@@ -6,6 +6,7 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
+use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
 #[derive(Debug)]
@@ -88,11 +89,11 @@ pub(crate) enum Type<'item> {
 }
 
 impl<'item> Type<'item> {
-    pub(crate) fn name(self) -> Option<&'item str> {
+    pub(crate) fn name(self) -> Result<&'item str, ValidateError> {
         if let Type::Struct(struct_) = self {
-            Some(&struct_.name)
+            Ok(&struct_.name)
         } else {
-            None
+            Err(ValidateError)
         }
     }
 

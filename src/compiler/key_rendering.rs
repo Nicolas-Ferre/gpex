@@ -2,6 +2,7 @@ use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::types::TypeResolver;
+use crate::utils::validation::ValidateError;
 
 #[derive(Debug)]
 pub(crate) struct KeyRenderer<'item, 'index> {
@@ -15,26 +16,26 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
         }
     }
 
-    pub(crate) fn call_key(&self, node: &Call) -> Option<String> {
+    pub(crate) fn call_key(&self, node: &Call) -> Result<String, ValidateError> {
         let fn_name = &node.name;
         let arg_types = node
             .args
             .iter()
             .map(|arg| self.type_resolver.expr_type(arg).name())
-            .collect::<Option<Vec<_>>>()?
+            .collect::<Result<Vec<_>, _>>()?
             .join(", ");
-        Some(format!("{fn_name}({arg_types})"))
+        Ok(format!("{fn_name}({arg_types})"))
     }
 
-    pub(crate) fn fn_key(&self, node: &FnDefinition) -> Option<String> {
+    pub(crate) fn fn_key(&self, node: &FnDefinition) -> Result<String, ValidateError> {
         let fn_name = &node.name;
         let param_types = node
             .params
             .params
             .iter()
             .map(|param| self.type_resolver.expr_as_type(&param.type_).name())
-            .collect::<Option<Vec<_>>>()?
+            .collect::<Result<Vec<_>, _>>()?
             .join(", ");
-        Some(format!("{fn_name}({param_types})"))
+        Ok(format!("{fn_name}({param_types})"))
     }
 }

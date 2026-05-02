@@ -73,9 +73,7 @@ pub(crate) fn check_no_return_type(
     if let Some(&ItemRef::Fn(fn_)) = indexes.sources.get(&node.id())
         && fn_.return_type.is_none()
     {
-        let Some(fn_key) = KeyRenderer::new(indexes).fn_key(fn_) else {
-            return Err(ValidateError);
-        };
+        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("called function `{fn_key}` with no return type",),
@@ -100,9 +98,7 @@ pub(crate) fn check_has_return_type(
     if let Some(&ItemRef::Fn(fn_)) = indexes.sources.get(&node.id())
         && fn_.return_type.is_some()
     {
-        let Some(fn_key) = KeyRenderer::new(indexes).fn_key(fn_) else {
-            return Err(ValidateError);
-        };
+        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("repeated function `{fn_key}` with a return type",),
