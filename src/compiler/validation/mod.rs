@@ -61,6 +61,7 @@ impl<'item, 'index> Validator<'item, 'index> {
                 self.validate_module_import_usage(module);
             }
         }
+        self.context.logs.sort_by_key(Log::sort_key);
         if self
             .context
             .logs
