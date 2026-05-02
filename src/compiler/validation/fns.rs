@@ -10,24 +10,20 @@ use crate::utils::validation::ValidateError;
 
 impl Validator<'_, '_> {
     pub(super) fn validate_fn(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
+        let ref_ = ItemRef::Fn(node);
+        let mut dependency_resolver =
+            DependencyResolver::new(DependencyType::CycleDetection, self.indexes);
+        let dependency_result = dependency_resolver.scan_fn(node);
+        validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
+        self.validate_params(&node.params)?;
+        self.validate_fn_return_type(node)?;
         self.run_with_fn_constness(node.const_keyword_span.is_some(), |self_| {
-            let ref_ = ItemRef::Fn(node);
-            let mut dependency_resolver =
-                DependencyResolver::new(DependencyType::CycleDetection, self_.indexes);
-            let dependency_result = dependency_resolver.scan_fn(node);
-            validators::item::check_circular_dependencies(
-                ref_,
-                dependency_result,
-                &mut self_.context,
-            )?;
-            self_.validate_params(&node.params)?;
-            self_.validate_fn_return_type(node)?;
-            self_.validate_fn_statements(node)?;
-            self_.validate_fn_name(node);
-            let fn_key = self_.key_renderer.fn_key(node)?;
-            validators::item::check_usage(ref_, &fn_key, &mut self_.context, self_.indexes);
-            Ok(())
-        })
+            self_.validate_fn_statements(node)
+        })?;
+        self.validate_fn_name(node);
+        let fn_key = self.key_renderer.fn_key(node)?;
+        validators::item::check_usage(ref_, &fn_key, &mut self.context, self.indexes);
+        Ok(())
     }
 
     fn run_with_fn_constness<O>(

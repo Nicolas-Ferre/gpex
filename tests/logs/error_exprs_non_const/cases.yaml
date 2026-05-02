@@ -17,6 +17,16 @@ dimensions:
         code: "fn _result(_param: {{non_const_item.ref}}) -> i32 { return 123; }"
       fn_return_type:
         code: "fn _result() -> {{non_const_item.ref}} { return 123; }"
+      fn_param_type_typeref_param:
+        code: |
+          const fn fn_(param_typeref: typeref, _param_other: {{non_const_item.ref}}) -> i32 {
+              return 123;
+          }
+      fn_return_type_with_typeref_param:
+        code: |
+          const fn fn_(param_typeref: typeref, _param_other: i32) -> {{non_const_item.ref}} {
+              return 123;
+          }
 
   - id: non_const_item
     cases:
@@ -26,3 +36,17 @@ dimensions:
       fn:
         code: "fn fn_() -> i32 { return 123; }"
         ref: "fn_()"
+      param:
+        code: ""
+        ref: "param_typeref"
+
+exclusions:
+  - const_expr_location:
+      - const_global
+      - statement_assignment_left
+      - statement_assignment_right
+      - statement_return
+      - call_arg
+      - fn_param_type
+      - fn_return_type
+    non_const_item: [ param ]

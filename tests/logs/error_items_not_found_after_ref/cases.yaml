@@ -31,6 +31,11 @@ dimensions:
           fn _fn(_param: {{expr.form}}) -> i32 {
               return 123;
           }
+      fn_with_param_after_param_type:
+        code: |
+          fn _fn(_before_param: {{expr.form}}, _param: typeref) -> i32 {
+              return 123;
+          }
       fn_return_type:
         # function is `const` to increase test coverage
         code: |
@@ -71,8 +76,5 @@ exclusions:
       - statement_assignment_right
       - statement_return
       - repeat_fn_arg
-    expr: [ fn_param ]
-
-  # Bug to fix (https://github.com/Nicolas-Ferre/gpex/issues/114)
-  - expr_location: [ fn_return_type ]
+      - fn_return_type
     expr: [ fn_param ]
