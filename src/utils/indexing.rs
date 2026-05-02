@@ -181,11 +181,14 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
         location: impl NodeRef,
         visibility: Visibility,
     ) -> bool {
-        location.file_index() == item.file_index()
-            || match visibility {
+        if location.file_index() == item.file_index() {
+            location.scope().starts_with(item.scope())
+        } else {
+            match visibility {
                 Visibility::Enforced => item.is_pub(),
                 Visibility::Ignored => true,
             }
+        }
     }
 
     fn is_item_location_child(item: Item, location: impl NodeRef) -> bool {
