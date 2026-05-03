@@ -69,12 +69,12 @@ impl Validator<'_, '_> {
     }
 
     fn const_allowed_cases(&self, node: &ConstDefinition) -> &'static [Case] {
-        let may_return_typeref = self
+        let may_be_typeref = self
             .type_resolver
             .expr_type(&node.value)
             .struct_ref()
             .is_none_or(|type_| type_ == self.indexes.search_prelude_type("typeref"));
-        if may_return_typeref {
+        if may_be_typeref {
             &[Case::ScreamingSnake, Case::Pascal]
         } else {
             &[Case::ScreamingSnake]
@@ -115,12 +115,12 @@ impl Validator<'_, '_> {
     }
 
     fn param_allowed_cases(&self, node: &Param) -> &'static [Case] {
-        let may_return_typeref = self
+        let may_be_typeref = self
             .type_resolver
             .expr_as_type(&node.type_)
             .struct_ref()
             .is_none_or(|type_| type_ == self.indexes.search_prelude_type("typeref"));
-        if may_return_typeref {
+        if may_be_typeref {
             &[Case::Snake, Case::Pascal]
         } else {
             &[Case::Snake]
