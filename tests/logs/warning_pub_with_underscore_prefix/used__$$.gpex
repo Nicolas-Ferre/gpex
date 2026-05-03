@@ -1,0 +1,2 @@
+pub {{item.code}} // warning about used item with underscore prefix should not be triggered
+var _usage = {{item.ref}};
