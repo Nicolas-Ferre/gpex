@@ -15,3 +15,5 @@ dimensions:
         code: "var var_ = 0;"
       fn:
         code: "fn fn_() -> i32 { return 0; }"
+      fn_param:
+        code: "fn fn_(param: i32) -> i32 { return 0; } var _result = fn_(0);"

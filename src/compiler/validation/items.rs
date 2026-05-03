@@ -98,6 +98,7 @@ impl Validator<'_, '_> {
     }
 
     fn validate_param(&mut self, param: &Param) -> Result<(), ValidateError> {
+        let ref_ = ItemRef::Param(param);
         self.validate_expr(&param.type_, Some(param.colon_span))?;
         validators::expr::check_types(
             param.type_.span(),
@@ -106,6 +107,23 @@ impl Validator<'_, '_> {
             Type::Struct(self.indexes.search_prelude_type("typeref")),
             &mut self.context,
         )?;
+        validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
+        validators::ident::check_char_count(param.name_span, &mut self.context);
+        let allowed_cases = self.param_allowed_cases(param);
+        validators::ident::check_case(param.name_span, allowed_cases, &mut self.context);
         Ok(())
+    }
+
+    fn param_allowed_cases(&self, node: &Param) -> &'static [Case] {
+        let may_return_typeref = self
+            .type_resolver
+            .expr_as_type(&node.type_)
+            .struct_ref()
+            .is_none_or(|type_| type_ == self.indexes.search_prelude_type("typeref"));
+        if may_return_typeref {
+            &[Case::Snake, Case::Pascal]
+        } else {
+            &[Case::Snake]
+        }
     }
 }
