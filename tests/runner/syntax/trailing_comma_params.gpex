@@ -2,4 +2,4 @@ fn fn_(param1: i32,) -> i32 {
     return param1;
 }
 
-var _value = fn_(123); // expected: 123
+var _result = fn_(123); // expected: 123
