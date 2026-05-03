@@ -10,7 +10,7 @@ dimensions:
       statement_assignment_left:
         code: |
           {{result.item_type}} output = called_fn({{expr.type_default}});
-          fn called_fn(param: {{expr.type}}) -> {{expr.type}} {
+          {{fn.qualifier}} fn called_fn(param: {{expr.type}}) -> {{expr.type}} {
               {{expr.form}} = {{expr.type_default}};
               return {{expr.form}};
           }
