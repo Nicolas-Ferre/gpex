@@ -6,13 +6,12 @@ mod common;
 use crate::common::Error;
 use gpex::{Program, Runner};
 use itertools::Itertools;
-use naga::back::wgsl as wgsl_back;
-use naga::front::wgsl;
-use naga::valid::{Capabilities, ValidationFlags, Validator};
 use regex::Regex;
 use std::ffi::OsStr;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
+use wgsl_parse::syntax::TranslationUnit;
 
 #[tokio::test]
 async fn run_const_optimizations() -> Result<(), Error> {
@@ -221,13 +220,8 @@ fn to_dot_path(file_path: &Path, root_path: &Path) -> String {
 }
 
 fn format_wgsl(code: &str) -> Result<String, Error> {
-    let module = wgsl::parse_str(code).map_err(convert_error)?;
-    let mut validator = Validator::new(ValidationFlags::all(), Capabilities::all());
-    let info = validator.validate(&module).map_err(convert_error)?;
-    let mut output = String::new();
-    let mut writer = wgsl_back::Writer::new(&mut output, wgsl_back::WriterFlags::empty());
-    writer.write(&module, &info).map_err(convert_error)?;
-    Ok(output)
+    let module = TranslationUnit::from_str(code).map_err(convert_error)?;
+    Ok(module.to_string())
 }
 
 fn convert_error(error: impl std::error::Error + 'static) -> Error {

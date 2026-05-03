@@ -4,9 +4,14 @@ dimensions:
   - id: expr_location
     cases:
       statement_assignment_left:
+        # call the function in another function signature to increase test coverage
         code: |
-          fn _fn(_param: i32) {
+          const fn called_fn() -> typeref {
               {{expr.form}} = {{expr.form}};
+              return i32;
+          }
+          fn _fn() -> called_fn() {
+              return 1;
           }
 
   - id: expr
@@ -26,12 +31,12 @@ dimensions:
       literal_u32:
         form: "0u"
         source: ""
+      type_native:
+        form: "i32"
+        source: ""
       const_global:
         form: "CONST"
         source: "const CONST = 123;"
       fn_call:
         form: "fn_()"
-        source: "fn fn_() -> i32 { return 0; }"
-      fn_param:
-        form: "_param"
-        source: ""
+        source: "const fn fn_() -> i32 { return 0; }"

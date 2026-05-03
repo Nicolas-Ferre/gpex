@@ -10,7 +10,7 @@ dimensions:
       statement_assignment_left:
         code: |
           {{result.item_type}} output = called_fn({{expr.type_default}});
-          fn called_fn(param: {{expr.type}}) -> {{expr.type}} {
+          {{fn.qualifier}} fn called_fn(param: {{expr.type}}) -> {{expr.type}} {
               {{expr.form}} = {{expr.type_default}};
               return {{expr.form}};
           }
@@ -165,6 +165,9 @@ exclusions:
   - expr_location: [ fn_param_type, fn_return_type ]
     result: [ var ]
 
+  - expr_location: [ statement_assignment_left ]
+    result: [ const ]
+
   - expr_location: [ value_global, repeat_fn_arg ]
     expr: [ fn_param ]
 
@@ -180,7 +183,6 @@ exclusions:
       - fn_call_not_const_args
       - fn_call_const_no_args
       - fn_call_const_args
-      - fn_param
 
   - expr_location: [ fn_param_type, fn_return_type ]
     expr: [ literal_bool, literal_f32, literal_i32, literal_u32, fn_param ]
