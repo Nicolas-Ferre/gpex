@@ -3,6 +3,12 @@
 dimensions:
   - id: expr_location
     cases:
+      statement_assignment_left:
+        code: |
+          var result = {{expr.other_type_default}};
+          fn _fn({{expr.params}}) {
+              {{expr.form}} = result;
+          }
       statement_assignment_right:
         code: |
           var result = {{expr.other_type_default}};
@@ -103,3 +109,16 @@ dimensions:
 exclusions:
   - expr_location: [ fn_param_type, fn_return_type ]
     expr: [ var_global, type_native, fn_param ]
+
+  - expr_location: [ statement_assignment_left ]
+    expr:
+      - literal_bool_true
+      - literal_bool_false
+      - literal_f32
+      - literal_i32
+      - literal_u32
+      - type_native
+      - const_global
+      - fn_call_no_arg
+      - fn_call_args
+      - fn_call_with_invalid_return_type

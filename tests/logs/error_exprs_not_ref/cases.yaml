@@ -26,6 +26,9 @@ dimensions:
       literal_u32:
         form: "0u"
         source: ""
+      type_native:
+        form: "i32"
+        source: ""
       const_global:
         form: "CONST"
         source: "const CONST = 123;"

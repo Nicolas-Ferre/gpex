@@ -5,3 +5,4 @@ error: expression is not a reference (at <root>/main__statement_assignment_left_
 error: expression is not a reference (at <root>/main__statement_assignment_left__literal_f32.gpex:3:5)
 error: expression is not a reference (at <root>/main__statement_assignment_left__literal_i32.gpex:3:5)
 error: expression is not a reference (at <root>/main__statement_assignment_left__literal_u32.gpex:3:5)
+error: expression is not a reference (at <root>/main__statement_assignment_left__type_native.gpex:3:5)

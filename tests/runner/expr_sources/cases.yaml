@@ -132,5 +132,5 @@ exclusions:
     expr: [ fn_param ]
 
   - expr_location: [ statement_assignment_left ]
-    expr: [ const_global, fn_call_no_args, fn_call_args, fn_param ]
+    expr: [ const_global, fn_call_no_args, fn_call_args ]
 
