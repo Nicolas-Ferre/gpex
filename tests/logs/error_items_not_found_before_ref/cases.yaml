@@ -49,7 +49,7 @@ dimensions:
         source: "fn _called_fn(param: i32) -> i32 { return param; }"
       fn_call_with_unknown_arg_type:
         form: "called(unknown_return_type())"
-        source: "pub const fn unknown_return_type() -> unknown { return 0; }"
+        source: "const fn unknown_return_type() -> unknown { return 0; }"
       fn_param_external:
         form: "other_param"
-        source: "pub fn _other_fn(other_param: i32) -> i32 { return other_param; }"
+        source: "fn _other_fn(other_param: i32) -> i32 { return other_param; }"
