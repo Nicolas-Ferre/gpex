@@ -1,7 +1,7 @@
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 
 #[derive(Debug)]
@@ -16,7 +16,7 @@ impl Module {
     pub(crate) fn parse<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
-        let items = context.parse_many(Item::parse, None, ParseContext::parse_end_of_file)?;
+        let items = context.parse_many(Item::parse, SeparatorParser::None, ParseContext::parse_end_of_file)?;
         Ok(Self {
             items,
             file_index: context.file_index,

@@ -3,7 +3,7 @@ use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::symbols::{
     COLON_SYMBOL, COMMA_SYMBOL, PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL,
 };
-use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
 
@@ -20,7 +20,9 @@ impl ParamGroup {
         let start_span = Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
         let params = context.parse_many(
             Param::parse,
-            Some(|context| Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())),
+            SeparatorParser::MaybeTrailing(|context| {
+                Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())
+            }),
             |context| Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL).map(|_| ()),
         )?;
         let end_span = Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;
