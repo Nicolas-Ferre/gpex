@@ -63,7 +63,7 @@ dimensions:
         expected: "123"
       statement_assignment:
         code: |
-          const fn fn_(param: i32) -> i32 { 
+          const fn fn_(param: i32) -> i32 {
               param = 123;
               return param;
           }

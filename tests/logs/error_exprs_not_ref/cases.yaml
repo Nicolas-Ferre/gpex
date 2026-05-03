@@ -4,12 +4,12 @@ dimensions:
   - id: expr_location
     cases:
       statement_assignment_left:
+        # call the function in another function signature to increase test coverage
         code: |
           const fn called_fn() -> typeref {
               {{expr.form}} = {{expr.form}};
-              return i32; 
+              return i32;
           }
-          // call the function in another function signature to increase test coverage
           fn _fn() -> called_fn() {
               return 1;
           }
