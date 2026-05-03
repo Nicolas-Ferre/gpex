@@ -2,5 +2,7 @@ warning: `_CONSTANT` item used but name starting with `_` (at <root>/main__const
   --> info: item used here (at <root>/main__const_global.gpex:2:14)
 warning: `_fn()` item used but name starting with `_` (at <root>/main__fn.gpex:1:4)
   --> info: item used here (at <root>/main__fn.gpex:2:14)
+warning: `_param` item used but name starting with `_` (at <root>/main__fn_param.gpex:1:8)
+  --> info: item used here (at <root>/main__fn_param.gpex:1:37)
 warning: `_var` item used but name starting with `_` (at <root>/main__var_global.gpex:1:5)
   --> info: item used here (at <root>/main__var_global.gpex:2:14)

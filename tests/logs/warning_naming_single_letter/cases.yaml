@@ -9,3 +9,5 @@ dimensions:
         code: "pub var v = 0;"
       fn:
         code: "pub fn f() -> i32 { return 0; }"
+      fn_param:
+        code: "pub fn fn_(p: i32) -> i32 { return p; }"

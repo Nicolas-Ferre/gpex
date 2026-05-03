@@ -12,3 +12,6 @@ dimensions:
       fn:
         code: "fn _fn() -> i32 { return 0; }"
         ref: "_fn()"
+      fn_param:
+        code: "fn _fn(_param: i32) -> i32 { return _param; }"
+        ref: "0"

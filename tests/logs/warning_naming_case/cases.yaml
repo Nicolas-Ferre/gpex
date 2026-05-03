@@ -17,6 +17,10 @@ dimensions:
         code: "fn {{case.name}}() -> i32 { return 0; }"
       fn_typeref:
         code: "fn {{case.name}}() -> typeref { return i32; }"
+      fn_param_non_typeref:
+        code: "fn _fn({{case.name}}: i32) -> i32 { return 0; }"
+      fn_param_typeref:
+        code: "fn _fn({{case.name}}: typeref) -> i32 { return 0; }"
 
   - id: case
     cases:
@@ -49,4 +53,10 @@ exclusions:
     case: [ snake_case ]
 
   - item: [ fn_typeref ]
+    case: [ snake_case, pascal_case ]
+
+  - item: [ fn_param_non_typeref ]
+    case: [ snake_case ]
+
+  - item: [ fn_param_typeref ]
     case: [ snake_case, pascal_case ]
