@@ -140,6 +140,13 @@ pub(crate) fn check_usage(
             location: Some(context.location(name_span)),
             inner: vec![],
         });
+    } else if item.is_pub() && name.starts_with('_') {
+        context.logs.push(Log {
+            level: LogLevel::Warning,
+            msg: format!("`{displayed_key}` item public but name starting with `_`"),
+            location: Some(context.location(name_span)),
+            inner: vec![],
+        });
     } else if let Some(&ref_span) = ref_span
         && name.starts_with('_')
     {

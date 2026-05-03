@@ -116,6 +116,11 @@ fn compile_warning_naming_single_letter() -> Result<(), Error> {
 }
 
 #[test]
+fn compile_warning_pub_with_underscore_prefix() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/warning_pub_with_underscore_prefix"))
+}
+
+#[test]
 fn compile_warning_unused() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/warning_unused"))
 }

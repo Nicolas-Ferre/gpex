@@ -40,11 +40,11 @@ dimensions:
   - id: expr
     cases:
       const_global:
-        form: "_CONST"
-        source: "const _CONST = 0;"
+        form: "CONST"
+        source: "const CONST = 0;"
       var_global:
-        form: "_var"
-        source: "var _var = 0;"
+        form: "var_"
+        source: "var var_ = 0;"
       fn_call:
-        form: "_called_fn()"
-        source: "fn _called_fn() -> i32 { return 0; }"
+        form: "called_fn()"
+        source: "fn called_fn() -> i32 { return 0; }"
