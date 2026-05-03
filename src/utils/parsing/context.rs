@@ -132,11 +132,7 @@ impl<'config> ParseContext<'config> {
                 }
             }
             items.push(
-                match self.parse_next_item(
-                    separator_parser.parser().is_some(),
-                    item_parser,
-                    stop_excluded_parser,
-                ) {
+                match self.parse_next_item(item_parser, separator_parser, stop_excluded_parser) {
                     ParseManyStepResult::Item(item) => item,
                     ParseManyStepResult::End => break Ok(items),
                     ParseManyStepResult::Error(error) => {
@@ -220,8 +216,8 @@ impl<'config> ParseContext<'config> {
 
     fn parse_next_item<T>(
         &mut self,
-        has_separator: bool,
         item_parser: Parser<'config, T>,
+        separator_parser: SeparatorParser<'config>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> ParseManyStepResult<'config, T> {
         let previous_context = self.clone();
@@ -231,7 +227,7 @@ impl<'config> ParseContext<'config> {
         };
         *self = previous_context;
         match stop_excluded_parser(&mut self.clone()) {
-            Ok(()) if has_separator => ParseManyStepResult::Error(item_error),
+            Ok(()) if separator_parser.parser().is_some() => ParseManyStepResult::Error(item_error),
             Ok(()) => ParseManyStepResult::End,
             Err(_) => ParseManyStepResult::Error(item_error),
         }
