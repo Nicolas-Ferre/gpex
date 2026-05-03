@@ -5,8 +5,13 @@ dimensions:
     cases:
       statement_assignment_left:
         code: |
-          fn _fn() {
+          const fn called_fn() -> typeref {
               {{expr.form}} = {{expr.form}};
+              return i32; 
+          }
+          // call the function in another function signature to increase test coverage
+          fn _fn() -> called_fn() {
+              return 1;
           }
 
   - id: expr
@@ -34,4 +39,4 @@ dimensions:
         source: "const CONST = 123;"
       fn_call:
         form: "fn_()"
-        source: "fn fn_() -> i32 { return 0; }"
+        source: "const fn fn_() -> i32 { return 0; }"
