@@ -26,6 +26,7 @@ impl Transpiler<'_, '_> {
         } else {
             _ = write!(self.shader, " {{ ");
         }
+        self.transpile_mut_param_definitions(&node.params);
         for statement in &node.statements {
             self.transpile_statement(statement);
         }
@@ -90,7 +91,18 @@ impl Transpiler<'_, '_> {
             .struct_ref()
             .unwrap_or_else(|| unreachable!("parameter type should be validated before"));
         let type_name = Self::transpile_type_name(type_);
-        _ = write!(self.shader, "_{id}: {type_name}");
+        _ = write!(self.shader, "_{id}_const: {type_name}");
+    }
+
+    fn transpile_mut_param_definitions(&mut self, node: &ParamGroup) {
+        for param in &node.params {
+            self.transpile_mut_param_definition(param);
+        }
+    }
+
+    fn transpile_mut_param_definition(&mut self, node: &Param) {
+        let id = node.id;
+        _ = write!(self.shader, "var _{id} = _{id}_const; ");
     }
 
     fn transpile_type_name(type_: &StructDefinition) -> &str {

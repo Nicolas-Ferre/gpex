@@ -5,7 +5,9 @@ use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
 use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
+use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -157,11 +159,44 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
 
     fn fn_value(&mut self, node: &FnDefinition) -> ConstValue<'item> {
         if node.const_keyword_span.is_none() {
-            ConstValue::RuntimeValue
-        } else if let Some(return_) = node.return_statement() {
-            self.expr_value(&return_.value)
-        } else {
-            ConstValue::Unknown
+            return ConstValue::RuntimeValue;
+        }
+        for statement in &node.statements {
+            match statement {
+                Statement::Return(statement) => return self.expr_value(&statement.value),
+                Statement::Assignment(statement) => {
+                    if self.run_assignment_statement(statement).is_err() {
+                        return ConstValue::Unknown;
+                    }
+                }
+            }
+        }
+        ConstValue::Unknown
+    }
+
+    fn run_assignment_statement(&mut self, node: &AssignmentStatement) -> Result<(), ()> {
+        let assigned_param = self.param(&node.assigned).ok_or(())?;
+        let new_value = self.expr_value(&node.value);
+        let param_value = self
+            .scope_values
+            .last_mut()
+            .and_then(|values| values.get_mut(&assigned_param.id))
+            .unwrap_or_else(|| unreachable!("param should be registered before"));
+        *param_value = new_value;
+        Ok(())
+    }
+
+    fn param(&self, expr: &Expr) -> Option<&'item Param> {
+        match expr {
+            Expr::F32Literal(_)
+            | Expr::U32Literal(_)
+            | Expr::I32Literal(_)
+            | Expr::BoolLiteral(_)
+            | Expr::Call(_) => None,
+            Expr::Ident(ident) => match self.indexes.sources.get(&ident.id)? {
+                ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_) => None,
+                ItemRef::Param(param) => Some(param),
+            },
         }
     }
 

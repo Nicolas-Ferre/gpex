@@ -5,7 +5,7 @@ dimensions:
     cases:
       statement_assignment_left:
         code: |
-          fn _fn(_param: i32) {
+          fn _fn() {
               {{expr.form}} = {{expr.form}};
           }
 
@@ -32,6 +32,3 @@ dimensions:
       fn_call:
         form: "fn_()"
         source: "fn fn_() -> i32 { return 0; }"
-      fn_param:
-        form: "_param"
-        source: ""

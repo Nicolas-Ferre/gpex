@@ -1,7 +1,7 @@
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::params::ParamGroup;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
-use crate::compiler::parsing::statements::{ReturnStatement, Statement};
+use crate::compiler::parsing::statements::Statement;
 use crate::compiler::parsing::symbols::{
     ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, FN_KEYWORD, PUB_KEYWORD,
 };
@@ -84,15 +84,5 @@ impl FnDefinition {
 
     pub(crate) fn key(&self) -> String {
         format!("{}({})", self.name, self.params.params.len())
-    }
-
-    pub(crate) fn return_statement(&self) -> Option<&ReturnStatement> {
-        self.statements.iter().find_map(|statement| {
-            if let Statement::Return(statement) = statement {
-                Some(statement)
-            } else {
-                None
-            }
-        })
     }
 }
