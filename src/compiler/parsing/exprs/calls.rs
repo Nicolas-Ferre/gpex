@@ -4,7 +4,7 @@ use crate::compiler::parsing::symbols::{
     COMMA_SYMBOL, PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL,
 };
 use crate::utils::indexing::NodeRef;
-use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
 
@@ -42,7 +42,9 @@ impl Call {
         context.force_parse_any_error();
         let args = context.parse_many(
             Expr::parse,
-            Some(|context| Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())),
+            SeparatorParser::MaybeTrailing(|context| {
+                Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())
+            }),
             |context| Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL).map(|_| ()),
         )?;
         let end_span = Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;

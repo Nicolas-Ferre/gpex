@@ -108,7 +108,7 @@ impl<'config> ParseContext<'config> {
     pub(crate) fn parse_many<T>(
         &mut self,
         item_parser: Parser<'config, T>,
-        separator_parser: Option<Parser<'config, ()>>,
+        separator_parser: SeparatorParser<'config>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> Result<Vec<T>, ParseError<'config>> {
         let initial_context = self.clone();
@@ -132,14 +132,15 @@ impl<'config> ParseContext<'config> {
                 }
             }
             items.push(
-                match self.parse_next_item(
-                    separator_parser.is_some(),
-                    item_parser,
-                    stop_excluded_parser,
-                ) {
+                match self.parse_next_item(item_parser, separator_parser, stop_excluded_parser) {
                     ParseManyStepResult::Item(item) => item,
                     ParseManyStepResult::End => break Ok(items),
                     ParseManyStepResult::Error(error) => {
+                        if matches!(separator_parser, SeparatorParser::MaybeTrailing(_))
+                            && stop_excluded_parser(&mut self.clone()).is_ok()
+                        {
+                            break Ok(items);
+                        }
                         *self = initial_context;
                         break Err(error);
                     }
@@ -195,10 +196,10 @@ impl<'config> ParseContext<'config> {
 
     fn parse_separator(
         &mut self,
-        separator_parser: Option<Parser<'config, ()>>,
+        separator_parser: SeparatorParser<'config>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> ParseManyStepResult<'config, ()> {
-        let Some(separator_parser) = separator_parser else {
+        let Some(separator_parser) = separator_parser.parser() else {
             return ParseManyStepResult::Item(());
         };
         let previous_context = self.clone();
@@ -215,8 +216,8 @@ impl<'config> ParseContext<'config> {
 
     fn parse_next_item<T>(
         &mut self,
-        has_separator: bool,
         item_parser: Parser<'config, T>,
+        separator_parser: SeparatorParser<'config>,
         stop_excluded_parser: Parser<'config, ()>,
     ) -> ParseManyStepResult<'config, T> {
         let previous_context = self.clone();
@@ -226,7 +227,7 @@ impl<'config> ParseContext<'config> {
         };
         *self = previous_context;
         match stop_excluded_parser(&mut self.clone()) {
-            Ok(()) if has_separator => ParseManyStepResult::Error(item_error),
+            Ok(()) if separator_parser.parser().is_some() => ParseManyStepResult::Error(item_error),
             Ok(()) => ParseManyStepResult::End,
             Err(_) => ParseManyStepResult::Error(item_error),
         }
@@ -235,6 +236,24 @@ impl<'config> ParseContext<'config> {
     fn parse_whitespaces(&mut self) {
         let trimmed_code = self.remaining_code().trim_start(); // no-fn-check (recursivity)
         self.offset += self.remaining_code().len() - trimmed_code.len(); // no-fn-check (recursivity)
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum SeparatorParser<'context> {
+    None,
+    NotTrailing(Parser<'context, ()>),
+    MaybeTrailing(Parser<'context, ()>),
+}
+
+impl<'context> SeparatorParser<'context> {
+    fn parser(self) -> Option<Parser<'context, ()>> {
+        match self {
+            SeparatorParser::None => None,
+            SeparatorParser::NotTrailing(parser) | SeparatorParser::MaybeTrailing(parser) => {
+                Some(parser)
+            }
+        }
     }
 }
 

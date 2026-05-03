@@ -5,7 +5,7 @@ use crate::compiler::parsing::statements::Statement;
 use crate::compiler::parsing::symbols::{
     ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, FN_KEYWORD, PUB_KEYWORD,
 };
-use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
 
@@ -60,9 +60,10 @@ impl FnDefinition {
                     (None, None, params.span)
                 };
             let body_start_span = Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
-            let statements = context.parse_many(Statement::parse, None, |context| {
-                Span::parse_symbol(context, BRACE_CLOSE_SYMBOL).map(|_| ())
-            })?;
+            let statements =
+                context.parse_many(Statement::parse, SeparatorParser::None, |context| {
+                    Span::parse_symbol(context, BRACE_CLOSE_SYMBOL).map(|_| ())
+                })?;
             let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
                 id,
