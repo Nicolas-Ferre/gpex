@@ -1,2 +1,4 @@
-pub {{item.code}} // warning about used item with underscore prefix should not be triggered
+// Only warning about public item with underscore prefix should be triggered,
+// not warning about used item with underscore prefix
+pub {{item.code}}
 var _usage = {{item.ref}};
