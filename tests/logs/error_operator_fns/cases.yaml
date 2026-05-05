@@ -3,9 +3,9 @@
 dimensions:
   - id: operator_fn
     cases:
-      unary_operator_with_no_param:
+      unary_no_param:
         code: "fn {{fn.name}}() -> i32 { return 0; }"
-      unary_operator_with_more_than_one_param:
+      unary_more_than_one_param:
         code: "fn {{fn.name}}(_param1: i32, _param2: i32) -> i32 { return 0; }"
 
   - id: fn
