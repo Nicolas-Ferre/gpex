@@ -1,4 +1,4 @@
-# Test items with conflicting names.
+# Test operator function definitions.
 
 dimensions:
   - id: operator_fn
