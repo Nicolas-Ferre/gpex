@@ -81,6 +81,11 @@ fn compile_error_items_not_found_pub_in_priv_import() -> Result<(), Error> {
 }
 
 #[test]
+fn compile_error_operator_fns() -> Result<(), Error> {
+    compile_and_check_logs(Path::new("tests/logs/error_operator_fns"))
+}
+
+#[test]
 fn compile_error_out_of_bounds() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_out_of_bounds"))
 }
