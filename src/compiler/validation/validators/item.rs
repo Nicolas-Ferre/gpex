@@ -226,3 +226,22 @@ pub(crate) fn check_unary_operator_fn_params(
         Err(ValidateError)
     }
 }
+
+pub(crate) fn check_unary_operator_fn_return_type(
+    fn_: &FnDefinition,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) -> Result<(), ValidateError> {
+    if !UNARY_OPERATOR_FN_NAMES.contains(&fn_.name.as_str()) || fn_.return_type.is_some() {
+        Ok(())
+    } else {
+        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            msg: format!("`{fn_key}` unary operator function without return type"),
+            location: Some(context.location(fn_.signature_span)),
+            inner: vec![],
+        });
+        Err(ValidateError)
+    }
+}

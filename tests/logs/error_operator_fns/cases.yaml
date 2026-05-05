@@ -7,6 +7,8 @@ dimensions:
         code: "fn {{fn.name}}() -> i32 { return 0; }"
       unary_more_than_one_param:
         code: "fn {{fn.name}}(_param1: i32, _param2: i32) -> i32 { return 0; }"
+      unary_no_return_type:
+        code: "fn {{fn.name}}(_param: i32) { }"
 
   - id: fn
     cases:

@@ -2,3 +2,5 @@ error: `__neg__(i32, i32)` unary operator function must have exactly one paramet
 error: `__not__(i32, i32)` unary operator function must have exactly one parameter (at <root>/main__unary_more_than_one_param__not.gpex:1:4)
 error: `__neg__()` unary operator function must have exactly one parameter (at <root>/main__unary_no_param__neg.gpex:1:4)
 error: `__not__()` unary operator function must have exactly one parameter (at <root>/main__unary_no_param__not.gpex:1:4)
+error: `__neg__(i32)` unary operator function without return type (at <root>/main__unary_no_return_type__neg.gpex:1:4)
+error: `__not__(i32)` unary operator function without return type (at <root>/main__unary_no_return_type__not.gpex:1:4)
