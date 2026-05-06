@@ -1,6 +1,7 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::key_rendering::KeyRenderer;
+use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
@@ -8,8 +9,6 @@ use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, V
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
-
-const UNARY_OPERATOR_FN_NAMES: &[&str] = &["__neg__", "__not__"];
 
 pub(crate) fn check_circular_dependencies(
     item: ItemRef<'_>,
@@ -213,7 +212,7 @@ pub(crate) fn check_unary_operator_fn_params(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    if !UNARY_OPERATOR_FN_NAMES.contains(&fn_.name.as_str()) || fn_.params.params.len() == 1 {
+    if !UNARY_FN_NAMES.contains(&fn_.name.as_str()) || fn_.params.params.len() == 1 {
         Ok(())
     } else {
         let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
@@ -232,7 +231,7 @@ pub(crate) fn check_unary_operator_fn_return_type(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    if !UNARY_OPERATOR_FN_NAMES.contains(&fn_.name.as_str()) || fn_.return_type.is_some() {
+    if !UNARY_FN_NAMES.contains(&fn_.name.as_str()) || fn_.return_type.is_some() {
         Ok(())
     } else {
         let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;

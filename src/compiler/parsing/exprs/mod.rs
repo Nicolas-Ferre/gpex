@@ -29,6 +29,7 @@ impl Expr {
             |context| I32Literal::parse(context).map(Self::I32Literal),
             |context| BoolLiteral::parse(context).map(Self::BoolLiteral),
             |context| Call::parse(context).map(Self::Call),
+            |context| Call::parse_unary(context).map(Self::Call),
             |context| Ident::parse(context).map(Self::Ident),
         ])
     }
