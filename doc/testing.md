@@ -60,5 +60,5 @@ dimensions: # dimensions are applied in order for the replacement of placeholder
 ```
 
 It is possible to disable a test by inserting `<EXCLUDE>` in a generated `.gpex` file.
-To optimize tests, it is recommended to exclude all generated files of a given tests, not only the
-main file.
+To optimize tests, it is recommended to exclude all generated files of a given test case, not only
+the main file.

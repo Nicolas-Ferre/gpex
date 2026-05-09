@@ -104,7 +104,7 @@ dimensions:
       const:
         exclusions: |
           {{expr.exclude_if_not_const}}
-        qualifier: "{{expr.exclude_if_not_const}} const"
+        qualifier: "const"
         exclude_if_not_const: ""
       not_const:
         exclusions: ""

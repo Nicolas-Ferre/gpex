@@ -44,16 +44,14 @@ dimensions:
       var_global:
         exclusions: |
           {{expr.exclude_if_requires_fn_with_param}}
-        code_before: |
-          var output = {{expr.form}};
+        code_before: "var output = {{expr.form}};"
         code_after: ""
         expected: "{{global.expr_value}}"
       const_global:
         exclusions: |
           {{expr.exclude_if_not_const}}
           {{expr.exclude_if_requires_fn_with_param}}
-        code_before: |
-          const output = {{expr.form}};
+        code_before: "const output = {{expr.form}};"
         code_after: ""
         expected: "{{global.expr_value}}"
       statement_assignment_left:
