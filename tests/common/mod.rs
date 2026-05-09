@@ -117,8 +117,8 @@ fn generate_file<'a>(
         .iter()
         .map(|case| replace_placeholders(&content, case))
         .filter(|(_, generated_content)| !generated_content.contains(EXCLUDE_TAG))
-        .map(|(case, generated_content)| save_generated_file(case, file_path, generated_content)?)
-        .collect::<Result<_, _>>()
+        .map(|(case, generated_content)| save_generated_file(case, file_path, generated_content))
+        .collect()
 }
 
 fn replace_placeholders<'a>(
@@ -139,14 +139,14 @@ fn save_generated_file<'a>(
     case: &'a [DimensionCase],
     file_path: &Path,
     generated_content: String,
-) -> Result<Result<&'a [DimensionCase], Error>, Error> {
+) -> Result<&'a [DimensionCase], Error> {
     let case_name = case_name(case);
     let generated_content = generated_content.replace(CASE_KEY_PLACEHOLDER, &case_name);
     let output_path =
         env::temp_dir().join(replace_in_path(file_path, CASE_KEY_PLACEHOLDER, &case_name));
     fs::create_dir_all(path_parent(&output_path)).map_err(Error::Io)?;
     fs::write(&output_path, &generated_content).map_err(Error::Io)?;
-    Ok(Ok(case))
+    Ok(case)
 }
 
 fn case_name(case: &[DimensionCase]) -> String {
