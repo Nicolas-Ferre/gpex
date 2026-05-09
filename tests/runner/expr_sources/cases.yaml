@@ -6,6 +6,8 @@ dimensions:
       after_expr:
         imported_indirect_code: ""
         imported_direct_code: ""
+        exclusions: |
+          {{expr.exclude_if_source_only_before_expr}}
         inline_code: |
           {{expr_location.code_before}}
           var _result = output; // expected: {{expr_location.expected}}
@@ -14,6 +16,7 @@ dimensions:
       before_expr:
         imported_indirect_code: ""
         imported_direct_code: ""
+        exclusions: ""
         inline_code: |
           {{expr.source}}
           {{expr_location.code_before}}
@@ -22,6 +25,7 @@ dimensions:
       imported_direct:
         imported_indirect_code: ""
         imported_direct_code: "{{expr.source}}"
+        exclusions: ""
         inline_code: |
           {{expr_location.code_before}}
           var _result = output; // expected: {{expr_location.expected}}
@@ -29,6 +33,7 @@ dimensions:
       imported_indirect:
         imported_indirect_code: "{{expr.source}}"
         imported_direct_code: ""
+        exclusions: ""
         inline_code: |
           {{expr_location.code_before}}
           var _result = output; // expected: {{expr_location.expected}}
@@ -37,14 +42,21 @@ dimensions:
   - id: expr_location
     cases:
       var_global:
+        exclusions: |
+          {{expr.exclude_if_requires_fn_with_param}}
         code_before: "var output = {{expr.form}};"
         code_after: ""
         expected: "{{global.expr_value}}"
       const_global:
+        exclusions: |
+          {{expr.exclude_if_not_const}}
+          {{expr.exclude_if_requires_fn_with_param}}
         code_before: "const output = {{expr.form}};"
         code_after: ""
         expected: "{{global.expr_value}}"
       statement_assignment_left:
+        exclusions: |
+          {{expr.exclude_if_not_ref}}
         code_before: |
           var output = called_fn({{global.default_value}});
           fn called_fn(param: typeref) -> typeref {
@@ -54,6 +66,7 @@ dimensions:
         code_after: ""
         expected: "{{global.default_value}}"
       statement_assignment_right:
+        exclusions: ""
         code_before: "var output = {{global.default_value}};"
         code_after: |
           repeat called_fn({{global.expr_value}});
@@ -62,6 +75,7 @@ dimensions:
           }
         expected: "{{global.expr_value}}"
       statement_return:
+        exclusions: ""
         code_before: |
           var output = called_fn({{global.expr_value}});
           fn called_fn(param: typeref) -> typeref {
@@ -70,6 +84,8 @@ dimensions:
         code_after: ""
         expected: "{{global.expr_value}}"
       repeat_fn_arg:
+        exclusions: |
+          {{expr.exclude_if_requires_fn_with_param}}
         code_before: "var output = {{global.default_value}};"
         code_after: |
           repeat called_fn({{expr.form}});
@@ -78,6 +94,9 @@ dimensions:
           }
         expected: "{{global.expr_value}}"
       fn_param_type:
+        exclusions: |
+          {{expr.exclude_if_not_const}}
+          {{expr.exclude_if_requires_fn_with_param}}
         code_before: |
           var output = called_fn({{global.value_from_expr_as_type}});
           fn called_fn(param: {{expr.form}}) -> {{global.expr_value}} {
@@ -86,6 +105,9 @@ dimensions:
         code_after: ""
         expected: "{{global.value_from_expr_as_type}}"
       fn_return_type:
+        exclusions: |
+          {{expr.exclude_if_not_const}}
+          {{expr.exclude_if_requires_fn_with_param}}
         code_before: |
           var output = called_fn({{global.value_from_expr_as_type}});
           fn called_fn(param: {{global.expr_value}}) -> {{expr.form}} {
@@ -99,20 +121,40 @@ dimensions:
       var_global:
         form: "var_"
         source: "pub var var_ = {{global.expr_value}};"
+        exclude_if_source_only_before_expr: "<EXCLUDE>"
+        exclude_if_not_ref: ""
+        exclude_if_not_const: "<EXCLUDE>"
+        exclude_if_requires_fn_with_param: ""
       const_global:
         form: "CONST"
         source: "pub const CONST = {{global.expr_value}};"
+        exclude_if_source_only_before_expr: "<EXCLUDE>"
+        exclude_if_not_ref: "<EXCLUDE>"
+        exclude_if_not_const: ""
+        exclude_if_requires_fn_with_param: ""
       fn_call_no_args:
         form: "fn_()"
         source: "pub const fn fn_() -> typeref { return {{global.expr_value}}; }"
+        exclude_if_source_only_before_expr: ""
+        exclude_if_not_ref: "<EXCLUDE>"
+        exclude_if_not_const: ""
+        exclude_if_requires_fn_with_param: ""
       fn_call_args:
         form: "fn_(arg_fn())"
         source: |
           pub const fn arg_fn() -> typeref { return {{global.expr_value}}; }
           pub const fn fn_(param: typeref) -> typeref { return param; }
+        exclude_if_source_only_before_expr: ""
+        exclude_if_not_ref: "<EXCLUDE>"
+        exclude_if_not_const: ""
+        exclude_if_requires_fn_with_param: ""
       fn_param:
         form: "param"
         source: ""
+        exclude_if_source_only_before_expr: "<EXCLUDE>"
+        exclude_if_not_ref: ""
+        exclude_if_not_const: ""
+        exclude_if_requires_fn_with_param: "<EXCLUDE>"
 
   - id: global
     cases:
@@ -120,17 +162,3 @@ dimensions:
         default_value: "bool"
         expr_value: "i32"
         value_from_expr_as_type: "123"
-
-exclusions:
-  - source_location: [ after_expr ]
-    expr: [ var_global, const_global, fn_param ]
-
-  - expr_location: [ const_global, fn_param_type, fn_return_type ]
-    expr: [ var_global ]
-
-  - expr_location: [ var_global, const_global, repeat_fn_arg, fn_param_type, fn_return_type ]
-    expr: [ fn_param ]
-
-  - expr_location: [ statement_assignment_left ]
-    expr: [ const_global, fn_call_no_args, fn_call_args ]
-

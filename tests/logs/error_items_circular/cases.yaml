@@ -4,27 +4,35 @@ dimensions:
   - id: cycle_location1
     cases:
       const_global:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_const}}"
         item1: "pub const CONST1 = {{cycle_location2.item3_ref}};"
         item2: "pub const CONST2 = {{cycle_location2.item4_ref}};"
       var_global:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_var}}"
         item1: "pub var var1 = {{cycle_location2.item3_ref}};"
         item2: "pub var var2 = {{cycle_location2.item4_ref}};"
       statement_assignment_left:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_fn_without_arg}}"
         item1: "pub fn fn1() -> i32 { {{cycle_location2.item3_ref}} = 0; return true; }"
         item2: "pub fn fn2() -> i32 { {{cycle_location2.item4_ref}} = 0; return true; }"
       statement_assignment_right:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_fn_without_arg}}"
         item1: "pub fn fn1() -> i32 { var_ = {{cycle_location2.item3_ref}}; return true; }"
         item2: "pub fn fn2() -> i32 { var_ = {{cycle_location2.item4_ref}}; return 0; }"
       statement_return:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_fn_without_arg}}"
         item1: "pub fn fn1() -> i32 { return {{cycle_location2.item3_ref}}; }"
         item2: "pub fn fn2() -> i32 { return {{cycle_location2.item4_ref}}; }"
       call_arg:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_var}}"
         item1: "pub var var1 = called({{cycle_location2.item3_ref}});"
         item2: "pub var var2 = called({{cycle_location2.item4_ref}});"
       fn_param_type:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_fn_with_arg}}"
         item1: "pub fn fn1(_param: {{cycle_location2.item3_ref}}) -> i32 { return 0; }"
         item2: "pub fn fn2(_param: {{cycle_location2.item4_ref}}) -> i32 { return 0; }"
       fn_return_type:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_fn_without_arg}}"
         item1: "pub fn fn1() -> {{cycle_location2.item3_ref}} { return 0; }"
         item2: "pub fn fn2() -> {{cycle_location2.item4_ref}} { return 0; }"
       # repeat_fn_arg case is not defined as it never creates circular dependencies.
@@ -78,49 +86,28 @@ dimensions:
       const:
         item1: "CONST1"
         item2: "CONST2"
+        exclude_if_not_const: ""
+        exclude_if_not_var: "<EXCLUDE>"
+        exclude_if_not_fn_without_arg: "<EXCLUDE>"
+        exclude_if_not_fn_with_arg: "<EXCLUDE>"
       var:
         item1: "var1"
         item2: "var2"
+        exclude_if_not_const: "<EXCLUDE>"
+        exclude_if_not_var: ""
+        exclude_if_not_fn_without_arg: "<EXCLUDE>"
+        exclude_if_not_fn_with_arg: "<EXCLUDE>"
       fn_without_arg:
         item1: "fn1()"
         item2: "fn2()"
+        exclude_if_not_const: "<EXCLUDE>"
+        exclude_if_not_var: "<EXCLUDE>"
+        exclude_if_not_fn_without_arg: ""
+        exclude_if_not_fn_with_arg: "<EXCLUDE>"
       fn_with_arg:
         item1: "fn1(0)"
         item2: "fn2(0)"
-
-exclusions:
-  - cycle_location1:
-      - var_global
-      - statement_assignment_left
-      - statement_assignment_right
-      - statement_return
-      - call_arg
-      - fn_param_type
-      - fn_return_type
-    cycle_location1_ref: [ const ]
-
-  - cycle_location1:
-      - const_global
-      - statement_assignment_left
-      - statement_assignment_right
-      - statement_return
-      - fn_param_type
-      - fn_return_type
-    cycle_location1_ref: [ var ]
-
-  - cycle_location1:
-      - const_global
-      - var_global
-      - fn_param_type
-      - call_arg
-    cycle_location1_ref: [ fn_without_arg ]
-
-  - cycle_location1:
-      - const_global
-      - var_global
-      - statement_assignment_left
-      - statement_assignment_right
-      - statement_return
-      - call_arg
-      - fn_return_type
-    cycle_location1_ref: [ fn_with_arg ]
+        exclude_if_not_const: "<EXCLUDE>"
+        exclude_if_not_var: "<EXCLUDE>"
+        exclude_if_not_fn_without_arg: "<EXCLUDE>"
+        exclude_if_not_fn_with_arg: ""
