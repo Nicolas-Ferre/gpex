@@ -30,6 +30,18 @@ dimensions:
           const fn called_fn(param: i32) -> i32 {
               return param;
           }
+      unary_operand_neg:
+        code: |
+          var _result = -{{expr.form}}; // expected: {{expr.value}}
+          const fn __neg__(param: i32) -> i32 {
+              return param;
+          }
+      unary_operand_not:
+        code: |
+          var _result = !{{expr.form}}; // expected: {{expr.value}}
+          const fn __not__(param: i32) -> i32 {
+              return param;
+          }
       # repeat_fn_arg is not tested because it is irrelevant for this test.
 
   - id: expr
@@ -49,4 +61,12 @@ dimensions:
       const_fn_with_param_and_statement_assignment:
         form: "fn_(123)"
         source: "const fn fn_(param: i32) -> i32 { param = 123; return param; }"
+        value: "123"
+      const_unary_neg:
+        form: "-123u"
+        source: "const fn __neg__(_param: u32) -> i32 { return 123; }"
+        value: "123"
+      const_unary_not:
+        form: "!123u"
+        source: "const fn __not__(_param: u32) -> i32 { return 123; }"
         value: "123"

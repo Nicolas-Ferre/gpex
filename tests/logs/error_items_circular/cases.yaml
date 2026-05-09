@@ -27,6 +27,14 @@ dimensions:
         exclusions: "{{cycle_location1_ref.exclude_if_not_var}}"
         item1: "pub var var1 = called({{cycle_location2.item3_ref}});"
         item2: "pub var var2 = called({{cycle_location2.item4_ref}});"
+      unary_neg:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_var}}"
+        item1: "pub var var1 = -{{cycle_location2.item3_ref}};"
+        item2: "pub var var2 = -{{cycle_location2.item4_ref}};"
+      unary_not:
+        exclusions: "{{cycle_location1_ref.exclude_if_not_var}}"
+        item1: "pub var var1 = !{{cycle_location2.item3_ref}};"
+        item2: "pub var var2 = !{{cycle_location2.item4_ref}};"
       fn_param_type:
         exclusions: "{{cycle_location1_ref.exclude_if_not_fn_with_arg}}"
         item1: "pub fn fn1(_param: {{cycle_location2.item3_ref}}) -> i32 { return 0; }"
@@ -68,6 +76,16 @@ dimensions:
         item3: "pub var var3 = called({{cycle_location1_ref.item2}});"
         item3_ref: "var3"
         item4: "pub var var4 = called({{cycle_location1_ref.item1}});"
+        item4_ref: "var4"
+      unary_neg:
+        item3: "pub var var3 = -{{cycle_location1_ref.item2}};"
+        item3_ref: "var3"
+        item4: "pub var var4 = -{{cycle_location1_ref.item1}};"
+        item4_ref: "var4"
+      unary_not:
+        item3: "pub var var3 = !{{cycle_location1_ref.item2}};"
+        item3_ref: "var3"
+        item4: "pub var var4 = !{{cycle_location1_ref.item1}};"
         item4_ref: "var4"
       fn_param_type:
         item3: "pub fn fn3(_param: {{cycle_location1_ref.item2}}) -> i32 { return 0; }"

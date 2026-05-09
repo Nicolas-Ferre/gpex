@@ -1,6 +1,8 @@
 warning: `CONST` item unused (at <root>/priv_items__const_global.gpex:1:7)
 warning: `fn_()` item unused (at <root>/priv_items__fn.gpex:1:4)
 warning: `param` item unused (at <root>/priv_items__fn_param.gpex:1:8)
+warning: `__neg__(i32)` item unused (at <root>/priv_items__fn_unary_neg.gpex:1:4)
+warning: `__not__(i32)` item unused (at <root>/priv_items__fn_unary_not.gpex:1:4)
 warning: `used` import unused (at <root>/priv_items__import_duplicated_used.gpex:1:1)
 warning: module importing itself (at <root>/priv_items__import_self.gpex:1:1)
 warning: `unused` import unused (at <root>/priv_items__import_unused.gpex:1:1)

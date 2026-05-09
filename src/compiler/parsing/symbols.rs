@@ -87,6 +87,14 @@ pub(crate) const EQUAL_SYMBOL: Symbol = Symbol {
     name: "`=`",
     slice: "=",
 };
+pub(crate) const EXCLAMATION_MARK_SYMBOL: Symbol = Symbol {
+    name: "`!`",
+    slice: "!",
+};
+pub(crate) const HYPHEN_SYMBOL: Symbol = Symbol {
+    name: "`-`",
+    slice: "-",
+};
 pub(crate) const PARENTHESIS_OPEN_SYMBOL: Symbol = Symbol {
     name: "`(`",
     slice: "(",

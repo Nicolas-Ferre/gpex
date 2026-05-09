@@ -25,7 +25,10 @@ dimensions:
           }
       repeat_fn_arg:
         code: "repeat fn_({{expr.form}});"
-        code_unique_name: "repeat fn_({{expr.form_unique_name}});"
+      unary_neg:
+        code: "var _result = -{{expr.form}};"
+      unary_not:
+        code: "var _result = !{{expr.form}};"
       fn_param_type:
         code: |
           fn _fn(_param: {{expr.form}}) -> i32 {
@@ -48,3 +51,9 @@ dimensions:
       fn_call:
         form: "called_fn()"
         source: "fn called_fn() -> i32 { return 0; }"
+      unary_neg:
+        form: "-true"
+        source: "fn __neg__(param: bool) -> bool { return param; }"
+      unary_not:
+        form: "!true"
+        source: "fn __not__(param: bool) -> bool { return param; }"
