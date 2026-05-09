@@ -6,14 +6,14 @@ dimensions:
       var_global:
         code: |
           var var_ = {{expr.form}};
-          var _result = var_; // expected: {{source.expected}}
+          var _result = var_; // expected: {{expr.value}}
       const_global:
         code: |
           const RESULT = {{expr.form}};
-          var _result = RESULT; // expected: {{source.expected}}
+          var _result = RESULT; // expected: {{expr.value}}
       statement_assignment_right:
         code: |
-          var result = 0; // expected: {{source.expected}}
+          var result = 0; // expected: {{expr.value}}
           repeat called_fn();
           fn called_fn() {
               result = {{expr.form}};
@@ -23,55 +23,30 @@ dimensions:
           fn called_fn() -> i32 {
               return {{expr.form}};
           }
-          var _result = called_fn(); // expected: {{source.expected}}
-      repeat_fn_arg:
+          var _result = called_fn(); // expected: {{expr.value}}
+      fn_call_arg:
         code: |
-          var result = 0; // expected: {{source.expected}}
-          repeat called_fn({{expr.form}});
-          fn called_fn(param: i32) {
-              result = param;
+          var _result = called_fn({{expr.form}}); // expected: {{expr.value}}
+          const fn called_fn(param: i32) -> i32 {
+              return param;
           }
+      # repeat_fn_arg is not tested because it is irrelevant for this test.
 
   - id: expr
     cases:
       const_global:
         form: "CONST"
         source: "const CONST = 123;"
+        value: "123"
       const_fn_without_param:
         form: "fn_()"
         source: "const fn fn_() -> i32 { return 123; }"
-      const_fn_with_param_literal:
+        value: "123"
+      const_fn_with_param_and_statement_return:
         form: "fn_(123)"
-        source: ""
-      const_fn_with_param_const:
-        form: "fn_(CONST)"
-        source: "const CONST = 123;"
-      const_fn_with_param_fn_call:
-        form: "fn_(fn_(123))"
-        source: ""
-
-  - id: source
-    cases:
-      none:
-        code: ""
-        expected: "123"
-      statement_return:
-        code: |
-          const fn fn_(param: i32) -> i32 { 
-              return param;
-          }
-        expected: "123"
-      statement_assignment:
-        code: |
-          const fn fn_(param: i32) -> i32 {
-              param = 123;
-              return param;
-          }
-        expected: "123"
-
-exclusions:
-  - expr: [ const_fn_with_param_literal, const_fn_with_param_const, const_fn_with_param_fn_call ]
-    source: [ none ]
-
-  - expr: [ const_global,const_fn_without_param ]
-    source: [ statement_return, statement_assignment ]
+        source: "const fn fn_(param: i32) -> i32 { return param; }"
+        value: "123"
+      const_fn_with_param_and_statement_assignment:
+        form: "fn_(123)"
+        source: "const fn fn_(param: i32) -> i32 { param = 123; return param; }"
+        value: "123"

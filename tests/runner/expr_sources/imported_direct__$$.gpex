@@ -1,3 +1,6 @@
 pub import ~.imported_indirect__$$;
 
 {{source_location.imported_direct_code}}
+
+{{source_location.exclusions}}
+{{expr_location.exclusions}}

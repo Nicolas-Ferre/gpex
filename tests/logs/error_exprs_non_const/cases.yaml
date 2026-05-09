@@ -4,25 +4,41 @@ dimensions:
   - id: const_expr_location
     cases:
       const_global:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "const _RESULT = {{non_const_item.ref}};"
       statement_assignment_left:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "const fn _result() { {{non_const_item.ref}} = 123; }"
       statement_assignment_right:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "const fn _result() { value = {{non_const_item.ref}}; }"
       statement_return:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "const fn _result() -> i32 { return {{non_const_item.ref}}; }"
       call_arg:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "const _RESULT = fn_({{non_const_item.ref}});"
       fn_param_type:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "fn _result(_param: {{non_const_item.ref}}) -> i32 { return 123; }"
       fn_return_type:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "fn _result() -> {{non_const_item.ref}} { return 123; }"
       fn_param_type_typeref_param:
+        exclusions: ""
         code: |
           const fn fn_(param_typeref: typeref, _param_other: {{non_const_item.ref}}) -> i32 {
               return 123;
           }
       fn_return_type_with_typeref_param:
+        exclusions: ""
         code: |
           const fn fn_(param_typeref: typeref, _param_other: i32) -> {{non_const_item.ref}} {
               return 123;
@@ -33,20 +49,12 @@ dimensions:
       var_global:
         code: "var var_ = 123;"
         ref: "var_"
+        exclude_if_requires_fn_with_param_typeref: ""
       fn:
         code: "fn fn_() -> i32 { return 123; }"
         ref: "fn_()"
+        exclude_if_requires_fn_with_param_typeref: ""
       param:
         code: ""
         ref: "param_typeref"
-
-exclusions:
-  - const_expr_location:
-      - const_global
-      - statement_assignment_left
-      - statement_assignment_right
-      - statement_return
-      - call_arg
-      - fn_param_type
-      - fn_return_type
-    non_const_item: [ param ]
+        exclude_if_requires_fn_with_param_typeref: "<EXCLUDE>"

@@ -4,49 +4,69 @@ dimensions:
   - id: item
     cases:
       import:
+        exclusions: |
+          {{case.exclude_if_screaming_snake_case}}
+          {{case.exclude_if_camel_case}}
+          {{case.exclude_if_pascal_case}}
         code: "pub import {{case.name}}.{{case.name}};"
       const_global_non_typeref:
+        exclusions: |
+          {{case.exclude_if_snake_case}}
+          {{case.exclude_if_camel_case}}
+          {{case.exclude_if_pascal_case}}
         code: "const {{case.name}} = 0;"
       const_global_typeref:
+        exclusions: |
+          {{case.exclude_if_snake_case}}
+          {{case.exclude_if_camel_case}}
         code: "const {{case.name}} = i32;"
       var_global:
+        exclusions: |
+          {{case.exclude_if_screaming_snake_case}}
+          {{case.exclude_if_camel_case}}
+          {{case.exclude_if_pascal_case}}
         code: "var {{case.name}} = 0;"
       fn_no_return:
+        exclusions: |
+          {{case.exclude_if_screaming_snake_case}}
+          {{case.exclude_if_camel_case}}
+          {{case.exclude_if_pascal_case}}
         code: "var value = 0; fn {{case.name}}() { value = 0; }"
       fn_non_typeref:
+        exclusions: |
+          {{case.exclude_if_screaming_snake_case}}
+          {{case.exclude_if_camel_case}}
+          {{case.exclude_if_pascal_case}}
         code: "fn {{case.name}}() -> i32 { return 0; }"
       fn_typeref:
+        exclusions: |
+          {{case.exclude_if_screaming_snake_case}}
+          {{case.exclude_if_camel_case}}
         code: "fn {{case.name}}() -> typeref { return i32; }"
 
   - id: case
     cases:
       screaming_snake_case:
         name: "_SCREAMING_SNAKE_CASE"
+        exclude_if_screaming_snake_case: "<EXCLUDE>"
+        exclude_if_snake_case: ""
+        exclude_if_camel_case: ""
+        exclude_if_pascal_case: ""
       snake_case:
         name: "_snake_case"
+        exclude_if_screaming_snake_case: ""
+        exclude_if_snake_case: "<EXCLUDE>"
+        exclude_if_camel_case: ""
+        exclude_if_pascal_case: ""
       camel_case:
         name: "_camelCase"
+        exclude_if_screaming_snake_case: ""
+        exclude_if_snake_case: ""
+        exclude_if_camel_case: "<EXCLUDE>"
+        exclude_if_pascal_case: ""
       pascal_case:
         name: "_PascalCase"
-
-exclusions:
-  - item: [ import ]
-    case: [ screaming_snake_case, camel_case, pascal_case ]
-
-  - item: [ const_global_non_typeref ]
-    case: [ snake_case, camel_case, pascal_case ]
-
-  - item: [ const_global_typeref ]
-    case: [ snake_case, camel_case ]
-
-  - item: [ var_global ]
-    case: [ screaming_snake_case, camel_case, pascal_case ]
-
-  - item: [ fn_no_return ]
-    case: [ screaming_snake_case, camel_case, pascal_case ]
-
-  - item: [ fn_non_typeref ]
-    case: [ screaming_snake_case, camel_case, pascal_case ]
-
-  - item: [ fn_typeref ]
-    case: [ screaming_snake_case, camel_case ]
+        exclude_if_screaming_snake_case: ""
+        exclude_if_snake_case: ""
+        exclude_if_camel_case: ""
+        exclude_if_pascal_case: "<EXCLUDE>"
