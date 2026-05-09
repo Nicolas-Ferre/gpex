@@ -40,3 +40,9 @@ dimensions:
       fn_call:
         form: "fn_()"
         source: "const fn fn_() -> i32 { return 0; }"
+      unary_neg:
+        form: "-true"
+        source: "const fn __neg__(param: bool) -> bool { return param; }"
+      unary_not:
+        form: "!true"
+        source: "const fn __not__(param: bool) -> bool { return param; }"

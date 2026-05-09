@@ -51,6 +51,23 @@ dimensions:
           fn fn_(param: {{expr.type}}) {
               result = param;
           }
+      unary_operand_neg:
+        exclusions: |
+          {{expr.exclude_if_requires_fn_with_param}}
+          {{expr.exclude_if_supports_native_negation}}
+        code: |
+          {{result.item_type}} result = -{{expr.form}}; // expected: {{expr.value}}
+          {{fn.qualifier}} fn __neg__(param: {{expr.type}}) -> {{expr.type}} {
+              return param;
+          }
+      unary_operand_not:
+        exclusions: |
+          {{expr.exclude_if_requires_fn_with_param}}
+        code: |
+          {{result.item_type}} result = !{{expr.form}}; // expected: {{expr.value}}
+          {{fn.qualifier}} fn __not__(param: {{expr.type}}) -> {{expr.type}} {
+              return param;
+          }
       fn_call_arg:
         exclusions: ""
         code: |
@@ -123,6 +140,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: "<EXCLUDE>"
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       literal_f32:
         form: "1.23"
         value: "1.23"
@@ -133,6 +151,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: "<EXCLUDE>"
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: "<EXCLUDE>"
       literal_u32:
         form: "123u"
         value: "123u"
@@ -143,6 +162,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: "<EXCLUDE>"
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       literal_i32:
         form: "123"
         value: "123"
@@ -153,6 +173,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: "<EXCLUDE>"
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: "<EXCLUDE>"
       type_native:
         form: "i32"
         value: "i32"
@@ -163,6 +184,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: ""
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       var_global:
         form: "var_"
         value: "i32"
@@ -173,6 +195,7 @@ dimensions:
         exclude_if_not_ref: ""
         exclude_if_not_typeref: ""
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       const_global:
         form: "CONST"
         value: "i32"
@@ -183,6 +206,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_requires_fn_with_param: ""
         exclude_if_not_typeref: ""
+        exclude_if_supports_native_negation: ""
       fn_call_not_const_no_args:
         form: "fn_()"
         value: "i32"
@@ -193,6 +217,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: ""
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       fn_call_const_no_args:
         form: "fn_()"
         value: "i32"
@@ -203,6 +228,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: ""
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       fn_call_not_const_args:
         form: "fn_(0, i32)"
         value: "i32"
@@ -213,6 +239,7 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: ""
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       fn_call_const_args:
         form: "fn_(0, i32)"
         value: "i32"
@@ -223,6 +250,29 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_typeref: ""
         exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
+      unary_neg:
+        form: "-i32"
+        value: "i32"
+        type: "typeref"
+        type_default: "bool"
+        source: "const fn __neg__(param: typeref) -> typeref { return param; }"
+        exclude_if_not_const: ""
+        exclude_if_not_ref: "<EXCLUDE>"
+        exclude_if_not_typeref: ""
+        exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
+      unary_not:
+        form: "!i32"
+        value: "i32"
+        type: "typeref"
+        type_default: "bool"
+        source: "const fn __not__(param: typeref) -> typeref { return param; }"
+        exclude_if_not_const: ""
+        exclude_if_not_ref: "<EXCLUDE>"
+        exclude_if_not_typeref: ""
+        exclude_if_requires_fn_with_param: ""
+        exclude_if_supports_native_negation: ""
       fn_param:
         form: "param"
         value: "i32"
@@ -233,3 +283,4 @@ dimensions:
         exclude_if_not_ref: ""
         exclude_if_not_typeref: ""
         exclude_if_requires_fn_with_param: "<EXCLUDE>"
+        exclude_if_supports_native_negation: ""

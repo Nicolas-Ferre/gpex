@@ -15,6 +15,10 @@ dimensions:
         code: "fn _result() -> i32 { return fn_(); }"
       repeat_fn_arg:
         code: "repeat fn_(fn_());"
+      unary_operand_neg:
+        code: "var _result = -fn_();"
+      unary_operand_not:
+        code: "var _result = !fn_();"
       fn_param_type:
         code: "fn _result(_param: fn_()) -> i32 { return 123; }"
       fn_return_type:

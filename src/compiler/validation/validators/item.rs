@@ -1,7 +1,7 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::key_rendering::KeyRenderer;
-use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
+use crate::compiler::parsing::exprs::calls::{OPERATOR_FN_NAME_PREFIX, UNARY_FN_NAMES};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
@@ -136,14 +136,17 @@ pub(crate) fn check_usage(
     let name_span = item.name_span();
     let name = context.slice(name_span);
     let ref_span = indexes.item_first_refs.get(&item.id());
-    if !item.is_pub() && ref_span.is_none() && !name.starts_with('_') {
+    if !item.is_pub()
+        && ref_span.is_none()
+        && (!name.starts_with('_') || name.starts_with(OPERATOR_FN_NAME_PREFIX))
+    {
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item unused"),
             location: Some(context.location(name_span)),
             inner: vec![],
         });
-    } else if item.is_pub() && name.starts_with('_') {
+    } else if item.is_pub() && name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX) {
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item public but name starting with `_`"),
@@ -152,6 +155,7 @@ pub(crate) fn check_usage(
         });
     } else if let Some(&ref_span) = ref_span
         && name.starts_with('_')
+        && !name.starts_with(OPERATOR_FN_NAME_PREFIX)
     {
         context.logs.push(Log {
             level: LogLevel::Warning,

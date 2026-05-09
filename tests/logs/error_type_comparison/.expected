@@ -16,6 +16,10 @@ error: expression with invalid type `i32` (at <root>/main__fn_param_type__litera
   --> info: expected `typeref` type
 error: expression with invalid type `u32` (at <root>/main__fn_param_type__literal_u32.gpex:2:16)
   --> info: expected `typeref` type
+error: expression with invalid type `bool` (at <root>/main__fn_param_type__unary_neg.gpex:2:16)
+  --> info: expected `typeref` type
+error: expression with invalid type `bool` (at <root>/main__fn_param_type__unary_not.gpex:2:16)
+  --> info: expected `typeref` type
 error: expression with invalid type `i32` (at <root>/main__fn_return_type__const_global.gpex:2:13)
   --> info: expected `typeref` type
 error: expression with invalid type `i32` (at <root>/main__fn_return_type__fn_call_args.gpex:2:13)
@@ -33,6 +37,10 @@ error: expression with invalid type `f32` (at <root>/main__fn_return_type__liter
 error: expression with invalid type `i32` (at <root>/main__fn_return_type__literal_i32.gpex:2:13)
   --> info: expected `typeref` type
 error: expression with invalid type `u32` (at <root>/main__fn_return_type__literal_u32.gpex:2:13)
+  --> info: expected `typeref` type
+error: expression with invalid type `bool` (at <root>/main__fn_return_type__unary_neg.gpex:2:13)
+  --> info: expected `typeref` type
+error: expression with invalid type `bool` (at <root>/main__fn_return_type__unary_not.gpex:2:13)
   --> info: expected `typeref` type
 error: expression with invalid type `u32` (at <root>/main__statement_assignment_left__fn_param.gpex:4:13)
   --> info: expected `i32` type (at <root>/main__statement_assignment_left__fn_param.gpex:4:5)
@@ -60,6 +68,10 @@ error: expression with invalid type `u32` (at <root>/main__statement_assignment_
   --> info: expected `i32` type (at <root>/main__statement_assignment_right__literal_u32.gpex:4:5)
 error: expression with invalid type `typeref` (at <root>/main__statement_assignment_right__type_native.gpex:4:14)
   --> info: expected `u32` type (at <root>/main__statement_assignment_right__type_native.gpex:4:5)
+error: expression with invalid type `bool` (at <root>/main__statement_assignment_right__unary_neg.gpex:4:14)
+  --> info: expected `u32` type (at <root>/main__statement_assignment_right__unary_neg.gpex:4:5)
+error: expression with invalid type `bool` (at <root>/main__statement_assignment_right__unary_not.gpex:4:14)
+  --> info: expected `u32` type (at <root>/main__statement_assignment_right__unary_not.gpex:4:5)
 error: expression with invalid type `i32` (at <root>/main__statement_assignment_right__var_global.gpex:4:14)
   --> info: expected `u32` type (at <root>/main__statement_assignment_right__var_global.gpex:4:5)
 error: expression with invalid type `i32` (at <root>/main__statement_return__const_global.gpex:3:12)
@@ -84,5 +96,9 @@ error: expression with invalid type `u32` (at <root>/main__statement_return__lit
   --> info: expected `i32` type (at <root>/main__statement_return__literal_u32.gpex:2:13)
 error: expression with invalid type `typeref` (at <root>/main__statement_return__type_native.gpex:3:12)
   --> info: expected `u32` type (at <root>/main__statement_return__type_native.gpex:2:13)
+error: expression with invalid type `bool` (at <root>/main__statement_return__unary_neg.gpex:3:12)
+  --> info: expected `u32` type (at <root>/main__statement_return__unary_neg.gpex:2:13)
+error: expression with invalid type `bool` (at <root>/main__statement_return__unary_not.gpex:3:12)
+  --> info: expected `u32` type (at <root>/main__statement_return__unary_not.gpex:2:13)
 error: expression with invalid type `i32` (at <root>/main__statement_return__var_global.gpex:3:12)
   --> info: expected `u32` type (at <root>/main__statement_return__var_global.gpex:2:13)

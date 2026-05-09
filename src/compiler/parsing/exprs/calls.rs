@@ -12,6 +12,7 @@ use crate::utils::parsing::span::{Span, SpanProps};
 const UNARY_NEG_FN_NAME: &str = "__neg__";
 const UNARY_NOT_FN_NAME: &str = "__not__";
 pub(crate) const UNARY_FN_NAMES: &[&str] = &[UNARY_NEG_FN_NAME, UNARY_NOT_FN_NAME];
+pub(crate) const OPERATOR_FN_NAME_PREFIX: &str = "__";
 
 #[derive(Debug)]
 pub(crate) struct Call {

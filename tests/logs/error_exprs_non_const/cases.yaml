@@ -23,6 +23,14 @@ dimensions:
         exclusions: |
           {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
         code: "const _RESULT = fn_({{non_const_item.ref}});"
+      unary_operand_neg:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
+        code: "const _RESULT = -{{non_const_item.ref}};"
+      unary_operand_not:
+        exclusions: |
+          {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
+        code: "const _RESULT = !{{non_const_item.ref}};"
       fn_param_type:
         exclusions: |
           {{non_const_item.exclude_if_requires_fn_with_param_typeref}}
@@ -53,6 +61,14 @@ dimensions:
       fn:
         code: "fn fn_() -> i32 { return 123; }"
         ref: "fn_()"
+        exclude_if_requires_fn_with_param_typeref: ""
+      fn_unary_neg:
+        code: "fn __neg__(param: i32) -> i32 { return param; }"
+        ref: "- 123"
+        exclude_if_requires_fn_with_param_typeref: ""
+      fn_unary_not:
+        code: "fn __not__(param: i32) -> i32 { return param; }"
+        ref: "!123"
         exclude_if_requires_fn_with_param_typeref: ""
       param:
         code: ""

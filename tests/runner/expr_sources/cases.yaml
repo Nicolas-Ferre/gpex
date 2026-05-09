@@ -93,6 +93,26 @@ dimensions:
               _result = param;
           }
         expected: "{{global.expr_value}}"
+      unary_operand_neg:
+        exclusions: |
+          {{expr.exclude_if_requires_fn_with_param}}
+        code_before: |
+          var output = -{{expr.form}}; // expected: {{global.expr_value}}
+          const fn __neg__(param: typeref) -> typeref {
+              return param;
+          }
+        code_after: ""
+        expected: "{{global.expr_value}}"
+      unary_operand_not:
+        exclusions: |
+          {{expr.exclude_if_requires_fn_with_param}}
+        code_before: |
+          var output = !{{expr.form}}; // expected: {{global.expr_value}}
+          const fn __not__(param: typeref) -> typeref {
+              return param;
+          }
+        code_after: ""
+        expected: "{{global.expr_value}}"
       fn_param_type:
         exclusions: |
           {{expr.exclude_if_not_const}}
@@ -144,6 +164,20 @@ dimensions:
         source: |
           pub const fn arg_fn() -> typeref { return {{global.expr_value}}; }
           pub const fn fn_(param: typeref) -> typeref { return param; }
+        exclude_if_source_only_before_expr: ""
+        exclude_if_not_ref: "<EXCLUDE>"
+        exclude_if_not_const: ""
+        exclude_if_requires_fn_with_param: ""
+      unary_custom_neg:
+        form: "-123u"
+        source: "pub const fn __neg__(_param: u32) -> typeref { return {{global.expr_value}}; }"
+        exclude_if_source_only_before_expr: ""
+        exclude_if_not_ref: "<EXCLUDE>"
+        exclude_if_not_const: ""
+        exclude_if_requires_fn_with_param: ""
+      unary_custom_not:
+        form: "!123u"
+        source: "pub const fn __not__(_param: u32) -> typeref { return {{global.expr_value}}; }"
         exclude_if_source_only_before_expr: ""
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_not_const: ""
