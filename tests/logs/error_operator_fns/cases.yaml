@@ -3,7 +3,7 @@
 dimensions:
   - id: operator_fn
     cases:
-      unary_no_param:
+      unary_less_than_one_param:
         exclusions: |
           {{fn.exclude_if_binary}}
         code: "fn {{fn.name}}() -> i32 { return 0; }"

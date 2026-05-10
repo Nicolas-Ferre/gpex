@@ -267,6 +267,6 @@ pub(crate) fn check_binary_operator_fn(
         });
         Err(ValidateError)
     } else {
-        Ok(()) // no-coverage: off (will be covered by tests when binary operator overloading will be implemented)
+        Ok(()) // no-coverage (will be covered by tests when binary operator overloading will be implemented)
     }
 }
