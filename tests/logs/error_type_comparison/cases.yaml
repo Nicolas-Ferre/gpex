@@ -171,16 +171,6 @@ dimensions:
         exclude_if_not_ref: "<EXCLUDE>"
         exclude_if_valid_type: ""
         exclude_if_not_valid_in_fn_signature: ""
-      # TODO: create external test
-      #fn_call_with_invalid_return_type:
-      #  form: "called_fn()"
-      #  source: "const fn called_fn() -> 0 { return 0; }"
-      #  other_type: "u32"
-      #  other_type_default: "0u"
-      #  params: ""
-      #  exclude_if_not_ref: "<EXCLUDE>"
-      #  exclude_if_valid_type: ""
-      #  exclude_if_not_valid_in_fn_signature: ""
       unary_neg:
         form: "-true"
         source: "const fn __neg__(param: bool) -> bool { return param; }"
