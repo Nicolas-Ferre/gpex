@@ -4,14 +4,20 @@ dimensions:
   - id: expr_location
     cases:
       var_global:
+        exclusions: |
+          {{expr_location_binary.exclude_if_binary}}
         code: |
           var var_ = {{expr.form}};
           var _result = var_; // expected: {{expr.value}}
       const_global:
+        exclusions: |
+          {{expr_location_binary.exclude_if_binary}}
         code: |
           const RESULT = {{expr.form}};
           var _result = RESULT; // expected: {{expr.value}}
       statement_assignment_right:
+        exclusions: |
+          {{expr_location_binary.exclude_if_binary}}
         code: |
           var result = 0; // expected: {{expr.value}}
           repeat called_fn();
@@ -19,30 +25,127 @@ dimensions:
               result = {{expr.form}};
           }
       statement_return:
+        exclusions: |
+          {{expr_location_binary.exclude_if_binary}}
         code: |
           fn called_fn() -> i32 {
               return {{expr.form}};
           }
           var _result = called_fn(); // expected: {{expr.value}}
       fn_call_arg:
+        exclusions: |
+          {{expr_location_binary.exclude_if_binary}}
         code: |
           var _result = called_fn({{expr.form}}); // expected: {{expr.value}}
           const fn called_fn(param: i32) -> i32 {
               return param;
           }
       unary_operand_neg:
+        exclusions: |
+          {{expr_location_binary.exclude_if_binary}}
         code: |
-          var _result = -{{expr.form}}; // expected: {{expr.value}}
+          var _result = - {{expr.form}}; // expected: {{expr.value}}
           const fn __neg__(param: i32) -> i32 {
               return param;
           }
       unary_operand_not:
+        exclusions: |
+          {{expr_location_binary.exclude_if_binary}}
         code: |
           var _result = !{{expr.form}}; // expected: {{expr.value}}
           const fn __not__(param: i32) -> i32 {
               return param;
           }
+      binary_operand_left:
+        exclusions: |
+          {{expr_location_binary.exclude_if_not_binary}}
+        code: |
+          var _result = {{expr.form}} {{expr_location_binary.operator}} 456; // expected: {{expr.value}}
+          const fn {{expr_location_binary.fn_name}}(param1: i32, _param2: i32) -> i32 {
+              return param1;
+          }
+      binary_operand_right:
+        exclusions: |
+          {{expr_location_binary.exclude_if_not_binary}}
+        code: |
+          var _result = 456 {{expr_location_binary.operator}} {{expr.form}}; // expected: {{expr.value}}
+          const fn {{expr_location_binary.fn_name}}(_param1: i32, param2: i32) -> i32 {
+              return param2;
+          }
       # repeat_fn_arg is not tested because it is irrelevant for this test.
+
+  - id: expr_location_binary
+    cases:
+      none:
+        operator: ""
+        fn_name: ""
+        exclude_if_not_binary: "<EXCLUDE>"
+        exclude_if_binary: ""
+      add:
+        operator: "+"
+        fn_name: "__add__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      sub:
+        operator: "-"
+        fn_name: "__sub__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      mul:
+        operator: "*"
+        fn_name: "__mul__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      div:
+        operator: "/"
+        fn_name: "__div__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      mod:
+        operator: "%"
+        fn_name: "__mod__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      eq:
+        operator: "=="
+        fn_name: "__eq__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      ne:
+        operator: "!="
+        fn_name: "__ne__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      lt:
+        operator: "<"
+        fn_name: "__lt__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      le:
+        operator: "<="
+        fn_name: "__le__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      gt:
+        operator: ">"
+        fn_name: "__gt__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      ge:
+        operator: ">="
+        fn_name: "__ge__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      and:
+        operator: "&&"
+        fn_name: "__and__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      or:
+        operator: "||"
+        fn_name: "__or__"
+        exclude_if_not_binary: ""
+        exclude_if_binary: "<EXCLUDE>"
 
   - id: expr
     cases:
@@ -69,4 +172,56 @@ dimensions:
       const_unary_not:
         form: "!123u"
         source: "const fn __not__(_param: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_add:
+        form: "123 + 456u"
+        source: "const fn __add__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_sub:
+        form: "123 - 456u"
+        source: "const fn __sub__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_mul:
+        form: "123 * 456u"
+        source: "const fn __mul__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_div:
+        form: "123 / 456u"
+        source: "const fn __div__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_mod:
+        form: "123 % 456u"
+        source: "const fn __mod__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_eq:
+        form: "123 == 456u"
+        source: "const fn __eq__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_ne:
+        form: "123 != 456u"
+        source: "const fn __ne__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_lt:
+        form: "123 < 456u"
+        source: "const fn __lt__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_le:
+        form: "123 <= 456u"
+        source: "const fn __le__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_gt:
+        form: "123 > 456u"
+        source: "const fn __gt__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_ge:
+        form: "123 >= 456u"
+        source: "const fn __ge__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_and:
+        form: "123 && 456u"
+        source: "const fn __and__(_param1: i32, _param2: u32) -> i32 { return 123; }"
+        value: "123"
+      const_binary_or:
+        form: "123 || 456u"
+        source: "const fn __or__(_param1: i32, _param2: u32) -> i32 { return 123; }"
         value: "123"

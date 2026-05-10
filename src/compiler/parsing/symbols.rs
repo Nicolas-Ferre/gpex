@@ -59,6 +59,18 @@ pub(crate) const VAR_KEYWORD: Symbol = Symbol {
     slice: "var",
 };
 
+pub(crate) const AND_SYMBOL: Symbol = Symbol {
+    name: "`&&`",
+    slice: "&&",
+};
+pub(crate) const ANGLE_BRACKET_OPEN_SYMBOL: Symbol = Symbol {
+    name: "`<`",
+    slice: "<",
+};
+pub(crate) const ANGLE_BRACKET_CLOSE_SYMBOL: Symbol = Symbol {
+    name: "`>`",
+    slice: ">",
+};
 pub(crate) const ARROW_SYMBOL: Symbol = Symbol {
     name: "`->`",
     slice: "->",
@@ -79,6 +91,22 @@ pub(crate) const COMMA_SYMBOL: Symbol = Symbol {
     name: "`,`",
     slice: ",",
 };
+pub(crate) const COMPARE_EQUAL_SYMBOL: Symbol = Symbol {
+    name: "`==`",
+    slice: "==",
+};
+pub(crate) const COMPARE_LESS_EQUAL_SYMBOL: Symbol = Symbol {
+    name: "`<=`",
+    slice: "<=",
+};
+pub(crate) const COMPARE_GREATER_EQUAL_SYMBOL: Symbol = Symbol {
+    name: "`>=`",
+    slice: ">=",
+};
+pub(crate) const COMPARE_NOT_EQUAL_SYMBOL: Symbol = Symbol {
+    name: "`!=`",
+    slice: "!=",
+};
 pub(crate) const DOT_SYMBOL: Symbol = Symbol {
     name: "`.`",
     slice: ".",
@@ -95,6 +123,10 @@ pub(crate) const HYPHEN_SYMBOL: Symbol = Symbol {
     name: "`-`",
     slice: "-",
 };
+pub(crate) const OR_SYMBOL: Symbol = Symbol {
+    name: "`||`",
+    slice: "||",
+};
 pub(crate) const PARENTHESIS_OPEN_SYMBOL: Symbol = Symbol {
     name: "`(`",
     slice: "(",
@@ -103,9 +135,25 @@ pub(crate) const PARENTHESIS_CLOSE_SYMBOL: Symbol = Symbol {
     name: "`)`",
     slice: ")",
 };
+pub(crate) const PERCENT_SYMBOL: Symbol = Symbol {
+    name: "`%`",
+    slice: "%",
+};
+pub(crate) const PLUS_SYMBOL: Symbol = Symbol {
+    name: "`+`",
+    slice: "+",
+};
 pub(crate) const SEMICOLON_SYMBOL: Symbol = Symbol {
     name: "`;`",
     slice: ";",
+};
+pub(crate) const SLASH_SYMBOL: Symbol = Symbol {
+    name: "`/`",
+    slice: "/",
+};
+pub(crate) const STAR_SYMBOL: Symbol = Symbol {
+    name: "`*`",
+    slice: "*",
 };
 pub(crate) const TILDE_SYMBOL: Symbol = Symbol {
     name: "`~`",

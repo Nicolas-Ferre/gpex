@@ -1,9 +1,8 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::key_rendering::KeyRenderer;
-use crate::compiler::parsing::exprs::calls::{
-    BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX, UNARY_FN_NAMES,
-};
+use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
+use crate::compiler::parsing::exprs::{BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
@@ -267,6 +266,6 @@ pub(crate) fn check_binary_operator_fn(
         });
         Err(ValidateError)
     } else {
-        Ok(()) // no-coverage (will be covered by tests when binary operator overloading will be implemented)
+        Ok(())
     }
 }

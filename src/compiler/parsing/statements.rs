@@ -31,7 +31,9 @@ impl ReturnStatement {
     fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
         let return_keyword_span = Span::parse_symbol(context, RETURN_KEYWORD)?;
         context.force_parse_any_error();
-        let value = Expr::parse(context)?;
+        let value = Expr::parse(context, |context| {
+            Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ())
+        })?;
         let semicolon_keyword_span = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self {
             span: return_keyword_span.until(semicolon_keyword_span),
@@ -48,10 +50,14 @@ pub(crate) struct AssignmentStatement {
 
 impl AssignmentStatement {
     fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
-        let assigned = Expr::parse(context)?;
+        let assigned = Expr::parse(context, |context| {
+            Span::parse_symbol(context, EQUAL_SYMBOL).map(|_| ())
+        })?;
         Span::parse_symbol(context, EQUAL_SYMBOL)?;
         context.force_parse_any_error();
-        let value = Expr::parse(context)?;
+        let value = Expr::parse(context, |context| {
+            Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ())
+        })?;
         Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self { assigned, value })
     }
