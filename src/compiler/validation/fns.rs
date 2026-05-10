@@ -17,12 +17,8 @@ impl Validator<'_, '_> {
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         self.validate_params(&node.params)?;
         self.validate_fn_return_type(node)?;
-        validators::item::check_unary_operator_fn_params(node, &mut self.context, self.indexes)?;
-        validators::item::check_unary_operator_fn_return_type(
-            node,
-            &mut self.context,
-            self.indexes,
-        )?;
+        validators::item::check_unary_operator_fn(node, &mut self.context, self.indexes)?;
+        validators::item::check_binary_operator_fn(node, &mut self.context, self.indexes)?;
         self.run_with_fn_constness(node.const_keyword_span.is_some(), |self_| {
             self_.validate_fn_statements(node)
         })?;

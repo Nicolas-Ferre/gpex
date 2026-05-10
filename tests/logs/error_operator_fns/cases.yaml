@@ -4,18 +4,95 @@ dimensions:
   - id: operator_fn
     cases:
       unary_no_param:
+        exclusions: |
+          {{fn.exclude_if_binary}}
         code: "fn {{fn.name}}() -> i32 { return 0; }"
         error: "`{{fn.name}}()` unary operator function must have exactly one parameter"
       unary_more_than_one_param:
+        exclusions: |
+          {{fn.exclude_if_binary}}
         code: "fn {{fn.name}}(_param1: i32, _param2: i32) -> i32 { return 0; }"
         error: "`{{fn.name}}(i32, i32)` unary operator function must have exactly one parameter"
       unary_no_return_type:
+        exclusions: |
+          {{fn.exclude_if_binary}}
         code: "fn {{fn.name}}(_param: i32) { }"
         error: "`{{fn.name}}(i32)` unary operator function without return type"
+      binary_less_than_two_params:
+        exclusions: |
+          {{fn.exclude_if_unary}}
+        code: "fn {{fn.name}}(_param: i32) -> i32 { return 0; }"
+        error: "`{{fn.name}}(i32)` binary operator function must have exactly two parameters"
+      binary_more_than_two_params:
+        exclusions: |
+          {{fn.exclude_if_unary}}
+        code: "fn {{fn.name}}(_param1: i32, _param2: i32, _param3: i32) -> i32 { return 0; }"
+        error: "`{{fn.name}}(i32, i32, i32)` binary operator function must have exactly two parameters"
+      binary_no_return_type:
+        exclusions: |
+          {{fn.exclude_if_unary}}
+        code: "fn {{fn.name}}(_param1: i32, _param2: i32) { }"
+        error: "`{{fn.name}}(i32, i32)` binary operator function without return type"
 
   - id: fn
     cases:
       neg:
         name: "__neg__"
+        exclude_if_unary: "<EXCLUDE>"
+        exclude_if_binary: ""
       not:
         name: "__not__"
+        exclude_if_unary: "<EXCLUDE>"
+        exclude_if_binary: ""
+      add:
+        name: "__add__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      sub:
+        name: "__sub__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      mul:
+        name: "__mul__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      div:
+        name: "__div__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      mod:
+        name: "__mod__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      eq:
+        name: "__eq__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      ne:
+        name: "__ne__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      lt:
+        name: "__lt__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      le:
+        name: "__le__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      gt:
+        name: "__gt__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      ge:
+        name: "__ge__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      and:
+        name: "__and__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"
+      or:
+        name: "__or__"
+        exclude_if_unary: ""
+        exclude_if_binary: "<EXCLUDE>"

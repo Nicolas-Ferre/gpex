@@ -1,1 +1,3 @@
 error: {{operator_fn.error}} (at <root>/main__$$.gpex:1:4)
+
+{{operator_fn.exclusions}}
