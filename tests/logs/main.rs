@@ -201,12 +201,12 @@ fn assert_logs_globally(
     Ok(())
 }
 
-fn contains_case_path(string: &str, case_name: &str) -> bool {
-    string.contains(&format!("__{case_name}.gpex")) || string.contains(&format!("__{case_name}/"))
-}
-
 fn is_log_related_to_case(log: &Log, case_name: &str) -> bool {
     log.location
         .as_ref()
         .is_some_and(|location| contains_case_path(&location.path.to_string_lossy(), case_name))
+}
+
+fn contains_case_path(string: &str, case_name: &str) -> bool {
+    string.contains(&format!("__{case_name}.gpex")) || string.contains(&format!("__{case_name}/"))
 }
