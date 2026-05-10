@@ -27,7 +27,7 @@ When configuring a test with `TranspiledCodeAction::Checked` in `tests/runner/ma
 compares the transpiled code with `.expected` file. If no `.expected` file exists, it is
 auto-generated on first run.
 Alternatively, it is possible to specify a `.expected.pattern` file containing a regex that
-must match the transpiled code.
+must match the transpiled code, which has priority over the `.expected` file.
 
 ## Diagnostic snapshot tests (`tests/logs/`)
 
