@@ -5,10 +5,13 @@ dimensions:
     cases:
       unary_no_param:
         code: "fn {{fn.name}}() -> i32 { return 0; }"
+        error: "`{{fn.name}}()` unary operator function must have exactly one parameter"
       unary_more_than_one_param:
         code: "fn {{fn.name}}(_param1: i32, _param2: i32) -> i32 { return 0; }"
+        error: "`{{fn.name}}(i32, i32)` unary operator function must have exactly one parameter"
       unary_no_return_type:
         code: "fn {{fn.name}}(_param: i32) { }"
+        error: "`{{fn.name}}(i32)` unary operator function without return type"
 
   - id: fn
     cases:

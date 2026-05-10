@@ -1,0 +1,4 @@
+error: expression not constant (at <root>/main__$$.gpex:{{const_expr_location.expr_span_start}})
+  --> info: expression must be constant (at <root>/main__$$.gpex:{{const_expr_location.const_mark_span_start}})
+
+{{const_expr_location.exclusions}}

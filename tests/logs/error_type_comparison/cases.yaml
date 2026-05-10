@@ -9,8 +9,12 @@ dimensions:
         code: |
           var result = {{expr.other_type_default}};
           fn _fn({{expr.params}}) {
-              {{expr.form}} = result;
+              {{expr.form}} 
+                  = result;
           }
+        actual_type: "{{expr.other_type}}"
+        info: "expected `{{expr.type}}` type (at <root>/main__$$.gpex:4:5)"
+        actual_span_start: "5:11"
       statement_assignment_right:
         exclusions: ""
         code: |
@@ -18,12 +22,20 @@ dimensions:
           fn _fn({{expr.params}}) {
               result = {{expr.form}};
           }
+        actual_type: "{{expr.type}}"
+        info: "expected `{{expr.other_type}}` type (at <root>/main__$$.gpex:4:5)"
+        actual_span_start: "4:14"
       statement_return:
         exclusions: ""
         code: |
-          fn _fn({{expr.params}}) -> {{expr.other_type}} { 
+          fn _fn(
+              {{expr.params}}
+          ) -> {{expr.other_type}} { 
               return {{expr.form}};
           }
+        actual_type: "{{expr.type}}"
+        info: "expected `{{expr.other_type}}` type (at <root>/main__$$.gpex:4:6)"
+        actual_span_start: "5:12"
       fn_param_type:
         exclusions: |
           {{expr.exclude_if_valid_type}}
@@ -32,6 +44,9 @@ dimensions:
           fn _fn(_param: {{expr.form}}) -> i32 {
               return 123;
           }
+        actual_type: "{{expr.type}}"
+        info: "expected `typeref` type"
+        actual_span_start: "2:16"
       fn_return_type:
         exclusions: |
           {{expr.exclude_if_valid_type}}
@@ -40,12 +55,16 @@ dimensions:
           fn _fn() -> {{expr.form}} {
               return 123;
           }
+        actual_type: "{{expr.type}}"
+        info: "expected `typeref` type"
+        actual_span_start: "2:13"
 
   - id: expr
     cases:
       literal_bool_true:
         form: "true"
         source: ""
+        type: "bool"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -55,6 +74,7 @@ dimensions:
       literal_bool_false:
         form: "false"
         source: ""
+        type: "bool"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -64,6 +84,7 @@ dimensions:
       literal_f32:
         form: "1.23"
         source: ""
+        type: "f32"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -73,6 +94,7 @@ dimensions:
       literal_i32:
         form: "123"
         source: ""
+        type: "i32"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -82,6 +104,7 @@ dimensions:
       literal_u32:
         form: "123u"
         source: ""
+        type: "u32"
         other_type: "i32"
         other_type_default: "0"
         params: ""
@@ -91,6 +114,7 @@ dimensions:
       type_native:
         form: "i32"
         source: ""
+        type: "typeref"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -100,6 +124,7 @@ dimensions:
       const_global:
         form: "ITEM"
         source: "const ITEM = 0;"
+        type: "i32"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -109,6 +134,7 @@ dimensions:
       var_global:
         form: "item"
         source: "var item = 0;"
+        type: "i32"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -118,6 +144,7 @@ dimensions:
       fn_param:
         form: "param"
         source: ""
+        type: "i32"
         other_type: "u32"
         other_type_default: "0u"
         params: "param: i32"
@@ -127,6 +154,7 @@ dimensions:
       fn_call_no_arg:
         form: "called_fn()"
         source: "const fn called_fn() -> i32 { return 0; }"
+        type: "i32"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -136,15 +164,7 @@ dimensions:
       fn_call_args:
         form: "called_fn(123u, 456)"
         source: "const fn called_fn(_param1: u32, param2: i32) -> i32 { return param2; }"
-        other_type: "u32"
-        other_type_default: "0u"
-        params: ""
-        exclude_if_not_ref: "<EXCLUDE>"
-        exclude_if_valid_type: ""
-        exclude_if_not_valid_in_fn_signature: ""
-      fn_call_with_invalid_return_type:
-        form: "called_fn()"
-        source: "const fn called_fn() -> 0 { return 0; }"
+        type: "i32"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -154,6 +174,7 @@ dimensions:
       unary_neg:
         form: "-true"
         source: "const fn __neg__(param: bool) -> bool { return param; }"
+        type: "bool"
         other_type: "u32"
         other_type_default: "0u"
         params: ""
@@ -163,6 +184,7 @@ dimensions:
       unary_not:
         form: "!true"
         source: "const fn __not__(param: bool) -> bool { return param; }"
+        type: "bool"
         other_type: "u32"
         other_type_default: "0u"
         params: ""

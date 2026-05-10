@@ -1,8 +1,0 @@
-error: `imported.inner` module not found (at <root>/inner/main__absolute_inner.gpex:1:8)
-  --> info: cannot read "<root>/imported/inner.gpex"
-error: `imported` module not found (at <root>/inner/main__absolute_root.gpex:1:8)
-  --> info: cannot read "<root>/imported.gpex"
-error: `~.imported` module not found (at <root>/inner/main__relative_direct.gpex:1:8)
-  --> info: cannot read "<root>/inner/imported.gpex"
-error: `~.~.imported` module not found (at <root>/inner/main__relative_indirect.gpex:1:8)
-  --> info: cannot read "<root>/imported.gpex"

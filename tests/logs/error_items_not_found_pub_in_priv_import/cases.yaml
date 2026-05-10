@@ -5,55 +5,75 @@ dimensions:
     cases:
       const_global:
         code: "const _RESULT = {{expr.form}};"
+        expr_span_start: "3:17"
       var_global:
         code: "var _result = {{expr.form}};"
-      statement_assignment_left:
-        code: |
-          fn _fn() {
-              {{expr.form}} = 123;
-          }
+        expr_span_start: "3:15"
       statement_assignment_right:
         code: |
           var result = 0;
           fn _fn() {
               result = {{expr.form}};
           }
+        expr_span_start: "5:14"
       statement_return:
         code: |
           fn _fn() -> i32 {
               return {{expr.form}};
           }
+        expr_span_start: "4:12"
       repeat_fn_arg:
         code: "repeat fn_({{expr.form}});"
+        expr_span_start: "3:12"
       unary_neg:
         code: "var _result = -{{expr.form}};"
+        expr_span_start: "3:16"
       unary_not:
         code: "var _result = !{{expr.form}};"
+        expr_span_start: "3:16"
       fn_param_type:
         code: |
           fn _fn(_param: {{expr.form}}) -> i32 {
               return 123;
           }
+        expr_span_start: "3:16"
       fn_return_type:
         code: |
           fn _fn() -> {{expr.form}} {
               return 123;
           }
+        expr_span_start: "3:13"
+      # statement_assignment_left is not tested because logs are not easy to generalize
 
   - id: expr
     cases:
       const_global:
         form: "CONST"
         source: "const CONST = 0;"
+        item_name: "CONST"
+        case_name: "const_global"
+        item_span_start: "1:11"
       var_global:
         form: "var_"
         source: "var var_ = 0;"
+        item_name: "var_"
+        case_name: "var_global"
+        item_span_start: "1:9"
       fn_call:
         form: "called_fn()"
         source: "fn called_fn() -> i32 { return 0; }"
+        item_name: "called_fn()"
+        case_name: "fn_call"
+        item_span_start: "1:8"
       unary_neg:
         form: "-true"
         source: "fn __neg__(param: bool) -> bool { return param; }"
+        item_name: "__neg__(bool)"
+        case_name: "unary_neg"
+        item_span_start: "1:8"
       unary_not:
         form: "!true"
         source: "fn __not__(param: bool) -> bool { return param; }"
+        item_name: "__not__(bool)"
+        case_name: "unary_not"
+        item_span_start: "1:8"

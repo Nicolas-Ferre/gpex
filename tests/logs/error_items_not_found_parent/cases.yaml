@@ -5,5 +5,9 @@ dimensions:
     cases:
       const_global:
         code: "const _ITSELF = _ITSELF;"
+        name: "_ITSELF"
+        ref_span_start: "1:17"
       var_global:
         code: "var _itself = _itself;"
+        name: "_itself"
+        ref_span_start: "1:15"

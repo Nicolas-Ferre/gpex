@@ -20,6 +20,13 @@ fn compile_error_exprs_not_ref() -> Result<(), Error> {
 }
 
 #[test]
+fn compile_error_fns_not_found_with_unknown_return_type() -> Result<(), Error> {
+    compile_and_check_logs(Path::new(
+        "tests/logs/error_fns_not_found_with_unknown_return_type",
+    ))
+}
+
+#[test]
 fn compile_error_fns_without_return_type() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_fns_without_return_type"))
 }
@@ -140,6 +147,38 @@ fn compile_and_check_logs(path: &Path) -> Result<(), Error> {
     let logs = gpex::compile_program(&generated_dir, true)
         .err()
         .unwrap_or_default();
+    if path.join(".expected__$$").exists() {
+        assert_logs_per_case(&generated_dir, &case_names, &logs)
+    } else {
+        assert_logs_globally(path, &generated_dir, &case_names, &logs)
+    }
+}
+
+fn assert_logs_per_case(
+    generated_dir: &Path,
+    case_names: &[String],
+    logs: &[Log],
+) -> Result<(), Error> {
+    for case_name in case_names {
+        let expected_path = generated_dir.join(format!(".expected__{case_name}"));
+        let actual = logs
+            .iter()
+            .filter(|log| is_log_related_to_case(log, case_name))
+            .map(Log::to_string)
+            .join("")
+            .replace(&generated_dir.display().to_string(), "<root>");
+        let expected = fs::read_to_string(&expected_path).map_err(Error::Io)?;
+        assert_eq!(actual.trim(), expected.trim());
+    }
+    Ok(())
+}
+
+fn assert_logs_globally(
+    path: &Path,
+    generated_dir: &Path,
+    case_names: &[String],
+    logs: &[Log],
+) -> Result<(), Error> {
     let actual = logs
         .iter()
         .map(Log::to_string)
@@ -148,17 +187,26 @@ fn compile_and_check_logs(path: &Path) -> Result<(), Error> {
     let expected_path = path.join(".expected");
     if expected_path.exists() {
         let expected = fs::read_to_string(&expected_path).map_err(Error::Io)?;
-        assert_eq!(actual, expected);
+        assert_eq!(actual.trim(), expected.trim());
     } else {
         fs::write(&expected_path, actual).map_err(Error::Io)?;
         panic!("expected logs saved on disk in {}", expected_path.display());
     }
-    for case_name in &case_names {
+    for case_name in case_names {
         assert!(
-            actual.contains(&format!("__{case_name}.gpex"))
-                || actual.contains(&format!("__{case_name}/")),
+            contains_case_path(&actual, case_name),
             "'{case_name}' case did not generate any error"
         );
     }
     Ok(())
+}
+
+fn is_log_related_to_case(log: &Log, case_name: &str) -> bool {
+    log.location
+        .as_ref()
+        .is_some_and(|location| contains_case_path(&location.path.to_string_lossy(), case_name))
+}
+
+fn contains_case_path(string: &str, case_name: &str) -> bool {
+    string.contains(&format!("__{case_name}.gpex")) || string.contains(&format!("__{case_name}/"))
 }
