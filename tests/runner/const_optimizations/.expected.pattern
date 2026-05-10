@@ -1,0 +1,42 @@
+\A// INIT SHADER
+
+struct Buffer \{
+(    v[0-9]+: i32,?
+)+}
+
+@group\(0\) @binding\(0\)
+var<storage, read_write> b: Buffer;
+(
+fn _[0-9]+\(\) -> i32 \{
+    return i32\(123\);
+}
+)+
+@compute @workgroup_size\(1, 1, 1\)
+fn main\(\) \{
+(    b\.v[0-9]+ = i32\(123\);
+    b\.v[0-9]+ = b\.v[0-9]+;
+)+(    b\.v[0-9]+ = i32\(123\);
+)+(    b\.v[0-9]+ = _[0-9]+\(\);
+)+(    b\.v[0-9]+ = i32\(0\);
+)+(    b\.v[0-9]+ = i32\(123\);
+)+}
+
+
+// UPDATE SHADER
+
+struct Buffer \{
+(    v[0-9]+: i32,?
+)+}
+
+@group\(0\) @binding\(0\)
+var<storage, read_write> b: Buffer;
+(
+fn _[0-9]+\(\) \{
+    b\.v[0-9]+ = i32\(123\);
+}
+)+
+@compute @workgroup_size\(1, 1, 1\)
+fn main\(\) \{
+(    _[0-9]+\(\);
+)+}
+[\s]*\z

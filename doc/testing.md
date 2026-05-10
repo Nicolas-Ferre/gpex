@@ -23,6 +23,13 @@ var _result = 2_147_483_647; // expected: 2147483647
 
 The harness scans for `// expected: <value>` and asserts that the value stored on GPU side matches.
 
+When configuring a test with `TranspiledCodeAction::Checked` in `tests/runner/main.rs`, the test
+compares the transpiled code with `.expected` file. If no `.expected` file exists, it is
+auto-generated on first run.
+
+Alternatively, it is possible to specify a `.expected.pattern` file containing a regex that
+must match the transpiled code, which has priority over the `.expected` file.
+
 ## Diagnostic snapshot tests (`tests/logs/`)
 
 Compiles `.gpex` fixtures that trigger errors/warnings and compares the full log output against
