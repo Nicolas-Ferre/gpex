@@ -167,8 +167,17 @@ fn check_transpiled_code(path: &Path, program: &Program) -> Result<(), Error> {
         format_wgsl(&program.init_shader)?,
         format_wgsl(&program.update_shader)?
     );
+    let expected_pattern_path = path.join(".expected.pattern");
     let expected_path = path.join(".expected");
-    if expected_path.exists() {
+    if expected_pattern_path.exists() {
+        let expected_code_pattern =
+            fs::read_to_string(&expected_pattern_path).map_err(Error::Io)?;
+        let expected_code_regex = Regex::new(expected_code_pattern.trim()).map_err(Error::Regex)?;
+        assert!(
+            expected_code_regex.is_match(&actual_code),
+            "Obtained code:\n\n{actual_code}"
+        );
+    } else if expected_path.exists() {
         let expected_code = fs::read_to_string(&expected_path).map_err(Error::Io)?;
         assert_eq!(actual_code, expected_code);
     } else {
