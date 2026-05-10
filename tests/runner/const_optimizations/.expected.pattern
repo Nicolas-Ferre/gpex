@@ -1,4 +1,4 @@
-^// INIT SHADER
+\A// INIT SHADER
 
 struct Buffer \{
 (    v[0-9]+: i32,?
@@ -39,4 +39,4 @@ fn _[0-9]+\(\) \{
 fn main\(\) \{
 (    _[0-9]+\(\);
 )+}
-[\s]*$
+[\s]*\z

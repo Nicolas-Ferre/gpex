@@ -173,7 +173,7 @@ fn check_transpiled_code(path: &Path, program: &Program) -> Result<(), Error> {
         let expected_code_pattern =
             fs::read_to_string(&expected_pattern_path).map_err(Error::Io)?;
         let expected_code_regex =
-            Regex::new(&format!("(?msu){expected_code_pattern}")).map_err(Error::Regex)?;
+            Regex::new(&format!("(?msu){}", expected_code_pattern.trim())).map_err(Error::Regex)?;
         assert!(
             expected_code_regex.is_match(&actual_code),
             "Obtained code:\n\n{actual_code}"
