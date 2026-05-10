@@ -5,40 +5,65 @@ dimensions:
     cases:
       const_global:
         code: "const _RESULT = {{literal.form}};"
+        literal_span_start: "1:17"
+        additional_error: ""
       var_global:
         code: "var _result = {{literal.form}};"
+        literal_span_start: "1:15"
+        additional_error: ""
       statement_assignment_right:
         code: "var value = 0; fn _result() { value = {{literal.form}}; }"
+        literal_span_start: "1:39"
+        additional_error: ""
       statement_return:
         code: "fn _result() -> i32 { return {{literal.form}}; }"
+        literal_span_start: "1:30"
+        additional_error: ""
       repeat_fn_arg:
         code: "repeat called_fn({{literal.form}});"
+        literal_span_start: "1:18"
+        additional_error: ""
       unary_neg:
         code: "var _result = - {{literal.form}};"
+        literal_span_start: "1:17"
+        additional_error: ""
       unary_not:
         code: "var _result = !{{literal.form}};"
-      fn_param_type_with_return_type:
-        code: "fn _result(_param: {{literal.form}}) -> i32 { return 123; }"
-      fn_param_type_without_return_type:
+        literal_span_start: "1:16"
+        additional_error: ""
+      fn_param_type:
+        # repeat is used to increase test coverage
         code: "repeat result(0); fn result(_param: {{literal.form}}) -> i32 { return 123; }"
+        literal_span_start: "1:37"
+        additional_error: "error: `result(i32)` item not found (at <root>/main__$$.gpex:1:8)"
       fn_return_type:
         code: "fn _result() -> {{literal.form}} { return 123; }"
+        literal_span_start: "1:17"
+        additional_error: ""
 
   - id: literal
     cases:
       f32_too_small:
         form: "-400000000000000000000000000000000000000.0"
+        type: "f32"
       f32_too_big:
         form: "400000000000000000000000000000000000000.0"
+        type: "f32"
       f32_very_long:
         form: "99999999999999999999999999999999999999999999999999.99999999999999999999999999999999999999999999999999"
+        type: "f32"
       i32_too_small:
         form: "-2_147_483_649"
+        type: "i32"
       i32_too_big:
         form: "2_147_483_648"
+        type: "i32"
       i32_very_long:
         form: "99999999999999999999999999999999999999999999999999"
+        type: "i32"
       u32_too_big:
         form: "4_294_967_296u"
+        type: "u32"
       u32_very_long:
         form: "99999999999999999999999999999999999999999999999999u"
+        type: "u32"

@@ -1,0 +1,4 @@
+error: expression with invalid type `{{expr_location.actual_type}}` (at <root>/main__$$.gpex:{{expr_location.actual_span_start}})
+  --> info: {{expr_location.info}}
+
+{{expr_location.exclusions}}

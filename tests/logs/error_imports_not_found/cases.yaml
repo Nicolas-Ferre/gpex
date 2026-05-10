@@ -5,9 +5,13 @@ dimensions:
     cases:
       absolute_inner:
         form: "imported.inner"
+        path: "<root>/imported/inner.gpex"
       absolute_root:
         form: "imported"
+        path: "<root>/imported.gpex"
       relative_direct:
         form: "~.imported"
+        path: "<root>/inner/imported.gpex"
       relative_indirect:
         form: "~.~.imported"
+        path: "<root>/imported.gpex"

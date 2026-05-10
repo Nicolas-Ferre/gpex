@@ -5,61 +5,82 @@ dimensions:
     cases:
       const_global:
         code: "const _RESULT = {{expr.form}};"
+        expr_span_start: "3:17"
       var_global:
         code: "var _result = {{expr.form}};"
-      statement_assignment_left:
-        code: |
-          fn _fn() {
-              {{expr.form}} = 123;
-          }
+        expr_span_start: "3:15"
       statement_assignment_right:
         code: |
           var result = 0;
           fn _fn() {
               result = {{expr.form}};
           }
+        expr_span_start: "5:14"
       statement_return:
         code: |
           fn _fn() -> i32 {
               return {{expr.form}};
           }
+        expr_span_start: "4:12"
       repeat_fn_arg:
         code: "repeat fn_({{expr.form}});"
         code_unique_name: "repeat fn_({{expr.form_unique_name}});"
+        expr_span_start: "3:12"
       unary_neg:
         code: "var _result = -{{expr.form}};"
         code_unique_name: "var _result = -{{expr.form_unique_name}};"
+        expr_span_start: "3:16"
       unary_not:
         code: "var _result = !{{expr.form}};"
         code_unique_name: "var _result = !{{expr.form_unique_name}};"
+        expr_span_start: "3:16"
       fn_param_type:
         code: |
           fn _fn(_param: {{expr.form}}) -> i32 {
               return 123;
           }
+        expr_span_start: "3:16"
       fn_return_type:
         code: |
           fn _fn() -> {{expr.form}} {
               return 123;
           }
+        expr_span_start: "3:13"
+      # statement_assignment_left is not tested because logs are not easy to generalize
 
   - id: expr
     cases:
       const_global:
         form: "_CONST"
         source: "const _CONST = 0;"
+        item_name: "_CONST"
+        info: "  --> info: item not qualified with `pub` (at <root>/imported__$$.gpex:1:7)"
       var_global:
         form: "_var"
         source: "var _var = 0;"
+        item_name: "_var"
+        info: "  --> info: item not qualified with `pub` (at <root>/imported__$$.gpex:1:5)"
       fn_call:
         form: "_called_fn()"
         source: "fn _called_fn() -> i32 { return 0; }"
+        item_name: "_called_fn()"
+        info: "  --> info: item not qualified with `pub` (at <root>/imported__$$.gpex:1:4)"
       unary_neg:
         form: "-true"
         source: "fn __neg__(param: bool) -> bool { return param; }"
+        item_name: "__neg__(bool)"
+        info: |2
+            --> info: item not qualified with `pub` (at <root>/imported__$$.gpex:1:4)
+          warning: `__neg__(bool)` item unused (at <root>/imported__$$.gpex:1:4)
       unary_not:
         form: "!true"
         source: "fn __not__(param: bool) -> bool { return param; }"
+        item_name: "__not__(bool)"
+        info: |2
+            --> info: item not qualified with `pub` (at <root>/imported__$$.gpex:1:4)
+          warning: `__not__(bool)` item unused (at <root>/imported__$$.gpex:1:4)
       fn_param:
         form: "param"
         source: "pub fn called_fn(param: i32) -> i32 { return param; }"
+        item_name: "param"
+        info: ""

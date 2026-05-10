@@ -28,6 +28,10 @@ The harness scans for `// expected: <value>` and asserts that the value stored o
 Compiles `.gpex` fixtures that trigger errors/warnings and compares the full log output against
 `.expected` snapshot files. If no `.expected` file exists, it is auto-generated on first run.
 
+To be noted that when using parametrized tests, it is possible to specify a `.expected__$$` file
+instead of `.expected`, which contains the template of the expected logs for each case. The file
+supports the same placeholders as `.gpex` files.
+
 Subdirectories follow the naming convention `<log level>_<subcategory>` (e.g. `error_syntax/`,
 `warning_unused/`, ...).
 

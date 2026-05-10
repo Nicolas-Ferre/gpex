@@ -92,7 +92,7 @@ fn generate_dir<'a>(
         let file_type = entry.file_type().map_err(Error::Io)?;
         if file_type.is_dir() {
             included_case_combinations.extend(generate_dir(&path, cases)?);
-        } else if path.extension() == Some(OsStr::new("gpex")) {
+        } else if is_generated_file(&path) {
             included_case_combinations.extend(generate_file(&path, cases)?);
         }
     }
@@ -119,6 +119,14 @@ fn generate_file<'a>(
         .filter(|(_, generated_content)| !generated_content.contains(EXCLUDE_TAG))
         .map(|(case, generated_content)| save_generated_file(case, file_path, generated_content))
         .collect()
+}
+
+fn is_generated_file(file_path: &Path) -> bool {
+    file_path.extension() == Some(OsStr::new("gpex"))
+        || file_path.file_name().is_some_and(|name| {
+            name.to_str()
+                .is_some_and(|name| name.starts_with(".expected_"))
+        })
 }
 
 fn replace_placeholders<'a>(

@@ -1,0 +1,7 @@
+error: `{{cycle_location1_ref.item1_name}}` item has circular dependencies (at <root>/imported1__$$.gpex:{{cycle_location1.item1_span_start}})
+  --> info: depends on this item (at <root>/imported1__$$.gpex:{{cycle_location1.ref3_span_start}})
+  --> info: depends on this item (at <root>/imported2__$$.gpex:{{cycle_location2.ref2_span_start}})
+  --> info: depends on this item (at <root>/imported1__$$.gpex:{{cycle_location1.ref4_span_start}})
+  --> info: depends on itself (at <root>/imported2__$$.gpex:{{cycle_location2.ref1_span_start}})
+
+{{cycle_location1.exclusions}}

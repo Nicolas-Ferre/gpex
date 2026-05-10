@@ -1,0 +1,2 @@
+error: called function `fn_()` with no return type (at <root>/main__$$.gpex:{{fn_call_location.error_span_start}})
+  --> info: function has no return type (at <root>/main__$$.gpex:2:4)
