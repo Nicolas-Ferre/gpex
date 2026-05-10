@@ -11,7 +11,35 @@ use crate::utils::parsing::span::{Span, SpanProps};
 
 const UNARY_NEG_FN_NAME: &str = "__neg__";
 const UNARY_NOT_FN_NAME: &str = "__not__";
+const BINARY_ADD_FN_NAME: &str = "__add__";
+const BINARY_SUB_FN_NAME: &str = "__sub__";
+const BINARY_MUL_FN_NAME: &str = "__mul__";
+const BINARY_DIV_FN_NAME: &str = "__div__";
+const BINARY_MOD_FN_NAME: &str = "__mod__";
+const BINARY_EQ_FN_NAME: &str = "__eq__";
+const BINARY_NE_FN_NAME: &str = "__ne__";
+const BINARY_LT_FN_NAME: &str = "__lt__";
+const BINARY_LE_FN_NAME: &str = "__le__";
+const BINARY_GT_FN_NAME: &str = "__gt__";
+const BINARY_GE_FN_NAME: &str = "__ge__";
+const BINARY_AND_FN_NAME: &str = "__and__";
+const BINARY_OR_FN_NAME: &str = "__or__";
 pub(crate) const UNARY_FN_NAMES: &[&str] = &[UNARY_NEG_FN_NAME, UNARY_NOT_FN_NAME];
+pub(crate) const BINARY_FN_NAMES: &[&str] = &[
+    BINARY_ADD_FN_NAME,
+    BINARY_SUB_FN_NAME,
+    BINARY_MUL_FN_NAME,
+    BINARY_DIV_FN_NAME,
+    BINARY_MOD_FN_NAME,
+    BINARY_EQ_FN_NAME,
+    BINARY_NE_FN_NAME,
+    BINARY_LT_FN_NAME,
+    BINARY_LE_FN_NAME,
+    BINARY_GT_FN_NAME,
+    BINARY_GE_FN_NAME,
+    BINARY_AND_FN_NAME,
+    BINARY_OR_FN_NAME,
+];
 pub(crate) const OPERATOR_FN_NAME_PREFIX: &str = "__";
 
 #[derive(Debug)]

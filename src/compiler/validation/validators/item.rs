@@ -1,7 +1,9 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::key_rendering::KeyRenderer;
-use crate::compiler::parsing::exprs::calls::{OPERATOR_FN_NAME_PREFIX, UNARY_FN_NAMES};
+use crate::compiler::parsing::exprs::calls::{
+    BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX, UNARY_FN_NAMES,
+};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
@@ -209,14 +211,14 @@ pub(crate) fn check_found<'index>(
     }
 }
 
-pub(crate) fn check_unary_operator_fn_params(
+pub(crate) fn check_unary_operator_fn(
     fn_: &FnDefinition,
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) -> Result<(), ValidateError> {
-    if !UNARY_FN_NAMES.contains(&fn_.name.as_str()) || fn_.params.params.len() == 1 {
+    if !UNARY_FN_NAMES.contains(&fn_.name.as_str()) {
         Ok(())
-    } else {
+    } else if fn_.params.params.len() != 1 {
         let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
         context.logs.push(Log {
             level: LogLevel::Error,
@@ -225,17 +227,7 @@ pub(crate) fn check_unary_operator_fn_params(
             inner: vec![],
         });
         Err(ValidateError)
-    }
-}
-
-pub(crate) fn check_unary_operator_fn_return_type(
-    fn_: &FnDefinition,
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
-) -> Result<(), ValidateError> {
-    if !UNARY_FN_NAMES.contains(&fn_.name.as_str()) || fn_.return_type.is_some() {
-        Ok(())
-    } else {
+    } else if fn_.return_type.is_none() {
         let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
         context.logs.push(Log {
             level: LogLevel::Error,
@@ -244,5 +236,37 @@ pub(crate) fn check_unary_operator_fn_return_type(
             inner: vec![],
         });
         Err(ValidateError)
+    } else {
+        Ok(())
+    }
+}
+
+pub(crate) fn check_binary_operator_fn(
+    fn_: &FnDefinition,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) -> Result<(), ValidateError> {
+    if !BINARY_FN_NAMES.contains(&fn_.name.as_str()) {
+        Ok(())
+    } else if fn_.params.params.len() != 2 {
+        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            msg: format!("`{fn_key}` binary operator function must have exactly two parameters"),
+            location: Some(context.location(fn_.signature_span)),
+            inner: vec![],
+        });
+        Err(ValidateError)
+    } else if fn_.return_type.is_none() {
+        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            msg: format!("`{fn_key}` binary operator function without return type"),
+            location: Some(context.location(fn_.signature_span)),
+            inner: vec![],
+        });
+        Err(ValidateError)
+    } else {
+        Ok(()) // no-coverage (will be covered by tests when binary operator overloading will be implemented)
     }
 }
