@@ -126,13 +126,13 @@ fn generate_case_dir(dir_path: &Path) -> Result<(), Failed> {
         } else if path.extension() == Some(OsStr::new("gpex")) {
             let code = fs::read_to_string(&path)?;
             let code = expected_const_regex.replace_all(&code, |caps: &Captures<'_>| {
-                let var_name = caps[1].to_lowercase();
+                let const_name = caps[1].strip_prefix("_").unwrap_or(&caps[1]);
                 format!(
                     "const {} = {};\npub var {}_const = {}; // expected: {}",
-                    &caps[1],
+                    const_name,
                     &caps[2],
-                    var_name.strip_prefix("_").unwrap_or(&var_name),
-                    &caps[2],
+                    const_name.to_lowercase(),
+                    const_name,
                     &caps[3],
                 )
             });
