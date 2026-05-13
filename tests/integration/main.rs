@@ -41,17 +41,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn run_case(path: &Path, runtime: Arc<Runtime>) -> Result<(), Failed> {
-    let folder_name = path.file_name().unwrap_or_default().to_string_lossy();
+    let dir_name = path.file_name().unwrap_or_default().to_string_lossy();
     runtime.block_on(async move {
-        if folder_name.starts_with("ok_") {
+        if dir_name.starts_with("ok_") {
             run_ok_cases(path, false).await
-        } else if folder_name.starts_with("wgsl_") {
+        } else if dir_name.starts_with("wgsl_") {
             run_ok_cases(path, true).await
-        } else if folder_name.starts_with("nok_") {
+        } else if dir_name.starts_with("nok_") {
             run_nok_cases(path)
         } else {
             Err(
-                format!("Test folder should have 'ok_', 'wgsl_' or 'nok_' prefix: {folder_name}")
+                format!("Test directory should have 'ok_', 'wgsl_' or 'nok_' prefix: {dir_name}")
                     .into(),
             )
         }
