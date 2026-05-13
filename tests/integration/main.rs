@@ -58,12 +58,12 @@ fn run_case(path: &Path, runtime: Arc<Runtime>) -> Result<(), Failed> {
     })
 }
 
-async fn run_ok_cases(path: &Path, is_wgsl_checked: bool) -> Result<(), Failed> {
+async fn run_ok_cases(path: &Path, is_wgsl_check_enabled: bool) -> Result<(), Failed> {
     let (program, _) = convert_gpex_result(gpex::compile_program(path, true))?;
     let mut runner = convert_gpex_result(Runner::new(program).await)?;
     runner.run_step();
     check_global_vars(path, path, &runner)?;
-    if is_wgsl_checked {
+    if is_wgsl_check_enabled {
         check_wgsl_output(path, runner.program())?;
     }
     Ok(())
