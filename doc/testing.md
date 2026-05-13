@@ -17,7 +17,7 @@ Some tests rely on `.gpex` examples:
 Tests examples of GPEx programs located in `tests/integration/*/`. The testing behavior depends on
 the name prefix of the inner directory.
 
-### `tests/integration/ok_*` test directories
+### `tests/integration/*/ok_*` test directories
 
 These directories are tested the following way:
 
@@ -30,7 +30,7 @@ These directories are tested the following way:
   var _result = 2_147_483_647; // expected: 2147483647
   ```
 
-### `tests/integration/wgsl_*` test directories
+### `tests/integration/*/wgsl_*` test directories
 
 These directories are tested the following way:
 
@@ -38,7 +38,7 @@ These directories are tested the following way:
 - Verify that the generated WGSL code matches the expected WGSL code in `.expected`. If this file
   doesn't exist, it is auto-generated during the first test run.
 
-### `tests/integration/nok_*` test directories
+### `tests/integration/*/nok_*` test directories
 
 These directories are tested the following way:
 
