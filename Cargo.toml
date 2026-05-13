@@ -24,6 +24,8 @@ tokio = { version = "1", features = ["full"] }
 wgpu = "29"
 
 [dev-dependencies]
+libtest-mimic = "0.8"
+pretty_assertions = "1.4"
 regex = "1"
 serde_norway = "0.9"
 wgsl-parse = "0.3"
@@ -75,3 +77,8 @@ option_if_let_else = { level = "allow", priority = 1 } # many false positives
 redundant_pub_crate = { level = "allow", priority = 1 } # not working well for now
 return_self_not_must_use = { level = "allow", priority = 1 } # many false positives
 significant_drop_tightening = { level = "allow", priority = 1 } # many false positives
+
+[[test]]
+name = "integration"
+path = "tests/integration/main.rs"
+harness = false
