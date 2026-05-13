@@ -1,75 +1,48 @@
 # Testing
 
-Three integration test suites, each with its own `main.rs` harness.
+Two test suites are defined, each with its own `main.rs` harness.
 
-## Compiler integration tests (`tests/lib/`)
+## Library tests (`tests/lib/`)
 
 Tests items exported by the `lib` crate, so they are normally rarely updated.
 
 Some tests rely on `.gpex` examples:
 
-- `valid/`: Projects that compile successfully (asserts program structure and buffer fields)
-- `error/`: Projects that produce errors
-- `warning/`: Projects that produce warnings
+- `valid/`: program that compiles successfully.
+- `error/`: program that produces errors.
+- `warning/`: program that produces warnings.
 
-## GPU execution tests (`tests/runner/`)
+## Integration tests (`tests/integration/`)
 
-Compiles `.gpex` fixtures, runs them on the GPU, then verifies variable values. Test expectations
-are embedded in the source files as comments:
+Tests examples of GPEx programs located in `tests/integration/*/`. The testing behavior depends on
+the name prefix of the inner directory.
 
-```gpex
-var _result = 2_147_483_647; // expected: 2147483647
-```
+### `tests/integration/*/ok_*` test directories
 
-The harness scans for `// expected: <value>` and asserts that the value stored on GPU side matches.
+These directories are tested the following way:
 
-When configuring a test with `TranspiledCodeAction::Checked` in `tests/runner/main.rs`, the test
-compares the transpiled code with `.expected` file. If no `.expected` file exists, it is
-auto-generated on first run.
+- Compile the directory.
+- Verify the compilation succeeded.
+- Run the program.
+- Verify that expected values of variables match actual values stored on GPU.
+  An expected value can be indicated in a `.gpex` file using the following type of comment:
+  ```gpex
+  var _result = 2_147_483_647; // expected: 2147483647
+  ```
 
-Alternatively, it is possible to specify a `.expected.pattern` file containing a regex that
-must match the transpiled code, which has priority over the `.expected` file.
+### `tests/integration/*/wgsl_*` test directories
 
-## Diagnostic snapshot tests (`tests/logs/`)
+These directories are tested the following way:
 
-Compiles `.gpex` fixtures that trigger errors/warnings and compares the full log output against
-`.expected` snapshot files. If no `.expected` file exists, it is auto-generated on first run.
+- Same as `ok_*` tests.
+- Verify that the generated WGSL code matches the expected WGSL code in `.expected`. If this file
+  doesn't exist, it is auto-generated during the first test run.
 
-For parametrized tests, a `.expected__$$` file can be specified instead of `.expected`, which
-contains the template of the expected logs for each case. The file supports the same placeholders as
-`.gpex` files.
+### `tests/integration/*/nok_*` test directories
 
-Subdirectories follow the naming convention `<log level>_<subcategory>` (e.g. `error_syntax/`,
-`warning_unused/`, ...).
+These directories are tested the following way:
 
-## Parametrized tests
-
-Tests in `tests/lib/` and `tests/runner/` are organized in folders, each containing either:
-
-- Simple tests: a static test folder with `.gpex` files (e.g., `syntax/`).
-- Parametric tests: a `cases.yaml` file defining test dimensions, plus `.gpex` template files.
-
-The parametric tests support the following placeholders:
-
-- `$$` in filenames and `.gpex`file content: replaced by the unique name of the generated test.
-- `{{dimension.key}}` in `.gpex` file content: replaced by a property of the generated case defined
-  in `cases.yaml`.
-
-The test harness generates concrete test cases by taking the Cartesian product of all dimension
-cases and substituting placeholders.
-
-`cases.yaml` schema is the following:
-
-```yaml
-dimensions: # dimensions are applied in order for the replacement of placeholders 
-  - id: <dimension name>
-    cases:
-      <case name>:
-        <key1>: <value1> # {{<dimension name>.<key1>}} will be replaced by <value1> in .gpex files
-        ...
-  - ...
-```
-
-It is possible to disable a test by inserting `<EXCLUDE>` in a generated `.gpex` file.
-To optimize tests, it is recommended to exclude all generated files of a given test case, not only
-the main file.
+- Compile the directory.
+- Verify the compilation returned errors or warnings.
+- Verify that the compilation error messages match the expected messages in `.expected`. If this
+  file doesn't exist, it is auto-generated during the first test run.
