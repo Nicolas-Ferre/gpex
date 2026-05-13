@@ -28,6 +28,7 @@ These directories are tested the following way:
   An expected value can be indicated in a `.gpex` file using the following type of comment:
   ```gpex
   var _result = 2_147_483_647; // expected: 2147483647
+  const _RESULT = 2_147_483_647; // expected: 2147483647
   ```
 
 ### `tests/integration/*/wgsl_*` test directories

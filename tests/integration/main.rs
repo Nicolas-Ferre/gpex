@@ -4,15 +4,19 @@ use gpex::{Log, Program, Runner};
 use itertools::Itertools;
 use libtest_mimic::{Arguments, Failed, Trial};
 use pretty_assertions::assert_eq;
-use regex::Regex;
+use regex::{Captures, Regex};
 use std::ffi::OsStr;
 use std::fmt::Write;
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::sync::Arc;
+use std::{env, fs};
 use tokio::runtime::Runtime;
 use wgsl_parse::syntax::TranslationUnit;
+
+const EXPECTED_VAR_REGEX: &str = r"var +(\w+) *= *[^;]*; *// expected: *(.+)";
+const EXPECTED_CONST_REGEX: &str = r"const +(\w+) *= *([^;]*); *// expected: *(.+)";
+const EXPECTED_PATTERN: &str = "// expected";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let runtime = Arc::new(Runtime::new()?);
@@ -59,10 +63,11 @@ fn run_case(path: &Path, runtime: Arc<Runtime>) -> Result<(), Failed> {
 }
 
 async fn run_ok_cases(path: &Path, is_wgsl_check_enabled: bool) -> Result<(), Failed> {
-    let (program, _) = convert_gpex_result(gpex::compile_program(path, true))?;
+    let generated_path = generate_case(path)?;
+    let (program, _) = convert_gpex_result(gpex::compile_program(&generated_path, true))?;
     let mut runner = convert_gpex_result(Runner::new(program).await)?;
     runner.run_step();
-    check_global_vars(path, path, &runner)?;
+    check_global_vars(&generated_path, &generated_path, &runner)?;
     if is_wgsl_check_enabled {
         check_wgsl_output(path, runner.program())?;
     }
@@ -100,10 +105,55 @@ fn convert_gpex_result<T>(result: Result<T, Vec<Log>>) -> Result<T, Failed> {
     }
 }
 
+fn generate_case(root_path: &Path) -> Result<PathBuf, Failed> {
+    let test_dir = env::temp_dir().join(root_path);
+    if test_dir.exists() {
+        fs::remove_dir_all(&test_dir)?;
+    }
+    generate_case_dir(root_path)?;
+    Ok(test_dir)
+}
+
+fn generate_case_dir(dir_path: &Path) -> Result<(), Failed> {
+    let expected_const_regex = Regex::new(EXPECTED_CONST_REGEX)?;
+    let expected_var_regex = Regex::new(EXPECTED_VAR_REGEX)?;
+    for entry in dir_path.read_dir()? {
+        let entry = entry?;
+        let path = entry.path();
+        let file_type = entry.file_type()?;
+        if file_type.is_dir() {
+            generate_case_dir(&path)?;
+        } else if path.extension() == Some(OsStr::new("gpex")) {
+            let code = fs::read_to_string(&path)?;
+            let code = expected_const_regex.replace_all(&code, |caps: &Captures<'_>| {
+                let const_name = caps[1].strip_prefix("_").unwrap_or(&caps[1]);
+                format!(
+                    "const {} = {};\npub var {}_const = {}; // expected: {}",
+                    const_name,
+                    &caps[2],
+                    const_name.to_lowercase(),
+                    const_name,
+                    &caps[3],
+                )
+            });
+            assert_eq!(
+                expected_var_regex.captures_iter(&code).count(),
+                code.matches(EXPECTED_PATTERN).count(),
+                "some of the expected values are ignored in '{}'",
+                path.display()
+            );
+            let generated_path = env::temp_dir().join(path);
+            fs::create_dir_all(path_parent(&generated_path))?;
+            fs::write(&generated_path, code.as_ref())?;
+        }
+    }
+    Ok(())
+}
+
 fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Result<(), Failed> {
     let mut all_actual = String::new();
     let mut all_expected = String::new();
-    let expected_regex = Regex::new(r"var +(\w+) *=.*// expected: *(.+)")?;
+    let expected_regex = Regex::new(EXPECTED_VAR_REGEX)?;
     for entry in dir_path.read_dir()? {
         let entry = entry?;
         let path = entry.path();
@@ -127,6 +177,11 @@ fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Resu
     }
     assert_eq!(all_actual, all_expected);
     Ok(())
+}
+
+fn path_parent(path: &Path) -> &Path {
+    path.parent()
+        .unwrap_or_else(|| unreachable!("parent should be at least temporary folder"))
 }
 
 fn check_wgsl_output(path: &Path, program: &Program) -> Result<(), Failed> {
