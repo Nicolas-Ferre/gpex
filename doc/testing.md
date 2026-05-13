@@ -8,9 +8,9 @@ Tests items exported by the `lib` crate, so they are normally rarely updated.
 
 Some tests rely on `.gpex` examples:
 
-- `valid/`: Projects that compile successfully (asserts program structure and buffer fields)
-- `error/`: Projects that produce errors
-- `warning/`: Projects that produce warnings
+- `valid/`: program that compiles successfully
+- `error/`: program that produces errors
+- `warning/`: program that produces warnings
 
 ## Integration tests (`tests/integration/`)
 
