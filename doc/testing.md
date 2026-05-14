@@ -36,8 +36,8 @@ These directories are tested the following way:
 These directories are tested the following way:
 
 - Same as `ok_*` tests.
-- Verify that the generated WGSL code matches the expected WGSL code in `.expected`. If this file
-  doesn't exist, it is auto-generated during the first test run.
+- Verify that the generated WGSL code matches the expected WGSL code in `.expected.wgsl`.
+  If this file doesn't exist, it is auto-generated during the first test run.
 
 ### `tests/integration/*/nok_*` test directories
 
@@ -45,5 +45,5 @@ These directories are tested the following way:
 
 - Compile the directory.
 - Verify the compilation returned errors or warnings.
-- Verify that the compilation error messages match the expected messages in `.expected`. If this
-  file doesn't exist, it is auto-generated during the first test run.
+- Verify that the compilation error messages match the expected messages in `.expected.stderr`.
+  If this file doesn't exist, it is auto-generated during the first test run.
