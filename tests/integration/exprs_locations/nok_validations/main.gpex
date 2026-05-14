@@ -1,0 +1,54 @@
+// Test that validation is performed from any expression location (must generate errors).
+// This simplifies the testing for all other nok_* tests, for which it is not needed to exhaustively
+// test all expression locations.
+
+// =========================| Global variable default value |=========================
+
+var _var = error;
+
+// =========================| Global constant value |=========================
+
+const _CONST = error;
+
+// =========================| Repeat call |=========================
+
+repeat error();
+
+// =========================| Function parameter type |=========================
+
+fn _fn(param: error) -> i32 {
+    return 0;
+}
+
+// =========================| Function return type |=========================
+
+fn _fn() -> error {
+    return 0;
+}
+
+// =========================| Assignment statement left value |=========================
+
+fn _fn() {
+    error = 0;
+}
+
+// =========================| Assignment statement right value |=========================
+
+fn _fn(param: i32) {
+    param = error;
+}
+
+// =========================| Return statement value |=========================
+
+fn _fn() -> i32 {
+    return error;
+}
+
+// =========================| Call argument |=========================
+
+var _call = call(error);
+
+// =========================| Unary operators |=========================
+
+var _neg = -error;
+var _not = !error;

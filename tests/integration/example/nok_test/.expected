@@ -1,2 +1,0 @@
-error: expression not constant (at <root>/main.gpex:2:19)
-  --> info: expression must be constant (at <root>/main.gpex:2:1)

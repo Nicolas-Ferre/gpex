@@ -1,0 +1,8 @@
+error: `f32` literal out of bounds (at <root>/main.gpex:5:22)
+error: `f32` literal out of bounds (at <root>/main.gpex:6:22)
+error: `f32` literal out of bounds (at <root>/main.gpex:7:23)
+error: `i32` literal out of bounds (at <root>/main.gpex:11:22)
+error: `i32` literal out of bounds (at <root>/main.gpex:12:22)
+error: `i32` literal out of bounds (at <root>/main.gpex:13:23)
+error: `u32` literal out of bounds (at <root>/main.gpex:17:22)
+error: `u32` literal out of bounds (at <root>/main.gpex:18:23)
