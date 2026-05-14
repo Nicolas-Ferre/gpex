@@ -117,31 +117,6 @@ fn compile_warning_empty() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/warning_empty"))
 }
 
-#[test]
-fn compile_warning_naming_case() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/warning_naming_case"))
-}
-
-#[test]
-fn compile_warning_naming_single_letter() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/warning_naming_single_letter"))
-}
-
-#[test]
-fn compile_warning_pub_with_underscore_prefix() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/warning_pub_with_underscore_prefix"))
-}
-
-#[test]
-fn compile_warning_unused() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/warning_unused"))
-}
-
-#[test]
-fn compile_warning_used_with_underscore_prefix() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/warning_used_with_underscore_prefix"))
-}
-
 fn compile_and_check_logs(path: &Path) -> Result<(), Error> {
     let (generated_dir, case_names) = common::generate_cases(path)?;
     let logs = gpex::compile_program(&generated_dir, true)

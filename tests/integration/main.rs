@@ -87,7 +87,7 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
         let expected_path = path.join(".expected");
         if expected_path.exists() {
             let expected = fs::read_to_string(&expected_path)?;
-            assert_eq!(actual.trim(), expected.trim());
+            assert_eq!(expected.trim(), actual.trim());
             Ok(())
         } else {
             fs::write(&expected_path, actual)?;
@@ -137,8 +137,8 @@ fn generate_case_dir(dir_path: &Path) -> Result<(), Failed> {
                 )
             });
             assert_eq!(
-                expected_var_regex.captures_iter(&code).count(),
                 code.matches(EXPECTED_PATTERN).count(),
+                expected_var_regex.captures_iter(&code).count(),
                 "some of the expected values are ignored in '{}'",
                 path.display()
             );
@@ -175,7 +175,7 @@ fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Resu
             }
         }
     }
-    assert_eq!(all_actual, all_expected);
+    assert_eq!(all_expected, all_actual);
     Ok(())
 }
 
@@ -193,7 +193,7 @@ fn check_wgsl_output(path: &Path, program: &Program) -> Result<(), Failed> {
     let expected_path = path.join(".expected");
     if expected_path.exists() {
         let expected_code = fs::read_to_string(&expected_path)?;
-        assert_eq!(actual_code, expected_code);
+        assert_eq!(expected_code, actual_code);
         Ok(())
     } else {
         fs::write(&expected_path, actual_code)?;

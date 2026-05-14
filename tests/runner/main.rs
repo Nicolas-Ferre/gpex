@@ -84,16 +84,6 @@ async fn run_imports() -> Result<(), Error> {
 }
 
 #[tokio::test]
-async fn run_item_naming() -> Result<(), Error> {
-    run_test_dir(
-        Path::new("tests/runner/item_naming"),
-        TranspiledCodeAction::Ignored,
-        WarningAction::Failing,
-    )
-    .await
-}
-
-#[tokio::test]
 async fn run_import_priority() -> Result<(), Error> {
     run_test_dir(
         Path::new("tests/runner/import_priority"),

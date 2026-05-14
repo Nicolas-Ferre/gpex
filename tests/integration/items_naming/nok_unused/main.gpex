@@ -1,0 +1,27 @@
+// Test unused items without single underscore prefix (must generate warnings).
+
+// =========================| Imports |=========================
+
+import main; // self import
+import unused;
+
+import duplicated;
+import duplicated;
+const _DUPLICATED_IMPORT_USAGE = DUPLICATED_IMPORTED;
+
+// =========================| Global constants |=========================
+
+const CONST = 0;
+
+// =========================| Global variables |=========================
+
+var var_ = 0;
+
+// =========================| Functions |=========================
+
+fn fn_() -> i32 { return 0; }
+fn __fn_with_double_underscore_prefix() -> i32 { return 0; }
+
+// =========================| Function parameters |=========================
+
+fn _fn(param: i32) -> i32 { return 0; }

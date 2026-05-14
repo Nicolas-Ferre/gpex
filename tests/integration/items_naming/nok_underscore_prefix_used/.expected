@@ -1,0 +1,8 @@
+warning: `_CONST` item used but name starting with `_` (at <root>/main.gpex:5:7)
+  --> info: item used here (at <root>/main.gpex:6:20)
+warning: `_var` item used but name starting with `_` (at <root>/main.gpex:10:5)
+  --> info: item used here (at <root>/main.gpex:11:18)
+warning: `_fn()` item used but name starting with `_` (at <root>/main.gpex:15:4)
+  --> info: item used here (at <root>/main.gpex:16:17)
+warning: `_param` item used but name starting with `_` (at <root>/main.gpex:20:8)
+  --> info: item used here (at <root>/main.gpex:20:23)

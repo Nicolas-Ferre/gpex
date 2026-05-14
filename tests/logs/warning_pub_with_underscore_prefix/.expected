@@ -1,6 +1,0 @@
-warning: `_CONSTANT` item public but name starting with `_` (at <root>/unused__const_global.gpex:1:11)
-warning: `_fn()` item public but name starting with `_` (at <root>/unused__fn.gpex:1:8)
-warning: `_var` item public but name starting with `_` (at <root>/unused__var_global.gpex:1:9)
-warning: `_CONSTANT` item public but name starting with `_` (at <root>/used__const_global.gpex:3:11)
-warning: `_fn()` item public but name starting with `_` (at <root>/used__fn.gpex:3:8)
-warning: `_var` item public but name starting with `_` (at <root>/used__var_global.gpex:3:9)
