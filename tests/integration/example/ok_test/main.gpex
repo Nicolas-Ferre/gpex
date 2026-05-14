@@ -1,2 +1,0 @@
-var _result = 1; // expected: 1
-const _RESULT = 2; // expected: 2

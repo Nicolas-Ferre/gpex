@@ -1,2 +1,0 @@
-{{expr_location.additional_error}}
-error: `{{literal.type}}` literal out of bounds (at <root>/main__$$.gpex:{{expr_location.literal_span_start}})

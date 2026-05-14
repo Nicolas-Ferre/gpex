@@ -84,7 +84,7 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
             .map(Log::to_string)
             .join("")
             .replace(&path.display().to_string(), "<root>");
-        let expected_path = path.join(".expected");
+        let expected_path = path.join(".expected.stderr");
         if expected_path.exists() {
             let expected = fs::read_to_string(&expected_path)?;
             assert_eq!(expected.trim(), actual.trim());
@@ -190,7 +190,7 @@ fn check_wgsl_output(path: &Path, program: &Program) -> Result<(), Failed> {
         format_wgsl(&program.init_shader)?,
         format_wgsl(&program.update_shader)?
     );
-    let expected_path = path.join(".expected");
+    let expected_path = path.join(".expected.wgsl");
     if expected_path.exists() {
         let expected_code = fs::read_to_string(&expected_path)?;
         assert_eq!(expected_code, actual_code);

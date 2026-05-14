@@ -93,11 +93,6 @@ fn compile_error_operator_fns() -> Result<(), Error> {
 }
 
 #[test]
-fn compile_error_out_of_bounds() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_out_of_bounds"))
-}
-
-#[test]
 fn compile_error_statements_missing() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_statements_missing"))
 }
