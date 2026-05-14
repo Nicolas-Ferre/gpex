@@ -1,0 +1,53 @@
+// Test invalid cases used for item names (must generate warnings).
+
+// =========================| Imports |=========================
+
+pub import _camelCaseImport._camelCaseImport;
+pub import _PascalCaseImport._PascalCaseImport;
+pub import _SCREAMING_SNAKE_CASE_IMPORT._SCREAMING_SNAKE_CASE_IMPORT;
+
+// =========================| Global constants |=========================
+
+const _snake_case_const = 0;
+const _camelCaseConst = 0;
+const _PascalCaseConst = 0;
+
+const _snake_case_const_typeref = i32;
+const _camelCaseConstTyperef = i32;
+
+// =========================| Global variables |=========================
+
+var _camelCaseVar = 0;
+var _PascalCaseVar = 0;
+var _SCREAMING_SNAKE_CASE_VAR = 0;
+
+var _camelCaseVarTyperef = i32;
+var _PascalCaseVarTyperef = i32;
+var _SCREAMING_SNAKE_CASE_VAR_TYPEREF = i32;
+
+// =========================| Functions |=========================
+
+fn _camelCaseFnNoReturn(param: i32) { param = 0; }
+fn _PascalCaseFnNoReturn(param: i32) { param = 0; }
+fn _SCREAMING_SNAKE_CASE_FN_NO_RETURN(param: i32) { param = 0; }
+
+fn _camelCaseFnReturn() -> i32 { return 0; }
+fn _PascalCaseFnReturn() -> i32 { return 0; }
+fn _SCREAMING_SNAKE_CASE_FN_RETURN() -> i32 { return 0; }
+
+fn _camelCaseFnReturnTyperef() -> typeref { return i32; }
+fn _PascalCaseFnReturnTyperef() -> typeref { return i32; }
+fn _SCREAMING_SNAKE_CASE_FN_RETURN_TYPEREF() -> typeref { return i32; }
+
+const fn _camelCaseFnReturnConstTyperef() -> typeref { return i32; }
+const fn _SCREAMING_SNAKE_CASE_FN_RETURN_CONST_TYPEREF() -> typeref { return i32; }
+
+// =========================| Function parameters |=========================
+
+fn _fn_camel_case(_camelCaseParam: i32) -> i32 { return 0; }
+fn _fn_pascal_case(_PascalCaseParam: i32) -> i32 { return 0; }
+fn _fn_snake_case(_SCREAMING_SNAKE_CASE_PARAM: i32) -> i32 { return 0; }
+
+fn _fn_camel_case_typeref(_camelCaseParamTyperef: typeref) -> i32 { return 0; }
+fn _fn_pascal_case_typeref(_PascalCaseParamTyperef: typeref) -> i32 { return 0; }
+fn _fn_snake_case_typeref(_SCREAMING_SNAKE_CASE_PARAM_TYPEREF: typeref) -> i32 { return 0; }

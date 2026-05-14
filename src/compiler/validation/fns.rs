@@ -46,7 +46,7 @@ impl Validator<'_, '_> {
             Type::NoReturn => false,
             Type::Unknown => unreachable!("return type should be validated before"),
         };
-        let allowed_cases: &[Case] = if may_return_typeref {
+        let allowed_cases: &[Case] = if may_return_typeref && node.const_keyword_span.is_some() {
             &[Case::Snake, Case::Pascal]
         } else {
             &[Case::Snake]

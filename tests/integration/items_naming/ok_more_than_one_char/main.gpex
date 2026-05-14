@@ -1,0 +1,17 @@
+// Test items named with at least two characters (must not generate warnings).
+
+// =========================| Global constants |=========================
+
+pub const CO = 0;
+
+// =========================| Global variables |=========================
+
+pub var va = 0;
+
+// =========================| Functions |=========================
+
+pub fn fu() -> i32 { return 0; }
+
+// =========================| Function parameters |=========================
+
+fn _fn(pa: i32) { pa = 0; }
