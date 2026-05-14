@@ -46,8 +46,8 @@ const fn _SCREAMING_SNAKE_CASE_FN_RETURN_CONST_TYPEREF() -> typeref { return i32
 
 fn _fn_camel_case(_camelCaseParam: i32) -> i32 { return 0; }
 fn _fn_pascal_case(_PascalCaseParam: i32) -> i32 { return 0; }
-fn _fn_snake_case(_SCREAMING_SNAKE_CASE_PARAM: i32) -> i32 { return 0; }
+fn _fn_screaming_snake_case(_SCREAMING_SNAKE_CASE_PARAM: i32) -> i32 { return 0; }
 
 fn _fn_camel_case_typeref(_camelCaseParamTyperef: typeref) -> i32 { return 0; }
 fn _fn_pascal_case_typeref(_PascalCaseParamTyperef: typeref) -> i32 { return 0; }
-fn _fn_snake_case_typeref(_SCREAMING_SNAKE_CASE_PARAM_TYPEREF: typeref) -> i32 { return 0; }
+fn _fn_screaming_snake_case_typeref(_SCREAMING_SNAKE_CASE_PARAM_TYPEREF: typeref) -> i32 { return 0; }
