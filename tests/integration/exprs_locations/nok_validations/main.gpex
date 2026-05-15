@@ -2,53 +2,53 @@
 // This simplifies the testing for all other nok_* tests, for which it is not needed to exhaustively
 // test all expression locations.
 
-// =========================| Global variable default value |=========================
+// =========================| Global variable default values |=========================
 
 var _var = error;
 
-// =========================| Global constant value |=========================
+// =========================| Global constant values |=========================
 
 const _CONST = error;
 
-// =========================| Repeat call |=========================
+// =========================| Repeat calls |=========================
 
 repeat error();
 
-// =========================| Function parameter type |=========================
+// =========================| Function parameter types |=========================
 
 fn _fn(param: error) -> i32 {
     return 0;
 }
 
-// =========================| Function return type |=========================
+// =========================| Function return types |=========================
 
 fn _fn() -> error {
     return 0;
 }
 
-// =========================| Assignment statement left value |=========================
-
-fn _fn() {
-    error = 0;
-}
-
-// =========================| Assignment statement right value |=========================
-
-fn _fn(param: i32) {
-    param = error;
-}
-
-// =========================| Return statement value |=========================
+// =========================| Return statement values |=========================
 
 fn _fn() -> i32 {
     return error;
 }
 
-// =========================| Call argument |=========================
+// =========================| Assignment statement left values |=========================
+
+fn _fn() {
+    error = 0;
+}
+
+// =========================| Assignment statement right values |=========================
+
+fn _fn(param: i32) {
+    param = error;
+}
+
+// =========================| Call arguments |=========================
 
 var _call = call(error);
 
-// =========================| Unary operators |=========================
+// =========================| Unary operator operands |=========================
 
 var _neg = -error;
 var _not = !error;

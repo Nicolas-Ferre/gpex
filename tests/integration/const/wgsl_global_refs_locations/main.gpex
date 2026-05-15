@@ -1,0 +1,52 @@
+// Test references to global item in all constant locations (should be transpiled inline).
+
+const fn global_item(param: i32) -> i32 {
+    return param;
+}
+const fn GlobalItemTyperef(param: typeref) -> typeref {
+    return param;
+}
+
+// =========================| Global constant values |=========================
+
+const _RESULT_GLOBAL_CONST = global_item(1); // expected: 1
+
+// =========================| Function parameter types |=========================
+
+const _RESULT_FN_PARAM_TYPE = fn_with_param_type(2u); // expected: 2u
+const fn fn_with_param_type(param: GlobalItemTyperef(u32)) -> u32 {
+    return param;
+}
+
+// =========================| Function return types |=========================
+
+const _RESULT_FN_RETURN_TYPE = fn_with_return_type(3.0); // expected: 3.0
+const fn fn_with_return_type(param: f32) -> GlobalItemTyperef(f32) {
+    return param;
+}
+
+// =========================| Return statement values |=========================
+
+const _RESULT_RETURN = fn_with_return(); // expected: 4
+const fn fn_with_return() -> i32 {
+    return global_item(4);
+}
+
+// =========================| Assignment statement right values |=========================
+
+const _RESULT_ASSIGNMENT_RIGHT = fn_with_assignment_right(0); // expected: 5
+const fn fn_with_assignment_right(param: i32) -> i32 {
+    param = global_item(5);
+    return param;
+}
+
+// =========================| Function call arguments |=========================
+
+const _RESULT_FN_CALL_ARG = global_item(global_item(6)); // expected: 6
+
+// =========================| Unary operator operands |=========================
+
+const _RESULT_UNARY = -global_item(7); // expected: 7
+const fn __neg__(param: i32) -> i32 {
+    return param;
+}
