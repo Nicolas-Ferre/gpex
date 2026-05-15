@@ -32,3 +32,13 @@ const fn fn_with_returned_call_arg(param: i32) -> i32 {
 const fn called_fn(param: i32) -> i32 {
     return param;
 }
+
+// =========================| Unary operators |=========================
+
+const _RESULT_UNARY = fn_with_returned_unary(5); // expected: 5
+const fn fn_with_returned_unary(param: i32) -> i32 {
+    return -param;
+}
+const fn __neg__(param: i32) -> i32 {
+    return param;
+}
