@@ -1,11 +1,11 @@
-// Test not constant expressions in constant context (must generate errors).
+// Test all not constant expressions in constant contexts (must generate errors).
 
 // =========================| Global variable references |=========================
 
 var var_ = 0;
 const _RESULT_VAR = var_;
 
-// =========================| Parameter reference |=========================
+// =========================| Parameter references |=========================
 
 fn _fn_with_param_as_param_type(param1: typeref, param2: param1) -> i32 {
     return param2;
