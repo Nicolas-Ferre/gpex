@@ -1,0 +1,51 @@
+// Test not constant expressions in all constant locations (must generate errors).
+
+var not_const_value = 0;
+const fn called_const_fn(param: i32) -> i32 {
+    return param;
+}
+const fn __neg__(param: i32) -> i32 {
+    return param;
+}
+
+// =========================| Global constant values |=========================
+
+const _CONST = not_const_value;
+
+// =========================| Function parameter types |=========================
+
+fn _fn_param_type(param: not_const_value) -> i32 {
+    return param;
+}
+
+// =========================| Function return types |=========================
+
+fn _fn_return_type(param: i32) -> not_const_value {
+    return param;
+}
+
+// =========================| Return statement values |=========================
+
+const fn _fn_return() -> i32 {
+    return not_const_value;
+}
+
+// =========================| Assignment statement left values |=========================
+
+const fn _fn_assignment_left(){
+    not_const_value = 0;
+}
+
+// =========================| Assignment statement right values |=========================
+
+const fn _fn_assignment_right(param: i32) {
+    param = not_const_value;
+}
+
+// =========================| Function call arguments |=========================
+
+const _FN_CALL_ARG = called_const_fn(not_const_value);
+
+// =========================| Unary operator operands |=========================
+
+const _UNARY_OPERAND = -not_const_value;

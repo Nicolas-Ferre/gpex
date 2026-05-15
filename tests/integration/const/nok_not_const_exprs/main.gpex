@@ -1,0 +1,29 @@
+// Test all not constant expressions in constant contexts (must generate errors).
+
+// =========================| Global variable references |=========================
+
+var var_ = 0;
+const _RESULT_VAR = var_;
+
+// =========================| Parameter references |=========================
+
+fn _fn_with_param_as_param_type(param1: typeref, param2: param1) -> i32 {
+    return param2;
+}
+fn _fn_with_param_as_return_type(param: typeref) -> param {
+    return param;
+}
+
+// =========================| Function calls |=========================
+
+const _RESULT_FN_CALL = not_const_fn();
+fn not_const_fn() -> i32 {
+    return 0;
+}
+
+// =========================| Unary operators |=========================
+
+const _RESULT_UNARY = -true;
+fn __neg__(param: bool) -> bool {
+    return param;
+}

@@ -10,11 +10,6 @@ use std::fs;
 use std::path::Path;
 
 #[test]
-fn compile_error_exprs_non_const() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_exprs_non_const"))
-}
-
-#[test]
 fn compile_error_exprs_not_ref() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_exprs_not_ref"))
 }

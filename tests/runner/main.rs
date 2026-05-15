@@ -14,16 +14,6 @@ use std::str::FromStr;
 use wgsl_parse::syntax::TranslationUnit;
 
 #[tokio::test]
-async fn run_const_optimizations() -> Result<(), Error> {
-    run_test_dir(
-        Path::new("tests/runner/const_optimizations"),
-        TranspiledCodeAction::Checked,
-        WarningAction::Failing,
-    )
-    .await
-}
-
-#[tokio::test]
 async fn run_empty() -> Result<(), Error> {
     run_test_dir(
         Path::new("tests/runner/empty"),

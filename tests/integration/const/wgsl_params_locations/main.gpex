@@ -1,0 +1,44 @@
+// Test parameters in all constant locations (should be transpiled inline).
+
+// =========================| Return statement values |=========================
+
+const _RESULT_RETURN = fn_with_return(1); // expected: 1
+const fn fn_with_return(param: i32) -> i32 {
+    return param;
+}
+
+// =========================| Assignment statement left values |=========================
+
+const _RESULT_ASSIGNMENT_LEFT = fn_with_assignment_left(0); // expected: 2
+const fn fn_with_assignment_left(param: i32) -> i32 {
+    param = 2;
+    return param;
+}
+
+// =========================| Assignment statement right values |=========================
+
+const _RESULT_ASSIGNMENT_RIGHT = fn_with_assignment_right(0, 3); // expected: 3
+const fn fn_with_assignment_right(param1: i32, param2: i32) -> i32 {
+    param1 = param2;
+    return param2;
+}
+
+// =========================| Function call arguments |=========================
+
+const _RESULT_FN_ARG = fn_with_returned_call_arg(4); // expected: 4
+const fn fn_with_returned_call_arg(param: i32) -> i32 {
+    return called_fn(param);
+}
+const fn called_fn(param: i32) -> i32 {
+    return param;
+}
+
+// =========================| Unary operator operands |=========================
+
+const _RESULT_UNARY = fn_with_returned_unary(5); // expected: 5
+const fn fn_with_returned_unary(param: i32) -> i32 {
+    return -param;
+}
+const fn __neg__(param: i32) -> i32 {
+    return param;
+}
