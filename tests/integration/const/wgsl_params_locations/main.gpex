@@ -23,7 +23,7 @@ const fn fn_with_assignment_right(param1: i32, param2: i32) -> i32 {
     return param2;
 }
 
-// =========================| Function call args |=========================
+// =========================| Function call arguments |=========================
 
 const _RESULT_FN_ARG = fn_with_returned_call_arg(4); // expected: 4
 const fn fn_with_returned_call_arg(param: i32) -> i32 {
