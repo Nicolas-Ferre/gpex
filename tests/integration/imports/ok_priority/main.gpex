@@ -1,3 +1,5 @@
+// Test imported item priorities.
+
 import ~.imported1;
 import ~.imported2;
 

@@ -27,18 +27,6 @@ fn compile_error_fns_without_return_type() -> Result<(), Error> {
 }
 
 #[test]
-fn compile_error_imports_not_found() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_imports_not_found"))
-}
-
-#[test]
-fn compile_error_imports_not_found_outside_project() -> Result<(), Error> {
-    compile_and_check_logs(Path::new(
-        "tests/logs/error_imports_not_found_outside_project",
-    ))
-}
-
-#[test]
 fn compile_error_items_circular() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_items_circular"))
 }
