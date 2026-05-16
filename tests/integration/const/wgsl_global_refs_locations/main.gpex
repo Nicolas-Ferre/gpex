@@ -1,4 +1,4 @@
-// Test global item references in all constant locations (should be transpiled inline).
+// Test global item references in all constant locations (must be transpiled inline).
 
 const fn global_item(param: i32) -> i32 {
     return param;
