@@ -1,4 +1,4 @@
-// Test parameters in all constant locations (should be transpiled inline).
+// Test parameters in all constant locations (must be transpiled inline).
 
 // =========================| Return statement values |=========================
 

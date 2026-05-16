@@ -1,0 +1,7 @@
+// Test access to types defined in prelude (must be transpiled correctly).
+
+var _f32_type = f32; // expected: f32
+var _i32_type = i32; // expected: i32
+var _u32_type = u32; // expected: u32
+var _bool_type = bool; // expected: bool
+var _typeref_type = typeref; // expected: typeref

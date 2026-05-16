@@ -1,4 +1,4 @@
-// Test all forms of constant expressions (should be transpiled inline).
+// Test all forms of constant expressions (must be transpiled inline).
 
 // =========================| Global constant references |=========================
 
