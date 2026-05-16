@@ -1,0 +1,42 @@
+// Test all expression forms that are not allowed in reference locations (must generate errors).
+
+// =========================| Literals |=========================
+
+fn _literals_as_ref() {
+    false = true;
+    true = false;
+    1.0 = 0.0;
+    1 = 0;
+    1u = 0u;
+}
+
+// =========================| Type references |=========================
+
+fn _type_as_ref() {
+    i32 = u32;
+}
+
+// =========================| Global constants |=========================
+
+const CONST = 0;
+fn _global_const_as_ref() {
+    CONST = 0;
+}
+
+// =========================| Function calls |=========================
+
+fn _fn_call_as_ref() {
+    called_fn() = 0;
+}
+fn called_fn() -> i32 {
+    return 0;
+}
+
+// =========================| Unary operators |=========================
+
+fn _unary_as_ref() {
+    !0 = 0;
+}
+fn __not__(param: i32) -> i32 {
+    return param;
+}
