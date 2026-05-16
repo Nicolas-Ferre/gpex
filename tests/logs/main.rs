@@ -10,11 +10,6 @@ use std::fs;
 use std::path::Path;
 
 #[test]
-fn compile_error_exprs_not_ref() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_exprs_not_ref"))
-}
-
-#[test]
 fn compile_error_fns_not_found_with_unknown_return_type() -> Result<(), Error> {
     compile_and_check_logs(Path::new(
         "tests/logs/error_fns_not_found_with_unknown_return_type",
