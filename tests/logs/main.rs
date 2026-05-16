@@ -71,23 +71,8 @@ fn compile_error_operator_fns() -> Result<(), Error> {
 }
 
 #[test]
-fn compile_error_statements_missing() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_statements_missing"))
-}
-
-#[test]
-fn compile_error_syntax() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_syntax"))
-}
-
-#[test]
 fn compile_error_type_comparison() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_type_comparison"))
-}
-
-#[test]
-fn compile_warning_empty() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/warning_empty"))
 }
 
 fn compile_and_check_logs(path: &Path) -> Result<(), Error> {

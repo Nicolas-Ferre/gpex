@@ -1,0 +1,8 @@
+error: missing `return` statement (at <root>/main.gpex:6:1)
+  --> info: function has a return type (at <root>/main.gpex:5:13)
+error: missing `return` statement (at <root>/main.gpex:12:1)
+  --> info: function has a return type (at <root>/main.gpex:10:29)
+error: missing `return` statement (at <root>/main.gpex:18:1)
+  --> info: function has a return type (at <root>/main.gpex:16:43)
+error: missing `return` statement (at <root>/main.gpex:27:1)
+  --> info: function has a return type (at <root>/main.gpex:25:47)

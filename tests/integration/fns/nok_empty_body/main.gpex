@@ -1,0 +1,4 @@
+// Test empty function bodies (must generate warnings).
+
+fn _fn() {
+}
