@@ -3,10 +3,6 @@
 dimensions:
   - id: item
     cases:
-      import_after_item:
-        code: |
-          const _ITEM = 0;
-          import ~.imported;
       compilerimpl_struct:
         code: "struct MyType = compilerimpl {}"
       repeat_with_returned_type:

@@ -1,3 +1,0 @@
-import {{import.form}};
-
-var _result = IMPORTED; // expected: 123

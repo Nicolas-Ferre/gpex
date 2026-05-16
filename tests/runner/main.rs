@@ -64,26 +64,6 @@ async fn run_fn_aliasing() -> Result<(), Error> {
 }
 
 #[tokio::test]
-async fn run_imports() -> Result<(), Error> {
-    run_test_dir(
-        Path::new("tests/runner/imports"),
-        TranspiledCodeAction::Ignored,
-        WarningAction::Failing,
-    )
-    .await
-}
-
-#[tokio::test]
-async fn run_import_priority() -> Result<(), Error> {
-    run_test_dir(
-        Path::new("tests/runner/import_priority"),
-        TranspiledCodeAction::Ignored,
-        WarningAction::Failing,
-    )
-    .await
-}
-
-#[tokio::test]
 async fn run_repeats() -> Result<(), Error> {
     run_test_dir(
         Path::new("tests/runner/repeats"),

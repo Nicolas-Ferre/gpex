@@ -1,0 +1,3 @@
+import ~.~.ok_forms.imported.nested;
+
+var _result = IMPORTED; // expected: 2

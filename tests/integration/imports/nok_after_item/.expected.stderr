@@ -1,0 +1,2 @@
+error: `import` statement not at the top of the module (at <root>/main.gpex:2:1)
+  --> info: `import` statements should appear before anything else
