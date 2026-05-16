@@ -1,42 +1,64 @@
 // Test all expression forms that are not allowed in reference locations (must generate errors).
+// The function running the reference location is used in other function signature
+// to test constant calculation behavior in case of error.
 
 // =========================| Literals |=========================
 
-fn _literals_as_ref() {
+const fn literals_as_ref() -> typeref {
     false = true;
     true = false;
     1.0 = 0.0;
     1 = 0;
     1u = 0u;
+    return i32;
+}
+fn _calculate_literals_as_ref() -> literals_as_ref() {
+    return 0;
 }
 
 // =========================| Type references |=========================
 
-fn _type_as_ref() {
+const fn types_as_ref() -> typeref {
     i32 = u32;
+    return i32;
+}
+fn _calculate_types_as_ref() -> types_as_ref() {
+    return 0;
 }
 
 // =========================| Global constants |=========================
 
 const CONST = 0;
-fn _global_const_as_ref() {
+const fn global_consts_as_ref() -> typeref {
     CONST = 0;
+    return i32;
+}
+fn _calculate_global_consts_as_ref() -> global_consts_as_ref() {
+    return 0;
 }
 
 // =========================| Function calls |=========================
 
-fn _fn_call_as_ref() {
+const fn fn_calls_as_ref() -> typeref {
     called_fn() = 0;
+    return i32;
 }
-fn called_fn() -> i32 {
+const fn called_fn() -> i32 {
+    return 0;
+}
+fn _calculate_fn_calls_as_ref() -> fn_calls_as_ref() {
     return 0;
 }
 
 // =========================| Unary operators |=========================
 
-fn _unary_as_ref() {
+const fn unary_as_ref() -> typeref {
     !0 = 0;
+    return i32;
 }
-fn __not__(param: i32) -> i32 {
+const fn __not__(param: i32) -> i32 {
     return param;
+}
+fn _calculate_unary_as_ref() -> unary_as_ref() {
+    return 0;
 }
