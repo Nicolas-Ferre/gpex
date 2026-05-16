@@ -1,6 +1,6 @@
 // Test all expression forms that are not allowed in reference locations (must generate errors).
-// The function running the reference location is used in other function signature
-// to test constant calculation behavior in case of error.
+// The functions containing reference locations are used in other function signature
+// to test constant calculation behavior in case of reference check error.
 
 // =========================| Literals |=========================
 
