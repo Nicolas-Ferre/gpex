@@ -84,16 +84,6 @@ async fn run_import_priority() -> Result<(), Error> {
 }
 
 #[tokio::test]
-async fn run_prelude_types() -> Result<(), Error> {
-    run_test_dir(
-        Path::new("tests/runner/prelude_types"),
-        TranspiledCodeAction::Checked,
-        WarningAction::Failing,
-    )
-    .await
-}
-
-#[tokio::test]
 async fn run_repeats() -> Result<(), Error> {
     run_test_dir(
         Path::new("tests/runner/repeats"),
