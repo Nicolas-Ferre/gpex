@@ -1,3 +1,5 @@
+// Test all forms of imports pointing on non-existing modules (must generate errors).
+
 import absolute_root;
 import absolute.inner;
 import ~.relative_root;
