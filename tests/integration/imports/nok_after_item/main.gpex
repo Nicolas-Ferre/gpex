@@ -1,4 +1,4 @@
-// Test import that is not at the top of the file (must generate errors).
+// Test import that is not at the top of the module (must generate errors).
 
 const _ITEM = 0;
 import ~.imported;
