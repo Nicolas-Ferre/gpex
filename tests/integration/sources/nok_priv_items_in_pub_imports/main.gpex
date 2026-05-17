@@ -2,7 +2,7 @@
 
 import ~.imported;
 
-var _result_const = _CONST;
+const _RESULT_CONST = _CONST;
 var _result_var = _var;
 var _result_fn = _fn(0);
 var _result_param = param;
