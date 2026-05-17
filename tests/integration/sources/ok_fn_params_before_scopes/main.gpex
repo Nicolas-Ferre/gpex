@@ -1,0 +1,8 @@
+// Test function parameter source before all possible scopes (must be found).
+
+// =========================| Function body |=========================
+
+var _result_fn_no_arg = fn_param_value(1); // expected: 1
+fn fn_param_value(param: i32) -> i32 {
+    return param;
+}

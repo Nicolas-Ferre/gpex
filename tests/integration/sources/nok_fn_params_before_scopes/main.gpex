@@ -1,0 +1,8 @@
+// Test function parameter source after all possible scopes (must generate errors).
+
+// =========================| Global |=========================
+
+fn _global(source: i32) -> i32 {
+    return source;
+}
+var _result_global = source;

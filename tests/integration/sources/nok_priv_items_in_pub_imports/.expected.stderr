@@ -1,0 +1,7 @@
+error: `_CONST` item not found (at <root>/main.gpex:5:23)
+  --> info: item not qualified with `pub` (at <root>/imported.gpex:1:7)
+error: `_var` item not found (at <root>/main.gpex:6:19)
+  --> info: item not qualified with `pub` (at <root>/imported.gpex:3:5)
+error: `_fn(i32)` item not found (at <root>/main.gpex:7:18)
+  --> info: item not qualified with `pub` (at <root>/imported.gpex:5:4)
+error: `param` item not found (at <root>/main.gpex:8:21)
