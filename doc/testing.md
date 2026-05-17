@@ -23,6 +23,8 @@ These directories are tested the following way:
 
 - Compile the directory.
 - Verify the compilation succeeded.
+- Verify no compiler warning was produced, unless a `.allow_warnings` file exists in the test
+  directory.
 - Run the program.
 - Verify that expected values of variables match actual values stored on GPU.
   An expected value can be indicated in a `.gpex` file using the following type of comment:
