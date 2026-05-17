@@ -63,8 +63,12 @@ fn run_case(path: &Path, runtime: Arc<Runtime>) -> Result<(), Failed> {
 }
 
 async fn run_ok_cases(path: &Path, is_wgsl_check_enabled: bool) -> Result<(), Failed> {
+    let is_warning_treated_as_error = !path.join(".allow_warnings").exists();
     let generated_path = generate_case(path)?;
-    let (program, _) = convert_gpex_result(gpex::compile_program(&generated_path, true))?;
+    let (program, _) = convert_gpex_result(gpex::compile_program(
+        &generated_path,
+        is_warning_treated_as_error,
+    ))?;
     let mut runner = convert_gpex_result(Runner::new(program).await)?;
     runner.run_step();
     check_global_vars(&generated_path, &generated_path, &runner)?;

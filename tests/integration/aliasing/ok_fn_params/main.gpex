@@ -1,0 +1,17 @@
+// Test aliasing of function parameters (correct function parameters must be used).
+
+// =========================| Alias before |=========================
+
+var param_before = 0;
+fn fn_before(param_before: i32) -> i32 {
+    return param_before;
+}
+var _result_before = fn_before(1); // expected: 1
+
+// =========================| Alias after |=========================
+
+fn fn_after(param_after: i32) -> i32 {
+    return param_after;
+}
+var param_after = 0;
+var _result_after = fn_after(2); // expected: 2
