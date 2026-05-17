@@ -7,9 +7,9 @@ pub fn same_param_types(_param: i32) -> bool {
 }
 
 pub fn different_param_types(_param: i32) -> bool {
-    return true;
+    return false;
 }
 
 pub fn different_param_count(_param: i32) -> bool {
-    return true;
+    return false;
 }

@@ -1,5 +1,7 @@
 // Test aliasing of functions (correct function must be used).
 
+import ~.imported;
+
 // =========================| No parameter |=========================
 
 fn no_param() -> bool {
