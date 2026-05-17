@@ -1,0 +1,15 @@
+pub fn no_param() -> bool {
+    return false;
+}
+
+pub fn same_param_types(_param: i32) -> bool {
+    return false;
+}
+
+pub fn different_param_types(_param: i32) -> bool {
+    return true;
+}
+
+pub fn different_param_count(_param: i32) -> bool {
+    return true;
+}

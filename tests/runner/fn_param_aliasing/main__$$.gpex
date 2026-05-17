@@ -1,3 +1,0 @@
-{{other_item_location.code}}
-
-var _result = fn_(123); // expected: 123

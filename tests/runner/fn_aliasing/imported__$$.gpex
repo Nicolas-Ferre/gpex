@@ -1,3 +1,0 @@
-pub fn fn_({{config.fn1_param}}) -> bool {
-    return false; // this function is never called because it is redefined in main module
-}
