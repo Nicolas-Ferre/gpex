@@ -1,8 +1,0 @@
-error: missing `return` statement (at <root>/missing_return.gpex:2:1)
-  --> info: function has a return type (at <root>/missing_return.gpex:1:13)
-error: missing `return` statement (at <root>/missing_return_but_other_statement_present.gpex:3:1)
-  --> info: function has a return type (at <root>/missing_return_but_other_statement_present.gpex:1:36)
-error: missing `return` statement (at <root>/missing_return_in_fn_used_as_const.gpex:3:1)
-  --> info: function has a return type (at <root>/missing_return_in_fn_used_as_const.gpex:1:29)
-error: missing `return` statement (at <root>/missing_return_in_fn_used_in_other_fn_signature.gpex:5:35)
-  --> info: function has a return type (at <root>/missing_return_in_fn_used_in_other_fn_signature.gpex:5:26)

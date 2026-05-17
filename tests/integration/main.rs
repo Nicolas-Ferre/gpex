@@ -110,6 +110,7 @@ fn generate_case(root_path: &Path) -> Result<PathBuf, Failed> {
     if test_dir.exists() {
         fs::remove_dir_all(&test_dir)?;
     }
+    fs::create_dir_all(&test_dir)?;
     generate_case_dir(root_path)?;
     Ok(test_dir)
 }

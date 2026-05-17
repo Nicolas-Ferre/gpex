@@ -1,3 +1,0 @@
-import ~.imported;
-
-repeat set_value();
