@@ -1,0 +1,54 @@
+// Test not found source for all locations (must generate errors).
+// This also ensures that validation in general is performed for all locations
+// (so no need to exhaustively test all locations for other nok_* tests).
+
+// =========================| Global variable default values |=========================
+
+var _var = error;
+
+// =========================| Global constant values |=========================
+
+const _CONST = error;
+
+// =========================| Repeat calls |=========================
+
+repeat error();
+
+// =========================| Function parameter types |=========================
+
+fn _fn(param: error) -> i32 {
+    return 0;
+}
+
+// =========================| Function return types |=========================
+
+fn _fn() -> error {
+    return 0;
+}
+
+// =========================| Return statement values |=========================
+
+fn _fn() -> i32 {
+    return error;
+}
+
+// =========================| Assignment statement left values |=========================
+
+fn _fn() {
+    error = 0;
+}
+
+// =========================| Assignment statement right values |=========================
+
+fn _fn(param: i32) {
+    param = error;
+}
+
+// =========================| Call arguments |=========================
+
+var _call = call(error);
+
+// =========================| Unary operator operands |=========================
+
+var _neg = -error;
+var _not = !error;

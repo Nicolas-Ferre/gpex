@@ -14,26 +14,6 @@ use std::str::FromStr;
 use wgsl_parse::syntax::TranslationUnit;
 
 #[tokio::test]
-async fn run_expr_sources() -> Result<(), Error> {
-    run_test_dir(
-        Path::new("tests/runner/expr_sources"),
-        TranspiledCodeAction::Ignored,
-        WarningAction::Ignored,
-    )
-    .await
-}
-
-#[tokio::test]
-async fn run_exprs() -> Result<(), Error> {
-    run_test_dir(
-        Path::new("tests/runner/exprs"),
-        TranspiledCodeAction::Ignored,
-        WarningAction::Ignored,
-    )
-    .await
-}
-
-#[tokio::test]
 async fn run_fn_param_aliasing() -> Result<(), Error> {
     run_test_dir(
         Path::new("tests/runner/fn_param_aliasing"),

@@ -10,13 +10,6 @@ use std::fs;
 use std::path::Path;
 
 #[test]
-fn compile_error_fns_not_found_with_unknown_return_type() -> Result<(), Error> {
-    compile_and_check_logs(Path::new(
-        "tests/logs/error_fns_not_found_with_unknown_return_type",
-    ))
-}
-
-#[test]
 fn compile_error_fns_without_return_type() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_fns_without_return_type"))
 }
@@ -34,35 +27,6 @@ fn compile_error_items_disallowed() -> Result<(), Error> {
 #[test]
 fn compile_error_multiple_definitions() -> Result<(), Error> {
     compile_and_check_logs(Path::new("tests/logs/error_multiple_definitions"))
-}
-
-#[test]
-fn compile_error_items_not_found_after_ref() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_items_not_found_after_ref"))
-}
-
-#[test]
-fn compile_error_items_not_found_before_ref() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_items_not_found_before_ref"))
-}
-
-#[test]
-fn compile_error_items_not_found_parent() -> Result<(), Error> {
-    compile_and_check_logs(Path::new("tests/logs/error_items_not_found_parent"))
-}
-
-#[test]
-fn compile_error_items_not_found_priv_in_pub_import() -> Result<(), Error> {
-    compile_and_check_logs(Path::new(
-        "tests/logs/error_items_not_found_priv_in_pub_import",
-    ))
-}
-
-#[test]
-fn compile_error_items_not_found_pub_in_priv_import() -> Result<(), Error> {
-    compile_and_check_logs(Path::new(
-        "tests/logs/error_items_not_found_pub_in_priv_import",
-    ))
 }
 
 #[test]

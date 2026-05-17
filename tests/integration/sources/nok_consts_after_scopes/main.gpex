@@ -1,0 +1,28 @@
+// Test constant sources after all possible scopes (must generate errors).
+
+// =========================| Global |=========================
+
+var _result_global = _SOURCE;
+
+// =========================| Function body |=========================
+
+var _result_fn_body = fn_body();
+fn fn_body() -> typeref {
+    return _SOURCE;
+}
+
+// =========================| Function parameter type |=========================
+
+var _result_fn_param_type = fn_param_type(0);
+fn fn_param_type(param: _SOURCE) -> i32 {
+    return param;
+}
+
+// =========================| Function return type |=========================
+
+var _result_fn_return_type = fn_return_type(0);
+fn fn_return_type(param: _SOURCE) -> i32 {
+    return param;
+}
+
+const _SOURCE = i32;

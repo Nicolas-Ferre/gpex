@@ -1,2 +1,0 @@
-error: `{{expr.item_name}}` item not found (at <root>/main__$$.gpex:{{expr_location.expr_span_start}})
-{{expr.info}}

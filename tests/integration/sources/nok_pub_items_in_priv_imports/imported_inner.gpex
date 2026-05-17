@@ -1,0 +1,7 @@
+pub const CONST = 0;
+
+pub var var_ = 0;
+
+pub fn fn_(param: i32) -> i32 {
+    return param;
+}

@@ -1,0 +1,27 @@
+// Test function sources with all call expression forms (must be found).
+
+// =========================| Function without parameters |=========================
+
+var _result_fn_no_param = fn_no_param(); // expected: 1
+fn fn_no_param() -> i32 {
+    return 1;
+}
+
+// =========================| Function with parameters |=========================
+
+var _result_fn_params = fn_params(2, 0u); // expected: 2
+fn fn_params(param1: i32, _param2: u32) -> i32 {
+    return param1;
+}
+
+// =========================| Unary operator function |=========================
+
+var _result_unary_neg = -true; // expected: true
+fn __neg__(param: bool) -> bool {
+    return param;
+}
+
+var _result_unary_not = !3; // expected: 3
+fn __not__(param: i32) -> i32 {
+    return param;
+}
