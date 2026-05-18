@@ -1,6 +1,0 @@
-var value = 0;
-fn fn_() {
-    value = 1;
-}
-
-{{fn_call_location.code}}

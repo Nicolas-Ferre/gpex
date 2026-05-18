@@ -1,0 +1,7 @@
+// Test calls without function type as expressions (must generate errors).
+
+var _result = fn_(0);
+
+fn fn_(param: i32) {
+    param = 0;
+}

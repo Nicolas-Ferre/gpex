@@ -27,7 +27,6 @@ wgpu = "29"
 libtest-mimic = "0.8"
 pretty_assertions = "1.4"
 regex = "1"
-serde_norway = "0.9"
 wgsl-parse = "0.3"
 
 [lints.rust]

@@ -1,0 +1,15 @@
+// Test duplicated items (must generate errors).
+
+// =========================| Global constant |=========================
+
+const _duplicated = 0;
+const _duplicated = 0;
+
+// =========================| Global variable |=========================
+
+var _duplicated = 0;
+var _duplicated = 0;
+
+// =========================| Function parameter |=========================
+
+fn _fn(_duplicated: i32, _other: u32, _duplicated: f32) {}

@@ -1,0 +1,25 @@
+// Test type comparison for all possible locations (must generate errors).
+
+// =========================| Return statement |=========================
+
+fn _fn_typeref() -> i32 {
+    return true;
+}
+
+// =========================| Assignment statement |=========================
+
+fn _fn_assignment(param: i32) {
+    param = true;
+}
+
+// =========================| Function parameter type |=========================
+
+fn _fn_param_type(param: true) -> i32 {
+    return param;
+}
+
+// =========================| Function return type |=========================
+
+fn _fn_param_type() -> true {
+    return 0;
+}

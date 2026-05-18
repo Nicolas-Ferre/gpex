@@ -1,0 +1,45 @@
+// Test indirect circular dependencies passing via all expression locations (must generate errors).
+
+import ~.main2;
+
+// =========================| Global constant |=========================
+
+pub const CONST1 = CONST2;
+
+// =========================| Global variable |=========================
+
+pub var var1 = var2;
+
+// =========================| Call argument |=========================
+
+pub var call1 = called(call2);
+
+// =========================| Function parameter type |=========================
+
+pub fn fn1_param_type(param: fn2_param_type(0)) -> i32 {
+    return fn2_return();
+}
+
+// =========================| Function return type |=========================
+
+pub fn fn1_return_type() -> fn2_return_type() {
+    return fn2_return();
+}
+
+// =========================| Return statement value |=========================
+
+pub fn fn1_return() -> i32 {
+    return fn2_return();
+}
+
+// =========================| Assignment statement left value |=========================
+
+pub fn fn1_assignment_left() {
+    fn2_assignment_left() = 0;
+}
+
+// =========================| Assignment statement right value |=========================
+
+pub fn fn1_assignment_right(param: i32) {
+    param = fn2_assignment_right(0);
+}

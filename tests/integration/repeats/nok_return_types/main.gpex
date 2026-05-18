@@ -1,0 +1,7 @@
+// Test repeat calling functions with return type (must generate errors).
+
+repeat fn_();
+
+fn fn_() -> i32 {
+    return 0;
+}

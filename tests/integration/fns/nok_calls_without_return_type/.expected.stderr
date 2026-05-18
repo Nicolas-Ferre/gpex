@@ -1,0 +1,2 @@
+error: called function `fn_(i32)` with no return type (at <root>/main.gpex:3:15)
+  --> info: function has no return type (at <root>/main.gpex:5:4)
