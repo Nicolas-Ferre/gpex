@@ -52,3 +52,19 @@ var _call = call(error);
 
 var _neg = -error;
 var _not = !error;
+
+// =========================| Binary operator operands |=========================
+
+var _add = error + error;
+var _sub = error - error;
+var _mul = error * error;
+var _div = error / error;
+var _mod = error % error;
+var _eq = error == error;
+var _ne = error != error;
+var _lt = error < error;
+var _le = error <= error;
+var _gt = error > error;
+var _ge = error >= error;
+var _and = error && error;
+var _or = error || error;

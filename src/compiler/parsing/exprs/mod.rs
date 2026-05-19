@@ -83,20 +83,6 @@ impl Expr {
         }
     }
 
-    fn parse_operand<'context>(
-        context: &mut ParseContext<'context>,
-    ) -> Result<Self, ParseError<'context>> {
-        context.parse_any(&[
-            |context| F32Literal::parse(context).map(Self::F32Literal),
-            |context| U32Literal::parse(context).map(Self::U32Literal),
-            |context| I32Literal::parse(context).map(Self::I32Literal),
-            |context| BoolLiteral::parse(context).map(Self::BoolLiteral),
-            |context| Call::parse(context).map(Self::Call),
-            |context| Call::parse_unary(context).map(Self::Call),
-            |context| Ident::parse(context).map(Self::Ident),
-        ])
-    }
-
     fn parse_binary_right_part<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<BinaryRightPart, ParseError<'context>> {
@@ -118,6 +104,20 @@ impl Expr {
         context.force_parse_any_error();
         let operand = Self::parse_operand(context)?;
         Ok(BinaryRightPart { operator, operand })
+    }
+
+    fn parse_operand<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Self, ParseError<'context>> {
+        context.parse_any(&[
+            |context| F32Literal::parse(context).map(Self::F32Literal),
+            |context| U32Literal::parse(context).map(Self::U32Literal),
+            |context| I32Literal::parse(context).map(Self::I32Literal),
+            |context| BoolLiteral::parse(context).map(Self::BoolLiteral),
+            |context| Call::parse(context).map(Self::Call),
+            |context| Call::parse_unary(context).map(Self::Call),
+            |context| Ident::parse(context).map(Self::Ident),
+        ])
     }
 
     fn create_binary_call(

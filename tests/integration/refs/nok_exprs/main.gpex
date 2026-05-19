@@ -62,3 +62,16 @@ const fn __not__(param: i32) -> i32 {
 fn _calculate_unary_as_ref() -> unary_as_ref() {
     return 0;
 }
+
+// =========================| Binary operator |=========================
+
+const fn binary_as_ref() -> typeref {
+    true + false = false;
+    return i32;
+}
+const fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}
+fn _calculate_binary_as_ref() -> binary_as_ref() {
+    return 0;
+}

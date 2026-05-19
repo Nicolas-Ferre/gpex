@@ -27,3 +27,10 @@ const _RESULT_UNARY = -true;
 fn __neg__(param: bool) -> bool {
     return param;
 }
+
+// =========================| Binary operator |=========================
+
+const _RESULT_BINARY = true + false;
+fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}

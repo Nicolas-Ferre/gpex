@@ -42,3 +42,23 @@ const fn fn_with_returned_unary(param: i32) -> i32 {
 const fn __neg__(param: i32) -> i32 {
     return param;
 }
+
+// =========================| Binary operator operand |=========================
+
+const _RESULT_BINARY_LEFT = fn_with_returned_binary_left(5); // expected: 5
+const fn fn_with_returned_binary_left(param: i32) -> i32 {
+    return param + 0;
+}
+const fn __add__(param1: i32, _param2: i32) -> i32 {
+    return param1;
+}
+
+// =========================| Binary operator right operand |=========================
+
+const _RESULT_BINARY_RIGHT = fn_with_returned_binary_right(6); // expected: 6
+const fn fn_with_returned_binary_right(param: i32) -> i32 {
+    return 0u + param;
+}
+const fn __add__(_param1: u32, param2: i32) -> i32 {
+    return param2;
+}

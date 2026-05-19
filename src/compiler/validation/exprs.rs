@@ -45,8 +45,12 @@ impl Validator<'_, '_> {
     }
 
     pub(crate) fn validate_call(&mut self, node: &Call) -> Result<(), ValidateError> {
+        let mut is_error_detected = false;
         for arg in &node.args {
-            self.validate_expr(arg, self.const_mark_span)?; // no-fn-check (recursivity)
+            is_error_detected |= self.validate_expr(arg, self.const_mark_span).is_err(); // no-fn-check (recursivity)
+        }
+        if is_error_detected {
+            return Err(ValidateError);
         }
         let source = validators::item::check_found(
             node,

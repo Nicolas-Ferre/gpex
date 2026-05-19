@@ -29,3 +29,10 @@ const _RESULT_UNARY = !0; // expected: 4
 const fn __not__(_param: i32) -> i32 {
     return 4;
 }
+
+// =========================| Binary operator |=========================
+
+const _RESULT_BINARY = true + false; // expected: 5
+const fn __add__(_param1: bool, _param2: bool) -> i32 {
+    return 5;
+}
