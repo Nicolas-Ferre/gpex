@@ -1,6 +1,0 @@
-error: forbidden `compilerimpl` item outside prelude (at <root>/main__compilerimpl_struct.gpex:1:8)
-error: repeated function `fn_()` with a return type (at <root>/main__repeat_with_returned_type.gpex:4:8)
-  --> info: function has a return type (at <root>/main__repeat_with_returned_type.gpex:1:4)
-error: `return` statement not at the end of the block (at <root>/main__statement_return_duplicated.gpex:2:5)
-error: `return` statement in function with no return type (at <root>/main__statement_return_without_return_type.gpex:2:5)
-  --> info: function has no return type (at <root>/main__statement_return_without_return_type.gpex:1:4)

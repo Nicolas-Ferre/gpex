@@ -1,0 +1,63 @@
+// Test type comparison for all expression forms (must generate errors).
+
+// =========================| Literals |=========================
+
+fn _fn_bool_false() -> i32 {
+    return false;
+}
+fn _fn_bool_true() -> i32 {
+    return true;
+}
+fn _fn_f32() -> i32 {
+    return 0.0;
+}
+fn _fn_i32() -> u32 {
+    return 0;
+}
+fn _fn_u32() -> i32 {
+    return 0u;
+}
+
+// =========================| Type reference |=========================
+
+fn _fn_typeref() -> i32 {
+    return i32;
+}
+
+// =========================| Constant |=========================
+
+const CONST = 0.0;
+fn _fn_typeref() -> i32 {
+    return CONST;
+}
+
+// =========================| Variable |=========================
+
+var var_ = 0.0;
+fn _fn_typeref() -> i32 {
+    return var_;
+}
+
+// =========================| Function parameter |=========================
+
+fn _fn_typeref(param: f32) -> i32 {
+    return param;
+}
+
+// =========================| Function call |=========================
+
+fn _fn_call() -> i32 {
+    return called();
+}
+fn called() -> f32 {
+    return 0.0;
+}
+
+// =========================| Unary operator |=========================
+
+fn _fn_unary() -> i32 {
+    return -true;
+}
+fn __neg__(param: bool) -> bool {
+    return param;
+}

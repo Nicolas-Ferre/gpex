@@ -1,0 +1,4 @@
+error: called function `fn_with_no_return(i32)` with no return type (at <root>/main.gpex:9:22)
+  --> info: function has no return type (at <root>/main.gpex:3:4)
+error: called function `fn_with_no_return(i32)` with no return type (at <root>/main.gpex:14:26)
+  --> info: function has no return type (at <root>/main.gpex:3:4)

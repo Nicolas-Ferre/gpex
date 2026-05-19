@@ -1,0 +1,7 @@
+// Test all direct circular dependencies passing (must generate errors).
+
+// =========================| Function |=========================
+
+fn fn_() -> i32 {
+    return fn_();
+}
