@@ -1,0 +1,8 @@
+warning: module importing itself (at <root>/main.gpex:5:1)
+warning: `unused` import unused (at <root>/main.gpex:6:1)
+warning: `duplicated` import unused (at <root>/main.gpex:8:1)
+warning: `CONST` item unused (at <root>/main.gpex:14:7)
+warning: `var_` item unused (at <root>/main.gpex:18:5)
+warning: `fn_()` item unused (at <root>/main.gpex:22:4)
+warning: `__fn_with_double_underscore_prefix()` item unused (at <root>/main.gpex:23:4)
+warning: `param` item unused (at <root>/main.gpex:27:8)

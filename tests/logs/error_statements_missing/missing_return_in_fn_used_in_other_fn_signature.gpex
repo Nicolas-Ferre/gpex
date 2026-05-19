@@ -1,5 +1,0 @@
-fn fn_() -> ReturnType() {
-    return i32;
-}
-
-const fn ReturnType() -> typeref {}

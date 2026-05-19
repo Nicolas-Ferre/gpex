@@ -1,0 +1,14 @@
+// Test repeat call ordering (must be run in order).
+
+var result = 0; // expected: 2
+
+fn set_first() {
+	result = 1;
+}
+
+fn set_second() {
+	result = 2;
+}
+
+repeat set_first();
+repeat set_second();

@@ -109,21 +109,7 @@ impl Validator<'_, '_> {
         )?;
         validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
         validators::ident::check_char_count(param.name_span, &mut self.context);
-        let allowed_cases = self.param_allowed_cases(param);
-        validators::ident::check_case(param.name_span, allowed_cases, &mut self.context);
+        validators::ident::check_case(param.name_span, &[Case::Snake], &mut self.context);
         Ok(())
-    }
-
-    fn param_allowed_cases(&self, node: &Param) -> &'static [Case] {
-        let may_be_typeref = self
-            .type_resolver
-            .expr_as_type(&node.type_)
-            .struct_ref()
-            .is_none_or(|type_| type_ == self.indexes.search_prelude_type("typeref"));
-        if may_be_typeref {
-            &[Case::Snake, Case::Pascal]
-        } else {
-            &[Case::Snake]
-        }
     }
 }

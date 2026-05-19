@@ -1,0 +1,17 @@
+// Test unused items named with underscore prefix (must not generate warnings).
+
+// =========================| Global constants |=========================
+
+const _CONST = 0;
+
+// =========================| Global variables |=========================
+
+var _var = 0;
+
+// =========================| Functions |=========================
+
+fn _fn() -> i32 { return 0; }
+
+// =========================| Function parameters |=========================
+
+fn _fn(_param: i32) -> i32 { return 0; }

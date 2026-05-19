@@ -1,0 +1,3 @@
+import imported.nested;
+
+var _result = IMPORTED; // expected: 2

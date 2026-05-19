@@ -1,0 +1,7 @@
+const _CONST = 0;
+
+var _var = 0;
+
+fn _fn(param: i32) -> i32 {
+    return param;
+}

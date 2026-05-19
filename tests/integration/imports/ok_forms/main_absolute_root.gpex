@@ -1,0 +1,3 @@
+import imported_root;
+
+var _result = IMPORTED; // expected: 1

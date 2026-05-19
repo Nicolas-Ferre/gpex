@@ -1,0 +1,5 @@
+// Test variable sources before all possible scopes (must generate errors).
+
+// =========================| Child scope |=========================
+
+const _SOURCE = _SOURCE;

@@ -1,0 +1,30 @@
+// Test function sources before all possible scopes (must be found).
+
+const fn source() -> typeref {
+    return i32;
+}
+
+// =========================| Global |=========================
+
+var _result_global = source(); // expected: i32
+
+// =========================| Function body |=========================
+
+var _result_fn_body = fn_body(); // expected: i32
+fn fn_body() -> typeref {
+    return source();
+}
+
+// =========================| Function parameter type |=========================
+
+var _result_fn_param_type = fn_param_type(1); // expected: 1
+fn fn_param_type(param: source()) -> i32 {
+    return param;
+}
+
+// =========================| Function return type |=========================
+
+var _result_fn_return_type = fn_return_type(2); // expected: 2
+fn fn_return_type(param: i32) -> source() {
+    return param;
+}

@@ -1,0 +1,59 @@
+// INIT SHADER
+
+struct Buffer {
+    v5: u32,
+    v6: u32,
+    v7: f32,
+    v8: f32,
+    v9: f32,
+    v10: f32,
+    v11: i32,
+    v12: i32,
+    v13: i32,
+    v14: u32,
+    v15: u32
+}
+
+@group(0) @binding(0)
+var<storage, read_write> b: Buffer;
+
+@compute @workgroup_size(1, 1, 1)
+fn main() {
+    b.v15 = u32(4294967295);
+    b.v14 = u32(0);
+    b.v13 = i32(2147483647);
+    b.v12 = i32(0);
+    b.v11 = i32(-2147483648);
+    b.v10 = f32(3.4028235e38);
+    b.v9 = f32(1e-23);
+    b.v8 = f32(0.0);
+    b.v7 = f32(-3.4028235e38);
+    b.v6 = u32(1);
+    b.v5 = u32(0);
+}
+
+
+// UPDATE SHADER
+
+struct Buffer {
+    v5: u32,
+    v6: u32,
+    v7: f32,
+    v8: f32,
+    v9: f32,
+    v10: f32,
+    v11: i32,
+    v12: i32,
+    v13: i32,
+    v14: u32,
+    v15: u32
+}
+
+@group(0) @binding(0)
+var<storage, read_write> b: Buffer;
+
+@compute @workgroup_size(1, 1, 1)
+fn main() {
+
+}
+

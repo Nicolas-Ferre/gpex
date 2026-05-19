@@ -1,0 +1,43 @@
+// Test aliasing of functions (correct function must be used).
+
+import ~.imported;
+
+// =========================| No parameter |=========================
+
+fn no_param() -> bool {
+    return false;
+}
+fn no_param() -> bool {
+    return true;
+}
+var _result_no_param = no_param(); // expected: true
+
+// =========================| Same parameter types |=========================
+
+fn same_param_types(_param: i32) -> bool {
+    return false;
+}
+fn same_param_types(_param: i32) -> bool {
+    return true;
+}
+var _result_same_param_types = same_param_types(0); // expected: true
+
+// =========================| Different parameter types |=========================
+
+fn different_param_types(_param: i32) -> bool {
+    return true;
+}
+fn different_param_types(_param: u32) -> bool {
+    return false;
+}
+var _result_different_param_types = different_param_types(0); // expected: true
+
+// =========================| Different parameter count |=========================
+
+fn different_param_count(_param: i32) -> bool {
+    return true;
+}
+fn different_param_count() -> bool {
+    return false;
+}
+var _result_different_param_count = different_param_count(0); // expected: true

@@ -1,0 +1,7 @@
+error: `CONST` item not found (at <root>/main.gpex:5:21)
+  --> info: item can be imported from `imported_inner` (at <root>/imported_inner.gpex:1:11)
+error: `var_` item not found (at <root>/main.gpex:6:19)
+  --> info: item can be imported from `imported_inner` (at <root>/imported_inner.gpex:3:9)
+error: `fn_(i32)` item not found (at <root>/main.gpex:7:18)
+  --> info: item can be imported from `imported_inner` (at <root>/imported_inner.gpex:5:8)
+error: `param` item not found (at <root>/main.gpex:8:21)

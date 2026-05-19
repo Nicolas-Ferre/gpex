@@ -46,7 +46,7 @@ impl Validator<'_, '_> {
             Type::NoReturn => false,
             Type::Unknown => unreachable!("return type should be validated before"),
         };
-        let allowed_cases: &[Case] = if may_return_typeref {
+        let allowed_cases: &[Case] = if may_return_typeref && node.const_keyword_span.is_some() {
             &[Case::Snake, Case::Pascal]
         } else {
             &[Case::Snake]
@@ -71,16 +71,23 @@ impl Validator<'_, '_> {
     }
 
     fn validate_fn_statements(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
+        let mut is_error_detected = false;
         for (index, statement) in node.statements.iter().enumerate() {
-            self.validate_statement(statement, node.const_keyword_span)?;
+            is_error_detected |= self
+                .validate_statement(statement, node.const_keyword_span)
+                .is_err();
             if let Statement::Return(return_) = statement {
-                validators::statement::check_return_before_end(
+                is_error_detected |= validators::statement::check_return_before_end(
                     return_.span,
                     index,
                     node.statements.len(),
                     &mut self.context,
-                )?;
+                )
+                .is_err();
             }
+        }
+        if is_error_detected {
+            return Err(ValidateError);
         }
         if let Some(return_type) = &node.return_type {
             let return_statement = validators::statement::check_missing_return(

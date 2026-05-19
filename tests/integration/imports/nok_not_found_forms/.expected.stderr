@@ -1,0 +1,12 @@
+error: `absolute_root` module not found (at <root>/main.gpex:3:8)
+  --> info: cannot read "<root>/absolute_root.gpex"
+error: `absolute.inner` module not found (at <root>/main.gpex:4:8)
+  --> info: cannot read "<root>/absolute/inner.gpex"
+error: `~.relative_root` module not found (at <root>/main.gpex:5:8)
+  --> info: cannot read "<root>/relative_root.gpex"
+error: `~.relative.inner` module not found (at <root>/main.gpex:6:8)
+  --> info: cannot read "<root>/relative/inner.gpex"
+error: `~.~.relative_indirect` module not found (at <root>/main.gpex:7:8)
+  --> info: cannot read "tests/integration/imports/relative_indirect.gpex"
+error: `~.~.~.~.~.~.relative_outside` module not found (at <root>/main.gpex:8:8)
+  --> info: cannot read "../relative_outside.gpex"

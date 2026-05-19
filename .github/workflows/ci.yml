@@ -52,6 +52,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+          cache-bin: false
       - name: Run clippy
         run: cargo clippy --all-targets --no-deps --target ${{ matrix.target }} -- -D warnings
 
@@ -75,6 +76,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+          cache-bin: false
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
           tool: grcov
@@ -144,6 +146,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+          cache-bin: false
       - name: Install dependencies
         run: sudo apt update && sudo apt install -y moreutils shellcheck
       - name: Lint Bash scripts

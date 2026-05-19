@@ -1,0 +1,8 @@
+// Test public items used from imported private imports (must generate errors).
+
+import ~.imported;
+
+var _result_const = CONST;
+var _result_var = var_;
+var _result_fn = fn_(0);
+var _result_param = param;
