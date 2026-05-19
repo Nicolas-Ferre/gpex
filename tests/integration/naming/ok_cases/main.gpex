@@ -1,23 +1,23 @@
 // Test valid cases used for item names (must not generate warnings).
 
-// =========================| Imports |=========================
+// =========================| Import |=========================
 
 pub import _snake_case_import._snake_case_import;
 
-// =========================| Global constants |=========================
+// =========================| Global constant |=========================
 
 const _SCREAMING_SNAKE_CASE_CONST = 0;
 
 const _SCREAMING_SNAKE_CASE_CONST_TYPEREF = i32;
 const _PascalCaseConstTyperef = i32;
 
-// =========================| Global variables |=========================
+// =========================| Global variable |=========================
 
 var _snake_case_var = 0;
 
 var _snake_case_var_typeref = i32;
 
-// =========================| Functions |=========================
+// =========================| Function |=========================
 
 fn _snake_case_fn(param: i32) { param = 0; }
 
@@ -28,7 +28,7 @@ fn _snake_case_fn_return_typeref() -> typeref { return i32; }
 const fn _snake_case_fn_return_const_typeref() -> typeref { return i32; }
 const fn _PascalCaseFnReturnConstTyperef() -> typeref { return i32; }
 
-// =========================| Function parameters |=========================
+// =========================| Function parameter |=========================
 
 fn _fn_snake_case(_snake_case_param: i32) -> i32 { return 0; }
 

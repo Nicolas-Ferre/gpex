@@ -1,6 +1,6 @@
 // Test all expression forms that are allowed in reference locations (must behave correctly).
 
-// =========================| Global variables |=========================
+// =========================| Global variable |=========================
 
 var var_result = 0; // expected: 1
 repeat var_as_ref();
@@ -8,7 +8,7 @@ fn var_as_ref() {
     var_result = 1;
 }
 
-// =========================| Function parameters |=========================
+// =========================| Function parameter |=========================
 
 var _fn_param_result = fn_param_as_ref(0); // expected: 2
 fn fn_param_as_ref(param: i32) -> i32 {

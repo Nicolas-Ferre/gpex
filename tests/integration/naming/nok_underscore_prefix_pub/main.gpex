@@ -1,21 +1,21 @@
 // Test public items named with underscore prefix (must generate warnings).
 // Item usage is also tested to ensure only one warning is generated.
 
-// =========================| Global constants |=========================
+// =========================| Global constant |=========================
 
 pub const _CONST = 0;
 
 pub const _CONST_USED = 0;
 var _const_usage = _CONST_USED;
 
-// =========================| Global variables |=========================
+// =========================| Global variable |=========================
 
 pub var _var = 0;
 
 pub var _var_used = 0;
 var _var_usage = _var_used;
 
-// =========================| Functions |=========================
+// =========================| Function |=========================
 
 pub fn _fn() -> i32 { return 0; }
 

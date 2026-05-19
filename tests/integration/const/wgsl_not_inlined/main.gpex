@@ -1,6 +1,6 @@
 // Test partially constant expressions (should not be transpiled inline).
 
-// ====================| Function calls with argument constness mix |====================
+// ====================| Function call with argument constness mix |====================
 
 var var_ = 0;
 var _result_fn_arg_constness_mix = called_fn_with_arg_constness_mix(var_, 0); // expected: 1

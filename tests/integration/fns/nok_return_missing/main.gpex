@@ -1,17 +1,17 @@
 // Test missing return statements in functions returning a value (must generate errors).
 
-// =========================| Empty bodies |=========================
+// =========================| Empty body |=========================
 
 fn _fn() -> i32 {
 }
 
-// =========================| Not empty bodies |=========================
+// =========================| Not empty body |=========================
 
 const fn _fn(param: i32) -> u32 {
     param = 0;
 }
 
-// =========================| Functions used in function signature |=========================
+// =========================| Function used in function signature |=========================
 
 const fn UsedInFnSignature(param: i32) -> typeref {
     param = 0;
@@ -20,7 +20,7 @@ fn _fn() -> UsedInFnSignature(0) {
     return 0;
 }
 
-// =========================| Functions used in constant context |=========================
+// =========================| Function used in constant context |=========================
 
 const fn used_in_const_context(param: i32) -> i32 {
     param = 0;
