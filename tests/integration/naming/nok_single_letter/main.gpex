@@ -1,0 +1,17 @@
+// Test items named with a single letter (must generate warnings).
+
+// =========================| Global constant |=========================
+
+pub const C = 0;
+
+// =========================| Global variable |=========================
+
+pub var v = 0;
+
+// =========================| Function |=========================
+
+pub fn f() -> i32 { return 0; }
+
+// =========================| Function parameter |=========================
+
+fn _fn(p: i32) { p = 0; }

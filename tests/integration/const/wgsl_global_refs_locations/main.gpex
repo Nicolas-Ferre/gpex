@@ -7,32 +7,32 @@ const fn GlobalItemTyperef(param: typeref) -> typeref {
     return param;
 }
 
-// =========================| Global constant values |=========================
+// =========================| Global constant value |=========================
 
 const _RESULT_GLOBAL_CONST = global_item(1); // expected: 1
 
-// =========================| Function parameter types |=========================
+// =========================| Function parameter type |=========================
 
 const _RESULT_FN_PARAM_TYPE = fn_with_param_type(2u); // expected: 2u
 const fn fn_with_param_type(param: GlobalItemTyperef(u32)) -> u32 {
     return param;
 }
 
-// =========================| Function return types |=========================
+// =========================| Function return type |=========================
 
 const _RESULT_FN_RETURN_TYPE = fn_with_return_type(3.0); // expected: 3.0
 const fn fn_with_return_type(param: f32) -> GlobalItemTyperef(f32) {
     return param;
 }
 
-// =========================| Return statement values |=========================
+// =========================| Return statement value |=========================
 
 const _RESULT_RETURN = fn_with_return(); // expected: 4
 const fn fn_with_return() -> i32 {
     return global_item(4);
 }
 
-// =========================| Assignment statement right values |=========================
+// =========================| Assignment statement right value |=========================
 
 const _RESULT_ASSIGNMENT_RIGHT = fn_with_assignment_right(0); // expected: 5
 const fn fn_with_assignment_right(param: i32) -> i32 {
@@ -40,11 +40,11 @@ const fn fn_with_assignment_right(param: i32) -> i32 {
     return param;
 }
 
-// =========================| Function call arguments |=========================
+// =========================| Function call argument |=========================
 
 const _RESULT_FN_CALL_ARG = global_item(global_item(6)); // expected: 6
 
-// =========================| Unary operator operands |=========================
+// =========================| Unary operator operand |=========================
 
 const _RESULT_UNARY = -global_item(7); // expected: 7
 const fn __neg__(param: i32) -> i32 {

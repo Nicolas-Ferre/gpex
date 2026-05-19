@@ -2,53 +2,53 @@
 // This also ensures that validation in general is performed for all locations
 // (so no need to exhaustively test all locations for other nok_* tests).
 
-// =========================| Global variable default values |=========================
+// =========================| Global variable default value |=========================
 
 var _var = error;
 
-// =========================| Global constant values |=========================
+// =========================| Global constant value |=========================
 
 const _CONST = error;
 
-// =========================| Repeat calls |=========================
+// =========================| Repeat call |=========================
 
 repeat error();
 
-// =========================| Function parameter types |=========================
+// =========================| Function parameter type |=========================
 
 fn _fn(param: error) -> i32 {
     return 0;
 }
 
-// =========================| Function return types |=========================
+// =========================| Function return type |=========================
 
 fn _fn() -> error {
     return 0;
 }
 
-// =========================| Return statement values |=========================
+// =========================| Return statement value |=========================
 
 fn _fn() -> i32 {
     return error;
 }
 
-// =========================| Assignment statement left values |=========================
+// =========================| Assignment statement left value |=========================
 
 fn _fn() {
     error = 0;
 }
 
-// =========================| Assignment statement right values |=========================
+// =========================| Assignment statement right value |=========================
 
 fn _fn(param: i32) {
     param = error;
 }
 
-// =========================| Call arguments |=========================
+// =========================| Call argument |=========================
 
 var _call = call(error);
 
-// =========================| Unary operator operands |=========================
+// =========================| Unary operator operand |=========================
 
 var _neg = -error;
 var _not = !error;
