@@ -1,12 +1,12 @@
 // Test invalid cases used for item names (must generate warnings).
 
-// =========================| Imports |=========================
+// =========================| Import |=========================
 
 pub import _camelCaseImport._camelCaseImport;
 pub import _PascalCaseImport._PascalCaseImport;
 pub import _SCREAMING_SNAKE_CASE_IMPORT._SCREAMING_SNAKE_CASE_IMPORT;
 
-// =========================| Global constants |=========================
+// =========================| Global constant |=========================
 
 const _snake_case_const = 0;
 const _camelCaseConst = 0;
@@ -15,7 +15,7 @@ const _PascalCaseConst = 0;
 const _snake_case_const_typeref = i32;
 const _camelCaseConstTyperef = i32;
 
-// =========================| Global variables |=========================
+// =========================| Global variable |=========================
 
 var _camelCaseVar = 0;
 var _PascalCaseVar = 0;
@@ -25,7 +25,7 @@ var _camelCaseVarTyperef = i32;
 var _PascalCaseVarTyperef = i32;
 var _SCREAMING_SNAKE_CASE_VAR_TYPEREF = i32;
 
-// =========================| Functions |=========================
+// =========================| Function |=========================
 
 fn _camelCaseFnNoReturn(param: i32) { param = 0; }
 fn _PascalCaseFnNoReturn(param: i32) { param = 0; }
@@ -42,7 +42,7 @@ fn _SCREAMING_SNAKE_CASE_FN_RETURN_TYPEREF() -> typeref { return i32; }
 const fn _camelCaseFnReturnConstTyperef() -> typeref { return i32; }
 const fn _SCREAMING_SNAKE_CASE_FN_RETURN_CONST_TYPEREF() -> typeref { return i32; }
 
-// =========================| Function parameters |=========================
+// =========================| Function parameter |=========================
 
 fn _fn_camel_case(_camelCaseParam: i32) -> i32 { return 0; }
 fn _fn_pascal_case(_PascalCaseParam: i32) -> i32 { return 0; }

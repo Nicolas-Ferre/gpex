@@ -1,29 +1,29 @@
 // Test all forms of constant expressions (must be transpiled inline).
 
-// =========================| Global constant references |=========================
+// =========================| Global constant reference |=========================
 
 const CONST = 1;
 const _RESULT_GLOBAL_CONST = CONST; // expected: 1
 
-// =========================| `compilerimpl` type references |=========================
+// =========================| `compilerimpl` type reference |=========================
 
 const _COMPILERIMPL_TYPE = i32; // expected: i32
 
-// =========================| Function parameter references |=========================
+// =========================| Function parameter reference |=========================
 
 const _RESULT_FN_PARAM = fn_returning_param(2); // expected: 2
 const fn fn_returning_param(param: i32) -> i32 {
     return param;
 }
 
-// =========================| Function calls |=========================
+// =========================| Function call |=========================
 
 const _RESULT_FN_CALL = called_fn(); // expected: 3
 const fn called_fn() -> i32 {
     return 3;
 }
 
-// =========================| Unary operators |=========================
+// =========================| Unary operator |=========================
 
 const _RESULT_UNARY = !0; // expected: 4
 const fn __not__(_param: i32) -> i32 {

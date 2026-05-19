@@ -1,0 +1,20 @@
+// Test used items named with underscore prefix (must generate warnings).
+
+// =========================| Global constant |=========================
+
+const _CONST = 0;
+var _const_usage = _CONST;
+
+// =========================| Global variable |=========================
+
+var _var = 0;
+var _var_usage = _var;
+
+// =========================| Function |=========================
+
+fn _fn() -> i32 { return 0; }
+var _fn_usage = _fn();
+
+// =========================| Function parameter |=========================
+
+fn _fn(_param: i32) { _param = 0; }

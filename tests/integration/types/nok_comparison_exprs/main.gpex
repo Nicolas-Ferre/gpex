@@ -1,6 +1,6 @@
 // Test type comparison for all expression forms (must generate errors).
 
-// =========================| Literals |=========================
+// =========================| Literal |=========================
 
 fn _fn_bool_false() -> i32 {
     return false;

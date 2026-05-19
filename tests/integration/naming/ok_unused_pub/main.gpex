@@ -1,0 +1,13 @@
+// Test unused public items (must not generate warnings).
+
+// =========================| Global constant |=========================
+
+pub const CONST = 0;
+
+// =========================| Global variable |=========================
+
+pub var var_ = 0;
+
+// =========================| Function |=========================
+
+pub fn fn_() -> i32 { return 0; }
