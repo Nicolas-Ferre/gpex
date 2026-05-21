@@ -92,3 +92,13 @@ var _result_binary_or = 16u || 0.0; // expected: 16u
 fn __or__(param1: u32, _param2: f32) -> u32 {
     return param1;
 }
+
+// =========================| Binary operator chain |=========================
+
+var _result_binary_chain = true + false * true; // expected: false
+fn __add__(_param1: bool, _param2: bool) -> bool {
+    return true;
+}
+fn __mul__(_param1: bool, _param2: bool) -> bool {
+    return false;
+}
