@@ -1,3 +1,4 @@
+use crate::compiler::parsing;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::symbols::{
@@ -53,7 +54,7 @@ impl Param {
     fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
         let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
         let colon_span = Span::parse_symbol(context, COLON_SYMBOL)?;
-        let type_ = Expr::parse(context)?;
+        let type_ = Expr::parse(context, parsing::arg_stop_excluded_parser)?;
         Ok(Self {
             id: context.next_id(),
             scope: context.scope().to_vec(),

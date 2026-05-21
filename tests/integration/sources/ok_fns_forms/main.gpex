@@ -25,3 +25,80 @@ var _result_unary_not = !3; // expected: 3
 fn __not__(param: i32) -> i32 {
     return param;
 }
+
+// =========================| Binary operator function |=========================
+
+var _result_binary_add = 4u + 0.0; // expected: 4u
+fn __add__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_sub = 5u - 0.0; // expected: 5u
+fn __sub__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_mul = 6u * 0.0; // expected: 6u
+fn __mul__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_div = 7u / 0.0; // expected: 7u
+fn __div__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_mod = 8u % 0.0; // expected: 8u
+fn __mod__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_eq = 9u == 0.0; // expected: 9u
+fn __eq__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_ne = 10u != 0.0; // expected: 10u
+fn __ne__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_lt = 11u < 0.0; // expected: 11u
+fn __lt__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_le = 12u <= 0.0; // expected: 12u
+fn __le__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_gt = 13u > 0.0; // expected: 13u
+fn __gt__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_ge = 14u >= 0.0; // expected: 14u
+fn __ge__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_and = 15u && 0.0; // expected: 15u
+fn __and__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+var _result_binary_or = 16u || 0.0; // expected: 16u
+fn __or__(param1: u32, _param2: f32) -> u32 {
+    return param1;
+}
+
+// =========================| Binary operator chain |=========================
+
+var _result_binary_chain = true + false * true; // expected: false
+fn __add__(_param1: bool, _param2: bool) -> bool {
+    return true;
+}
+fn __mul__(_param1: bool, _param2: bool) -> bool {
+    return false;
+}

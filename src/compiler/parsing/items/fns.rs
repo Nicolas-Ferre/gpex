@@ -53,7 +53,9 @@ impl FnDefinition {
             let params = ParamGroup::parse(context)?;
             let (arrow_span, return_type, signature_end_span) =
                 if let Ok(arrow_span) = Span::parse_symbol(context, ARROW_SYMBOL) {
-                    let expr = Expr::parse(context)?;
+                    let expr = Expr::parse(context, |context| {
+                        Span::parse_symbol(context, BRACE_OPEN_SYMBOL).map(|_| ())
+                    })?;
                     let span = expr.span();
                     (Some(arrow_span), Some(expr), span)
                 } else {

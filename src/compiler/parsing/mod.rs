@@ -7,7 +7,10 @@ pub(crate) mod symbols;
 
 use crate::Log;
 use crate::compiler::parsing::modules::Module;
+use crate::compiler::parsing::symbols::{COMMA_SYMBOL, PARENTHESIS_CLOSE_SYMBOL};
 use crate::utils::parsing::context::ParseContext;
+use crate::utils::parsing::error::ParseError;
+use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use std::path::Path;
 
@@ -31,4 +34,15 @@ pub(crate) fn parse(root_path: &Path, files: &[ReadFile]) -> Result<Vec<Module>,
     } else {
         Err(errors)
     }
+}
+
+fn arg_stop_excluded_parser<'context>(
+    context: &mut ParseContext<'context>,
+) -> Result<(), ParseError<'context>> {
+    context
+        .parse_any(&[
+            |context| Span::parse_symbol(context, COMMA_SYMBOL),
+            |context| Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL),
+        ])
+        .map(|_| ())
 }

@@ -7,6 +7,9 @@ const fn called_const_fn(param: i32) -> i32 {
 const fn __neg__(param: i32) -> i32 {
     return param;
 }
+const fn __add__(param1: i32, _param2: i32) -> i32 {
+    return param1;
+}
 
 // =========================| Global constant value |=========================
 
@@ -49,3 +52,7 @@ const _FN_CALL_ARG = called_const_fn(not_const_value);
 // =========================| Unary operator operand |=========================
 
 const _UNARY_OPERAND = -not_const_value;
+
+// =========================| Binary operator operands |=========================
+
+const _BINARY_OPERAND = not_const_value + not_const_value;

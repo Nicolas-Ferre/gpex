@@ -34,7 +34,9 @@ impl VarDefinition {
             context.force_parse_any_error();
             let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
-            let default_value = Expr::parse(context)?;
+            let default_value = Expr::parse(context, |context| {
+                Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ())
+            })?;
             Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
             Ok(Self {
                 id,
@@ -77,7 +79,9 @@ impl ConstDefinition {
             let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
             context.force_parse_any_error();
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
-            let value = Expr::parse(context)?;
+            let value = Expr::parse(context, |context| {
+                Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ())
+            })?;
             Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
             Ok(Self {
                 id,

@@ -61,3 +61,12 @@ fn _fn_unary() -> i32 {
 fn __neg__(param: bool) -> bool {
     return param;
 }
+
+// =========================| Binary operator |=========================
+
+fn _fn_binary() -> i32 {
+    return true + false;
+}
+fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}

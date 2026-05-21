@@ -5,7 +5,9 @@ struct Buffer {
     v16: i32,
     v26: i32,
     v39: i32,
-    v54: i32
+    v54: i32,
+    v69: i32,
+    v86: i32
 }
 
 @group(0) @binding(0)
@@ -13,6 +15,8 @@ var<storage, read_write> b: Buffer;
 
 @compute @workgroup_size(1, 1, 1)
 fn main() {
+    b.v86 = i32(6);
+    b.v69 = i32(5);
     b.v54 = i32(5);
     b.v39 = i32(4);
     b.v26 = i32(3);
@@ -28,7 +32,9 @@ struct Buffer {
     v16: i32,
     v26: i32,
     v39: i32,
-    v54: i32
+    v54: i32,
+    v69: i32,
+    v86: i32
 }
 
 @group(0) @binding(0)

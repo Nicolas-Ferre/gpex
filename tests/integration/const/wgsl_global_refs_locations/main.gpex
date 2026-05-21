@@ -50,3 +50,17 @@ const _RESULT_UNARY = -global_item(7); // expected: 7
 const fn __neg__(param: i32) -> i32 {
     return param;
 }
+
+// =========================| Binary operator left operand |=========================
+
+const _RESULT_BINARY_LEFT = global_item(8) + 0; // expected: 8
+const fn __add__(param1: i32, _param2: i32) -> i32 {
+    return param1;
+}
+
+// =========================| Binary operator right operand |=========================
+
+const _RESULT_BINARY_RIGHT = 0u + global_item(9); // expected: 9
+const fn __add__(_param1: u32, param2: i32) -> i32 {
+    return param2;
+}
