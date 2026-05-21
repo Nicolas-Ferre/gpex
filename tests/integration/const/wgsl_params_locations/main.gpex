@@ -43,7 +43,7 @@ const fn __neg__(param: i32) -> i32 {
     return param;
 }
 
-// =========================| Binary operator operand |=========================
+// =========================| Binary operator left operand |=========================
 
 const _RESULT_BINARY_LEFT = fn_with_returned_binary_left(5); // expected: 5
 const fn fn_with_returned_binary_left(param: i32) -> i32 {
