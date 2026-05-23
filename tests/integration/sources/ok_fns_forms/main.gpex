@@ -95,7 +95,7 @@ fn __or__(param1: u32, _param2: f32) -> u32 {
 
 // =========================| Binary operator chain |=========================
 
-var _result_binary_chain = true + false * true; // expected: false
+var _result_binary_chain = true + false * true; // expected: true
 fn __add__(_param1: bool, _param2: bool) -> bool {
     return true;
 }
