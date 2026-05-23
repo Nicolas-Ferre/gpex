@@ -2,8 +2,7 @@ use crate::compiler::parsing;
 use crate::compiler::parsing::exprs::{
     BINARY_ADD_FN_NAME, BINARY_AND_FN_NAME, BINARY_DIV_FN_NAME, BINARY_EQ_FN_NAME,
     BINARY_GE_FN_NAME, BINARY_GT_FN_NAME, BINARY_LE_FN_NAME, BINARY_LT_FN_NAME, BINARY_MOD_FN_NAME,
-    BINARY_MUL_FN_NAME, BINARY_NE_FN_NAME, BINARY_OR_FN_NAME, BINARY_SUB_FN_NAME, BinaryRightPart,
-    Expr,
+    BINARY_MUL_FN_NAME, BINARY_NE_FN_NAME, BINARY_OR_FN_NAME, BINARY_SUB_FN_NAME, Expr,
 };
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::symbols::{
@@ -97,9 +96,10 @@ impl Call {
     pub(super) fn from_binary(
         context: &mut ParseContext<'_>,
         left_operand: Expr,
-        right_part: BinaryRightPart,
+        operator: Span,
+        right_operand: Expr,
     ) -> Self {
-        let name = match context.slice(right_part.operator) {
+        let name = match context.slice(operator) {
             symbol if symbol == PLUS_SYMBOL.slice => BINARY_ADD_FN_NAME.into(),
             symbol if symbol == HYPHEN_SYMBOL.slice => BINARY_SUB_FN_NAME.into(),
             symbol if symbol == STAR_SYMBOL.slice => BINARY_MUL_FN_NAME.into(),
@@ -118,9 +118,9 @@ impl Call {
         Self {
             id: context.next_id(),
             scope: context.scope().to_vec(),
-            span: left_operand.span().until(right_part.operand.span()),
+            span: left_operand.span().until(right_operand.span()),
             name,
-            args: vec![left_operand, right_part.operand],
+            args: vec![left_operand, right_operand],
         }
     }
 

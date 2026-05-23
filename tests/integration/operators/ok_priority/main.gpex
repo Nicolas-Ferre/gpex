@@ -1,0 +1,249 @@
+// Test binary operator priority (must be correctly calculated).
+
+fn __add__(_param1: i32, _param2: i32) -> i32 {
+    return 1;
+}
+fn __sub__(_param1: i32, _param2: i32) -> i32 {
+    return 2;
+}
+fn __mul__(_param1: i32, _param2: i32) -> i32 {
+    return 3;
+}
+fn __div__(_param1: i32, _param2: i32) -> i32 {
+    return 4;
+}
+fn __mod__(_param1: i32, _param2: i32) -> i32 {
+    return 5;
+}
+fn __eq__(_param1: i32, _param2: i32) -> i32 {
+    return 6;
+}
+fn __ne__(_param1: i32, _param2: i32) -> i32 {
+    return 7;
+}
+fn __lt__(_param1: i32, _param2: i32) -> i32 {
+    return 8;
+}
+fn __le__(_param1: i32, _param2: i32) -> i32 {
+    return 9;
+}
+fn __gt__(_param1: i32, _param2: i32) -> i32 {
+    return 10;
+}
+fn __ge__(_param1: i32, _param2: i32) -> i32 {
+    return 11;
+}
+fn __and__(_param1: i32, _param2: i32) -> i32 {
+    return 12;
+}
+fn __or__(_param1: i32, _param2: i32) -> i32 {
+    return 13;
+}
+
+// =========================| `+` first |=========================
+
+var _add_add = 1 + 2 + 3; // expected: 1
+var _add_sub = 1 + 2 - 3; // expected: 2
+var _add_mul = 1 + 2 * 3; // expected: 1
+var _add_div = 1 + 2 / 3; // expected: 1
+var _add_mod = 1 + 2 % 3; // expected: 1
+var _add_eq = 1 + 2 == 3; // expected: 6
+var _add_ne = 1 + 2 != 3; // expected: 7
+var _add_lt = 1 + 2 < 3; // expected: 8
+var _add_le = 1 + 2 <= 3; // expected: 9
+var _add_gt = 1 + 2 > 3; // expected: 10
+var _add_ge = 1 + 2 >= 3; // expected: 11
+var _add_and = 1 + 2 && 3; // expected: 12
+var _add_or = 1 + 2 || 3; // expected: 13
+
+// =========================| `-` first |=========================
+
+var _sub_add = 1 - 2 + 3; // expected: 1
+var _sub_sub = 1 - 2 - 3; // expected: 2
+var _sub_mul = 1 - 2 * 3; // expected: 2
+var _sub_div = 1 - 2 / 3; // expected: 2
+var _sub_mod = 1 - 2 % 3; // expected: 2
+var _sub_eq = 1 - 2 == 3; // expected: 6
+var _sub_ne = 1 - 2 != 3; // expected: 7
+var _sub_lt = 1 - 2 < 3; // expected: 8
+var _sub_le = 1 - 2 <= 3; // expected: 9
+var _sub_gt = 1 - 2 > 3; // expected: 10
+var _sub_ge = 1 - 2 >= 3; // expected: 11
+var _sub_and = 1 - 2 && 3; // expected: 12
+var _sub_or = 1 - 2 || 3; // expected: 13
+
+// =========================| `*` first |=========================
+
+var _mul_add = 1 * 2 + 3; // expected: 1
+var _mul_sub = 1 * 2 - 3; // expected: 2
+var _mul_mul = 1 * 2 * 3; // expected: 3
+var _mul_div = 1 * 2 / 3; // expected: 4
+var _mul_mod = 1 * 2 % 3; // expected: 5
+var _mul_eq = 1 * 2 == 3; // expected: 6
+var _mul_ne = 1 * 2 != 3; // expected: 7
+var _mul_lt = 1 * 2 < 3; // expected: 8
+var _mul_le = 1 * 2 <= 3; // expected: 9
+var _mul_gt = 1 * 2 > 3; // expected: 10
+var _mul_ge = 1 * 2 >= 3; // expected: 11
+var _mul_and = 1 * 2 && 3; // expected: 12
+var _mul_or = 1 * 2 || 3; // expected: 13
+
+// =========================| `/` first |=========================
+
+var _div_add = 1 / 2 + 3; // expected: 1
+var _div_sub = 1 / 2 - 3; // expected: 2
+var _div_mul = 1 / 2 * 3; // expected: 3
+var _div_div = 1 / 2 / 3; // expected: 4
+var _div_mod = 1 / 2 % 3; // expected: 5
+var _div_eq = 1 / 2 == 3; // expected: 6
+var _div_ne = 1 / 2 != 3; // expected: 7
+var _div_lt = 1 / 2 < 3; // expected: 8
+var _div_le = 1 / 2 <= 3; // expected: 9
+var _div_gt = 1 / 2 > 3; // expected: 10
+var _div_ge = 1 / 2 >= 3; // expected: 11
+var _div_and = 1 / 2 && 3; // expected: 12
+var _div_or = 1 / 2 || 3; // expected: 13
+
+// =========================| `%` first |=========================
+
+var _mod_add = 1 % 2 + 3; // expected: 1
+var _mod_sub = 1 % 2 - 3; // expected: 2
+var _mod_mul = 1 % 2 * 3; // expected: 3
+var _mod_div = 1 % 2 / 3; // expected: 4
+var _mod_mod = 1 % 2 % 3; // expected: 5
+var _mod_eq = 1 % 2 == 3; // expected: 6
+var _mod_ne = 1 % 2 != 3; // expected: 7
+var _mod_lt = 1 % 2 < 3; // expected: 8
+var _mod_le = 1 % 2 <= 3; // expected: 9
+var _mod_gt = 1 % 2 > 3; // expected: 10
+var _mod_ge = 1 % 2 >= 3; // expected: 11
+var _mod_and = 1 % 2 && 3; // expected: 12
+var _mod_or = 1 % 2 || 3; // expected: 13
+
+// =========================| `==` first |=========================
+
+var _eq_add = 1 == 2 + 3; // expected: 6
+var _eq_sub = 1 == 2 - 3; // expected: 6
+var _eq_mul = 1 == 2 * 3; // expected: 6
+var _eq_div = 1 == 2 / 3; // expected: 6
+var _eq_mod = 1 == 2 % 3; // expected: 6
+var _eq_eq = 1 == 2 == 3; // expected: 6
+var _eq_ne = 1 == 2 != 3; // expected: 7
+var _eq_lt = 1 == 2 < 3; // expected: 8
+var _eq_le = 1 == 2 <= 3; // expected: 9
+var _eq_gt = 1 == 2 > 3; // expected: 10
+var _eq_ge = 1 == 2 >= 3; // expected: 11
+var _eq_and = 1 == 2 && 3; // expected: 12
+var _eq_or = 1 == 2 || 3; // expected: 13
+
+// =========================| `!=` first |=========================
+
+var _ne_add = 1 != 2 + 3; // expected: 7
+var _ne_sub = 1 != 2 - 3; // expected: 7
+var _ne_mul = 1 != 2 * 3; // expected: 7
+var _ne_div = 1 != 2 / 3; // expected: 7
+var _ne_mod = 1 != 2 % 3; // expected: 7
+var _ne_eq = 1 != 2 == 3; // expected: 6
+var _ne_ne = 1 != 2 != 3; // expected: 7
+var _ne_lt = 1 != 2 < 3; // expected: 8
+var _ne_le = 1 != 2 <= 3; // expected: 9
+var _ne_gt = 1 != 2 > 3; // expected: 10
+var _ne_ge = 1 != 2 >= 3; // expected: 11
+var _ne_and = 1 != 2 && 3; // expected: 12
+var _ne_or = 1 != 2 || 3; // expected: 13
+
+// =========================| `<` first |=========================
+
+var _lt_add = 1 < 2 + 3; // expected: 8
+var _lt_sub = 1 < 2 - 3; // expected: 8
+var _lt_mul = 1 < 2 * 3; // expected: 8
+var _lt_div = 1 < 2 / 3; // expected: 8
+var _lt_mod = 1 < 2 % 3; // expected: 8
+var _lt_eq = 1 < 2 == 3; // expected: 6
+var _lt_ne = 1 < 2 != 3; // expected: 7
+var _lt_lt = 1 < 2 < 3; // expected: 8
+var _lt_le = 1 < 2 <= 3; // expected: 9
+var _lt_gt = 1 < 2 > 3; // expected: 10
+var _lt_ge = 1 < 2 >= 3; // expected: 11
+var _lt_and = 1 < 2 && 3; // expected: 12
+var _lt_or = 1 < 2 || 3; // expected: 13
+
+// =========================| `<=` first |=========================
+
+var _le_add = 1 <= 2 + 3; // expected: 9
+var _le_sub = 1 <= 2 - 3; // expected: 9
+var _le_mul = 1 <= 2 * 3; // expected: 9
+var _le_div = 1 <= 2 / 3; // expected: 9
+var _le_mod = 1 <= 2 % 3; // expected: 9
+var _le_eq = 1 <= 2 == 3; // expected: 6
+var _le_ne = 1 <= 2 != 3; // expected: 7
+var _le_lt = 1 <= 2 < 3; // expected: 8
+var _le_le = 1 <= 2 <= 3; // expected: 9
+var _le_gt = 1 <= 2 > 3; // expected: 10
+var _le_ge = 1 <= 2 >= 3; // expected: 11
+var _le_and = 1 <= 2 && 3; // expected: 12
+var _le_or = 1 <= 2 || 3; // expected: 13
+
+// =========================| `>` first |=========================
+
+var _gt_add = 1 > 2 + 3; // expected: 10
+var _gt_sub = 1 > 2 - 3; // expected: 10
+var _gt_mul = 1 > 2 * 3; // expected: 10
+var _gt_div = 1 > 2 / 3; // expected: 10
+var _gt_mod = 1 > 2 % 3; // expected: 10
+var _gt_eq = 1 > 2 == 3; // expected: 6
+var _gt_ne = 1 > 2 != 3; // expected: 7
+var _gt_lt = 1 > 2 < 3; // expected: 8
+var _gt_le = 1 > 2 <= 3; // expected: 9
+var _gt_gt = 1 > 2 > 3; // expected: 10
+var _gt_ge = 1 > 2 >= 3; // expected: 11
+var _gt_and = 1 > 2 && 3; // expected: 12
+var _gt_or = 1 > 2 || 3; // expected: 13
+
+// =========================| `>=` first |=========================
+
+var _ge_add = 1 >= 2 + 3; // expected: 11
+var _ge_sub = 1 >= 2 - 3; // expected: 11
+var _ge_mul = 1 >= 2 * 3; // expected: 11
+var _ge_div = 1 >= 2 / 3; // expected: 11
+var _ge_mod = 1 >= 2 % 3; // expected: 11
+var _ge_eq = 1 >= 2 == 3; // expected: 6
+var _ge_ne = 1 >= 2 != 3; // expected: 7
+var _ge_lt = 1 >= 2 < 3; // expected: 8
+var _ge_le = 1 >= 2 <= 3; // expected: 9
+var _ge_gt = 1 >= 2 > 3; // expected: 10
+var _ge_ge = 1 >= 2 >= 3; // expected: 11
+var _ge_and = 1 >= 2 && 3; // expected: 12
+var _ge_or = 1 >= 2 || 3; // expected: 13
+
+// =========================| `&&` first |=========================
+
+var _and_add = 1 && 2 + 3; // expected: 12
+var _and_sub = 1 && 2 - 3; // expected: 12
+var _and_mul = 1 && 2 * 3; // expected: 12
+var _and_div = 1 && 2 / 3; // expected: 12
+var _and_mod = 1 && 2 % 3; // expected: 12
+var _and_eq = 1 && 2 == 3; // expected: 12
+var _and_ne = 1 && 2 != 3; // expected: 12
+var _and_lt = 1 && 2 < 3; // expected: 12
+var _and_le = 1 && 2 <= 3; // expected: 12
+var _and_gt = 1 && 2 > 3; // expected: 12
+var _and_ge = 1 && 2 >= 3; // expected: 12
+var _and_and = 1 && 2 && 3; // expected: 12
+var _and_or = 1 && 2 || 3; // expected: 13
+
+// =========================| `||` first |=========================
+
+var _or_add = 1 || 2 + 3; // expected: 13
+var _or_sub = 1 || 2 - 3; // expected: 13
+var _or_mul = 1 || 2 * 3; // expected: 13
+var _or_div = 1 || 2 / 3; // expected: 13
+var _or_mod = 1 || 2 % 3; // expected: 13
+var _or_eq = 1 || 2 == 3; // expected: 13
+var _or_ne = 1 || 2 != 3; // expected: 13
+var _or_lt = 1 || 2 < 3; // expected: 13
+var _or_le = 1 || 2 <= 3; // expected: 13
+var _or_gt = 1 || 2 > 3; // expected: 13
+var _or_ge = 1 || 2 >= 3; // expected: 13
+var _or_and = 1 || 2 && 3; // expected: 13
+var _or_or = 1 || 2 || 3; // expected: 13

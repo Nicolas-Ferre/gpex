@@ -9,7 +9,7 @@ use crate::compiler::parsing::symbols::{
 };
 use crate::utils::parsing::context::{ParseContext, Parser, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
-use crate::utils::parsing::span::Span;
+use crate::utils::parsing::span::{Span, SpanProps};
 use calls::Call;
 use idents::Ident;
 use literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
@@ -43,6 +43,20 @@ pub(crate) const BINARY_FN_NAMES: &[&str] = &[
     BINARY_OR_FN_NAME,
 ];
 pub(crate) const OPERATOR_FN_NAME_PREFIX: &str = "__";
+const OPERATOR_PRIORITIES: &[&[&str]] = &[
+    &[STAR_SYMBOL.slice, SLASH_SYMBOL.slice, PERCENT_SYMBOL.slice],
+    &[PLUS_SYMBOL.slice, HYPHEN_SYMBOL.slice],
+    &[
+        COMPARE_EQUAL_SYMBOL.slice,
+        COMPARE_NOT_EQUAL_SYMBOL.slice,
+        COMPARE_LESS_EQUAL_SYMBOL.slice,
+        ANGLE_BRACKET_OPEN_SYMBOL.slice,
+        COMPARE_GREATER_EQUAL_SYMBOL.slice,
+        ANGLE_BRACKET_CLOSE_SYMBOL.slice,
+    ],
+    &[AND_SYMBOL.slice],
+    &[OR_SYMBOL.slice],
+];
 
 #[derive(Debug)]
 pub(crate) enum Expr {
@@ -65,7 +79,7 @@ impl Expr {
             SeparatorParser::None,
             stop_excluded_parser,
         )?;
-        Ok(Self::create_binary_call(
+        Ok(Self::create_binary_chain(
             context,
             left_operand,
             binary_right_parts,
@@ -120,15 +134,45 @@ impl Expr {
         ])
     }
 
-    fn create_binary_call(
+    fn create_binary_chain(
         context: &mut ParseContext<'_>,
-        mut left_operand: Self,
-        binary_right_parts: Vec<BinaryRightPart>,
+        left_operand: Self,
+        mut binary_right_parts: Vec<BinaryRightPart>,
     ) -> Self {
-        for binary_right_part in binary_right_parts {
-            left_operand = Self::Call(Call::from_binary(context, left_operand, binary_right_part));
+        if binary_right_parts.is_empty() {
+            return left_operand;
         }
-        left_operand
+        let mut remaining_right_parts = binary_right_parts.split_off(
+            Self::lowest_priority_operator_index(context, &binary_right_parts),
+        );
+        let first_remaining_right_part = remaining_right_parts.remove(0);
+        let left_operand = Self::create_binary_chain(context, left_operand, binary_right_parts);
+        let right_operand = Self::create_binary_chain(
+            context,
+            first_remaining_right_part.operand,
+            remaining_right_parts,
+        );
+        Self::Call(Call::from_binary(
+            context,
+            left_operand,
+            first_remaining_right_part.operator,
+            right_operand,
+        ))
+    }
+
+    fn lowest_priority_operator_index(
+        context: &ParseContext<'_>,
+        binary_right_parts: &[BinaryRightPart],
+    ) -> usize {
+        OPERATOR_PRIORITIES
+            .iter()
+            .rev()
+            .find_map(|operators| {
+                binary_right_parts
+                    .iter()
+                    .rposition(|part| operators.contains(&context.slice(part.operator)))
+            })
+            .unwrap_or_else(|| unreachable!("no supported binary operator found"))
     }
 }
 
