@@ -4,7 +4,7 @@ pub(crate) mod literals;
 
 use crate::compiler::parsing::symbols::{
     AND_SYMBOL, ANGLE_BRACKET_CLOSE_SYMBOL, ANGLE_BRACKET_OPEN_SYMBOL, COMPARE_EQUAL_SYMBOL,
-    COMPARE_GREATER_EQUAL_SYMBOL, COMPARE_LESS_EQUAL_SYMBOL, COMPARE_NOT_EQUAL_SYMBOL,
+    COMPARE_GREATER_EQUAL_SYMBOL, COMPARE_LESS_EQUAL_SYMBOL, COMPARE_NOT_EQUAL_SYMBOL, DOT_SYMBOL,
     HYPHEN_SYMBOL, OR_SYMBOL, PERCENT_SYMBOL, PLUS_SYMBOL, SLASH_SYMBOL, STAR_SYMBOL,
 };
 use crate::utils::parsing::context::{ParseContext, Parser, SeparatorParser};
@@ -73,9 +73,9 @@ impl Expr {
         context: &mut ParseContext<'context>,
         stop_excluded_parser: Parser<'context, ()>,
     ) -> Result<Self, ParseError<'context>> {
-        let left_operand = Self::parse_operand(context)?;
+        let left_operand = Self::parse_operand(context, stop_excluded_parser)?;
         let binary_right_parts = context.parse_many(
-            Self::parse_binary_right_part,
+            |context| Self::parse_binary_right_part(context, stop_excluded_parser),
             SeparatorParser::None,
             stop_excluded_parser,
         )?;
@@ -99,38 +99,63 @@ impl Expr {
 
     fn parse_binary_right_part<'context>(
         context: &mut ParseContext<'context>,
+        stop_excluded_parser: Parser<'context, ()>,
     ) -> Result<BinaryRightPart, ParseError<'context>> {
-        let operator = context.parse_any(&[
-            |context| Span::parse_symbol(context, PLUS_SYMBOL),
-            |context| Span::parse_symbol(context, HYPHEN_SYMBOL),
-            |context| Span::parse_symbol(context, STAR_SYMBOL),
-            |context| Span::parse_symbol(context, SLASH_SYMBOL),
-            |context| Span::parse_symbol(context, PERCENT_SYMBOL),
-            |context| Span::parse_symbol(context, COMPARE_EQUAL_SYMBOL),
-            |context| Span::parse_symbol(context, COMPARE_NOT_EQUAL_SYMBOL),
-            |context| Span::parse_symbol(context, COMPARE_LESS_EQUAL_SYMBOL),
-            |context| Span::parse_symbol(context, ANGLE_BRACKET_OPEN_SYMBOL),
-            |context| Span::parse_symbol(context, COMPARE_GREATER_EQUAL_SYMBOL),
-            |context| Span::parse_symbol(context, ANGLE_BRACKET_CLOSE_SYMBOL),
-            |context| Span::parse_symbol(context, AND_SYMBOL),
-            |context| Span::parse_symbol(context, OR_SYMBOL),
-        ])?;
+        let operator = Self::parse_binary_operator(context)?;
         context.force_parse_any_error();
-        let operand = Self::parse_operand(context)?;
+        let operand = Self::parse_operand(context, stop_excluded_parser)?;
         Ok(BinaryRightPart { operator, operand })
     }
 
     fn parse_operand<'context>(
         context: &mut ParseContext<'context>,
+        stop_excluded_parser: Parser<'context, ()>,
     ) -> Result<Self, ParseError<'context>> {
+        let mut expr = context.parse_any(&[
+            &|context| F32Literal::parse(context).map(Self::F32Literal),
+            &|context| U32Literal::parse(context).map(Self::U32Literal),
+            &|context| I32Literal::parse(context).map(Self::I32Literal),
+            &|context| BoolLiteral::parse(context).map(Self::BoolLiteral),
+            &|context| Call::parse(context).map(Self::Call),
+            &|context| Call::parse_unary(context, stop_excluded_parser).map(Self::Call),
+            &|context| Ident::parse(context).map(Self::Ident),
+        ])?;
+        let calls = context.parse_many(
+            |context| {
+                Span::parse_symbol(context, DOT_SYMBOL)?;
+                Call::parse(context)
+            },
+            SeparatorParser::None,
+            |context| {
+                context.parse_any(&[
+                    &|context| Self::parse_binary_operator(context).map(|_| ()),
+                    &stop_excluded_parser,
+                ])
+            },
+        )?;
+        for call in calls {
+            expr = Self::Call(Call::from_uniform_syntax(expr, call));
+        }
+        Ok(expr)
+    }
+
+    fn parse_binary_operator<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Span, ParseError<'context>> {
         context.parse_any(&[
-            |context| F32Literal::parse(context).map(Self::F32Literal),
-            |context| U32Literal::parse(context).map(Self::U32Literal),
-            |context| I32Literal::parse(context).map(Self::I32Literal),
-            |context| BoolLiteral::parse(context).map(Self::BoolLiteral),
-            |context| Call::parse(context).map(Self::Call),
-            |context| Call::parse_unary(context).map(Self::Call),
-            |context| Ident::parse(context).map(Self::Ident),
+            &|context| Span::parse_symbol(context, PLUS_SYMBOL),
+            &|context| Span::parse_symbol(context, HYPHEN_SYMBOL),
+            &|context| Span::parse_symbol(context, STAR_SYMBOL),
+            &|context| Span::parse_symbol(context, SLASH_SYMBOL),
+            &|context| Span::parse_symbol(context, PERCENT_SYMBOL),
+            &|context| Span::parse_symbol(context, COMPARE_EQUAL_SYMBOL),
+            &|context| Span::parse_symbol(context, COMPARE_NOT_EQUAL_SYMBOL),
+            &|context| Span::parse_symbol(context, COMPARE_LESS_EQUAL_SYMBOL),
+            &|context| Span::parse_symbol(context, ANGLE_BRACKET_OPEN_SYMBOL),
+            &|context| Span::parse_symbol(context, COMPARE_GREATER_EQUAL_SYMBOL),
+            &|context| Span::parse_symbol(context, ANGLE_BRACKET_CLOSE_SYMBOL),
+            &|context| Span::parse_symbol(context, AND_SYMBOL),
+            &|context| Span::parse_symbol(context, OR_SYMBOL),
         ])
     }
 

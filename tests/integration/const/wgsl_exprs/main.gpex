@@ -23,16 +23,23 @@ const fn called_fn() -> i32 {
     return 3;
 }
 
+// =========================| Uniform function call |=========================
+
+const _RESULT_FN_UNIFORM_CALL = 4.uniform_called_fn(); // expected: 4
+const fn uniform_called_fn(param: i32) -> i32 {
+    return param;
+}
+
 // =========================| Unary operator |=========================
 
-const _RESULT_UNARY = !0; // expected: 4
+const _RESULT_UNARY = !0; // expected: 5
 const fn __not__(_param: i32) -> i32 {
-    return 4;
+    return 5;
 }
 
 // =========================| Binary operator |=========================
 
-const _RESULT_BINARY = true + false; // expected: 5
+const _RESULT_BINARY = true + false; // expected: 6
 const fn __add__(_param1: bool, _param2: bool) -> i32 {
-    return 5;
+    return 6;
 }

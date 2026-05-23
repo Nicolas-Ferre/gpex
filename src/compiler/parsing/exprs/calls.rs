@@ -13,7 +13,7 @@ use crate::compiler::parsing::symbols::{
     STAR_SYMBOL,
 };
 use crate::utils::indexing::NodeRef;
-use crate::utils::parsing::context::{ParseContext, SeparatorParser};
+use crate::utils::parsing::context::{ParseContext, Parser, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
 
@@ -72,13 +72,14 @@ impl Call {
 
     pub(crate) fn parse_unary<'context>(
         context: &mut ParseContext<'context>,
+        stop_excluded_parser: Parser<'context, ()>,
     ) -> Result<Self, ParseError<'context>> {
         let operator = context.parse_any(&[
-            |context| Span::parse_symbol(context, HYPHEN_SYMBOL),
-            |context| Span::parse_symbol(context, EXCLAMATION_MARK_SYMBOL),
+            &|context| Span::parse_symbol(context, HYPHEN_SYMBOL),
+            &|context| Span::parse_symbol(context, EXCLAMATION_MARK_SYMBOL),
         ])?;
         context.force_parse_any_error();
-        let operand = Expr::parse_operand(context)?;
+        let operand = Expr::parse_operand(context, stop_excluded_parser)?;
         let name = match context.slice(operator) {
             symbol if symbol == HYPHEN_SYMBOL.slice => UNARY_NEG_FN_NAME.into(),
             symbol if symbol == EXCLAMATION_MARK_SYMBOL.slice => UNARY_NOT_FN_NAME.into(),
@@ -121,6 +122,19 @@ impl Call {
             span: left_operand.span().until(right_operand.span()),
             name,
             args: vec![left_operand, right_operand],
+        }
+    }
+
+    pub(super) fn from_uniform_syntax(receiver: Expr, call: Self) -> Self {
+        let receiver_span = receiver.span();
+        let mut args = vec![receiver];
+        args.extend(call.args);
+        Self {
+            id: call.id,
+            scope: call.scope,
+            span: receiver_span.until(call.span),
+            name: call.name,
+            args,
         }
     }
 
