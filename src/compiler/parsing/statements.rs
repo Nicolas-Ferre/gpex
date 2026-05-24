@@ -15,8 +15,8 @@ impl Statement {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         context.parse_any(&[
-            |context| ReturnStatement::parse(context).map(Self::Return),
-            |context| AssignmentStatement::parse(context).map(Self::Assignment),
+            &|context| ReturnStatement::parse(context).map(Self::Return),
+            &|context| AssignmentStatement::parse(context).map(Self::Assignment),
         ])
     }
 }

@@ -28,12 +28,12 @@ impl Item {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         context.parse_any(&[
-            |context| Import::parse(context).map(Self::Import),
-            |context| VarDefinition::parse(context).map(Self::Var),
-            |context| ConstDefinition::parse(context).map(Self::Const),
-            |context| StructDefinition::parse(context).map(Self::Struct),
-            |context| FnDefinition::parse(context).map(Self::Fn),
-            |context| RepeatDefinition::parse(context).map(Self::Repeat),
+            &|context| Import::parse(context).map(Self::Import),
+            &|context| VarDefinition::parse(context).map(Self::Var),
+            &|context| ConstDefinition::parse(context).map(Self::Const),
+            &|context| StructDefinition::parse(context).map(Self::Struct),
+            &|context| FnDefinition::parse(context).map(Self::Fn),
+            &|context| RepeatDefinition::parse(context).map(Self::Repeat),
         ])
     }
 }

@@ -1,3 +1,4 @@
+error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!` (at <root>/binary_missing_right_operand.gpex:1:16)
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!` (at <root>/choice_not_matching.gpex:1:13)
 error: expected identifier (at <root>/ident_incomplete.gpex:1:4)
 error: expected identifier (at <root>/ident_invalid.gpex:1:5)
@@ -9,7 +10,7 @@ error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, id
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!` (at <root>/param_list_invalid.gpex:1:15)
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!` (at <root>/repetition_item_invalid.gpex:1:20)
 error: expected `.` or `;` (at <root>/repetition_separator_invalid_not_trailing.gpex:1:12)
-error: expected `+`, `-`, `*`, `/`, `%`, `==`, `!=`, `<=`, `<`, `>=`, `>`, `&&`, `||`, `,` or `)` (at <root>/repetition_separator_invalid_trailing.gpex:1:19)
+error: expected `.`, `+`, `-`, `*`, `/`, `%`, `==`, `!=`, `<=`, `<`, `>=`, `>`, `&&`, `||`, `,` or `)` (at <root>/repetition_separator_invalid_trailing.gpex:1:19)
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-`, `!` or `)` (at <root>/repetition_separator_trailing_alone.gpex:1:17)
 error: expected identifier (at <root>/repetition_separator_trailing_disallowed.gpex:1:30)
 error: expected `~` or identifier (at <root>/repetition_too_small_count.gpex:1:8)

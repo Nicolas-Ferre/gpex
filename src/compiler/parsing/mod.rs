@@ -41,8 +41,8 @@ fn arg_stop_excluded_parser<'context>(
 ) -> Result<(), ParseError<'context>> {
     context
         .parse_any(&[
-            |context| Span::parse_symbol(context, COMMA_SYMBOL),
-            |context| Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL),
+            &|context| Span::parse_symbol(context, COMMA_SYMBOL),
+            &|context| Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL),
         ])
         .map(|_| ())
 }

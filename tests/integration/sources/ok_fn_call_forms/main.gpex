@@ -1,32 +1,64 @@
 // Test function sources with all call expression forms (must be found).
 
-// =========================| Function without parameters |=========================
+// =========================| Function call without arguments |=========================
 
-var _result_fn_no_param = fn_no_param(); // expected: 1
+var _result_fn_call_no_arg = fn_no_param(); // expected: 1
 fn fn_no_param() -> i32 {
     return 1;
 }
 
-// =========================| Function with parameters |=========================
+// =========================| Function call with arguments |=========================
 
-var _result_fn_params = fn_params(2, 0u); // expected: 2
+var _result_fn_call_args = fn_params(2, 0u); // expected: 2
 fn fn_params(param1: i32, _param2: u32) -> i32 {
     return param1;
 }
 
-// =========================| Unary operator function |=========================
+// =========================| Uniform function call with one argument |=========================
+
+var _result_uniform_fn_call_one_arg = 3.fn_uniform_one_param(); // expected: 3
+fn fn_uniform_one_param(param: i32) -> i32 {
+    return param;
+}
+
+// =========================| Negative uniform function call |=========================
+
+const NOT_LITERAL = 0;
+var _result_neg_uniform_fn_call_one_arg = -NOT_LITERAL.fn_neg_uniform(); // expected: -3
+fn fn_neg_uniform(_param: i32) -> i32 {
+    return 3;
+}
+fn __neg__(_param: i32) -> i32 {
+    return -3;
+}
+
+// =========================| Uniform function call with many arguments |=========================
+
+var _result_uniform_fn_call_many_arg = 0.fn_uniform_many_params(4); // expected: 4
+fn fn_uniform_many_params(_param1: i32, param2: i32) -> i32 {
+    return param2;
+}
+
+// =========================| Uniform function call chain |=========================
+
+var _result_uniform_fn_call_chain = 0.fn_uniform_chain(0).fn_uniform_chain(5); // expected: 5
+fn fn_uniform_chain(_param1: i32, param2: i32) -> i32 {
+    return param2;
+}
+
+// =========================| Unary operator |=========================
 
 var _result_unary_neg = -true; // expected: true
 fn __neg__(param: bool) -> bool {
     return param;
 }
 
-var _result_unary_not = !3; // expected: 3
+var _result_unary_not = !5; // expected: 5
 fn __not__(param: i32) -> i32 {
     return param;
 }
 
-// =========================| Binary operator function |=========================
+// =========================| Binary operator |=========================
 
 var _result_binary_add = 4u + 0.0; // expected: 4u
 fn __add__(param1: u32, _param2: f32) -> u32 {

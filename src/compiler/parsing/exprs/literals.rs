@@ -17,8 +17,8 @@ impl BoolLiteral {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         let span = context.parse_any(&[
-            |context| Span::parse_symbol(context, TRUE_KEYWORD),
-            |context| Span::parse_symbol(context, FALSE_KEYWORD),
+            &|context| Span::parse_symbol(context, TRUE_KEYWORD),
+            &|context| Span::parse_symbol(context, FALSE_KEYWORD),
         ])?;
         Ok(Self {
             span,
