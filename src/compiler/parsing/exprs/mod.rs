@@ -111,7 +111,23 @@ impl Expr {
         context: &mut ParseContext<'context>,
         stop_excluded_parser: Parser<'context, ()>,
     ) -> Result<Self, ParseError<'context>> {
-        let mut expr = context.parse_any(&[
+        let mut expr = Self::parse_operand_prefix(context, stop_excluded_parser)?;
+        let calls = context.parse_many(
+            Self::parse_operand_suffix,
+            SeparatorParser::None,
+            |context| Self::parse_operand_stop(context, stop_excluded_parser),
+        )?;
+        for call in calls {
+            expr = Self::Call(Call::from_uniform_syntax(expr, call));
+        }
+        Ok(expr)
+    }
+
+    fn parse_operand_prefix<'context>(
+        context: &mut ParseContext<'context>,
+        stop_excluded_parser: Parser<'context, ()>,
+    ) -> Result<Self, ParseError<'context>> {
+        context.parse_any(&[
             &|context| F32Literal::parse(context).map(Self::F32Literal),
             &|context| U32Literal::parse(context).map(Self::U32Literal),
             &|context| I32Literal::parse(context).map(Self::I32Literal),
@@ -119,24 +135,24 @@ impl Expr {
             &|context| Call::parse(context).map(Self::Call),
             &|context| Call::parse_unary(context, stop_excluded_parser).map(Self::Call),
             &|context| Ident::parse(context).map(Self::Ident),
-        ])?;
-        let calls = context.parse_many(
-            |context| {
-                Span::parse_symbol(context, DOT_SYMBOL)?;
-                Call::parse(context)
-            },
-            SeparatorParser::None,
-            |context| {
-                context.parse_any(&[
-                    &|context| Self::parse_binary_operator(context).map(|_| ()),
-                    &stop_excluded_parser,
-                ])
-            },
-        )?;
-        for call in calls {
-            expr = Self::Call(Call::from_uniform_syntax(expr, call));
-        }
-        Ok(expr)
+        ])
+    }
+
+    fn parse_operand_suffix<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Call, ParseError<'context>> {
+        Span::parse_symbol(context, DOT_SYMBOL)?;
+        Call::parse(context)
+    }
+
+    fn parse_operand_stop<'context>(
+        context: &mut ParseContext<'context>,
+        stop_excluded_parser: Parser<'context, ()>,
+    ) -> Result<(), ParseError<'context>> {
+        context.parse_any(&[
+            &|context| Self::parse_binary_operator(context).map(|_| ()),
+            &stop_excluded_parser,
+        ])
     }
 
     fn parse_binary_operator<'context>(
