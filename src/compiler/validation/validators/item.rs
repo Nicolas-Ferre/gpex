@@ -113,9 +113,10 @@ pub(crate) fn check_unique_params(
 
 pub(crate) fn check_prelude_location(
     item: ItemRef<'_>,
+    is_compiler_impl: bool,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if item.file_index() == PRELUDE_FILE_INDEX {
+    if !is_compiler_impl || item.file_index() == PRELUDE_FILE_INDEX {
         Ok(())
     } else {
         context.logs.push(Log {
