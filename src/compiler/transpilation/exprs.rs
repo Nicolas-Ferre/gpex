@@ -57,7 +57,7 @@ impl Transpiler<'_, '_> {
             self.shader += " + ";
             self.transpile_expr(&node.args[1]);
         } else {
-            unreachable!("not implemented GPU function");
+            unreachable!("not implemented `{}` GPU function", node.name);
         }
     }
 

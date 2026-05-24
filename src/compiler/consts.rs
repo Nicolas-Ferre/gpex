@@ -171,11 +171,13 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
         if node.name == "__add__" {
             let left = self.value(node.params.params[0].id);
             let right = self.value(node.params.params[1].id);
-            if let (ConstValue::I32(left), ConstValue::I32(right)) = (left, right) {
-                return ConstValue::I32(left + right);
+            match (left, right) {
+                (ConstValue::I32(left), ConstValue::I32(right)) => ConstValue::I32(left + right),
+                _ => unreachable!("not implemented `{}` constant GPU function", node.name),
             }
+        } else {
+            unreachable!("not implemented `{}` constant GPU function", node.name)
         }
-        unreachable!("not implemented `{}` constant GPU function", node.name)
     }
 
     fn fn_body_value(&mut self, body: &FnStatementsBody) -> ConstValue<'item> {

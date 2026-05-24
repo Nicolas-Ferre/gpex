@@ -114,7 +114,7 @@ impl Transpiler<'_, '_> {
             (PRELUDE_FILE_INDEX, "f32") => "f32",
             (PRELUDE_FILE_INDEX, "i32") => "i32",
             (PRELUDE_FILE_INDEX, "u32" | "bool") => "u32",
-            _ => unreachable!("not implemented GPU type"),
+            _ => unreachable!("not implemented `{}` GPU type", type_.name),
         }
     }
 }
