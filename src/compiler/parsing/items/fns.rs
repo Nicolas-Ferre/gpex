@@ -3,7 +3,8 @@ use crate::compiler::parsing::items::params::ParamGroup;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::statements::Statement;
 use crate::compiler::parsing::symbols::{
-    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, FN_KEYWORD, PUB_KEYWORD,
+    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, COMPILERIMPL_KEYWORD, CONST_KEYWORD,
+    EQUAL_SYMBOL, FN_KEYWORD, PUB_KEYWORD, SEMICOLON_SYMBOL,
 };
 use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
@@ -32,11 +33,7 @@ pub(crate) struct FnDefinition {
     #[derive_where(skip)]
     pub(crate) return_type: Option<Expr>,
     #[derive_where(skip)]
-    pub(crate) statements: Vec<Statement>,
-    #[derive_where(skip)]
-    pub(crate) body_span: Span,
-    #[derive_where(skip)]
-    pub(crate) body_end_span: Span,
+    pub(crate) body: FnBody,
 }
 
 impl FnDefinition {
@@ -53,20 +50,14 @@ impl FnDefinition {
             let params = ParamGroup::parse(context)?;
             let (arrow_span, return_type, signature_end_span) =
                 if let Ok(arrow_span) = Span::parse_symbol(context, ARROW_SYMBOL) {
-                    let expr = Expr::parse(context, |context| {
-                        Span::parse_symbol(context, BRACE_OPEN_SYMBOL).map(|_| ())
-                    })?;
+                    let expr = Expr::parse(context, Self::parse_return_type_stop)?;
                     let span = expr.span();
                     (Some(arrow_span), Some(expr), span)
                 } else {
                     (None, None, params.span)
                 };
-            let body_start_span = Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
-            let statements =
-                context.parse_many(Statement::parse, SeparatorParser::None, |context| {
-                    Span::parse_symbol(context, BRACE_CLOSE_SYMBOL).map(|_| ())
-                })?;
-            let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
+            let body =
+                context.parse_any(&[&Self::parse_body_statements, &Self::parse_compilerimpl])?;
             Ok(Self {
                 id,
                 scope,
@@ -78,9 +69,7 @@ impl FnDefinition {
                 params,
                 arrow_span,
                 return_type,
-                statements,
-                body_span: body_start_span.until(body_end_span),
-                body_end_span,
+                body,
             })
         })
     }
@@ -88,4 +77,51 @@ impl FnDefinition {
     pub(crate) fn key(&self) -> String {
         format!("{}({})", self.name, self.params.params.len())
     }
+
+    fn parse_return_type_stop<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<(), ParseError<'context>> {
+        context.parse_any(&[
+            &|context| Span::parse_symbol(context, BRACE_OPEN_SYMBOL).map(|_| ()),
+            &|context| Span::parse_symbol(context, EQUAL_SYMBOL).map(|_| ()),
+        ])
+    }
+
+    fn parse_body_statements<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<FnBody, ParseError<'context>> {
+        let body_start_span = Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
+        let statements =
+            context.parse_many(Statement::parse, SeparatorParser::None, |context| {
+                Span::parse_symbol(context, BRACE_CLOSE_SYMBOL).map(|_| ())
+            })?;
+        let body_end_span = Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
+        Ok(FnBody::Statements(FnStatementsBody {
+            statements,
+            body_span: body_start_span.until(body_end_span),
+            body_end_span,
+        }))
+    }
+
+    fn parse_compilerimpl<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<FnBody, ParseError<'context>> {
+        Span::parse_symbol(context, EQUAL_SYMBOL)?;
+        Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
+        Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
+        Ok(FnBody::Compilerimpl)
+    }
+}
+
+#[derive(Debug)]
+pub(crate) enum FnBody {
+    Compilerimpl,
+    Statements(FnStatementsBody),
+}
+
+#[derive(Debug)]
+pub(crate) struct FnStatementsBody {
+    pub(crate) statements: Vec<Statement>,
+    pub(crate) body_span: Span,
+    pub(crate) body_end_span: Span,
 }

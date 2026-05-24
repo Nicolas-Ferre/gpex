@@ -6,7 +6,7 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
-use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::parsing::statements::Statement;
@@ -69,8 +69,10 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
             if let Some(return_type) = &node.return_type {
                 self_.scan_expr(return_type)?;
             }
-            for statement in &node.statements {
-                self_.scan_statement(statement)?;
+            if let FnBody::Statements(body) = &node.body {
+                for statement in &body.statements {
+                    self_.scan_statement(statement)?;
+                }
             }
             Ok(())
         })

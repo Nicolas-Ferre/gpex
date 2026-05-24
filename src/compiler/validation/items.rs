@@ -24,10 +24,14 @@ impl Validator<'_, '_> {
         }
     }
 
-    pub(crate) fn validate_params(&mut self, params: &ParamGroup) -> Result<(), ValidateError> {
+    pub(crate) fn validate_params(
+        &mut self,
+        params: &ParamGroup,
+        is_compilerimpl: bool,
+    ) -> Result<(), ValidateError> {
         let mut are_params_valid = true;
         for param in &params.params {
-            if self.validate_param(param).is_err() {
+            if self.validate_param(param, is_compilerimpl).is_err() {
                 are_params_valid = false;
             }
         }
@@ -82,7 +86,7 @@ impl Validator<'_, '_> {
     }
 
     fn validate_struct(&mut self, node: &StructDefinition) -> Result<(), ValidateError> {
-        validators::item::check_prelude_location(ItemRef::Struct(node), &mut self.context)?;
+        validators::item::check_prelude_location(ItemRef::Struct(node), true, &mut self.context)?;
         Ok(())
     }
 
@@ -97,7 +101,11 @@ impl Validator<'_, '_> {
         Ok(())
     }
 
-    fn validate_param(&mut self, param: &Param) -> Result<(), ValidateError> {
+    fn validate_param(
+        &mut self,
+        param: &Param,
+        is_compilerimpl: bool,
+    ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Param(param);
         self.validate_expr(&param.type_, Some(param.colon_span))?;
         validators::expr::check_types(
@@ -107,7 +115,9 @@ impl Validator<'_, '_> {
             Type::Struct(self.indexes.search_prelude_type("typeref")),
             &mut self.context,
         )?;
-        validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
+        if !is_compilerimpl {
+            validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
+        }
         validators::ident::check_char_count(param.name_span, &mut self.context);
         validators::ident::check_case(param.name_span, &[Case::Snake], &mut self.context);
         Ok(())

@@ -4,7 +4,7 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::Item;
-use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::parsing::statements::Statement;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
@@ -133,16 +133,20 @@ impl<'item> Indexer<'item> {
         if let Some(return_type) = &item.return_type {
             self.index_expr(return_type);
         }
-        if item.const_keyword_span.is_some() {
-            for statement in &item.statements {
+        if item.const_keyword_span.is_some()
+            && let FnBody::Statements(body) = &item.body
+        {
+            for statement in &body.statements {
                 self.index_statement_refs(statement);
             }
         }
     }
 
     fn index_fn_not_const_parts(&mut self, item: &'item FnDefinition) {
-        if item.const_keyword_span.is_none() {
-            for statement in &item.statements {
+        if item.const_keyword_span.is_none()
+            && let FnBody::Statements(body) = &item.body
+        {
+            for statement in &body.statements {
                 self.index_statement_refs(statement);
             }
         }

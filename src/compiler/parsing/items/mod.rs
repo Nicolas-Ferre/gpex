@@ -19,7 +19,7 @@ pub(crate) enum Item {
     Var(VarDefinition),
     Const(ConstDefinition),
     Struct(StructDefinition),
-    Fn(FnDefinition),
+    Fn(Box<FnDefinition>),
     Repeat(RepeatDefinition),
 }
 
@@ -32,7 +32,7 @@ impl Item {
             &|context| VarDefinition::parse(context).map(Self::Var),
             &|context| ConstDefinition::parse(context).map(Self::Const),
             &|context| StructDefinition::parse(context).map(Self::Struct),
-            &|context| FnDefinition::parse(context).map(Self::Fn),
+            &|context| FnDefinition::parse(context).map(Box::new).map(Self::Fn),
             &|context| RepeatDefinition::parse(context).map(Self::Repeat),
         ])
     }

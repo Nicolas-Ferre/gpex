@@ -1,5 +1,5 @@
 use crate::compiler::indexing::item_ref::ItemRef;
-use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
@@ -17,6 +17,9 @@ impl Transpiler<'_, '_> {
     }
 
     pub(crate) fn transpile_fn(&mut self, node: &FnDefinition) {
+        let FnBody::Statements(body) = &node.body else {
+            return;
+        };
         let id = node.id;
         _ = write!(self.shader, "fn _{id}");
         self.transpile_params(&node.params);
@@ -27,7 +30,7 @@ impl Transpiler<'_, '_> {
             _ = write!(self.shader, " {{ ");
         }
         self.transpile_mut_param_definitions(&node.params);
-        for statement in &node.statements {
+        for statement in &body.statements {
             self.transpile_statement(statement);
         }
         _ = write!(self.shader, " }}");

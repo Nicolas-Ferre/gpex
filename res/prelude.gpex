@@ -48,3 +48,12 @@ pub struct f32 = compilerimpl {}
 /// var false_value = false;
 /// ```
 pub struct bool = compilerimpl {}
+
+/// Adds two `i32` values.
+///
+/// # Examples
+///
+/// ```gpex
+/// var value = 1 + 2;
+/// ```
+pub fn __add__(left: i32, right: i32) -> i32 = compilerimpl;
