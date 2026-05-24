@@ -31,8 +31,6 @@ pub(crate) struct FnDefinition {
     #[derive_where(skip)]
     pub(crate) arrow_span: Option<Span>,
     #[derive_where(skip)]
-    pub(crate) compilerimpl_span: Option<Span>,
-    #[derive_where(skip)]
     pub(crate) return_type: Option<Expr>,
     #[derive_where(skip)]
     pub(crate) body: FnBody,
@@ -70,7 +68,6 @@ impl FnDefinition {
                 signature_span: name_span.until(signature_end_span),
                 params,
                 arrow_span,
-                compilerimpl_span: None,
                 return_type,
                 body,
             })

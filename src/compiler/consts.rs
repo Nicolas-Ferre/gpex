@@ -162,7 +162,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             return ConstValue::RuntimeValue;
         }
         let FnBody::Statements(body) = &node.body else {
-            return ConstValue::RuntimeValue;
+            unreachable!("constant `compilerimpl` functions not yet implemented")
         };
         for statement in &body.statements {
             match statement {
