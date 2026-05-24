@@ -2,4 +2,5 @@
 
 var one = 1;
 
-var _i32_add = one + 2; // expected: 3
+var _i32_add = 2 + one; // expected: 3
+var _i32_add_overflow = 2_147_483_647 + one; // expected: -2147483648

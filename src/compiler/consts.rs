@@ -172,7 +172,9 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             let left = self.value(node.params.params[0].id);
             let right = self.value(node.params.params[1].id);
             match (left, right) {
-                (ConstValue::I32(left), ConstValue::I32(right)) => ConstValue::I32(left + right),
+                (ConstValue::I32(left), ConstValue::I32(right)) => {
+                    ConstValue::I32(left.wrapping_add(right))
+                }
                 _ => unreachable!("not implemented `{}` constant GPU function", node.name),
             }
         } else {
