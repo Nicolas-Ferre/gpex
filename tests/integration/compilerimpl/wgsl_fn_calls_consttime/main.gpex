@@ -1,0 +1,4 @@
+// Test prelude function calls at `const`-time (must be transpiled correctly).
+
+const _I32_ADD = 2 + 1; // expected: 3
+const _I32_ADD_OVERFLOW = 2_147_483_647 + 1; // expected: -2147483648

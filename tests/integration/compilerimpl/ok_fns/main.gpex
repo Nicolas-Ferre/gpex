@@ -1,3 +1,0 @@
-// Test access to functions defined in prelude (must be transpiled correctly).
-
-var _i32_add = 1 + 2; // expected: 3

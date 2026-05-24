@@ -65,7 +65,7 @@ impl StructDefinition {
             (PRELUDE_FILE_INDEX, "f32") => F32_SIZE,
             (PRELUDE_FILE_INDEX, "i32") => I32_SIZE,
             (PRELUDE_FILE_INDEX, "u32" | "bool") => U32_SIZE,
-            _ => unreachable!("not implemented GPU type"),
+            _ => unreachable!("not implemented `{}` GPU type", self.name),
         }
     }
 }
