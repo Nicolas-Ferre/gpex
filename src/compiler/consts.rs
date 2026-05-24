@@ -4,7 +4,7 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
@@ -161,9 +161,24 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
         if node.const_keyword_span.is_none() {
             return ConstValue::RuntimeValue;
         }
-        let FnBody::Statements(body) = &node.body else {
-            unreachable!("constant `compilerimpl` functions not yet implemented")
-        };
+        match &node.body {
+            FnBody::Compilerimpl => self.fn_compilerimpl_value(node),
+            FnBody::Statements(body) => self.fn_body_value(body),
+        }
+    }
+
+    fn fn_compilerimpl_value(&self, node: &FnDefinition) -> ConstValue<'item> {
+        if node.name == "__add__" {
+            let left = self.value(node.params.params[0].id);
+            let right = self.value(node.params.params[1].id);
+            if let (ConstValue::I32(left), ConstValue::I32(right)) = (left, right) {
+                return ConstValue::I32(left + right);
+            }
+        }
+        unreachable!("not implemented `{}` constant GPU function", node.name)
+    }
+
+    fn fn_body_value(&mut self, body: &FnStatementsBody) -> ConstValue<'item> {
         for statement in &body.statements {
             match statement {
                 Statement::Return(statement) => return self.expr_value(&statement.value),

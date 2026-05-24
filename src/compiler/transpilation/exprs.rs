@@ -52,12 +52,12 @@ impl Transpiler<'_, '_> {
     }
 
     fn transpile_compilerimpl_fn_call(&mut self, node: &Call) {
-        if node.name == "__add__" && node.args.len() == 2 {
+        if node.name == "__add__" {
             self.transpile_expr(&node.args[0]);
             self.shader += " + ";
             self.transpile_expr(&node.args[1]);
         } else {
-            unreachable!("not implemented `compilerimpl` function");
+            unreachable!("not implemented GPU function");
         }
     }
 

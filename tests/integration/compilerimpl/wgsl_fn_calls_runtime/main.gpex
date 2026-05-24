@@ -1,0 +1,5 @@
+// Test prelude function calls at runtime (must be transpiled correctly).
+
+var one = 1;
+
+var _i32_add = one + 2; // expected: 3

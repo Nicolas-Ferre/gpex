@@ -56,4 +56,4 @@ pub struct bool = compilerimpl {}
 /// ```gpex
 /// var value = 1 + 2;
 /// ```
-pub fn __add__(left: i32, right: i32) -> i32 = compilerimpl;
+pub const fn __add__(left: i32, right: i32) -> i32 = compilerimpl;

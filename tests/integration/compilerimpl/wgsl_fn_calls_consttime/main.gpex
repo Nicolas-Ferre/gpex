@@ -1,0 +1,3 @@
+// Test prelude function calls at `const`-time (must be transpiled correctly).
+
+const _I32_ADD = 1 + 2; // expected: 3
