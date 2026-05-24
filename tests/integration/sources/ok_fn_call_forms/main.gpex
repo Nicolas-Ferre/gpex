@@ -39,6 +39,13 @@ fn fn_uniform_many_params(_param1: i32, param2: i32) -> i32 {
     return param2;
 }
 
+// =========================| Uniform function call chain |=========================
+
+var _result_uniform_fn_call_chain = 0.fn_uniform_chain(0).fn_uniform_chain(5); // expected: 5
+fn fn_uniform_chain(_param1: i32, param2: i32) -> i32 {
+    return param2;
+}
+
 // =========================| Unary operator |=========================
 
 var _result_unary_neg = -true; // expected: true
