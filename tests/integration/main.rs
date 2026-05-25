@@ -5,7 +5,6 @@ use itertools::Itertools;
 use libtest_mimic::{Arguments, Failed, Trial};
 use pretty_assertions::assert_eq;
 use regex::{Captures, Regex};
-use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::fmt::Write;
 use std::path::{Path, PathBuf};
@@ -226,7 +225,8 @@ fn format_wgsl(code: &str) -> Result<String, Failed> {
         .sorted_unstable_by_key(|(_, number)| *number)
         .enumerate()
         .map(|(index, (ident, _))| (ident.to_string(), format!("ident{index}")))
-        .collect::<HashMap<_, _>>();
+        .sorted_unstable_by_key(|(old_name, _)| usize::MAX - old_name.len()) // to avoid replacing variable prefixes
+        .collect::<Vec<_>>();
     for (old_name, new_name) in &replaced_idents {
         formatted_wgsl = formatted_wgsl.replace(old_name, new_name);
     }
