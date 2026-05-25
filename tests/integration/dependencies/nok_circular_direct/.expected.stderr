@@ -1,9 +1,9 @@
 error: `fn_` item has circular dependencies
-│  → <root>/main.gpex5:4
+│  → <root>/main.gpex:5:4
 │    ¦ fn fn_() -> i32 {
 │    ¦    ^^^
 ├─ info: depends on itself
-│  → <root>/main.gpex6:12
+│  → <root>/main.gpex:6:12
 │    ¦     return fn_();
 │    ¦            ^^^^^
 ┴

@@ -1,90 +1,90 @@
 error: expression not constant
-│  → <root>/main.gpex16:16
+│  → <root>/main.gpex:16:16
 │    ¦ const _CONST = not_const_value;
 │    ¦                ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex16:1
+│  → <root>/main.gpex:16:1
 │    ¦ const _CONST = not_const_value;
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex20:26
+│  → <root>/main.gpex:20:26
 │    ¦ fn _fn_param_type(param: not_const_value) -> i32 {
 │    ¦                          ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex20:24
+│  → <root>/main.gpex:20:24
 │    ¦ fn _fn_param_type(param: not_const_value) -> i32 {
 │    ¦                        ^
 ┴
 error: expression not constant
-│  → <root>/main.gpex26:35
+│  → <root>/main.gpex:26:35
 │    ¦ fn _fn_return_type(param: i32) -> not_const_value {
 │    ¦                                   ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex26:32
+│  → <root>/main.gpex:26:32
 │    ¦ fn _fn_return_type(param: i32) -> not_const_value {
 │    ¦                                ^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex33:12
+│  → <root>/main.gpex:33:12
 │    ¦     return not_const_value;
 │    ¦            ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex32:1
+│  → <root>/main.gpex:32:1
 │    ¦ const fn _fn_return() -> i32 {
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex39:5
+│  → <root>/main.gpex:39:5
 │    ¦     not_const_value = 0;
 │    ¦     ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex38:1
+│  → <root>/main.gpex:38:1
 │    ¦ const fn _fn_assignment_left(){
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex45:13
+│  → <root>/main.gpex:45:13
 │    ¦     param = not_const_value;
 │    ¦             ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex44:1
+│  → <root>/main.gpex:44:1
 │    ¦ const fn _fn_assignment_right(param: i32) {
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex50:38
+│  → <root>/main.gpex:50:38
 │    ¦ const _FN_CALL_ARG = called_const_fn(not_const_value);
 │    ¦                                      ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex50:1
+│  → <root>/main.gpex:50:1
 │    ¦ const _FN_CALL_ARG = called_const_fn(not_const_value);
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex54:25
+│  → <root>/main.gpex:54:25
 │    ¦ const _UNARY_OPERAND = -not_const_value;
 │    ¦                         ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex54:1
+│  → <root>/main.gpex:54:1
 │    ¦ const _UNARY_OPERAND = -not_const_value;
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex58:25
+│  → <root>/main.gpex:58:25
 │    ¦ const _BINARY_OPERAND = not_const_value + not_const_value;
 │    ¦                         ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex58:1
+│  → <root>/main.gpex:58:1
 │    ¦ const _BINARY_OPERAND = not_const_value + not_const_value;
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex58:43
+│  → <root>/main.gpex:58:43
 │    ¦ const _BINARY_OPERAND = not_const_value + not_const_value;
 │    ¦                                           ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex58:1
+│  → <root>/main.gpex:58:1
 │    ¦ const _BINARY_OPERAND = not_const_value + not_const_value;
 │    ¦ ^^^^^
 ┴

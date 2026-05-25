@@ -1,5 +1,5 @@
 error: `source` item not found
-│  → <root>/main.gpex8:22
+│  → <root>/main.gpex:8:22
 │    ¦ var _result_global = source;
 │    ¦                      ^^^^^^
 ┴

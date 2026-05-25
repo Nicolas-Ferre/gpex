@@ -1,25 +1,25 @@
 error: `_SOURCE` item not found
-│  → <root>/main.gpex5:22
+│  → <root>/main.gpex:5:22
 │    ¦ var _result_global = _SOURCE;
 │    ¦                      ^^^^^^^
 ┴
 error: `_SOURCE` item not found
-│  → <root>/main.gpex11:12
+│  → <root>/main.gpex:11:12
 │    ¦     return _SOURCE;
 │    ¦            ^^^^^^^
 ┴
 error: `fn_param_type(i32)` item not found
-│  → <root>/main.gpex16:29
+│  → <root>/main.gpex:16:29
 │    ¦ var _result_fn_param_type = fn_param_type(0);
 │    ¦                             ^^^^^^^^^^^^^^^^
 ┴
 error: `_SOURCE` item not found
-│  → <root>/main.gpex17:25
+│  → <root>/main.gpex:17:25
 │    ¦ fn fn_param_type(param: _SOURCE) -> i32 {
 │    ¦                         ^^^^^^^
 ┴
 error: `_SOURCE` item not found
-│  → <root>/main.gpex24:34
+│  → <root>/main.gpex:24:34
 │    ¦ fn fn_return_type(param: i32) -> _SOURCE {
 │    ¦                                  ^^^^^^^
 ┴

@@ -1,90 +1,90 @@
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!`
-│  → <root>/binary_missing_right_operand.gpex1:16
+│  → <root>/binary_missing_right_operand.gpex:1:16
 │    ¦ var value = 2 +;
 │    ¦                ^
 ┴
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!`
-│  → <root>/choice_not_matching.gpex1:13
+│  → <root>/choice_not_matching.gpex:1:13
 │    ¦ var value = var;
 │    ¦             ^
 ┴
 error: expected identifier
-│  → <root>/ident_incomplete.gpex1:4
+│  → <root>/ident_incomplete.gpex:1:4
 │    ¦ var
 │    ¦    ^
 ┴
 error: expected identifier
-│  → <root>/ident_invalid.gpex1:5
+│  → <root>/ident_invalid.gpex:1:5
 │    ¦ var 123value = 0;
 │    ¦     ^
 ┴
 error: expected identifier
-│  → <root>/import_unexpected_segment.gpex1:18
+│  → <root>/import_unexpected_segment.gpex:1:18
 │    ¦ import ~.segment.var;
 │    ¦                  ^
 ┴
 error: expected identifier
-│  → <root>/keyword_eof.gpex1:4
+│  → <root>/keyword_eof.gpex:1:4
 │    ¦ var
 │    ¦    ^
 ┴
 error: expected `import`, `var`, `const`, `struct`, `fn`, `repeat` or end of file
-│  → <root>/keyword_prefix.gpex1:1
+│  → <root>/keyword_prefix.gpex:1:1
 │    ¦ varvalue = 0;
 │    ¦ ^
 ┴
 error: expected identifier
-│  → <root>/keyword_reserved.gpex1:5
+│  → <root>/keyword_reserved.gpex:1:5
 │    ¦ var var = 0;
 │    ¦     ^
 ┴
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!`
-│  → <root>/keyword_suffix.gpex1:13
+│  → <root>/keyword_suffix.gpex:1:13
 │    ¦ var value = 0suffix;
 │    ¦             ^
 ┴
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!`
-│  → <root>/param_list_invalid.gpex1:15
+│  → <root>/param_list_invalid.gpex:1:15
 │    ¦ fn _fn(param: var) {}
 │    ¦               ^
 ┴
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!`
-│  → <root>/repetition_item_invalid.gpex1:20
+│  → <root>/repetition_item_invalid.gpex:1:20
 │    ¦ var value = fn_(1, var);
 │    ¦                    ^
 ┴
 error: expected `.` or `;`
-│  → <root>/repetition_separator_invalid_not_trailing.gpex1:12
+│  → <root>/repetition_separator_invalid_not_trailing.gpex:1:12
 │    ¦ import foo invalid;
 │    ¦            ^
 ┴
 error: expected `.`, `+`, `-`, `*`, `/`, `%`, `==`, `!=`, `<=`, `<`, `>=`, `>`, `&&`, `||`, `,` or `)`
-│  → <root>/repetition_separator_invalid_trailing.gpex1:19
+│  → <root>/repetition_separator_invalid_trailing.gpex:1:19
 │    ¦ var value = fn_(1 var);
 │    ¦                   ^
 ┴
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-`, `!` or `)`
-│  → <root>/repetition_separator_trailing_alone.gpex1:17
+│  → <root>/repetition_separator_trailing_alone.gpex:1:17
 │    ¦ var value = fn_(,);
 │    ¦                 ^
 ┴
 error: expected identifier
-│  → <root>/repetition_separator_trailing_disallowed.gpex1:30
+│  → <root>/repetition_separator_trailing_disallowed.gpex:1:30
 │    ¦ import ~.choice_not_matching.;
 │    ¦                              ^
 ┴
 error: expected `~` or identifier
-│  → <root>/repetition_too_small_count.gpex1:8
+│  → <root>/repetition_too_small_count.gpex:1:8
 │    ¦ import ;
 │    ¦        ^
 ┴
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, identifier, `-` or `!`
-│  → <root>/statement_invalid.gpex2:12
+│  → <root>/statement_invalid.gpex:2:12
 │    ¦     return var;
 │    ¦            ^
 ┴
 error: expected `=`
-│  → <root>/symbol_unexpected.gpex1:11
+│  → <root>/symbol_unexpected.gpex:1:11
 │    ¦ var value # 0;
 │    ¦           ^
 ┴

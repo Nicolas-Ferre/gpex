@@ -1,5 +1,5 @@
 error: `_source` item not found
-│  → <root>/main.gpex5:15
+│  → <root>/main.gpex:5:15
 │    ¦ var _source = _source;
 │    ¦               ^^^^^^^
 ┴

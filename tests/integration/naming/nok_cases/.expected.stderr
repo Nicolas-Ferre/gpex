@@ -1,170 +1,170 @@
 warning: `_camelCaseImport` identifier not in snake_case
-│  → <root>/main.gpex5:12
+│  → <root>/main.gpex:5:12
 │    ¦ pub import _camelCaseImport._camelCaseImport;
 │    ¦            ^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseImport` identifier not in snake_case
-│  → <root>/main.gpex5:29
+│  → <root>/main.gpex:5:29
 │    ¦ pub import _camelCaseImport._camelCaseImport;
 │    ¦                             ^^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseImport` identifier not in snake_case
-│  → <root>/main.gpex6:12
+│  → <root>/main.gpex:6:12
 │    ¦ pub import _PascalCaseImport._PascalCaseImport;
 │    ¦            ^^^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseImport` identifier not in snake_case
-│  → <root>/main.gpex6:30
+│  → <root>/main.gpex:6:30
 │    ¦ pub import _PascalCaseImport._PascalCaseImport;
 │    ¦                              ^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_IMPORT` identifier not in snake_case
-│  → <root>/main.gpex7:12
+│  → <root>/main.gpex:7:12
 │    ¦ pub import _SCREAMING_SNAKE_CASE_IMPORT._SCREAMING_SNAKE_CASE_IMPORT;
 │    ¦            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_IMPORT` identifier not in snake_case
-│  → <root>/main.gpex7:41
+│  → <root>/main.gpex:7:41
 │    ¦ pub import _SCREAMING_SNAKE_CASE_IMPORT._SCREAMING_SNAKE_CASE_IMPORT;
 │    ¦                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_snake_case_const` identifier not in SCREAMING_SNAKE_CASE
-│  → <root>/main.gpex11:7
+│  → <root>/main.gpex:11:7
 │    ¦ const _snake_case_const = 0;
 │    ¦       ^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseConst` identifier not in SCREAMING_SNAKE_CASE
-│  → <root>/main.gpex12:7
+│  → <root>/main.gpex:12:7
 │    ¦ const _camelCaseConst = 0;
 │    ¦       ^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseConst` identifier not in SCREAMING_SNAKE_CASE
-│  → <root>/main.gpex13:7
+│  → <root>/main.gpex:13:7
 │    ¦ const _PascalCaseConst = 0;
 │    ¦       ^^^^^^^^^^^^^^^^
 ┴
 warning: `_snake_case_const_typeref` identifier not in SCREAMING_SNAKE_CASE or PascalCase
-│  → <root>/main.gpex15:7
+│  → <root>/main.gpex:15:7
 │    ¦ const _snake_case_const_typeref = i32;
 │    ¦       ^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseConstTyperef` identifier not in SCREAMING_SNAKE_CASE or PascalCase
-│  → <root>/main.gpex16:7
+│  → <root>/main.gpex:16:7
 │    ¦ const _camelCaseConstTyperef = i32;
 │    ¦       ^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseVar` identifier not in snake_case
-│  → <root>/main.gpex20:5
+│  → <root>/main.gpex:20:5
 │    ¦ var _camelCaseVar = 0;
 │    ¦     ^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseVar` identifier not in snake_case
-│  → <root>/main.gpex21:5
+│  → <root>/main.gpex:21:5
 │    ¦ var _PascalCaseVar = 0;
 │    ¦     ^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_VAR` identifier not in snake_case
-│  → <root>/main.gpex22:5
+│  → <root>/main.gpex:22:5
 │    ¦ var _SCREAMING_SNAKE_CASE_VAR = 0;
 │    ¦     ^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseVarTyperef` identifier not in snake_case
-│  → <root>/main.gpex24:5
+│  → <root>/main.gpex:24:5
 │    ¦ var _camelCaseVarTyperef = i32;
 │    ¦     ^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseVarTyperef` identifier not in snake_case
-│  → <root>/main.gpex25:5
+│  → <root>/main.gpex:25:5
 │    ¦ var _PascalCaseVarTyperef = i32;
 │    ¦     ^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_VAR_TYPEREF` identifier not in snake_case
-│  → <root>/main.gpex26:5
+│  → <root>/main.gpex:26:5
 │    ¦ var _SCREAMING_SNAKE_CASE_VAR_TYPEREF = i32;
 │    ¦     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseFnNoReturn` identifier not in snake_case
-│  → <root>/main.gpex30:4
+│  → <root>/main.gpex:30:4
 │    ¦ fn _camelCaseFnNoReturn(param: i32) { param = 0; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseFnNoReturn` identifier not in snake_case
-│  → <root>/main.gpex31:4
+│  → <root>/main.gpex:31:4
 │    ¦ fn _PascalCaseFnNoReturn(param: i32) { param = 0; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_FN_NO_RETURN` identifier not in snake_case
-│  → <root>/main.gpex32:4
+│  → <root>/main.gpex:32:4
 │    ¦ fn _SCREAMING_SNAKE_CASE_FN_NO_RETURN(param: i32) { param = 0; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseFnReturn` identifier not in snake_case
-│  → <root>/main.gpex34:4
+│  → <root>/main.gpex:34:4
 │    ¦ fn _camelCaseFnReturn() -> i32 { return 0; }
 │    ¦    ^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseFnReturn` identifier not in snake_case
-│  → <root>/main.gpex35:4
+│  → <root>/main.gpex:35:4
 │    ¦ fn _PascalCaseFnReturn() -> i32 { return 0; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_FN_RETURN` identifier not in snake_case
-│  → <root>/main.gpex36:4
+│  → <root>/main.gpex:36:4
 │    ¦ fn _SCREAMING_SNAKE_CASE_FN_RETURN() -> i32 { return 0; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseFnReturnTyperef` identifier not in snake_case
-│  → <root>/main.gpex38:4
+│  → <root>/main.gpex:38:4
 │    ¦ fn _camelCaseFnReturnTyperef() -> typeref { return i32; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseFnReturnTyperef` identifier not in snake_case
-│  → <root>/main.gpex39:4
+│  → <root>/main.gpex:39:4
 │    ¦ fn _PascalCaseFnReturnTyperef() -> typeref { return i32; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_FN_RETURN_TYPEREF` identifier not in snake_case
-│  → <root>/main.gpex40:4
+│  → <root>/main.gpex:40:4
 │    ¦ fn _SCREAMING_SNAKE_CASE_FN_RETURN_TYPEREF() -> typeref { return i32; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseFnReturnConstTyperef` identifier not in snake_case or PascalCase
-│  → <root>/main.gpex42:10
+│  → <root>/main.gpex:42:10
 │    ¦ const fn _camelCaseFnReturnConstTyperef() -> typeref { return i32; }
 │    ¦          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_FN_RETURN_CONST_TYPEREF` identifier not in snake_case or PascalCase
-│  → <root>/main.gpex43:10
+│  → <root>/main.gpex:43:10
 │    ¦ const fn _SCREAMING_SNAKE_CASE_FN_RETURN_CONST_TYPEREF() -> typeref { return i32; }
 │    ¦          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseParam` identifier not in snake_case
-│  → <root>/main.gpex47:19
+│  → <root>/main.gpex:47:19
 │    ¦ fn _fn_camel_case(_camelCaseParam: i32) -> i32 { return 0; }
 │    ¦                   ^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseParam` identifier not in snake_case
-│  → <root>/main.gpex48:20
+│  → <root>/main.gpex:48:20
 │    ¦ fn _fn_pascal_case(_PascalCaseParam: i32) -> i32 { return 0; }
 │    ¦                    ^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_PARAM` identifier not in snake_case
-│  → <root>/main.gpex49:29
+│  → <root>/main.gpex:49:29
 │    ¦ fn _fn_screaming_snake_case(_SCREAMING_SNAKE_CASE_PARAM: i32) -> i32 { return 0; }
 │    ¦                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseParamTyperef` identifier not in snake_case
-│  → <root>/main.gpex51:27
+│  → <root>/main.gpex:51:27
 │    ¦ fn _fn_camel_case_typeref(_camelCaseParamTyperef: typeref) -> i32 { return 0; }
 │    ¦                           ^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseParamTyperef` identifier not in snake_case
-│  → <root>/main.gpex52:28
+│  → <root>/main.gpex:52:28
 │    ¦ fn _fn_pascal_case_typeref(_PascalCaseParamTyperef: typeref) -> i32 { return 0; }
 │    ¦                            ^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_PARAM_TYPEREF` identifier not in snake_case
-│  → <root>/main.gpex53:37
+│  → <root>/main.gpex:53:37
 │    ¦ fn _fn_screaming_snake_case_typeref(_SCREAMING_SNAKE_CASE_PARAM_TYPEREF: typeref) -> i32 { return 0; }
 │    ¦                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴

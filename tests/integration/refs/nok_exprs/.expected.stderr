@@ -1,50 +1,50 @@
 error: expression is not a reference
-│  → <root>/main.gpex8:5
+│  → <root>/main.gpex:8:5
 │    ¦     false = true;
 │    ¦     ^^^^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex9:5
+│  → <root>/main.gpex:9:5
 │    ¦     true = false;
 │    ¦     ^^^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex10:5
+│  → <root>/main.gpex:10:5
 │    ¦     1.0 = 0.0;
 │    ¦     ^^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex11:5
+│  → <root>/main.gpex:11:5
 │    ¦     1 = 0;
 │    ¦     ^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex12:5
+│  → <root>/main.gpex:12:5
 │    ¦     1u = 0u;
 │    ¦     ^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex22:5
+│  → <root>/main.gpex:22:5
 │    ¦     i32 = u32;
 │    ¦     ^^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex33:5
+│  → <root>/main.gpex:33:5
 │    ¦     CONST = 0;
 │    ¦     ^^^^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex43:5
+│  → <root>/main.gpex:43:5
 │    ¦     called_fn() = 0;
 │    ¦     ^^^^^^^^^^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex56:5
+│  → <root>/main.gpex:56:5
 │    ¦     !0 = 0;
 │    ¦     ^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex69:5
+│  → <root>/main.gpex:69:5
 │    ¦     true + false = false;
 │    ¦     ^^^^^^^^^^^^
 ┴

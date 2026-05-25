@@ -1,18 +1,18 @@
 error: called function `fn_with_no_return(i32)` with no return type
-│  → <root>/main.gpex9:22
+│  → <root>/main.gpex:9:22
 │    ¦ var _result_direct = fn_with_no_return(0);
 │    ¦                      ^^^^^^^^^^^^^^^^^^^^
 ├─ info: function has no return type
-│  → <root>/main.gpex3:4
+│  → <root>/main.gpex:3:4
 │    ¦ fn fn_with_no_return(param: i32) {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: called function `fn_with_no_return(i32)` with no return type
-│  → <root>/main.gpex14:26
+│  → <root>/main.gpex:14:26
 │    ¦ repeat fn_with_no_return(fn_with_no_return(0));
 │    ¦                          ^^^^^^^^^^^^^^^^^^^^
 ├─ info: function has no return type
-│  → <root>/main.gpex3:4
+│  → <root>/main.gpex:3:4
 │    ¦ fn fn_with_no_return(param: i32) {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
