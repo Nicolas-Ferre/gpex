@@ -1,3 +1,5 @@
 error: `return` statement not at the end of the block
 │  → <root>/main.gpex:4:5
+│    ¦     return 0;
+│    ¦     ^^^^^^^^^
 ┴

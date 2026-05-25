@@ -1,3 +1,9 @@
 warning: empty statement block
 │  → <root>/main.gpex:3:10
+│    ¦ fn _fn() {
+│    ¦          ^
+│    ¦     // empty
+│    ¦ ^^^^^^^^^^^^
+│    ¦ }
+│    ¦ ^
 ┴

@@ -1,24 +1,40 @@
 warning: module importing itself
 │  → <root>/main.gpex:5:1
+│    ¦ import main; // self import
+│    ¦ ^^^^^^^^^^^^
 ┴
 warning: `unused` import unused
 │  → <root>/main.gpex:6:1
+│    ¦ import unused;
+│    ¦ ^^^^^^^^^^^^^^
 ┴
 warning: `duplicated` import unused
 │  → <root>/main.gpex:8:1
+│    ¦ import duplicated;
+│    ¦ ^^^^^^^^^^^^^^^^^^
 ┴
 warning: `CONST` item unused
 │  → <root>/main.gpex:14:7
+│    ¦ const CONST = 0;
+│    ¦       ^^^^^
 ┴
 warning: `var_` item unused
 │  → <root>/main.gpex:18:5
+│    ¦ var var_ = 0;
+│    ¦     ^^^^
 ┴
 warning: `fn_()` item unused
 │  → <root>/main.gpex:22:4
+│    ¦ fn fn_() -> i32 { return 0; }
+│    ¦    ^^^
 ┴
 warning: `__fn_with_double_underscore_prefix()` item unused
 │  → <root>/main.gpex:23:4
+│    ¦ fn __fn_with_double_underscore_prefix() -> i32 { return 0; }
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `param` item unused
 │  → <root>/main.gpex:27:8
+│    ¦ fn _fn(param: i32) -> i32 { return 0; }
+│    ¦        ^^^^^
 ┴

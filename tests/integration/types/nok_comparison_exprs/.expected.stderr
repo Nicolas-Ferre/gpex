@@ -1,60 +1,108 @@
 error: expression with invalid type `bool`
 │  → <root>/main.gpex:6:12
+│    ¦     return false;
+│    ¦            ^^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:5:24
+│    ¦ fn _fn_bool_false() -> i32 {
+│    ¦                        ^^^
 ┴
 error: expression with invalid type `bool`
 │  → <root>/main.gpex:9:12
+│    ¦     return true;
+│    ¦            ^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:8:23
+│    ¦ fn _fn_bool_true() -> i32 {
+│    ¦                       ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:12:12
+│    ¦     return 0.0;
+│    ¦            ^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:11:17
+│    ¦ fn _fn_f32() -> i32 {
+│    ¦                 ^^^
 ┴
 error: expression with invalid type `i32`
 │  → <root>/main.gpex:15:12
+│    ¦     return 0;
+│    ¦            ^
 ├─ info: expected `u32` type
 │  → <root>/main.gpex:14:17
+│    ¦ fn _fn_i32() -> u32 {
+│    ¦                 ^^^
 ┴
 error: expression with invalid type `u32`
 │  → <root>/main.gpex:18:12
+│    ¦     return 0u;
+│    ¦            ^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:17:17
+│    ¦ fn _fn_u32() -> i32 {
+│    ¦                 ^^^
 ┴
 error: expression with invalid type `typeref`
 │  → <root>/main.gpex:24:12
+│    ¦     return i32;
+│    ¦            ^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:23:21
+│    ¦ fn _fn_typeref() -> i32 {
+│    ¦                     ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:31:12
+│    ¦     return CONST;
+│    ¦            ^^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:30:21
+│    ¦ fn _fn_typeref() -> i32 {
+│    ¦                     ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:38:12
+│    ¦     return var_;
+│    ¦            ^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:37:21
+│    ¦ fn _fn_typeref() -> i32 {
+│    ¦                     ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:44:12
+│    ¦     return param;
+│    ¦            ^^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:43:31
+│    ¦ fn _fn_typeref(param: f32) -> i32 {
+│    ¦                               ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:50:12
+│    ¦     return called();
+│    ¦            ^^^^^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:49:18
+│    ¦ fn _fn_call() -> i32 {
+│    ¦                  ^^^
 ┴
 error: expression with invalid type `bool`
 │  → <root>/main.gpex:59:12
+│    ¦     return -true;
+│    ¦            ^^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:58:19
+│    ¦ fn _fn_unary() -> i32 {
+│    ¦                   ^^^
 ┴
 error: expression with invalid type `bool`
 │  → <root>/main.gpex:68:12
+│    ¦     return true + false;
+│    ¦            ^^^^^^^^^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:67:20
+│    ¦ fn _fn_binary() -> i32 {
+│    ¦                    ^^^
 ┴

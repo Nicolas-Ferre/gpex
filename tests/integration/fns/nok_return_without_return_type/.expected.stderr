@@ -1,5 +1,9 @@
 error: `return` statement in function with no return type
 │  → <root>/main.gpex:4:5
+│    ¦     return 0;
+│    ¦     ^^^^^^^^^
 ├─ info: function has no return type
 │  → <root>/main.gpex:3:4
+│    ¦ fn _fn() {
+│    ¦    ^^^
 ┴

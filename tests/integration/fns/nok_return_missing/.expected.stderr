@@ -1,20 +1,36 @@
 error: missing `return` statement
 │  → <root>/main.gpex:6:1
+│    ¦ }
+│    ¦ ^
 ├─ info: function has a return type
 │  → <root>/main.gpex:5:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
 ┴
 error: missing `return` statement
 │  → <root>/main.gpex:12:1
+│    ¦ }
+│    ¦ ^
 ├─ info: function has a return type
 │  → <root>/main.gpex:10:29
+│    ¦ const fn _fn(param: i32) -> u32 {
+│    ¦                             ^^^
 ┴
 error: missing `return` statement
 │  → <root>/main.gpex:18:1
+│    ¦ }
+│    ¦ ^
 ├─ info: function has a return type
 │  → <root>/main.gpex:16:43
+│    ¦ const fn UsedInFnSignature(param: i32) -> typeref {
+│    ¦                                           ^^^^^^^
 ┴
 error: missing `return` statement
 │  → <root>/main.gpex:27:1
+│    ¦ }
+│    ¦ ^
 ├─ info: function has a return type
 │  → <root>/main.gpex:25:47
+│    ¦ const fn used_in_const_context(param: i32) -> i32 {
+│    ¦                                               ^^^
 ┴
