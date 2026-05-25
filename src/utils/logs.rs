@@ -18,19 +18,15 @@ pub struct Log {
 
 impl Display for Log {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
-        writeln!(
-            formatter,
-            "{}: {}{}",
-            self.level,
-            self.msg,
-            if let Some(location) = &self.location {
-                format!(" (at {location})")
-            } else {
-                String::new()
-            }
-        )?; // no-coverage (difficult to test)
+        writeln!(formatter, "{}: {}", self.level, self.msg)?;
+        if let Some(location) = &self.location {
+            writeln!(formatter, "│  → {location}")?;
+        }
         for inner in &self.inner {
             write!(formatter, "{inner}")?;
+        }
+        if self.location.is_some() || !self.inner.is_empty() {
+            writeln!(formatter, "┴")?;
         }
         Ok(())
     }
@@ -69,17 +65,11 @@ pub struct LogInner {
 
 impl Display for LogInner {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
-        writeln!(
-            formatter,
-            "  --> {}: {}{}",
-            self.level,
-            self.msg,
-            if let Some(location) = &self.location {
-                format!(" (at {location})")
-            } else {
-                String::new()
-            }
-        )
+        writeln!(formatter, "├─ {}: {}", self.level, self.msg)?;
+        if let Some(location) = &self.location {
+            writeln!(formatter, "│  → {location}")?;
+        }
+        Ok(())
     }
 }
 

@@ -1,8 +1,18 @@
-error: expression with invalid type `bool` (at <root>/main.gpex:6:12)
-  --> info: expected `i32` type (at <root>/main.gpex:5:21)
-error: expression with invalid type `bool` (at <root>/main.gpex:12:13)
-  --> info: expected `i32` type (at <root>/main.gpex:12:5)
-error: expression with invalid type `bool` (at <root>/main.gpex:17:26)
-  --> info: expected `typeref` type
-error: expression with invalid type `bool` (at <root>/main.gpex:23:24)
-  --> info: expected `typeref` type
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:6:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:5:21
+┴
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:12:13
+├─ info: expected `i32` type
+│  → <root>/main.gpex:12:5
+┴
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:17:26
+├─ info: expected `typeref` type
+┴
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:23:24
+├─ info: expected `typeref` type
+┴

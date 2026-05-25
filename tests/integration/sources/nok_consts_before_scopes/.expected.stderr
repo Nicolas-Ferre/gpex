@@ -1,1 +1,3 @@
-error: `_SOURCE` item not found (at <root>/main.gpex:5:17)
+error: `_SOURCE` item not found
+│  → <root>/main.gpex:5:17
+┴

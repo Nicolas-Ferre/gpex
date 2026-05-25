@@ -1,2 +1,5 @@
-error: `fn_` item has circular dependencies (at <root>/main.gpex:5:4)
-  --> info: depends on itself (at <root>/main.gpex:6:12)
+error: `fn_` item has circular dependencies
+│  → <root>/main.gpex:5:4
+├─ info: depends on itself
+│  → <root>/main.gpex:6:12
+┴

@@ -1,3 +1,9 @@
-error: `source` item not found (at <root>/main.gpex:5:22)
-error: `fn_param_type(i32, typeref)` item not found (at <root>/main.gpex:12:29)
-error: `_source` item not found (at <root>/main.gpex:13:25)
+error: `source` item not found
+│  → <root>/main.gpex:5:22
+┴
+error: `fn_param_type(i32, typeref)` item not found
+│  → <root>/main.gpex:12:29
+┴
+error: `_source` item not found
+│  → <root>/main.gpex:13:25
+┴

@@ -1,2 +1,5 @@
-error: repeated function `fn_()` with a return type (at <root>/main.gpex:3:8)
-  --> info: function has a return type (at <root>/main.gpex:5:4)
+error: repeated function `fn_()` with a return type
+│  → <root>/main.gpex:3:8
+├─ info: function has a return type
+│  → <root>/main.gpex:5:4
+┴

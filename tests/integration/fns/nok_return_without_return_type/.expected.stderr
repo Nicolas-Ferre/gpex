@@ -1,2 +1,5 @@
-error: `return` statement in function with no return type (at <root>/main.gpex:4:5)
-  --> info: function has no return type (at <root>/main.gpex:3:4)
+error: `return` statement in function with no return type
+│  → <root>/main.gpex:4:5
+├─ info: function has no return type
+│  → <root>/main.gpex:3:4
+┴

@@ -1,24 +1,60 @@
-error: expression with invalid type `bool` (at <root>/main.gpex:6:12)
-  --> info: expected `i32` type (at <root>/main.gpex:5:24)
-error: expression with invalid type `bool` (at <root>/main.gpex:9:12)
-  --> info: expected `i32` type (at <root>/main.gpex:8:23)
-error: expression with invalid type `f32` (at <root>/main.gpex:12:12)
-  --> info: expected `i32` type (at <root>/main.gpex:11:17)
-error: expression with invalid type `i32` (at <root>/main.gpex:15:12)
-  --> info: expected `u32` type (at <root>/main.gpex:14:17)
-error: expression with invalid type `u32` (at <root>/main.gpex:18:12)
-  --> info: expected `i32` type (at <root>/main.gpex:17:17)
-error: expression with invalid type `typeref` (at <root>/main.gpex:24:12)
-  --> info: expected `i32` type (at <root>/main.gpex:23:21)
-error: expression with invalid type `f32` (at <root>/main.gpex:31:12)
-  --> info: expected `i32` type (at <root>/main.gpex:30:21)
-error: expression with invalid type `f32` (at <root>/main.gpex:38:12)
-  --> info: expected `i32` type (at <root>/main.gpex:37:21)
-error: expression with invalid type `f32` (at <root>/main.gpex:44:12)
-  --> info: expected `i32` type (at <root>/main.gpex:43:31)
-error: expression with invalid type `f32` (at <root>/main.gpex:50:12)
-  --> info: expected `i32` type (at <root>/main.gpex:49:18)
-error: expression with invalid type `bool` (at <root>/main.gpex:59:12)
-  --> info: expected `i32` type (at <root>/main.gpex:58:19)
-error: expression with invalid type `bool` (at <root>/main.gpex:68:12)
-  --> info: expected `i32` type (at <root>/main.gpex:67:20)
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:6:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:5:24
+┴
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:9:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:8:23
+┴
+error: expression with invalid type `f32`
+│  → <root>/main.gpex:12:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:11:17
+┴
+error: expression with invalid type `i32`
+│  → <root>/main.gpex:15:12
+├─ info: expected `u32` type
+│  → <root>/main.gpex:14:17
+┴
+error: expression with invalid type `u32`
+│  → <root>/main.gpex:18:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:17:17
+┴
+error: expression with invalid type `typeref`
+│  → <root>/main.gpex:24:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:23:21
+┴
+error: expression with invalid type `f32`
+│  → <root>/main.gpex:31:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:30:21
+┴
+error: expression with invalid type `f32`
+│  → <root>/main.gpex:38:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:37:21
+┴
+error: expression with invalid type `f32`
+│  → <root>/main.gpex:44:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:43:31
+┴
+error: expression with invalid type `f32`
+│  → <root>/main.gpex:50:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:49:18
+┴
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:59:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:58:19
+┴
+error: expression with invalid type `bool`
+│  → <root>/main.gpex:68:12
+├─ info: expected `i32` type
+│  → <root>/main.gpex:67:20
+┴

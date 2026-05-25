@@ -1,2 +1,4 @@
-error: `import` statement not at the top of the module (at <root>/main.gpex:4:1)
-  --> info: `import` statements should appear before anything else
+error: `import` statement not at the top of the module
+│  → <root>/main.gpex:4:1
+├─ info: `import` statements should appear before anything else
+┴

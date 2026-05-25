@@ -1,20 +1,50 @@
-error: expression not constant (at <root>/main.gpex:16:16)
-  --> info: expression must be constant (at <root>/main.gpex:16:1)
-error: expression not constant (at <root>/main.gpex:20:26)
-  --> info: expression must be constant (at <root>/main.gpex:20:24)
-error: expression not constant (at <root>/main.gpex:26:35)
-  --> info: expression must be constant (at <root>/main.gpex:26:32)
-error: expression not constant (at <root>/main.gpex:33:12)
-  --> info: expression must be constant (at <root>/main.gpex:32:1)
-error: expression not constant (at <root>/main.gpex:39:5)
-  --> info: expression must be constant (at <root>/main.gpex:38:1)
-error: expression not constant (at <root>/main.gpex:45:13)
-  --> info: expression must be constant (at <root>/main.gpex:44:1)
-error: expression not constant (at <root>/main.gpex:50:38)
-  --> info: expression must be constant (at <root>/main.gpex:50:1)
-error: expression not constant (at <root>/main.gpex:54:25)
-  --> info: expression must be constant (at <root>/main.gpex:54:1)
-error: expression not constant (at <root>/main.gpex:58:25)
-  --> info: expression must be constant (at <root>/main.gpex:58:1)
-error: expression not constant (at <root>/main.gpex:58:43)
-  --> info: expression must be constant (at <root>/main.gpex:58:1)
+error: expression not constant
+│  → <root>/main.gpex:16:16
+├─ info: expression must be constant
+│  → <root>/main.gpex:16:1
+┴
+error: expression not constant
+│  → <root>/main.gpex:20:26
+├─ info: expression must be constant
+│  → <root>/main.gpex:20:24
+┴
+error: expression not constant
+│  → <root>/main.gpex:26:35
+├─ info: expression must be constant
+│  → <root>/main.gpex:26:32
+┴
+error: expression not constant
+│  → <root>/main.gpex:33:12
+├─ info: expression must be constant
+│  → <root>/main.gpex:32:1
+┴
+error: expression not constant
+│  → <root>/main.gpex:39:5
+├─ info: expression must be constant
+│  → <root>/main.gpex:38:1
+┴
+error: expression not constant
+│  → <root>/main.gpex:45:13
+├─ info: expression must be constant
+│  → <root>/main.gpex:44:1
+┴
+error: expression not constant
+│  → <root>/main.gpex:50:38
+├─ info: expression must be constant
+│  → <root>/main.gpex:50:1
+┴
+error: expression not constant
+│  → <root>/main.gpex:54:25
+├─ info: expression must be constant
+│  → <root>/main.gpex:54:1
+┴
+error: expression not constant
+│  → <root>/main.gpex:58:25
+├─ info: expression must be constant
+│  → <root>/main.gpex:58:1
+┴
+error: expression not constant
+│  → <root>/main.gpex:58:43
+├─ info: expression must be constant
+│  → <root>/main.gpex:58:1
+┴
