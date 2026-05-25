@@ -1,6 +1,6 @@
 use owo_colors::colors::xterm::LightGray;
 use owo_colors::colors::{Blue, Red, Yellow};
-use owo_colors::{Color, OwoColorize, Stream::Stdout};
+use owo_colors::{Color, OwoColorize, Stream};
 use std::fmt::{Display, Formatter};
 use std::io;
 use std::ops::Range;
@@ -92,16 +92,17 @@ impl LogLocation {
         let start = self.line_column(self.span.start);
         let end = self.line_column(self.span.end);
         let rendered_lines = self.rendered_lines(start, end);
-        let location = format!("{}:{}:{}", self.path.display(), start.line, start.column);
-        writeln!(formatter, "│  → {}", italic(&location))?;
+        let location = format!("{}:{}:{}\n", self.path.display(), start.line, start.column);
+        write!(formatter, "│  → ")?;
+        fmt_italic(formatter, &location)?;
         for (line_number, line) in rendered_lines {
             let span_spaces = " ".repeat(Self::line_span_offset(start, line_number));
             let span_underline = "^".repeat(self.line_span_len(start, end, line_number, line));
-            let rendered_line = format!("¦ {line}");
-            let rendered_underline = format!("{span_spaces}{span_underline}");
-            writeln!(formatter, "│    {}", colored::<LightGray>(&rendered_line))?;
-            write!(formatter, "│    {}", colored::<LightGray>("¦ "))?;
-            writeln!(formatter, "{}", level.colored_str(&rendered_underline))?;
+            write!(formatter, "│    ")?;
+            fmt_colored::<LightGray>(formatter, &format!("¦ {line}\n"))?;
+            write!(formatter, "│    ")?;
+            fmt_colored::<LightGray>(formatter, "¦ ")?;
+            level.fmt_colored(formatter, &format!("{span_spaces}{span_underline}\n"))?;
         }
         Ok(())
     }
@@ -183,16 +184,16 @@ pub enum LogLevel {
 
 impl Display for LogLevel {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(formatter, "{}", self.colored_str(self.label()))
+        self.fmt_colored(formatter, self.label())
     }
 }
 
 impl LogLevel {
-    fn colored_str(self, string: &str) -> String {
+    fn fmt_colored(self, formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
         match self {
-            Self::Error => colored::<Red>(string),
-            Self::Warning => colored::<Yellow>(string),
-            Self::Info => colored::<Blue>(string),
+            Self::Error => fmt_colored::<Red>(formatter, string),
+            Self::Warning => fmt_colored::<Yellow>(formatter, string),
+            Self::Info => fmt_colored::<Blue>(formatter, string),
         }
     }
 
@@ -205,14 +206,18 @@ impl LogLevel {
     }
 }
 
-fn colored<C: Color>(string: &str) -> String {
-    string
-        .if_supports_color(Stdout, |text| text.fg::<C>())
-        .to_string()
+fn fmt_colored<C: Color>(formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
+    write!(
+        formatter,
+        "{}",
+        string.if_supports_color(Stream::Stdout, |string| string.fg::<C>())
+    )
 }
 
-fn italic(string: &str) -> String {
-    string
-        .if_supports_color(Stdout, |text| text.italic())
-        .to_string()
+fn fmt_italic(formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
+    write!(
+        formatter,
+        "{}",
+        string.if_supports_color(Stream::Stdout, |string| string.italic())
+    )
 }
