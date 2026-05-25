@@ -1,1 +1,3 @@
-error: `return` statement not at the end of the block (at <root>/main.gpex:4:5)
+error: `return` statement not at the end of the block
+│  → <root>/main.gpex:4:5
+┴

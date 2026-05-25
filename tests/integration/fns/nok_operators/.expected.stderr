@@ -1,45 +1,135 @@
-error: `__neg__()` unary operator function must have exactly one parameter (at <root>/main.gpex:5:4)
-error: `__not__()` unary operator function must have exactly one parameter (at <root>/main.gpex:8:4)
-error: `__neg__(i32, i32)` unary operator function must have exactly one parameter (at <root>/main.gpex:14:4)
-error: `__not__(i32, i32)` unary operator function must have exactly one parameter (at <root>/main.gpex:17:4)
-error: `__neg__(i32)` unary operator function without return type (at <root>/main.gpex:23:4)
-error: `__not__(i32)` unary operator function without return type (at <root>/main.gpex:26:4)
-error: `__add__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:32:4)
-error: `__sub__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:35:4)
-error: `__mul__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:38:4)
-error: `__div__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:41:4)
-error: `__mod__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:44:4)
-error: `__eq__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:47:4)
-error: `__ne__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:50:4)
-error: `__lt__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:53:4)
-error: `__le__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:56:4)
-error: `__gt__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:59:4)
-error: `__ge__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:62:4)
-error: `__and__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:65:4)
-error: `__or__(i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:68:4)
-error: `__add__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:74:4)
-error: `__sub__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:77:4)
-error: `__mul__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:80:4)
-error: `__div__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:83:4)
-error: `__mod__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:86:4)
-error: `__eq__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:89:4)
-error: `__ne__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:92:4)
-error: `__lt__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:95:4)
-error: `__le__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:98:4)
-error: `__gt__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:101:4)
-error: `__ge__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:104:4)
-error: `__and__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:107:4)
-error: `__or__(i32, i32, i32)` binary operator function must have exactly two parameters (at <root>/main.gpex:110:4)
-error: `__add__(i32, i32)` binary operator function without return type (at <root>/main.gpex:116:4)
-error: `__sub__(i32, i32)` binary operator function without return type (at <root>/main.gpex:119:4)
-error: `__mul__(i32, i32)` binary operator function without return type (at <root>/main.gpex:122:4)
-error: `__div__(i32, i32)` binary operator function without return type (at <root>/main.gpex:125:4)
-error: `__mod__(i32, i32)` binary operator function without return type (at <root>/main.gpex:128:4)
-error: `__eq__(i32, i32)` binary operator function without return type (at <root>/main.gpex:131:4)
-error: `__ne__(i32, i32)` binary operator function without return type (at <root>/main.gpex:134:4)
-error: `__lt__(i32, i32)` binary operator function without return type (at <root>/main.gpex:137:4)
-error: `__le__(i32, i32)` binary operator function without return type (at <root>/main.gpex:140:4)
-error: `__gt__(i32, i32)` binary operator function without return type (at <root>/main.gpex:143:4)
-error: `__ge__(i32, i32)` binary operator function without return type (at <root>/main.gpex:146:4)
-error: `__and__(i32, i32)` binary operator function without return type (at <root>/main.gpex:149:4)
-error: `__or__(i32, i32)` binary operator function without return type (at <root>/main.gpex:152:4)
+error: `__neg__()` unary operator function must have exactly one parameter
+│  → <root>/main.gpex:5:4
+┴
+error: `__not__()` unary operator function must have exactly one parameter
+│  → <root>/main.gpex:8:4
+┴
+error: `__neg__(i32, i32)` unary operator function must have exactly one parameter
+│  → <root>/main.gpex:14:4
+┴
+error: `__not__(i32, i32)` unary operator function must have exactly one parameter
+│  → <root>/main.gpex:17:4
+┴
+error: `__neg__(i32)` unary operator function without return type
+│  → <root>/main.gpex:23:4
+┴
+error: `__not__(i32)` unary operator function without return type
+│  → <root>/main.gpex:26:4
+┴
+error: `__add__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:32:4
+┴
+error: `__sub__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:35:4
+┴
+error: `__mul__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:38:4
+┴
+error: `__div__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:41:4
+┴
+error: `__mod__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:44:4
+┴
+error: `__eq__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:47:4
+┴
+error: `__ne__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:50:4
+┴
+error: `__lt__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:53:4
+┴
+error: `__le__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:56:4
+┴
+error: `__gt__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:59:4
+┴
+error: `__ge__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:62:4
+┴
+error: `__and__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:65:4
+┴
+error: `__or__(i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:68:4
+┴
+error: `__add__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:74:4
+┴
+error: `__sub__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:77:4
+┴
+error: `__mul__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:80:4
+┴
+error: `__div__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:83:4
+┴
+error: `__mod__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:86:4
+┴
+error: `__eq__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:89:4
+┴
+error: `__ne__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:92:4
+┴
+error: `__lt__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:95:4
+┴
+error: `__le__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:98:4
+┴
+error: `__gt__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:101:4
+┴
+error: `__ge__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:104:4
+┴
+error: `__and__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:107:4
+┴
+error: `__or__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/main.gpex:110:4
+┴
+error: `__add__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:116:4
+┴
+error: `__sub__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:119:4
+┴
+error: `__mul__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:122:4
+┴
+error: `__div__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:125:4
+┴
+error: `__mod__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:128:4
+┴
+error: `__eq__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:131:4
+┴
+error: `__ne__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:134:4
+┴
+error: `__lt__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:137:4
+┴
+error: `__le__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:140:4
+┴
+error: `__gt__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:143:4
+┴
+error: `__ge__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:146:4
+┴
+error: `__and__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:149:4
+┴
+error: `__or__(i32, i32)` binary operator function without return type
+│  → <root>/main.gpex:152:4
+┴

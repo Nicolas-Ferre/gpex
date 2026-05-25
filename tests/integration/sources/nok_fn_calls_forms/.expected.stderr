@@ -1,3 +1,9 @@
-error: `_mismatching_param_count()` item not found (at <root>/main.gpex:5:39)
-error: `_mismatching_param_type(u32)` item not found (at <root>/main.gpex:12:38)
-error: `unknown` item not found (at <root>/main.gpex:19:35)
+error: `_mismatching_param_count()` item not found
+│  → <root>/main.gpex:5:39
+┴
+error: `_mismatching_param_type(u32)` item not found
+│  → <root>/main.gpex:12:38
+┴
+error: `unknown` item not found
+│  → <root>/main.gpex:19:35
+┴

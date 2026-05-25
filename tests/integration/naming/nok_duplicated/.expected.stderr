@@ -1,9 +1,23 @@
-error: `_duplicated` item defined multiple times (at <root>/main.gpex:6:7)
-  --> info: item also defined here (at <root>/main.gpex:5:7)
-error: `_duplicated` item defined multiple times (at <root>/main.gpex:10:5)
-  --> info: item also defined here (at <root>/main.gpex:6:7)
-error: `_duplicated` item defined multiple times (at <root>/main.gpex:11:5)
-  --> info: item also defined here (at <root>/main.gpex:10:5)
-error: `_duplicated` parameter defined multiple times (at <root>/main.gpex:15:39)
-  --> info: parameter also defined here (at <root>/main.gpex:15:8)
-warning: `_duplicated` identifier not in SCREAMING_SNAKE_CASE (at <root>/main.gpex:5:7)
+error: `_duplicated` item defined multiple times
+│  → <root>/main.gpex:6:7
+├─ info: item also defined here
+│  → <root>/main.gpex:5:7
+┴
+error: `_duplicated` item defined multiple times
+│  → <root>/main.gpex:10:5
+├─ info: item also defined here
+│  → <root>/main.gpex:6:7
+┴
+error: `_duplicated` item defined multiple times
+│  → <root>/main.gpex:11:5
+├─ info: item also defined here
+│  → <root>/main.gpex:10:5
+┴
+error: `_duplicated` parameter defined multiple times
+│  → <root>/main.gpex:15:39
+├─ info: parameter also defined here
+│  → <root>/main.gpex:15:8
+┴
+warning: `_duplicated` identifier not in SCREAMING_SNAKE_CASE
+│  → <root>/main.gpex:5:7
+┴

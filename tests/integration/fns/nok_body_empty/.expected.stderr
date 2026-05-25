@@ -1,1 +1,3 @@
-warning: empty statement block (at <root>/main.gpex:3:10)
+warning: empty statement block
+│  → <root>/main.gpex:3:10
+┴
