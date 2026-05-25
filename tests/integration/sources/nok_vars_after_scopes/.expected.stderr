@@ -1,6 +1,10 @@
 error: `_source` item not found
-│  → <root>/main.gpex:5:22
+│  → <root>/main.gpex5:22
+│    ¦ var _result_global = _source;
+│    ¦                      ^^^^^^^
 ┴
 error: `_source` item not found
-│  → <root>/main.gpex:11:12
+│  → <root>/main.gpex11:12
+│    ¦     return _source;
+│    ¦            ^^^^^^^
 ┴

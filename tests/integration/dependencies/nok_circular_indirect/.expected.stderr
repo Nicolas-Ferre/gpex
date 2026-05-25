@@ -1,35 +1,69 @@
 error: `CONST1` item has circular dependencies
-│  → <root>/main1.gpex:7:11
+│  → <root>/main1.gpex7:11
+│    ¦ pub const CONST1 = CONST2;
+│    ¦           ^^^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:7:20
+│  → <root>/main1.gpex7:20
+│    ¦ pub const CONST1 = CONST2;
+│    ¦                    ^^^^^^
 ├─ info: depends on this item
-│  → <root>/main2.gpex:5:20
+│  → <root>/main2.gpex5:20
+│    ¦ pub const CONST2 = var1;
+│    ¦                    ^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:11:16
+│  → <root>/main1.gpex11:16
+│    ¦ pub var var1 = var2;
+│    ¦                ^^^^
 ├─ info: depends on this item
-│  → <root>/main2.gpex:9:16
+│  → <root>/main2.gpex9:16
+│    ¦ pub var var2 = call1;
+│    ¦                ^^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:15:24
+│  → <root>/main1.gpex15:24
+│    ¦ pub var call1 = called(call2);
+│    ¦                        ^^^^^
 ├─ info: depends on this item
-│  → <root>/main2.gpex:13:24
+│  → <root>/main2.gpex13:24
+│    ¦ pub var call2 = called(fn1_param_type(0));
+│    ¦                        ^^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:19:30
+│  → <root>/main1.gpex19:30
+│    ¦ pub fn fn1_param_type(param: fn2_param_type(0)) -> i32 {
+│    ¦                              ^^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main2.gpex:17:30
+│  → <root>/main2.gpex17:30
+│    ¦ pub fn fn2_param_type(param: fn1_return_type()) -> i32 {
+│    ¦                              ^^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:25:29
+│  → <root>/main1.gpex25:29
+│    ¦ pub fn fn1_return_type() -> fn2_return_type() {
+│    ¦                             ^^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main2.gpex:23:29
+│  → <root>/main2.gpex23:29
+│    ¦ pub fn fn2_return_type() -> fn1_return() {
+│    ¦                             ^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:32:12
+│  → <root>/main1.gpex32:12
+│    ¦     return fn2_return();
+│    ¦            ^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main2.gpex:30:12
+│  → <root>/main2.gpex30:12
+│    ¦     return fn1_assignment_left();
+│    ¦            ^^^^^^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:38:5
+│  → <root>/main1.gpex38:5
+│    ¦     fn2_assignment_left() = 0;
+│    ¦     ^^^^^^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main2.gpex:36:5
+│  → <root>/main2.gpex36:5
+│    ¦     fn1_assignment_right(0) = 0;
+│    ¦     ^^^^^^^^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/main1.gpex:44:13
+│  → <root>/main1.gpex44:13
+│    ¦     param = fn2_assignment_right(0);
+│    ¦             ^^^^^^^^^^^^^^^^^^^^^^^
 ├─ info: depends on itself
-│  → <root>/main2.gpex:42:13
+│  → <root>/main2.gpex42:13
+│    ¦     param = CONST1;
+│    ¦             ^^^^^^
 ┴

@@ -1,9 +1,15 @@
 error: `_mismatching_param_count()` item not found
-│  → <root>/main.gpex:5:39
+│  → <root>/main.gpex5:39
+│    ¦ var _result_mismatching_param_count = _mismatching_param_count();
+│    ¦                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `_mismatching_param_type(u32)` item not found
-│  → <root>/main.gpex:12:38
+│  → <root>/main.gpex12:38
+│    ¦ var _result_mismatching_param_type = _mismatching_param_type(0u);
+│    ¦                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `unknown` item not found
-│  → <root>/main.gpex:19:35
+│  → <root>/main.gpex19:35
+│    ¦ const fn unknown_return_type() -> unknown {
+│    ¦                                   ^^^^^^^
 ┴

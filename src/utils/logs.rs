@@ -20,7 +20,7 @@ impl Display for Log {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(formatter, "{}: {}", self.level, self.msg)?;
         if let Some(location) = &self.location {
-            writeln!(formatter, "│  → {location}")?;
+            location.fmt(formatter)?;
         }
         for inner in &self.inner {
             write!(formatter, "{inner}")?;
@@ -67,7 +67,7 @@ impl Display for LogInner {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(formatter, "├─ {}: {}", self.level, self.msg)?;
         if let Some(location) = &self.location {
-            writeln!(formatter, "│  → {location}")?;
+            location.fmt(formatter)?;
         }
         Ok(())
     }
@@ -86,10 +86,27 @@ pub struct LogLocation {
 
 impl Display for LogLocation {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let start = self.line_column(self.span.start);
+        let end = self.line_column(self.span.end);
+        let rendered_lines = self.rendered_lines(start, end);
+        write!(formatter, "│  → {}", self.path.display())?;
+        writeln!(formatter, ":{}:{}", start.line, start.column)?;
+        for (line_number, line) in rendered_lines {
+            let span_spaces = " ".repeat(Self::line_span_offset(start, line_number));
+            let span_underline = "^".repeat(self.line_span_len(start, end, line_number, line));
+            writeln!(formatter, "│    ¦ {line}")?;
+            writeln!(formatter, "│    ¦ {span_spaces}{span_underline}")?;
+        }
+        Ok(())
+    }
+}
+
+impl LogLocation {
+    fn line_column(&self, target_offset: usize) -> LocationCoords {
         let mut line = 1;
         let mut column = 1;
         for (offset, char) in self.code.char_indices() {
-            if offset == self.span.start {
+            if offset == target_offset {
                 break;
             } else if char == '\n' {
                 line += 1;
@@ -98,8 +115,55 @@ impl Display for LogLocation {
                 column += 1;
             }
         }
-        write!(formatter, "{}:{line}:{column}", self.path.display())
+        LocationCoords { line, column }
     }
+
+    fn rendered_lines(
+        &self,
+        start: LocationCoords,
+        end: LocationCoords,
+    ) -> impl Iterator<Item = (usize, &str)> {
+        self.code
+            .split('\n')
+            .enumerate()
+            .map(|(line_number, line)| (line_number + 1, line))
+            .skip(start.line - 1)
+            .take(end.line - start.line + 1)
+    }
+
+    fn line_span_offset(start: LocationCoords, line_number: usize) -> usize {
+        if line_number == start.line {
+            start.column - 1
+        } else {
+            0
+        }
+    }
+
+    fn line_span_len(
+        &self,
+        start: LocationCoords,
+        end: LocationCoords,
+        line_number: usize,
+        line: &str,
+    ) -> usize {
+        if line_number == start.line {
+            if start.line == end.line {
+                self.span.len()
+            } else {
+                line.chars().count() - start.column + 1
+            }
+        } else if line_number == end.line {
+            end.column - 1
+        } else {
+            line.chars().count()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+struct LocationCoords {
+    line: usize,
+    column: usize,
 }
 
 /// The level of a compilation log.

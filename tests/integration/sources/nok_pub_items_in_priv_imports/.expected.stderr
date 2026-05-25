@@ -1,18 +1,32 @@
 error: `CONST` item not found
-│  → <root>/main.gpex:5:21
+│  → <root>/main.gpex5:21
+│    ¦ var _result_const = CONST;
+│    ¦                     ^^^^^
 ├─ info: item can be imported from `imported_inner`
-│  → <root>/imported_inner.gpex:1:11
+│  → <root>/imported_inner.gpex1:11
+│    ¦ pub const CONST = 0;
+│    ¦           ^^^^^
 ┴
 error: `var_` item not found
-│  → <root>/main.gpex:6:19
+│  → <root>/main.gpex6:19
+│    ¦ var _result_var = var_;
+│    ¦                   ^^^^
 ├─ info: item can be imported from `imported_inner`
-│  → <root>/imported_inner.gpex:3:9
+│  → <root>/imported_inner.gpex3:9
+│    ¦ pub var var_ = 0;
+│    ¦         ^^^^
 ┴
 error: `fn_(i32)` item not found
-│  → <root>/main.gpex:7:18
+│  → <root>/main.gpex7:18
+│    ¦ var _result_fn = fn_(0);
+│    ¦                  ^^^^^^
 ├─ info: item can be imported from `imported_inner`
-│  → <root>/imported_inner.gpex:5:8
+│  → <root>/imported_inner.gpex5:8
+│    ¦ pub fn fn_(param: i32) -> i32 {
+│    ¦        ^^^
 ┴
 error: `param` item not found
-│  → <root>/main.gpex:8:21
+│  → <root>/main.gpex8:21
+│    ¦ var _result_param = param;
+│    ¦                     ^^^^^
 ┴

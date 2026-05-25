@@ -1,18 +1,30 @@
 error: expression with invalid type `bool`
-│  → <root>/main.gpex:6:12
+│  → <root>/main.gpex6:12
+│    ¦     return true;
+│    ¦            ^^^^
 ├─ info: expected `i32` type
-│  → <root>/main.gpex:5:21
+│  → <root>/main.gpex5:21
+│    ¦ fn _fn_typeref() -> i32 {
+│    ¦                     ^^^
 ┴
 error: expression with invalid type `bool`
-│  → <root>/main.gpex:12:13
+│  → <root>/main.gpex12:13
+│    ¦     param = true;
+│    ¦             ^^^^
 ├─ info: expected `i32` type
-│  → <root>/main.gpex:12:5
+│  → <root>/main.gpex12:5
+│    ¦     param = true;
+│    ¦     ^^^^^
 ┴
 error: expression with invalid type `bool`
-│  → <root>/main.gpex:17:26
+│  → <root>/main.gpex17:26
+│    ¦ fn _fn_param_type(param: true) -> i32 {
+│    ¦                          ^^^^
 ├─ info: expected `typeref` type
 ┴
 error: expression with invalid type `bool`
-│  → <root>/main.gpex:23:24
+│  → <root>/main.gpex23:24
+│    ¦ fn _fn_param_type() -> true {
+│    ¦                        ^^^^
 ├─ info: expected `typeref` type
 ┴

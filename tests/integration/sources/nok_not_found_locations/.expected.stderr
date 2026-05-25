@@ -1,111 +1,185 @@
 error: `error` item not found
-│  → <root>/main.gpex:7:12
+│  → <root>/main.gpex7:12
+│    ¦ var _var = error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:11:16
+│  → <root>/main.gpex11:16
+│    ¦ const _CONST = error;
+│    ¦                ^^^^^
 ┴
 error: `error()` item not found
-│  → <root>/main.gpex:15:8
+│  → <root>/main.gpex15:8
+│    ¦ repeat error();
+│    ¦        ^^^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:19:15
+│  → <root>/main.gpex19:15
+│    ¦ fn _fn(param: error) -> i32 {
+│    ¦               ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:25:13
+│  → <root>/main.gpex25:13
+│    ¦ fn _fn() -> error {
+│    ¦             ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:32:12
+│  → <root>/main.gpex32:12
+│    ¦     return error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:38:5
+│  → <root>/main.gpex38:5
+│    ¦     error = 0;
+│    ¦     ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:44:13
+│  → <root>/main.gpex44:13
+│    ¦     param = error;
+│    ¦             ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:49:18
+│  → <root>/main.gpex49:18
+│    ¦ var _call = call(error);
+│    ¦                  ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:53:13
+│  → <root>/main.gpex53:13
+│    ¦ var _neg = -error;
+│    ¦             ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:54:13
+│  → <root>/main.gpex54:13
+│    ¦ var _not = !error;
+│    ¦             ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:58:12
+│  → <root>/main.gpex58:12
+│    ¦ var _add = error + error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:58:20
+│  → <root>/main.gpex58:20
+│    ¦ var _add = error + error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:59:12
+│  → <root>/main.gpex59:12
+│    ¦ var _sub = error - error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:59:20
+│  → <root>/main.gpex59:20
+│    ¦ var _sub = error - error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:60:12
+│  → <root>/main.gpex60:12
+│    ¦ var _mul = error * error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:60:20
+│  → <root>/main.gpex60:20
+│    ¦ var _mul = error * error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:61:12
+│  → <root>/main.gpex61:12
+│    ¦ var _div = error / error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:61:20
+│  → <root>/main.gpex61:20
+│    ¦ var _div = error / error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:62:12
+│  → <root>/main.gpex62:12
+│    ¦ var _mod = error % error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:62:20
+│  → <root>/main.gpex62:20
+│    ¦ var _mod = error % error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:63:11
+│  → <root>/main.gpex63:11
+│    ¦ var _eq = error == error;
+│    ¦           ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:63:20
+│  → <root>/main.gpex63:20
+│    ¦ var _eq = error == error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:64:11
+│  → <root>/main.gpex64:11
+│    ¦ var _ne = error != error;
+│    ¦           ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:64:20
+│  → <root>/main.gpex64:20
+│    ¦ var _ne = error != error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:65:11
+│  → <root>/main.gpex65:11
+│    ¦ var _lt = error < error;
+│    ¦           ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:65:19
+│  → <root>/main.gpex65:19
+│    ¦ var _lt = error < error;
+│    ¦                   ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:66:11
+│  → <root>/main.gpex66:11
+│    ¦ var _le = error <= error;
+│    ¦           ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:66:20
+│  → <root>/main.gpex66:20
+│    ¦ var _le = error <= error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:67:11
+│  → <root>/main.gpex67:11
+│    ¦ var _gt = error > error;
+│    ¦           ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:67:19
+│  → <root>/main.gpex67:19
+│    ¦ var _gt = error > error;
+│    ¦                   ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:68:11
+│  → <root>/main.gpex68:11
+│    ¦ var _ge = error >= error;
+│    ¦           ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:68:20
+│  → <root>/main.gpex68:20
+│    ¦ var _ge = error >= error;
+│    ¦                    ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:69:12
+│  → <root>/main.gpex69:12
+│    ¦ var _and = error && error;
+│    ¦            ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:69:21
+│  → <root>/main.gpex69:21
+│    ¦ var _and = error && error;
+│    ¦                     ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:70:11
+│  → <root>/main.gpex70:11
+│    ¦ var _or = error || error;
+│    ¦           ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:70:20
+│  → <root>/main.gpex70:20
+│    ¦ var _or = error || error;
+│    ¦                    ^^^^^
 ┴

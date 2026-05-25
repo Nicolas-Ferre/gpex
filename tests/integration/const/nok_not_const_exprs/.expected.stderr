@@ -1,30 +1,54 @@
 error: expression not constant
-│  → <root>/main.gpex:6:21
+│  → <root>/main.gpex6:21
+│    ¦ const _RESULT_VAR = var_;
+│    ¦                     ^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:6:1
+│  → <root>/main.gpex6:1
+│    ¦ const _RESULT_VAR = var_;
+│    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:10:58
+│  → <root>/main.gpex10:58
+│    ¦ fn _fn_with_param_as_param_type(param1: typeref, param2: param1) -> i32 {
+│    ¦                                                          ^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:10:56
+│  → <root>/main.gpex10:56
+│    ¦ fn _fn_with_param_as_param_type(param1: typeref, param2: param1) -> i32 {
+│    ¦                                                        ^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:13:53
+│  → <root>/main.gpex13:53
+│    ¦ fn _fn_with_param_as_return_type(param: typeref) -> param {
+│    ¦                                                     ^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:13:50
+│  → <root>/main.gpex13:50
+│    ¦ fn _fn_with_param_as_return_type(param: typeref) -> param {
+│    ¦                                                  ^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:19:25
+│  → <root>/main.gpex19:25
+│    ¦ const _RESULT_FN_CALL = not_const_fn();
+│    ¦                         ^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:19:1
+│  → <root>/main.gpex19:1
+│    ¦ const _RESULT_FN_CALL = not_const_fn();
+│    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:26:23
+│  → <root>/main.gpex26:23
+│    ¦ const _RESULT_UNARY = -true;
+│    ¦                       ^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:26:1
+│  → <root>/main.gpex26:1
+│    ¦ const _RESULT_UNARY = -true;
+│    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:33:24
+│  → <root>/main.gpex33:24
+│    ¦ const _RESULT_BINARY = true + false;
+│    ¦                        ^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:33:1
+│  → <root>/main.gpex33:1
+│    ¦ const _RESULT_BINARY = true + false;
+│    ¦ ^^^^^
 ┴
