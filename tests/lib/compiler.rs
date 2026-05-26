@@ -42,6 +42,7 @@ fn compile_with_error() {
 #[test]
 #[expect(clippy::expect_used)]
 fn compile_missing_dir() {
+    owo_colors::set_override(false);
     let result = gpex::compile_program(Path::new("tests/lib/missing"), false);
     let errors = result.expect_err("compilation should generate logs");
     assert_eq!(errors.len(), 1);

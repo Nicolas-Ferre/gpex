@@ -1,3 +1,6 @@
+use owo_colors::colors::xterm::LightGray;
+use owo_colors::colors::{Blue, Red, Yellow};
+use owo_colors::{Color, OwoColorize, Stream};
 use std::fmt::{Display, Formatter};
 use std::io;
 use std::ops::Range;
@@ -20,7 +23,7 @@ impl Display for Log {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(formatter, "{}: {}", self.level, self.msg)?;
         if let Some(location) = &self.location {
-            location.fmt(formatter)?;
+            location.fmt(formatter, self.level)?;
         }
         for inner in &self.inner {
             write!(formatter, "{inner}")?;
@@ -67,7 +70,7 @@ impl Display for LogInner {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(formatter, "├─ {}: {}", self.level, self.msg)?;
         if let Some(location) = &self.location {
-            location.fmt(formatter)?;
+            location.fmt(formatter, self.level)?;
         }
         Ok(())
     }
@@ -84,24 +87,26 @@ pub struct LogLocation {
     pub span: Range<usize>,
 }
 
-impl Display for LogLocation {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+impl LogLocation {
+    fn fmt(&self, formatter: &mut Formatter<'_>, level: LogLevel) -> std::fmt::Result {
         let start = self.line_column(self.span.start);
         let end = self.line_column(self.span.end);
         let rendered_lines = self.rendered_lines(start, end);
-        write!(formatter, "│  → {}", self.path.display())?;
-        writeln!(formatter, ":{}:{}", start.line, start.column)?;
+        let location = format!("{}:{}:{}\n", self.path.display(), start.line, start.column);
+        write!(formatter, "│  → ")?;
+        fmt_italic(formatter, &location)?;
         for (line_number, line) in rendered_lines {
             let span_spaces = " ".repeat(Self::line_span_offset(start, line_number));
             let span_underline = "^".repeat(self.line_span_len(start, end, line_number, line));
-            writeln!(formatter, "│    ¦ {line}")?;
-            writeln!(formatter, "│    ¦ {span_spaces}{span_underline}")?;
+            write!(formatter, "│    ")?;
+            fmt_colored::<LightGray>(formatter, &format!("¦ {line}\n"))?;
+            write!(formatter, "│    ")?;
+            fmt_colored::<LightGray>(formatter, "¦ ")?;
+            level.fmt_colored(formatter, &format!("{span_spaces}{span_underline}\n"))?;
         }
         Ok(())
     }
-}
 
-impl LogLocation {
     fn line_column(&self, target_offset: usize) -> LocationCoords {
         let mut line = 1;
         let mut column = 1;
@@ -179,10 +184,40 @@ pub enum LogLevel {
 
 impl Display for LogLevel {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        self.fmt_colored(formatter, self.label())
+    }
+}
+
+impl LogLevel {
+    fn fmt_colored(self, formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
         match self {
-            Self::Error => write!(formatter, "error"),
-            Self::Warning => write!(formatter, "warning"),
-            Self::Info => write!(formatter, "info"),
+            Self::Error => fmt_colored::<Red>(formatter, string),
+            Self::Warning => fmt_colored::<Yellow>(formatter, string),
+            Self::Info => fmt_colored::<Blue>(formatter, string),
         }
     }
+
+    fn label(self) -> &'static str {
+        match self {
+            Self::Error => "error",
+            Self::Warning => "warning",
+            Self::Info => "info",
+        }
+    }
+}
+
+fn fmt_colored<C: Color>(formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
+    write!(
+        formatter,
+        "{}",
+        string.if_supports_color(Stream::Stdout, |string| string.fg::<C>())
+    )
+}
+
+fn fmt_italic(formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
+    write!(
+        formatter,
+        "{}",
+        string.if_supports_color(Stream::Stdout, |string| string.italic())
+    )
 }

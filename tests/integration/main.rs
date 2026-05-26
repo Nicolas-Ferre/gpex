@@ -20,6 +20,7 @@ const EXPECTED_CONST_REGEX: &str = r"const +(\w+) *= *([^;]*); *// expected: *(.
 const EXPECTED_PATTERN: &str = "// expected";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    owo_colors::set_override(false);
     let runtime = Arc::new(Runtime::new()?);
     let args = Arguments::from_args();
     let mut trials = vec![];
