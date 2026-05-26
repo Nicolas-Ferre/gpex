@@ -4,7 +4,7 @@
 // coverage: off (difficult to test)
 
 use clap::Parser;
-use gpex::{Log, Program, Runner};
+use gpex::{Log, LogLevel, Program, Runner};
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Parser)]
@@ -47,7 +47,13 @@ fn compile(args: &CompileArgs) {
         display_log(&errors);
         std::process::exit(1);
     } else {
-        println!("info: program saved in \"{}\"", args.output.display());
+        let log = Log {
+            level: LogLevel::Info,
+            msg: format!("program saved in \"{}\"", args.output.display()),
+            location: None,
+            inner: vec![],
+        };
+        eprint!("{log}");
     }
 }
 
@@ -90,9 +96,15 @@ async fn run_program(program: Program, args: &RunArgs) {
         runner.run_step();
         for var_path in &args.var_paths {
             if let Some(value) = runner.read_var(var_path) {
-                println!("info: {var_path} = `{value}`");
+                println!("{var_path} = `{value}`");
             } else {
-                println!("warning: `{var_path}` variable not found");
+                let log = Log {
+                    level: LogLevel::Warning,
+                    msg: format!("`{var_path}` variable not found"),
+                    location: None,
+                    inner: vec![],
+                };
+                eprint!("{log}");
             }
         }
     }
@@ -100,6 +112,6 @@ async fn run_program(program: Program, args: &RunArgs) {
 
 fn display_log(logs: &[Log]) {
     for log in logs {
-        print!("{log}");
+        eprint!("{log}");
     }
 }
