@@ -210,7 +210,7 @@ fn fmt_colored<C: Color>(formatter: &mut Formatter<'_>, string: &str) -> std::fm
     write!(
         formatter,
         "{}",
-        string.if_supports_color(Stream::Stdout, |string| string.fg::<C>())
+        string.if_supports_color(Stream::Stderr, |string| string.fg::<C>())
     )
 }
 
@@ -218,6 +218,6 @@ fn fmt_italic(formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
     write!(
         formatter,
         "{}",
-        string.if_supports_color(Stream::Stdout, |string| string.italic())
+        string.if_supports_color(Stream::Stderr, |string| string.italic())
     )
 }
