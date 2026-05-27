@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use owo_colors::colors::xterm::LightGray;
 use owo_colors::colors::{Blue, Red, Yellow};
 use owo_colors::{Color, OwoColorize, Stream};
@@ -5,6 +6,8 @@ use std::fmt::{Display, Formatter};
 use std::io;
 use std::ops::Range;
 use std::path::{Path, PathBuf};
+
+const TAB_WIDTH: usize = 4;
 
 /// A compilation log.
 #[derive(Debug)]
@@ -96,10 +99,11 @@ impl LogLocation {
         write!(formatter, "│  → ")?;
         fmt_italic(formatter, &location)?;
         for (line_number, line) in rendered_lines {
-            let span_spaces = " ".repeat(Self::line_span_offset(start, line_number));
-            let span_underline = "^".repeat(self.line_span_len(start, end, line_number, line));
+            let displayed_line = Self::displayed_line(line);
+            let span_spaces = " ".repeat(Self::line_span_offset(start, line_number, line));
+            let span_underline = "^".repeat(Self::line_span_len(start, end, line_number, line));
             write!(formatter, "│    ")?;
-            fmt_colored::<LightGray>(formatter, &format!("¦ {line}\n"))?;
+            fmt_colored::<LightGray>(formatter, &format!("¦ {displayed_line}\n"))?;
             write!(formatter, "│    ")?;
             fmt_colored::<LightGray>(formatter, "¦ ")?;
             level.fmt_colored(formatter, &format!("{span_spaces}{span_underline}\n"))?;
@@ -136,16 +140,15 @@ impl LogLocation {
             .take(end.line - start.line + 1)
     }
 
-    fn line_span_offset(start: LocationCoords, line_number: usize) -> usize {
+    fn line_span_offset(start: LocationCoords, line_number: usize, line: &str) -> usize {
         if line_number == start.line {
-            start.column - 1
+            Self::displayed_span_len(line, 1, start.column)
         } else {
             0
         }
     }
 
     fn line_span_len(
-        &self,
         start: LocationCoords,
         end: LocationCoords,
         line_number: usize,
@@ -153,15 +156,49 @@ impl LogLocation {
     ) -> usize {
         if line_number == start.line {
             if start.line == end.line {
-                self.span.len()
+                Self::displayed_span_len(line, start.column, end.column).max(1)
             } else {
-                line.chars().count() - start.column + 1
+                Self::displayed_span_len(line, start.column, line.chars().count() + 1)
             }
         } else if line_number == end.line {
-            end.column - 1
+            Self::displayed_span_len(line, 0, end.column)
         } else {
-            line.chars().count()
+            Self::displayed_span_len(line, 0, line.chars().count() + 1)
         }
+    }
+
+    fn displayed_line(line: &str) -> String {
+        let mut line_offset = 0;
+        line.chars()
+            .map(|char| {
+                if char == '\t' {
+                    let tab_size = TAB_WIDTH - line_offset % TAB_WIDTH;
+                    line_offset += tab_size;
+                    " ".repeat(tab_size)
+                } else {
+                    line_offset += 1;
+                    char.to_string()
+                }
+            })
+            .join("")
+    }
+
+    fn displayed_span_len(line: &str, column_start: usize, column_end: usize) -> usize {
+        let mut line_offset = 0;
+        let mut span_len = 0;
+        for (index, char) in line.chars().enumerate() {
+            let column = index + 1;
+            let char_len = if char == '\t' {
+                TAB_WIDTH - line_offset % TAB_WIDTH
+            } else {
+                1
+            };
+            line_offset += char_len;
+            if column >= column_start && column < column_end {
+                span_len += char_len;
+            }
+        }
+        span_len
     }
 }
 
