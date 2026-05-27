@@ -1,0 +1,6 @@
+// Test tabs in compiler log code snippet (must be correctly displayed).
+
+fn _empty_body()
+	{
+	//	tabulated
+	}

@@ -1,0 +1,9 @@
+warning: empty statement block
+│  → <root>/main.gpex:4:2
+│    ¦     {
+│    ¦     ^
+│    ¦     //  tabulated
+│    ¦ ^^^^^^^^^^^^^^^^^
+│    ¦     }
+│    ¦ ^^^^^
+┴
