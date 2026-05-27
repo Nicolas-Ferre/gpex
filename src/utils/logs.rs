@@ -158,12 +158,12 @@ impl LogLocation {
             if start.line == end.line {
                 Self::displayed_span_len(line, start.column, end.column).max(1)
             } else {
-                Self::displayed_span_len(line, start.column + 1, line.len()).max(1)
+                Self::displayed_span_len(line, start.column, line.chars().count() + 1)
             }
         } else if line_number == end.line {
             Self::displayed_span_len(line, 0, end.column)
         } else {
-            Self::displayed_span_len(line, 0, line.len() + 1)
+            Self::displayed_span_len(line, 0, line.chars().count() + 1)
         }
     }
 
