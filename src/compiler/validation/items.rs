@@ -86,7 +86,11 @@ impl Validator<'_, '_> {
     }
 
     fn validate_struct(&mut self, node: &StructDefinition) -> Result<(), ValidateError> {
-        validators::item::check_prelude_location(ItemRef::Struct(node), true, &mut self.context)?;
+        validators::item::check_prelude_location(
+            ItemRef::Struct(node),
+            Some(node.compilerimpl_keyword_span),
+            &mut self.context,
+        )?;
         Ok(())
     }
 

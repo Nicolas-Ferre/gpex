@@ -162,7 +162,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             return ConstValue::RuntimeValue;
         }
         match &node.body {
-            FnBody::Compilerimpl => self.fn_compilerimpl_value(node),
+            FnBody::Compilerimpl(_) => self.fn_compilerimpl_value(node),
             FnBody::Statements(body) => self.fn_body_value(body),
         }
     }

@@ -76,7 +76,7 @@ impl ItemRef<'_> {
         match self {
             Self::Var(node) => node.name_span,
             Self::Const(node) => node.name_span,
-            Self::Struct(node) => node.name_span,
+            Self::Struct(_) => unreachable!("struct name span is never used"),
             Self::Fn(node) => node.name_span,
             Self::Param(node) => node.name_span,
         }

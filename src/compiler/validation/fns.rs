@@ -11,13 +11,13 @@ use crate::utils::validation::ValidateError;
 impl Validator<'_, '_> {
     pub(super) fn validate_fn(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Fn(node);
-        let is_compilerimpl = matches!(node.body, FnBody::Compilerimpl);
+        let compilerimpl_span = node.body.compilerimpl_keyword_span();
         let mut dependency_resolver =
             DependencyResolver::new(DependencyType::CycleDetection, self.indexes);
         let dependency_result = dependency_resolver.scan_fn(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
-        validators::item::check_prelude_location(ref_, is_compilerimpl, &mut self.context)?;
-        self.validate_params(&node.params, is_compilerimpl)?;
+        validators::item::check_prelude_location(ref_, compilerimpl_span, &mut self.context)?;
+        self.validate_params(&node.params, compilerimpl_span.is_some())?;
         self.validate_fn_return_type(node)?;
         validators::item::check_unary_operator_fn(node, &mut self.context, self.indexes)?;
         validators::item::check_binary_operator_fn(node, &mut self.context, self.indexes)?;
@@ -82,8 +82,13 @@ impl Validator<'_, '_> {
                 .validate_statement(statement, node.const_keyword_span)
                 .is_err();
             if let Statement::Return(return_) = statement {
+                let next_statement_span = body
+                    .statements
+                    .get(index + 1)
+                    .map_or(body.body_end_span, Statement::span);
                 is_error_detected |= validators::statement::check_return_before_end(
                     return_.span,
+                    next_statement_span,
                     index,
                     body.statements.len(),
                     &mut self.context,
@@ -95,8 +100,13 @@ impl Validator<'_, '_> {
             return Err(ValidateError);
         }
         if let Some(return_type) = &node.return_type {
+            let previous_statement_span = body
+                .statements
+                .last()
+                .map_or(body.body_start_span, Statement::span);
             let return_statement = validators::statement::check_missing_return(
                 &body.statements,
+                previous_statement_span,
                 body.body_end_span,
                 return_type.span(),
                 &mut self.context,
@@ -111,7 +121,7 @@ impl Validator<'_, '_> {
         } else {
             validators::statement::check_disallowed_return(
                 &body.statements,
-                node.name_span,
+                node,
                 &mut self.context,
             )?;
             validators::statement::check_empty_block(

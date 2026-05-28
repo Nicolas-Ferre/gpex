@@ -113,19 +113,21 @@ pub(crate) fn check_unique_params(
 
 pub(crate) fn check_prelude_location(
     item: ItemRef<'_>,
-    is_compiler_impl: bool,
+    compilerimpl_keyword_span: Option<Span>,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if !is_compiler_impl || item.file_index() == PRELUDE_FILE_INDEX {
-        Ok(())
-    } else {
+    if let Some(compilerimpl_keyword_span) = compilerimpl_keyword_span
+        && item.file_index() != PRELUDE_FILE_INDEX
+    {
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: "forbidden `compilerimpl` item outside prelude".into(),
-            location: Some(context.location(item.name_span())),
+            location: Some(context.location(compilerimpl_keyword_span)),
             inner: vec![],
         });
         Err(ValidateError)
+    } else {
+        Ok(())
     }
 }
 
