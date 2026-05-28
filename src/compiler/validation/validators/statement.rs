@@ -1,10 +1,12 @@
+use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::statements::{ReturnStatement, Statement};
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_return_before_end(
-    span: Span,
+    return_span: Span,
+    next_statement_span: Span,
     position: usize,
     statement_count: usize,
     context: &mut ValidateContext<'_>,
@@ -16,8 +18,12 @@ pub(crate) fn check_return_before_end(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: "`return` statement not at the end of the block".into(),
-            location: Some(context.location(span)),
-            inner: vec![],
+            location: Some(context.location(return_span)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                msg: "this statement is after".into(),
+                location: Some(context.location(next_statement_span)),
+            }],
         });
         Err(ValidateError)
     }
@@ -25,6 +31,7 @@ pub(crate) fn check_return_before_end(
 
 pub(crate) fn check_missing_return<'statement>(
     statements: &'statement [Statement],
+    previous_statement_span: Span,
     block_end_span: Span,
     return_type_span: Span,
     context: &mut ValidateContext<'_>,
@@ -35,7 +42,7 @@ pub(crate) fn check_missing_return<'statement>(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: "missing `return` statement".into(),
-            location: Some(context.location(block_end_span)),
+            location: Some(context.location(previous_statement_span.until(block_end_span))),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "function has a return type".into(),
@@ -48,7 +55,7 @@ pub(crate) fn check_missing_return<'statement>(
 
 pub(crate) fn check_disallowed_return(
     statements: &[Statement],
-    fn_name_span: Span,
+    fn_: &FnDefinition,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
     let mut result = Ok(());
@@ -61,7 +68,7 @@ pub(crate) fn check_disallowed_return(
                 inner: vec![LogInner {
                     level: LogLevel::Info,
                     msg: "function has no return type".into(),
-                    location: Some(context.location(fn_name_span)),
+                    location: Some(context.location(fn_.signature_span)),
                 }],
             });
             result = Err(ValidateError);

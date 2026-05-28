@@ -1,5 +1,7 @@
 error: missing `return` statement
-│  → <root>/main.gpex:6:1
+│  → <root>/main.gpex:5:17
+│    ¦ fn _fn() -> i32 {
+│    ¦                 ^
 │    ¦ }
 │    ¦ ^
 ├─ info: function has a return type
@@ -8,7 +10,9 @@ error: missing `return` statement
 │    ¦             ^^^
 ┴
 error: missing `return` statement
-│  → <root>/main.gpex:12:1
+│  → <root>/main.gpex:11:5
+│    ¦     param = 0;
+│    ¦     ^^^^^^^^^^
 │    ¦ }
 │    ¦ ^
 ├─ info: function has a return type
@@ -17,7 +21,9 @@ error: missing `return` statement
 │    ¦                             ^^^
 ┴
 error: missing `return` statement
-│  → <root>/main.gpex:18:1
+│  → <root>/main.gpex:17:5
+│    ¦     param = 0;
+│    ¦     ^^^^^^^^^^
 │    ¦ }
 │    ¦ ^
 ├─ info: function has a return type
@@ -26,7 +32,9 @@ error: missing `return` statement
 │    ¦                                           ^^^^^^^
 ┴
 error: missing `return` statement
-│  → <root>/main.gpex:27:1
+│  → <root>/main.gpex:26:5
+│    ¦     param = 0;
+│    ¦     ^^^^^^^^^^
 │    ¦ }
 │    ¦ ^
 ├─ info: function has a return type

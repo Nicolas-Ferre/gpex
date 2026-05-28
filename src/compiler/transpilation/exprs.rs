@@ -42,7 +42,7 @@ impl Transpiler<'_, '_> {
     fn transpile_call(&mut self, node: &Call) {
         match self.indexes.sources[&node.id] {
             ItemRef::Fn(child) => match child.body {
-                FnBody::Compilerimpl => self.transpile_compilerimpl_fn_call(node),
+                FnBody::Compilerimpl(_) => self.transpile_compilerimpl_fn_call(node),
                 FnBody::Statements(_) => self.transpile_custom_fn_call(node, child),
             },
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {

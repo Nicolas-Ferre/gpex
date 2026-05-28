@@ -19,6 +19,13 @@ impl Statement {
             &|context| AssignmentStatement::parse(context).map(Self::Assignment),
         ])
     }
+
+    pub(crate) fn span(&self) -> Span {
+        match self {
+            Self::Return(statement) => statement.span,
+            Self::Assignment(statement) => statement.span,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -34,9 +41,9 @@ impl ReturnStatement {
         let value = Expr::parse(context, |context| {
             Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ())
         })?;
-        let semicolon_keyword_span = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
+        let semicolon_span = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(Self {
-            span: return_keyword_span.until(semicolon_keyword_span),
+            span: return_keyword_span.until(semicolon_span),
             value,
         })
     }
@@ -44,6 +51,7 @@ impl ReturnStatement {
 
 #[derive(Debug)]
 pub(crate) struct AssignmentStatement {
+    pub(crate) span: Span,
     pub(crate) assigned: Expr,
     pub(crate) value: Expr,
 }
@@ -58,7 +66,11 @@ impl AssignmentStatement {
         let value = Expr::parse(context, |context| {
             Span::parse_symbol(context, SEMICOLON_SYMBOL).map(|_| ())
         })?;
-        Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
-        Ok(Self { assigned, value })
+        let semicolon_span = Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
+        Ok(Self {
+            span: assigned.span().until(semicolon_span),
+            assigned,
+            value,
+        })
     }
 }

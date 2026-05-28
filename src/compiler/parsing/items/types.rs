@@ -25,6 +25,8 @@ pub(crate) struct StructDefinition {
     pub(crate) name_span: Span,
     #[derive_where(skip)]
     pub(crate) name: String,
+    #[derive_where(skip)]
+    pub(crate) compilerimpl_keyword_span: Span,
 }
 
 impl StructDefinition {
@@ -38,7 +40,7 @@ impl StructDefinition {
             context.force_parse_any_error();
             let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
             Span::parse_symbol(context, EQUAL_SYMBOL)?;
-            Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
+            let compilerimpl_keyword_span = Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
             Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
             Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
             Ok(Self {
@@ -47,6 +49,7 @@ impl StructDefinition {
                 pub_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),
+                compilerimpl_keyword_span,
             })
         })
     }

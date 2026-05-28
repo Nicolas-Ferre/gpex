@@ -99,6 +99,7 @@ impl FnDefinition {
         Ok(FnBody::Statements(FnStatementsBody {
             statements,
             body_span: body_start_span.until(body_end_span),
+            body_start_span,
             body_end_span,
         }))
     }
@@ -107,21 +108,31 @@ impl FnDefinition {
         context: &mut ParseContext<'context>,
     ) -> Result<FnBody, ParseError<'context>> {
         Span::parse_symbol(context, EQUAL_SYMBOL)?;
-        Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
+        let compilerimpl_keyword_span = Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
         Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
-        Ok(FnBody::Compilerimpl)
+        Ok(FnBody::Compilerimpl(compilerimpl_keyword_span))
     }
 }
 
 #[derive(Debug)]
 pub(crate) enum FnBody {
-    Compilerimpl,
+    Compilerimpl(Span),
     Statements(FnStatementsBody),
+}
+
+impl FnBody {
+    pub(crate) fn compilerimpl_keyword_span(&self) -> Option<Span> {
+        match self {
+            Self::Compilerimpl(span) => Some(*span),
+            Self::Statements(_) => None,
+        }
+    }
 }
 
 #[derive(Debug)]
 pub(crate) struct FnStatementsBody {
     pub(crate) statements: Vec<Statement>,
     pub(crate) body_span: Span,
+    pub(crate) body_start_span: Span,
     pub(crate) body_end_span: Span,
 }
