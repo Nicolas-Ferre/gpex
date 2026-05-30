@@ -1,7 +1,7 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::parsing::items::params::Param;
+use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::types::TypeResolver;
@@ -71,7 +71,7 @@ impl ItemNodeRef for ItemRef<'_> {
     }
 }
 
-impl ItemRef<'_> {
+impl<'item> ItemRef<'item> {
     pub(crate) fn name_span(self) -> Span {
         match self {
             Self::Var(node) => node.name_span,
@@ -83,12 +83,7 @@ impl ItemRef<'_> {
     }
 
     pub(crate) fn has_same_param_types_as_args(self, args: &[Expr], indexes: &Indexes<'_>) -> bool {
-        let params = match self {
-            ItemRef::Fn(node) => &node.params,
-            ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
-                unreachable!("only functions can have parameters")
-            }
-        };
+        let params = self.params();
         debug_assert_eq!(params.params.len(), args.len());
         let type_resolver = TypeResolver::new(indexes);
         params
@@ -96,5 +91,14 @@ impl ItemRef<'_> {
             .iter()
             .zip(args)
             .all(|(param, arg)| type_resolver.param_type(param) == type_resolver.expr_type(arg))
+    }
+
+    pub(crate) fn params(self) -> &'item ParamGroup {
+        match self {
+            ItemRef::Fn(item) => &item.params,
+            ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
+                unreachable!("only functions can have parameters")
+            }
+        }
     }
 }

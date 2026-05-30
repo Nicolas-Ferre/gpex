@@ -2,19 +2,13 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
+use crate::compiler::parsing::items::params::Param;
 use crate::compiler::validation::{Validator, validators};
-use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 
 impl Validator<'_, '_> {
-    pub(crate) fn validate_expr(
-        &mut self,
-        node: &Expr,
-        const_mark_span: Option<Span>,
-    ) -> Result<(), ValidateError> {
-        let previous_const_mark_span = self.const_mark_span;
-        self.const_mark_span = const_mark_span;
-        let result = match node {
+    pub(crate) fn validate_expr(&mut self, node: &Expr) -> Result<(), ValidateError> {
+        match node {
             Expr::F32Literal(child) => self.validate_f32_literal(child),
             Expr::U32Literal(child) => self.validate_u32_literal(child),
             Expr::I32Literal(child) => self.validate_i32_literal(child),
@@ -27,9 +21,7 @@ impl Validator<'_, '_> {
             )
             .and_then(|()| self.validate_call(child)),
             Expr::Ident(child) => self.validate_ident(child),
-        };
-        self.const_mark_span = previous_const_mark_span;
-        result
+        }
     }
 
     pub(crate) fn validate_f32_literal(&mut self, node: &F32Literal) -> Result<(), ValidateError> {
@@ -45,14 +37,22 @@ impl Validator<'_, '_> {
     }
 
     pub(crate) fn validate_call(&mut self, node: &Call) -> Result<(), ValidateError> {
+        let source = self.indexes.sources.get(&node.id).copied();
         let mut is_error_detected = false;
-        for arg in &node.args {
-            is_error_detected |= self.validate_expr(arg, self.const_mark_span).is_err(); // no-fn-check (recursivity)
+        for (index, arg) in node.args.iter().enumerate() {
+            let param = source.map(|source| &source.params().params[index]);
+            let const_mark_span = param
+                .and_then(Param::const_mark_span)
+                .or(self.const_mark_span);
+            self.with_const_mark_span(const_mark_span, |self_| {
+                is_error_detected |= self_.validate_expr(arg).is_err(); // no-fn-check (recursivity)
+            });
         }
         if is_error_detected {
             return Err(ValidateError);
         }
         let source = validators::item::check_found(
+            source,
             node,
             node.span,
             &node.key(),
@@ -73,7 +73,9 @@ impl Validator<'_, '_> {
     }
 
     pub(crate) fn validate_ident(&mut self, node: &Ident) -> Result<(), ValidateError> {
+        let source = self.indexes.sources.get(&node.id).copied();
         let source = validators::item::check_found(
+            source,
             node,
             node.span,
             &node.slice,

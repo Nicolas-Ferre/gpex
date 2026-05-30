@@ -133,4 +133,16 @@ impl<'item, 'index> Validator<'item, 'index> {
             }
         }
     }
+
+    fn with_const_mark_span<O>(
+        &mut self,
+        span: Option<Span>,
+        callback: impl FnOnce(&mut Self) -> O,
+    ) -> O {
+        let previous_const_mark_span = self.const_mark_span;
+        self.const_mark_span = span;
+        let output = callback(self);
+        self.const_mark_span = previous_const_mark_span;
+        output
+    }
 }

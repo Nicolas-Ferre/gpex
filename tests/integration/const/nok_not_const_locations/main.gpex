@@ -45,9 +45,16 @@ const fn _fn_assignment_right(param: i32) {
     param = not_const_value;
 }
 
-// =========================| Function call argument |=========================
+// =========================| Function call argument in constant context |=========================
 
-const _FN_CALL_ARG = called_const_fn(not_const_value);
+const _FN_CALL_ARG_CONST_CONTEXT = called_const_fn(not_const_value);
+
+// =========================| Constant function call argument |=========================
+
+const _RESULT_CONST_CALL_ARG = const_param(0, not_const_value, 0);
+fn const_param(_param1: const i32, param2: const i32, _param3: const i32) -> i32 {
+    return param2;
+}
 
 // =========================| Unary operator operand |=========================
 

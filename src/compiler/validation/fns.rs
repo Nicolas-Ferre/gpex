@@ -5,7 +5,6 @@ use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use crate::compiler::types::Type;
 use crate::compiler::validation::validators::ident::Case;
 use crate::compiler::validation::{Validator, validators};
-use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 
 impl Validator<'_, '_> {
@@ -61,7 +60,7 @@ impl Validator<'_, '_> {
         let (Some(arrow_span), Some(return_type)) = (node.arrow_span, &node.return_type) else {
             return Ok(());
         };
-        self.validate_expr(return_type, Some(arrow_span))?;
+        self.with_const_mark_span(Some(arrow_span), |self_| self_.validate_expr(return_type))?;
         validators::expr::check_types(
             return_type.span(),
             self.type_resolver.expr_type(return_type),
@@ -77,25 +76,25 @@ impl Validator<'_, '_> {
             return Ok(());
         };
         let mut is_error_detected = false;
-        for (index, statement) in body.statements.iter().enumerate() {
-            is_error_detected |= self
-                .validate_statement(statement, node.const_keyword_span)
-                .is_err();
-            if let Statement::Return(return_) = statement {
-                let next_statement_span = body
-                    .statements
-                    .get(index + 1)
-                    .map_or(body.body_end_span, Statement::span);
-                is_error_detected |= validators::statement::check_return_before_end(
-                    return_.span,
-                    next_statement_span,
-                    index,
-                    body.statements.len(),
-                    &mut self.context,
-                )
-                .is_err();
+        self.with_const_mark_span(node.const_keyword_span, |self_| {
+            for (index, statement) in body.statements.iter().enumerate() {
+                is_error_detected |= self_.validate_statement(statement).is_err();
+                if let Statement::Return(return_) = statement {
+                    let next_statement_span = body
+                        .statements
+                        .get(index + 1)
+                        .map_or(body.body_end_span, Statement::span);
+                    is_error_detected |= validators::statement::check_return_before_end(
+                        return_.span,
+                        next_statement_span,
+                        index,
+                        body.statements.len(),
+                        &mut self_.context,
+                    )
+                    .is_err();
+                }
             }
-        }
+        });
         if is_error_detected {
             return Err(ValidateError);
         }
@@ -133,21 +132,11 @@ impl Validator<'_, '_> {
         Ok(())
     }
 
-    fn validate_statement(
-        &mut self,
-        node: &Statement,
-        const_mark_span: Option<Span>,
-    ) -> Result<(), ValidateError> {
-        let previous_const_mark_span = self.const_mark_span;
-        self.const_mark_span = const_mark_span;
-        let result = match node {
-            Statement::Return(statement) => {
-                self.validate_expr(&statement.value, self.const_mark_span)
-            }
+    fn validate_statement(&mut self, node: &Statement) -> Result<(), ValidateError> {
+        match node {
+            Statement::Return(statement) => self.validate_expr(&statement.value),
             Statement::Assignment(statement) => self.validate_assignment_statement(statement),
-        };
-        self.const_mark_span = previous_const_mark_span;
-        result
+        }
     }
 
     fn validate_assignment_statement(
@@ -164,7 +153,7 @@ impl Validator<'_, '_> {
         node: &AssignmentStatement,
     ) -> Result<(), ValidateError> {
         validators::expr::check_ref(&node.assigned, &mut self.context, self.indexes);
-        self.validate_expr(&node.assigned, self.const_mark_span)?;
+        self.validate_expr(&node.assigned)?;
         Ok(())
     }
 
@@ -172,7 +161,7 @@ impl Validator<'_, '_> {
         &mut self,
         node: &AssignmentStatement,
     ) -> Result<(), ValidateError> {
-        self.validate_expr(&node.value, self.const_mark_span)?;
+        self.validate_expr(&node.value)?;
         validators::expr::check_types(
             node.value.span(),
             self.type_resolver.expr_type(&node.value),

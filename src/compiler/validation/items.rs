@@ -53,7 +53,7 @@ impl Validator<'_, '_> {
         validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
         validators::ident::check_char_count(node.name_span, &mut self.context);
         validators::ident::check_case(node.name_span, &[Case::Snake], &mut self.context);
-        self.validate_expr(&node.default_value, None)?;
+        self.validate_expr(&node.default_value)?;
         Ok(())
     }
 
@@ -68,7 +68,9 @@ impl Validator<'_, '_> {
         validators::ident::check_char_count(node.name_span, &mut self.context);
         let allowed_cases = self.const_allowed_cases(node);
         validators::ident::check_case(node.name_span, allowed_cases, &mut self.context);
-        self.validate_expr(&node.value, Some(node.const_keyword_span))?;
+        self.with_const_mark_span(Some(node.const_keyword_span), |self_| {
+            self_.validate_expr(&node.value)
+        })?;
         Ok(())
     }
 
@@ -111,7 +113,9 @@ impl Validator<'_, '_> {
         is_compilerimpl: bool,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Param(param);
-        self.validate_expr(&param.type_, Some(param.colon_span))?;
+        self.with_const_mark_span(Some(param.colon_span), |self_| {
+            self_.validate_expr(&param.type_)
+        })?;
         validators::expr::check_types(
             param.type_.span(),
             self.type_resolver.expr_type(&param.type_),

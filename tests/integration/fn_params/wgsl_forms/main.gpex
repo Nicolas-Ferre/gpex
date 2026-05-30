@@ -1,0 +1,17 @@
+// Test all forms of function parameters (must be correctly transpiled).
+
+// =========================| Copy |=========================
+
+var _result_copy = copy_param(1); // expected: 1
+fn copy_param(param: i32) -> i32 {
+    return param;
+}
+
+// =========================| Constant |=========================
+
+var _result_const_same_value_1 = const_param(2, 2u); // expected: 2
+var _result_const_same_value_2 = const_param(2, 3u); // expected: 2
+var _result_const_other_value = const_param(3, 4u); // expected: 3
+fn const_param(param: const i32, _other_param: u32) -> i32 {
+    return param;
+}
