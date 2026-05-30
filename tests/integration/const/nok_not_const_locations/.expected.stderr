@@ -62,9 +62,9 @@ error: expression not constant
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:54:47
-│    ¦ const _RESULT_CONST_CALL_ARG = const_param(0, not_const_value, 0);
-│    ¦                                               ^^^^^^^^^^^^^^^
+│  → <root>/main.gpex:54:45
+│    ¦ var _result_const_call_arg = const_param(0, not_const_value, 0);
+│    ¦                                             ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
 │  → <root>/main.gpex:55:44
 │    ¦ fn const_param(_param1: const i32, param2: const i32, _param3: const i32) -> i32 {
