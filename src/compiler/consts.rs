@@ -44,7 +44,7 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
             ItemRef::Var(_) => false,
             ItemRef::Const(_) | ItemRef::Struct(_) => true,
             ItemRef::Fn(node) => node.const_keyword_span.is_some(),
-            ItemRef::Param(_) => self.is_in_const_fn,
+            ItemRef::Param(node) => node.const_mark_span().is_some() || self.is_in_const_fn,
         }
     }
 
