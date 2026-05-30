@@ -2,7 +2,7 @@ use crate::compiler::parsing;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::symbols::{
-    COLON_SYMBOL, COMMA_SYMBOL, PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL,
+    COLON_SYMBOL, COMMA_SYMBOL, CONST_KEYWORD, PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL,
 };
 use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
@@ -47,13 +47,23 @@ pub(crate) struct Param {
     #[derive_where(skip)]
     pub(crate) colon_span: Span,
     #[derive_where(skip)]
+    pub(crate) qualifier: ParamQualifier,
+    #[derive_where(skip)]
     pub(crate) type_: Expr,
 }
 
 impl Param {
+    pub(crate) fn const_mark_span(&self) -> Option<Span> {
+        match self.qualifier {
+            ParamQualifier::None => None,
+            ParamQualifier::Const(span) => Some(span),
+        }
+    }
+
     fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
         let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
         let colon_span = Span::parse_symbol(context, COLON_SYMBOL)?;
+        let qualifier = ParamQualifier::parse(context)?;
         let type_ = Expr::parse(context, parsing::arg_stop_excluded_parser)?;
         Ok(Self {
             id: context.next_id(),
@@ -61,7 +71,23 @@ impl Param {
             name_span,
             name: context.slice(name_span).into(),
             colon_span,
+            qualifier,
             type_,
         })
+    }
+}
+
+#[derive(Debug)]
+pub(crate) enum ParamQualifier {
+    None,
+    Const(Span),
+}
+
+impl ParamQualifier {
+    fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
+        context.parse_any(&[
+            &|context| Span::parse_symbol(context, CONST_KEYWORD).map(Self::Const),
+            &|_| Ok(Self::None),
+        ])
     }
 }

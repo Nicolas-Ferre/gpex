@@ -173,6 +173,7 @@ pub(crate) fn check_usage(
 }
 
 pub(crate) fn check_found<'index>(
+    source: Option<ItemRef<'index>>,
     node: impl NodeRef,
     span: Span,
     key: &str,
@@ -180,8 +181,8 @@ pub(crate) fn check_found<'index>(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'index>,
 ) -> Result<ItemRef<'index>, ValidateError> {
-    if let Some(source) = indexes.sources.get(&node.id()) {
-        Ok(*source)
+    if let Some(source) = source {
+        Ok(source)
     } else {
         context.logs.push(Log {
             level: LogLevel::Error,

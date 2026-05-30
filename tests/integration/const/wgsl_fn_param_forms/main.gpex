@@ -1,0 +1,15 @@
+// Test all forms of function parameters in constant context (must be correctly transpiled).
+
+// =========================| Copy |=========================
+
+const _RESULT_COPY = copy_param(1); // expected: 1
+const fn copy_param(param: i32) -> i32 {
+    return param;
+}
+
+// =========================| Constant |=========================
+
+const _RESULT_CONST = const_param(2); // expected: 2
+const fn const_param(param: const i32) -> i32 {
+    return param;
+}

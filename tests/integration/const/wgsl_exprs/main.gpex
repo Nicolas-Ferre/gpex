@@ -16,6 +16,16 @@ const fn fn_returning_param(param: i32) -> i32 {
     return param;
 }
 
+// =========================| Function constant parameter reference |=========================
+
+var _result_const_fn_param = outer_const_param(7); // expected: 7
+fn outer_const_param(param: const i32) -> i32 {
+    return inner_const_param(param);
+}
+fn inner_const_param(param: const i32) -> i32 {
+    return param;
+}
+
 // =========================| Function call |=========================
 
 const _RESULT_FN_CALL = called_fn(); // expected: 3
