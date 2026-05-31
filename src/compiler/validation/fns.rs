@@ -1,3 +1,4 @@
+use crate::compiler::consts::ConstLocation;
 use crate::compiler::dependencies::{DependencyResolver, DependencyType};
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
@@ -20,23 +21,22 @@ impl Validator<'_, '_> {
         self.validate_fn_return_type(node)?;
         validators::item::check_unary_operator_fn(node, &mut self.context, self.indexes)?;
         validators::item::check_binary_operator_fn(node, &mut self.context, self.indexes)?;
-        self.run_with_fn_constness(node.const_keyword_span.is_some(), |self_| {
-            self_.validate_fn_statements(node)
-        })?;
+        self.validate_body(node)?;
         self.validate_fn_name(node);
         let fn_key = self.key_renderer.fn_key(node)?;
         validators::item::check_usage(ref_, &fn_key, &mut self.context, self.indexes);
         Ok(())
     }
 
-    fn run_with_fn_constness<O>(
+    pub(super) fn run_with_const_location<O>(
         &mut self,
-        is_in_const_fn: bool,
+        const_location: ConstLocation,
         callback: impl FnOnce(&mut Self) -> O,
     ) -> O {
-        self.const_checker.set_is_in_const_fn(is_in_const_fn);
+        let previous_const_location = self.const_checker.location;
+        self.const_checker.location = const_location;
         let result = callback(self);
-        self.const_checker.set_is_in_const_fn(false);
+        self.const_checker.location = previous_const_location;
         result
     }
 
@@ -68,6 +68,18 @@ impl Validator<'_, '_> {
             Type::Struct(self.indexes.search_prelude_type("typeref")),
             &mut self.context,
         )?;
+        Ok(())
+    }
+
+    fn validate_body(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
+        let body_const_location = if node.const_keyword_span.is_some() {
+            ConstLocation::ConstFnBody
+        } else {
+            ConstLocation::Other
+        };
+        self.run_with_const_location(body_const_location, |self_| {
+            self_.validate_fn_statements(node)
+        })?;
         Ok(())
     }
 

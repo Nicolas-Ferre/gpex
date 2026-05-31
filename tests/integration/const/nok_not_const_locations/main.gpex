@@ -49,6 +49,16 @@ const fn _fn_assignment_right(param: i32) {
 
 const _FN_CALL_ARG_CONST_CONTEXT = called_const_fn(not_const_value);
 
+// =========================| Function call argument in not constant context |=========================
+
+const fn outer_fn_call_arg_non_const_context(param: i32) -> i32 {
+    return inner_fn_call_arg_non_const_context(param);
+}
+
+const fn inner_fn_call_arg_non_const_context(param: const i32) -> i32 {
+    return param;
+}
+
 // =========================| Constant function call argument |=========================
 
 var _result_const_call_arg = const_param(0, not_const_value, 0);

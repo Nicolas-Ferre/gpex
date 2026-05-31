@@ -12,20 +12,16 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct ConstChecker<'item, 'index> {
-    is_in_const_fn: bool,
+    pub(crate) location: ConstLocation,
     indexes: &'index Indexes<'item>,
 }
 
 impl<'item, 'index> ConstChecker<'item, 'index> {
     pub(crate) fn new(indexes: &'index Indexes<'item>) -> Self {
         Self {
-            is_in_const_fn: false,
+            location: ConstLocation::Other,
             indexes,
         }
-    }
-
-    pub(crate) fn set_is_in_const_fn(&mut self, is_in_const_fn: bool) {
-        self.is_in_const_fn = is_in_const_fn;
     }
 
     pub(crate) fn is_expr_const(&self, node: &Expr) -> bool {
@@ -44,7 +40,11 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
             ItemRef::Var(_) => false,
             ItemRef::Const(_) | ItemRef::Struct(_) => true,
             ItemRef::Fn(node) => node.const_keyword_span.is_some(),
-            ItemRef::Param(node) => node.const_mark_span().is_some() || self.is_in_const_fn,
+            ItemRef::Param(node) => match self.location {
+                ConstLocation::ConstFnBody => true,
+                ConstLocation::ConstCallArg => node.const_mark_span().is_some(),
+                ConstLocation::Other => false,
+            },
         }
     }
 
@@ -62,6 +62,13 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
             .is_some_and(|source| self.is_item_const(*source))
             && node.args.iter().all(|arg| self.is_expr_const(arg))
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum ConstLocation {
+    ConstFnBody,
+    ConstCallArg,
+    Other,
 }
 
 #[derive(Debug)]
