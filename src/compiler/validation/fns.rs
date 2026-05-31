@@ -28,18 +28,6 @@ impl Validator<'_, '_> {
         Ok(())
     }
 
-    pub(super) fn run_with_const_location<O>(
-        &mut self,
-        const_location: ConstLocation,
-        callback: impl FnOnce(&mut Self) -> O,
-    ) -> O {
-        let previous_const_location = self.const_checker.location;
-        self.const_checker.location = const_location;
-        let result = callback(self);
-        self.const_checker.location = previous_const_location;
-        result
-    }
-
     fn validate_fn_name(&mut self, node: &FnDefinition) {
         let typeref_type = self.indexes.search_prelude_type("typeref");
         let may_return_typeref = match self.type_resolver.fn_type(node) {
