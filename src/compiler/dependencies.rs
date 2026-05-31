@@ -1,4 +1,4 @@
-use crate::compiler::consts::ConstChecker;
+use crate::compiler::consts::{ConstChecker, ConstLocation};
 use crate::compiler::indexing::indexer::FN_CALL_SEARCH_CONFIG;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
@@ -185,13 +185,17 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
         callback: impl FnOnce(&mut Self) -> O,
     ) -> O {
         let previous_fn_config = self.fn_config;
+        let previous_const_location = self.const_checker.location;
         self.fn_config = config;
-        self.const_checker
-            .set_is_in_const_fn(self.fn_config.is_fn_const && self.fn_config.are_args_const);
+        self.const_checker.location = if self.fn_config.is_fn_const && self.fn_config.are_args_const
+        {
+            ConstLocation::ConstFnBody
+        } else {
+            ConstLocation::Other
+        };
         let output = callback(self);
         self.fn_config = previous_fn_config;
-        self.const_checker
-            .set_is_in_const_fn(self.fn_config.is_fn_const && self.fn_config.are_args_const);
+        self.const_checker.location = previous_const_location;
         output
     }
 }

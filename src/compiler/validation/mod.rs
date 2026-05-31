@@ -5,7 +5,7 @@ mod fns;
 mod items;
 mod validators;
 
-use crate::compiler::consts::ConstChecker;
+use crate::compiler::consts::{ConstChecker, ConstLocation};
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::items::Item;
@@ -132,6 +132,18 @@ impl<'item, 'index> Validator<'item, 'index> {
                 );
             }
         }
+    }
+
+    fn run_with_const_location<O>(
+        &mut self,
+        location: ConstLocation,
+        callback: impl FnOnce(&mut Self) -> O,
+    ) -> O {
+        let previous_const_location = self.const_checker.location;
+        self.const_checker.location = location;
+        let result = callback(self);
+        self.const_checker.location = previous_const_location;
+        result
     }
 
     fn with_const_mark_span<O>(

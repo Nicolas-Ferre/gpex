@@ -1,3 +1,4 @@
+use crate::compiler::consts::ConstLocation;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -41,11 +42,17 @@ impl Validator<'_, '_> {
         let mut is_error_detected = false;
         for (index, arg) in node.args.iter().enumerate() {
             let param = source.map(|source| &source.params().params[index]);
-            let const_mark_span = param
-                .and_then(Param::const_mark_span)
-                .or(self.const_mark_span);
-            self.with_const_mark_span(const_mark_span, |self_| {
-                is_error_detected |= self_.validate_expr(arg).is_err(); // no-fn-check (recursivity)
+            let param_const_mark_span = param.and_then(Param::const_mark_span);
+            let const_mark_span = param_const_mark_span.or(self.const_mark_span);
+            let const_location = if param_const_mark_span.is_some() {
+                ConstLocation::ConstCallArg
+            } else {
+                self.const_checker.location
+            };
+            self.run_with_const_location(const_location, |self_| {
+                self_.with_const_mark_span(const_mark_span, |self_| {
+                    is_error_detected |= self_.validate_expr(arg).is_err(); // no-fn-check (recursivity)
+                });
             });
         }
         if is_error_detected {
