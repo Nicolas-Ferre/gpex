@@ -26,7 +26,8 @@ impl<'item, 'index> RefChecker<'item, 'index> {
 
     fn is_ident_ref(&self, node: &Ident) -> Option<bool> {
         Some(match self.indexes.sources.get(&node.id)? {
-            ItemRef::Var(_) | ItemRef::Param(_) => true,
+            ItemRef::Var(_) => true,
+            ItemRef::Param(source) => source.const_mark_span().is_none(),
             ItemRef::Const(_) | ItemRef::Struct(_) => false,
             ItemRef::Fn(_) => unreachable!("identifier should not refer to a function"),
         })
