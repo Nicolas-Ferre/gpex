@@ -35,16 +35,21 @@ error: expression is not a reference
 ┴
 error: expression is not a reference
 │  → <root>/main.gpex:43:5
+│    ¦     param = 0;
+│    ¦     ^^^^^
+┴
+error: expression is not a reference
+│  → <root>/main.gpex:53:5
 │    ¦     called_fn() = 0;
 │    ¦     ^^^^^^^^^^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex:56:5
+│  → <root>/main.gpex:66:5
 │    ¦     !0 = 0;
 │    ¦     ^^
 ┴
 error: expression is not a reference
-│  → <root>/main.gpex:69:5
+│  → <root>/main.gpex:79:5
 │    ¦     true + false = false;
 │    ¦     ^^^^^^^^^^^^
 ┴
