@@ -4,7 +4,7 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
@@ -41,9 +41,9 @@ impl<'item> Transpiler<'item, '_> {
 
     fn transpile_call(&mut self, node: &Call) {
         match self.indexes.sources[&node.id] {
-            ItemRef::Fn(child) => match child.body {
+            ItemRef::Fn(child) => match &child.body {
                 FnBody::Compilerimpl(_) => self.transpile_compilerimpl_fn_call(node),
-                FnBody::Statements(_) => self.transpile_custom_fn_call(node, child),
+                FnBody::Statements(body) => self.transpile_custom_fn_call(node, child, body),
             },
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
                 unreachable!("function calls cannot reference values")
@@ -61,8 +61,13 @@ impl<'item> Transpiler<'item, '_> {
         }
     }
 
-    fn transpile_custom_fn_call(&mut self, node: &Call, child: &'item FnDefinition) {
-        let specialized_fn_id = self.register_specialized_fn(node, child);
+    fn transpile_custom_fn_call(
+        &mut self,
+        node: &Call,
+        child: &'item FnDefinition,
+        body: &'item FnStatementsBody,
+    ) {
+        let specialized_fn_id = self.register_specialized_fn(node, child, body);
         _ = write!(self.shader, "_{}_{specialized_fn_id}", child.id);
         self.shader += "(";
         for (arg, param) in node.args.iter().zip(&child.params.params) {
@@ -74,7 +79,12 @@ impl<'item> Transpiler<'item, '_> {
         self.shader += ")";
     }
 
-    fn register_specialized_fn(&mut self, node: &Call, child: &'item FnDefinition) -> usize {
+    fn register_specialized_fn(
+        &mut self,
+        node: &Call,
+        child: &'item FnDefinition,
+        body: &'item FnStatementsBody,
+    ) -> usize {
         let const_param_values = node
             .args
             .iter()
@@ -88,6 +98,7 @@ impl<'item> Transpiler<'item, '_> {
             .entry(SpecializedFn {
                 fn_: child,
                 const_param_values,
+                fn_body: body,
             })
             .or_insert(specialized_fn_id)
     }

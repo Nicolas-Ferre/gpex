@@ -2,9 +2,9 @@
 
 struct Buffer {
     ident3: i32,
-    ident6: i32,
-    ident7: i32,
-    ident8: i32
+    ident6: f32,
+    ident7: f32,
+    ident8: f32
 }
 
 @group(0) @binding(0)
@@ -18,14 +18,14 @@ fn main() {
     b.ident3 = ident4ident2(i32(1));
 }
 
-fn ident9ident0(ident10_const: u32) -> i32 {
+fn ident9ident0(ident10_const: u32) -> f32 {
     var ident10 = ident10_const;
-    return i32(3);
+    return f32(3.0);
 }
 
-fn ident9ident1(ident10_const: u32) -> i32 {
+fn ident9ident1(ident10_const: u32) -> f32 {
     var ident10 = ident10_const;
-    return i32(2);
+    return f32(2.0);
 }
 
 fn ident4ident2(ident5_const: i32) -> i32 {
@@ -38,9 +38,9 @@ fn ident4ident2(ident5_const: i32) -> i32 {
 
 struct Buffer {
     ident0: i32,
-    ident1: i32,
-    ident2: i32,
-    ident3: i32
+    ident1: f32,
+    ident2: f32,
+    ident3: f32
 }
 
 @group(0) @binding(0)

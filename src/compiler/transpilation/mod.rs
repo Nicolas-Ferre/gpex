@@ -7,7 +7,7 @@ use crate::compiler::consts::{ConstResolver, ConstValue};
 use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
-use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::parsing::items::fns::{FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::modules::Module;
@@ -259,8 +259,11 @@ impl<'item, 'index> Transpiler<'item, 'index> {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, Clone)]
+#[derive_where::derive_where(PartialEq, Eq, Hash)]
 pub(crate) struct SpecializedFn<'item> {
     fn_: &'item FnDefinition,
     const_param_values: Vec<ConstValue<'item>>,
+    #[derive_where(skip)]
+    fn_body: &'item FnStatementsBody,
 }

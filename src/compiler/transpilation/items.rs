@@ -1,5 +1,4 @@
 use crate::compiler::consts::ConstValue;
-use crate::compiler::parsing::items::fns::FnBody;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
@@ -15,9 +14,6 @@ impl<'item> Transpiler<'item, '_> {
         }
         self.const_resolver.enter_scope();
         let source = &node.fn_;
-        let FnBody::Statements(body) = &source.body else {
-            return;
-        };
         let id = source.id;
         _ = write!(self.shader, "fn _{id}_{fn_index}");
         self.transpile_params(&source.params, node.const_param_values.into_iter());
@@ -28,7 +24,7 @@ impl<'item> Transpiler<'item, '_> {
             _ = write!(self.shader, " {{ ");
         }
         self.transpile_mut_param_definitions(&source.params);
-        for statement in &body.statements {
+        for statement in &node.fn_body.statements {
             self.transpile_statement(statement);
         }
         _ = write!(self.shader, " }}");
