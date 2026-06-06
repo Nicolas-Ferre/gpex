@@ -5,7 +5,6 @@ use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
@@ -14,26 +13,18 @@ use crate::utils::dependencies::Dependencies;
 use crate::utils::indexing::{SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum DependencyType {
-    CycleDetection,
-    Transpilation,
-}
-
 #[derive(Debug)]
 pub(crate) struct DependencyResolver<'item, 'index> {
     pub(crate) dependencies: Dependencies<ItemRef<'item>>,
-    type_: DependencyType,
     const_checker: ConstChecker<'item, 'index>,
     fn_config: FnConfig,
     indexes: &'index Indexes<'item>,
 }
 
 impl<'item, 'index> DependencyResolver<'item, 'index> {
-    pub(crate) fn new(type_: DependencyType, indexes: &'index Indexes<'item>) -> Self {
+    pub(crate) fn new(indexes: &'index Indexes<'item>) -> Self {
         Self {
             dependencies: Dependencies::new(),
-            type_,
             const_checker: ConstChecker::new(indexes),
             fn_config: FnConfig {
                 is_fn_const: false,
@@ -78,10 +69,6 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
         })
     }
 
-    pub(crate) fn scan_repeat(&mut self, node: &RepeatDefinition) -> Result<(), Vec<Span>> {
-        self.scan_call(&node.call)
-    }
-
     fn scan_statement(&mut self, node: &Statement) -> Result<(), Vec<Span>> {
         match node {
             Statement::Return(child) => self.scan_expr(&child.value)?,
@@ -94,9 +81,6 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
     }
 
     fn scan_expr(&mut self, node: &Expr) -> Result<(), Vec<Span>> {
-        if self.type_ == DependencyType::Transpilation && self.const_checker.is_expr_const(node) {
-            return Ok(());
-        }
         match node {
             Expr::F32Literal(_)
             | Expr::U32Literal(_)

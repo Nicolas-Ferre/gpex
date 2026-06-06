@@ -3,20 +3,20 @@
 mod exprs;
 mod items;
 
-use crate::compiler::consts::ConstResolver;
-use crate::compiler::dependencies::{DependencyResolver, DependencyType};
+use crate::compiler::consts::{ConstResolver, ConstValue};
+use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::types::TypeResolver;
-use crate::utils::dependencies::Dependencies;
 use crate::utils::reading::ReadFile;
 use itertools::Itertools;
 use petgraph::graphmap::DiGraphMap;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::mem;
 
 const MAIN_BUFFER_NAME: &str = "b";
@@ -61,9 +61,10 @@ pub struct BufferField {
 pub(crate) struct Transpiler<'item, 'index> {
     indexes: &'index Indexes<'item>,
     shader: String,
-    dependencies: Dependencies<ItemRef<'item>>,
     type_resolver: TypeResolver<'item, 'index>,
-    const_checker: ConstResolver<'item, 'index>,
+    const_resolver: ConstResolver<'item, 'index>,
+    specialized_fns: HashMap<SpecializedFn<'item>, usize>,
+    transpiled_specialized_fn_indexes: HashSet<usize>,
 }
 
 impl<'item, 'index> Transpiler<'item, 'index> {
@@ -71,9 +72,10 @@ impl<'item, 'index> Transpiler<'item, 'index> {
         Self {
             indexes,
             shader: String::new(),
-            dependencies: Dependencies::new(),
             type_resolver: TypeResolver::new(indexes),
-            const_checker: ConstResolver::new(indexes),
+            const_resolver: ConstResolver::new(indexes),
+            specialized_fns: HashMap::default(),
+            transpiled_specialized_fn_indexes: HashSet::default(),
         }
     }
 
@@ -172,16 +174,6 @@ impl<'item, 'index> Transpiler<'item, 'index> {
     }
 
     fn transpile_init(&mut self, modules: &[Module]) -> String {
-        let mut dependency_resolver =
-            DependencyResolver::new(DependencyType::Transpilation, self.indexes);
-        for module in modules {
-            for var in module.global_vars() {
-                dependency_resolver.scan_var(var).unwrap_or_else(|_| {
-                    unreachable!("circular dependencies should be validated before")
-                });
-            }
-        }
-        self.dependencies = dependency_resolver.dependencies;
         self.transpile_shader(modules, |self_| {
             for var in self_.sorted_global_vars_for_init(modules) {
                 self_.transpile_var_init(var);
@@ -191,16 +183,6 @@ impl<'item, 'index> Transpiler<'item, 'index> {
     }
 
     fn transpile_repeats(&mut self, modules: &[Module]) -> String {
-        let mut dependency_resolver =
-            DependencyResolver::new(DependencyType::Transpilation, self.indexes);
-        for module in modules {
-            for repeat in module.repeats() {
-                dependency_resolver.scan_repeat(repeat).unwrap_or_else(|_| {
-                    unreachable!("circular dependencies should be validated before")
-                });
-            }
-        }
-        self.dependencies = dependency_resolver.dependencies;
         self.transpile_shader(modules, |self_| {
             for module in modules {
                 for repeat in module.repeats() {
@@ -213,12 +195,23 @@ impl<'item, 'index> Transpiler<'item, 'index> {
 
     fn transpile_shader(&mut self, modules: &[Module], transpile_body: impl FnOnce(&mut Self)) {
         self.transpile_buffer_header(modules);
-        for dependency in self.dependencies.clone().iter() {
-            self.transpile_item(dependency);
-        }
         self.shader += " @compute @workgroup_size(1, 1, 1) fn main() { ";
         transpile_body(self);
         self.shader += "}";
+        let mut last_fn_count = 0;
+        while last_fn_count != self.specialized_fns.len() {
+            last_fn_count = self.specialized_fns.len();
+            for (fn_, index) in self
+                .specialized_fns
+                .clone()
+                .into_iter()
+                .sorted_by_key(|(_, index)| *index)
+            {
+                self.transpile_specialized_fn(fn_, index);
+            }
+        }
+        self.specialized_fns.clear();
+        self.transpiled_specialized_fn_indexes.clear();
     }
 
     fn transpile_buffer_header(&mut self, modules: &[Module]) {
@@ -243,8 +236,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
         let mut dependency_graph = DiGraphMap::<&VarDefinition, ()>::new();
         for var in modules.iter().flat_map(Module::global_vars) {
             dependency_graph.add_node(var);
-            let mut dependency_resolver =
-                DependencyResolver::new(DependencyType::Transpilation, self.indexes);
+            let mut dependency_resolver = DependencyResolver::new(self.indexes);
             dependency_resolver.scan_var(var).unwrap_or_else(|_| {
                 unreachable!("circular dependencies should be validated before")
             });
@@ -265,4 +257,10 @@ impl<'item, 'index> Transpiler<'item, 'index> {
             .sorted_unstable_by_key(|var| var.id)
             .collect()
     }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+pub(crate) struct SpecializedFn<'item> {
+    fn_: &'item FnDefinition,
+    const_param_values: Vec<ConstValue<'item>>,
 }
