@@ -4,17 +4,17 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::transpilation::{MAIN_BUFFER_NAME, Transpiler};
+use crate::compiler::transpilation::{MAIN_BUFFER_NAME, SpecializedFn, Transpiler};
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;
 
-impl Transpiler<'_, '_> {
+impl<'item> Transpiler<'item, '_> {
     pub(crate) fn transpile_expr(&mut self, node: &Expr) {
-        let value = self.const_checker.expr_value(node);
+        let value = self.const_resolver.expr_value(node);
         if value == ConstValue::RuntimeValue {
             match node {
                 Expr::Call(child) => self.transpile_call(child),
@@ -41,9 +41,9 @@ impl Transpiler<'_, '_> {
 
     fn transpile_call(&mut self, node: &Call) {
         match self.indexes.sources[&node.id] {
-            ItemRef::Fn(child) => match child.body {
+            ItemRef::Fn(child) => match &child.body {
                 FnBody::Compilerimpl(_) => self.transpile_compilerimpl_fn_call(node),
-                FnBody::Statements(_) => self.transpile_custom_fn_call(node, child),
+                FnBody::Statements(body) => self.transpile_custom_fn_call(node, child, body),
             },
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
                 unreachable!("function calls cannot reference values")
@@ -61,14 +61,46 @@ impl Transpiler<'_, '_> {
         }
     }
 
-    fn transpile_custom_fn_call(&mut self, node: &Call, child: &FnDefinition) {
-        _ = write!(self.shader, "_{}", child.id);
+    fn transpile_custom_fn_call(
+        &mut self,
+        node: &Call,
+        child: &'item FnDefinition,
+        body: &'item FnStatementsBody,
+    ) {
+        let specialized_fn_id = self.register_specialized_fn(node, child, body);
+        _ = write!(self.shader, "_{}_{specialized_fn_id}", child.id);
         self.shader += "(";
-        for arg in &node.args {
-            self.transpile_expr(arg);
-            self.shader += ", ";
+        for (arg, param) in node.args.iter().zip(&child.params.params) {
+            if param.const_mark_span().is_none() {
+                self.transpile_expr(arg);
+                self.shader += ", ";
+            }
         }
         self.shader += ")";
+    }
+
+    fn register_specialized_fn(
+        &mut self,
+        node: &Call,
+        child: &'item FnDefinition,
+        body: &'item FnStatementsBody,
+    ) -> usize {
+        let const_param_values = node
+            .args
+            .iter()
+            .zip(&child.params.params)
+            .filter(|(_, param)| param.const_mark_span().is_some())
+            .map(|(arg, _)| self.const_resolver.expr_value(arg))
+            .collect::<Vec<_>>();
+        let specialized_fn_id = self.specialized_fns.len();
+        *self
+            .specialized_fns
+            .entry(SpecializedFn {
+                fn_: child,
+                const_param_values,
+                fn_body: body,
+            })
+            .or_insert(specialized_fn_id)
     }
 
     fn transpile_ident(&mut self, node: &Ident) {
@@ -88,7 +120,7 @@ impl Transpiler<'_, '_> {
             ConstValue::I32(value) => _ = write!(self.shader, "i32({value})"),
             ConstValue::U32(value) => _ = write!(self.shader, "u32({value})"),
             ConstValue::F32(value) => {
-                _ = write!(self.shader, "f32({})", formatting::f32_to_string(*value));
+                _ = write!(self.shader, "f32({})", formatting::f32_to_string(value.0));
             }
             ConstValue::Bool(value) => _ = write!(self.shader, "u32({})", u32::from(*value)),
             ConstValue::Unknown | ConstValue::RuntimeValue => {

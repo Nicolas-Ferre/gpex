@@ -1,4 +1,4 @@
-use crate::compiler::dependencies::{DependencyResolver, DependencyType};
+use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
@@ -45,9 +45,7 @@ impl Validator<'_, '_> {
 
     fn validate_var(&mut self, node: &VarDefinition) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Var(node);
-        let mut dependency_resolver =
-            DependencyResolver::new(DependencyType::CycleDetection, self.indexes);
-        let dependency_result = dependency_resolver.scan_var(node);
+        let dependency_result = DependencyResolver::new(self.indexes).scan_var(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_unique_definition(ref_, &mut self.context, self.indexes)?;
         validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
@@ -59,9 +57,7 @@ impl Validator<'_, '_> {
 
     fn validate_const(&mut self, node: &ConstDefinition) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Const(node);
-        let mut dependency_resolver =
-            DependencyResolver::new(DependencyType::CycleDetection, self.indexes);
-        let dependency_result = dependency_resolver.scan_const(node);
+        let dependency_result = DependencyResolver::new(self.indexes).scan_const(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_unique_definition(ref_, &mut self.context, self.indexes)?;
         validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);

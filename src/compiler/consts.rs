@@ -9,6 +9,7 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 
 #[derive(Debug)]
 pub(crate) struct ConstChecker<'item, 'index> {
@@ -85,6 +86,27 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
         }
     }
 
+    pub(crate) fn enter_scope(&mut self) {
+        self.scope_values.push(HashMap::new());
+    }
+
+    pub(crate) fn exit_scope(&mut self) {
+        self.scope_values.pop();
+    }
+
+    pub(crate) fn value(&self, id: u64) -> ConstValue<'item> {
+        self.scope_values
+            .last()
+            .and_then(|values| values.get(&id))
+            .cloned()
+            .unwrap_or(ConstValue::RuntimeValue)
+    }
+
+    pub(crate) fn add_value(&mut self, id: u64, value: ConstValue<'item>) {
+        let current_scope_index = self.scope_values.len() - 1;
+        self.scope_values[current_scope_index].insert(id, value);
+    }
+
     pub(crate) fn expr_value(&mut self, expr: &Expr) -> ConstValue<'item> {
         match expr {
             Expr::F32Literal(node) => Self::f32_literal_value(node),
@@ -114,7 +136,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
 
     fn f32_literal_value(node: &F32Literal) -> ConstValue<'static> {
         if let Some(value) = node.value {
-            ConstValue::F32(value)
+            ConstValue::F32(HashableF32(value))
         } else {
             ConstValue::Unknown
         }
@@ -230,32 +252,19 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
     }
 
     fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
-        self.scope_values.push(HashMap::new());
+        self.enter_scope();
         let output = callback(self);
-        self.scope_values.pop();
+        self.exit_scope();
         output
-    }
-
-    fn value(&self, id: u64) -> ConstValue<'item> {
-        self.scope_values
-            .last()
-            .and_then(|values| values.get(&id))
-            .cloned()
-            .unwrap_or(ConstValue::RuntimeValue)
-    }
-
-    fn add_value(&mut self, id: u64, value: ConstValue<'item>) {
-        let current_scope_index = self.scope_values.len() - 1;
-        self.scope_values[current_scope_index].insert(id, value);
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) enum ConstValue<'item> {
     TypeRef(&'item StructDefinition),
     I32(i32),
     U32(u32),
-    F32(f32),
+    F32(HashableF32),
     Bool(bool),
     Unknown,
     RuntimeValue,
@@ -268,5 +277,22 @@ impl<'item> ConstValue<'item> {
         } else {
             None
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct HashableF32(pub(crate) f32);
+
+impl PartialEq for HashableF32 {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.to_bits() == other.0.to_bits()
+    }
+}
+
+impl Eq for HashableF32 {}
+
+impl Hash for HashableF32 {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.to_bits().hash(state);
     }
 }

@@ -1,5 +1,5 @@
 use crate::compiler::consts::ConstLocation;
-use crate::compiler::dependencies::{DependencyResolver, DependencyType};
+use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
@@ -12,9 +12,7 @@ impl Validator<'_, '_> {
     pub(super) fn validate_fn(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Fn(node);
         let compilerimpl_span = node.body.compilerimpl_keyword_span();
-        let mut dependency_resolver =
-            DependencyResolver::new(DependencyType::CycleDetection, self.indexes);
-        let dependency_result = dependency_resolver.scan_fn(node);
+        let dependency_result = DependencyResolver::new(self.indexes).scan_fn(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_prelude_location(ref_, compilerimpl_span, &mut self.context)?;
         self.validate_params(&node.params, compilerimpl_span.is_some())?;

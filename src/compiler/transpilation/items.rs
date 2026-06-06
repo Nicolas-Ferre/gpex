@@ -1,39 +1,34 @@
-use crate::compiler::indexing::item_ref::ItemRef;
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
+use crate::compiler::consts::ConstValue;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
-use crate::compiler::transpilation::Transpiler;
+use crate::compiler::transpilation::{SpecializedFn, Transpiler};
 use std::fmt::Write;
 
-impl Transpiler<'_, '_> {
-    pub(crate) fn transpile_item(&mut self, node: ItemRef<'_>) {
-        match node {
-            ItemRef::Fn(item) => self.transpile_fn(item),
-            ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => (),
-        }
-    }
-
-    pub(crate) fn transpile_fn(&mut self, node: &FnDefinition) {
-        let FnBody::Statements(body) = &node.body else {
+impl<'item> Transpiler<'item, '_> {
+    pub(crate) fn transpile_specialized_fn(&mut self, node: SpecializedFn<'item>, fn_index: usize) {
+        if !self.transpiled_specialized_fn_indexes.insert(fn_index) {
             return;
-        };
-        let id = node.id;
-        _ = write!(self.shader, "fn _{id}");
-        self.transpile_params(&node.params);
-        if let Some(return_type) = self.type_resolver.fn_type(node).struct_ref() {
+        }
+        self.const_resolver.enter_scope();
+        let source = &node.fn_;
+        let id = source.id;
+        _ = write!(self.shader, "fn _{id}_{fn_index}");
+        self.transpile_params(&source.params, node.const_param_values.into_iter());
+        if let Some(return_type) = self.type_resolver.fn_type(source).struct_ref() {
             let return_type_name = Self::transpile_type_name(return_type);
             _ = write!(self.shader, " -> {return_type_name} {{ ");
         } else {
             _ = write!(self.shader, " {{ ");
         }
-        self.transpile_mut_param_definitions(&node.params);
-        for statement in &body.statements {
+        self.transpile_mut_param_definitions(&source.params);
+        for statement in &node.fn_body.statements {
             self.transpile_statement(statement);
         }
         _ = write!(self.shader, " }}");
+        self.const_resolver.exit_scope();
     }
 
     pub(crate) fn transpile_var_init(&mut self, node: &VarDefinition) {
@@ -77,11 +72,24 @@ impl Transpiler<'_, '_> {
         self.shader += ";";
     }
 
-    fn transpile_params(&mut self, node: &ParamGroup) {
+    fn transpile_params(
+        &mut self,
+        node: &ParamGroup,
+        mut const_param_values: impl Iterator<Item = ConstValue<'item>>,
+    ) {
         self.shader += "(";
         for param in &node.params {
-            self.transpile_param(param);
-            self.shader += ", ";
+            if param.const_mark_span().is_some() {
+                self.const_resolver.add_value(
+                    param.id,
+                    const_param_values
+                        .next()
+                        .unwrap_or_else(|| unreachable!("mismatching number of const params")),
+                );
+            } else {
+                self.transpile_param(param);
+                self.shader += ", ";
+            }
         }
         self.shader += ")";
     }
@@ -99,7 +107,9 @@ impl Transpiler<'_, '_> {
 
     fn transpile_mut_param_definitions(&mut self, node: &ParamGroup) {
         for param in &node.params {
-            self.transpile_mut_param_definition(param);
+            if param.const_mark_span().is_none() {
+                self.transpile_mut_param_definition(param);
+            }
         }
     }
 
