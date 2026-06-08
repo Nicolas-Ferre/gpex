@@ -37,3 +37,7 @@ const fn _snake_case_fn_return_const_param(type_: const typeref, value: type_) -
 fn _fn_snake_case(_snake_case_param: i32) -> i32 { return 0; }
 
 fn _fn_snake_case_typeref(_snake_case_param_typeref: typeref) -> i32 { return 0; }
+
+fn _fn_snake_case_type_param(type_: const typeref, snake_case_param_type_param: type_) -> type_ {
+    return snake_case_param_type_param;
+}

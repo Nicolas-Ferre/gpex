@@ -1,5 +1,14 @@
 // Test parameters in all constant locations (must be transpiled inline).
 
+
+// =========================| Function signature |=========================
+
+const _RESULT1_CONST_FN_SIGNATURE = const_fn_signature(i32, 1); // expected: 1
+const _RESULT2_CONST_FN_SIGNATURE = const_fn_signature(u32, 2u); // expected: 2u
+const fn const_fn_signature(param: const typeref, value: param) -> param {
+    return value;
+}
+
 // =========================| Return statement value |=========================
 
 const _RESULT_RETURN = fn_with_return(1); // expected: 1
