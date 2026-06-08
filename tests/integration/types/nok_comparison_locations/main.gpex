@@ -23,5 +23,3 @@ fn _fn_param_type(param: true) -> i32 {
 fn _fn_param_type() -> true {
     return 0;
 }
-
-// TODO: add const params as expr
