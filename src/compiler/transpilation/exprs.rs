@@ -14,7 +14,7 @@ use std::fmt::Write;
 
 impl<'item> Transpiler<'item, '_> {
     pub(crate) fn transpile_expr(&mut self, node: &Expr) {
-        let value = self.const_resolver.expr_value(node);
+        let value = self.type_resolver.const_resolver.expr_value(node);
         if value == ConstValue::RuntimeValue {
             match node {
                 Expr::Call(child) => self.transpile_call(child),
@@ -90,7 +90,7 @@ impl<'item> Transpiler<'item, '_> {
             .iter()
             .zip(&child.params.params)
             .filter(|(_, param)| param.const_mark_span().is_some())
-            .map(|(arg, _)| self.const_resolver.expr_value(arg))
+            .map(|(arg, _)| self.type_resolver.const_resolver.expr_value(arg))
             .collect::<Vec<_>>();
         let specialized_fn_id = self.specialized_fns.len();
         *self
@@ -123,7 +123,7 @@ impl<'item> Transpiler<'item, '_> {
                 _ = write!(self.shader, "f32({})", formatting::f32_to_string(value.0));
             }
             ConstValue::Bool(value) => _ = write!(self.shader, "u32({})", u32::from(*value)),
-            ConstValue::Unknown | ConstValue::RuntimeValue => {
+            ConstValue::Param(_) | ConstValue::Unknown | ConstValue::RuntimeValue => {
                 unreachable!("non-constant cannot be transpiled")
             }
         }

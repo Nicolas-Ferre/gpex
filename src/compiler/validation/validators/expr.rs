@@ -17,19 +17,19 @@ pub(crate) fn check_types(
     expected_type: Type<'_>,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if let Type::Struct(expected_type) = expected_type
-        && let Type::Struct(actual_type) = actual_type
+    if let Type::Struct(_) | Type::Param(_) = expected_type
+        && let Type::Struct(_) | Type::Param(_) = actual_type
     {
         if actual_type == expected_type {
             Ok(())
         } else {
             context.logs.push(Log {
                 level: LogLevel::Error,
-                msg: format!("expression with invalid type `{}`", actual_type.name),
+                msg: format!("expression with invalid type `{}`", actual_type.name()?),
                 location: Some(context.location(actual_span)),
                 inner: vec![LogInner {
                     level: LogLevel::Info,
-                    msg: format!("expected `{}` type", expected_type.name),
+                    msg: format!("expected `{}` type", expected_type.name()?),
                     location: expected_span.map(|span| context.location(span)),
                 }],
             });

@@ -3,7 +3,7 @@
 mod exprs;
 mod items;
 
-use crate::compiler::consts::{ConstResolver, ConstValue};
+use crate::compiler::consts::ConstValue;
 use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
@@ -62,7 +62,6 @@ pub(crate) struct Transpiler<'item, 'index> {
     indexes: &'index Indexes<'item>,
     shader: String,
     type_resolver: TypeResolver<'item, 'index>,
-    const_resolver: ConstResolver<'item, 'index>,
     specialized_fns: HashMap<SpecializedFn<'item>, usize>,
     transpiled_specialized_fn_indexes: HashSet<usize>,
 }
@@ -73,7 +72,6 @@ impl<'item, 'index> Transpiler<'item, 'index> {
             indexes,
             shader: String::new(),
             type_resolver: TypeResolver::new(indexes),
-            const_resolver: ConstResolver::new(indexes),
             specialized_fns: HashMap::default(),
             transpiled_specialized_fn_indexes: HashSet::default(),
         }
@@ -117,7 +115,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
     }
 
     fn main_buffer_next_field_offset(
-        &self,
+        &mut self,
         fields: &[&VarDefinition],
         current_field_index: usize,
         current_field_offset: u32,
@@ -138,7 +136,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
         }
     }
 
-    fn main_buffer_alignment(&self, vars: &[&VarDefinition]) -> u32 {
+    fn main_buffer_alignment(&mut self, vars: &[&VarDefinition]) -> u32 {
         vars.iter()
             .map(|var| {
                 self.type_resolver

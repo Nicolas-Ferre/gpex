@@ -2,7 +2,14 @@
 
 // =========================| Function body |=========================
 
-var _result_fn_no_arg = fn_param_value(1); // expected: 1
-fn fn_param_value(param: i32) -> i32 {
+var _result_fn_body = fn_body(1); // expected: 1
+fn fn_body(param: i32) -> i32 {
     return param;
+}
+
+// =========================| Function signature |=========================
+
+var _result_fn_signature = fn_signature(i32, 2); // expected: 2
+fn fn_signature(param: const typeref, value: param) -> param {
+    return value;
 }

@@ -12,7 +12,7 @@ impl<'item> Transpiler<'item, '_> {
         if !self.transpiled_specialized_fn_indexes.insert(fn_index) {
             return;
         }
-        self.const_resolver.enter_scope();
+        self.type_resolver.const_resolver.enter_scope();
         let source = &node.fn_;
         let id = source.id;
         _ = write!(self.shader, "fn _{id}_{fn_index}");
@@ -28,7 +28,7 @@ impl<'item> Transpiler<'item, '_> {
             self.transpile_statement(statement);
         }
         _ = write!(self.shader, " }}");
-        self.const_resolver.exit_scope();
+        self.type_resolver.const_resolver.exit_scope();
     }
 
     pub(crate) fn transpile_var_init(&mut self, node: &VarDefinition) {
@@ -80,7 +80,7 @@ impl<'item> Transpiler<'item, '_> {
         self.shader += "(";
         for param in &node.params {
             if param.const_mark_span().is_some() {
-                self.const_resolver.add_value(
+                self.type_resolver.const_resolver.add_value(
                     param.id,
                     const_param_values
                         .next()

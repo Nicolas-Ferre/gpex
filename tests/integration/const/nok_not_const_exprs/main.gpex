@@ -5,15 +5,6 @@
 var var_ = 0;
 const _RESULT_VAR = var_;
 
-// =========================| Parameter reference |=========================
-
-fn _fn_with_param_as_param_type(param1: typeref, param2: param1) -> i32 {
-    return param2;
-}
-fn _fn_with_param_as_return_type(param: typeref) -> param {
-    return param;
-}
-
 // =========================| Function call |=========================
 
 const _RESULT_FN_CALL = not_const_fn();
