@@ -50,19 +50,6 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         }
     }
 
-    pub(crate) fn expr_as_type(&mut self, node: &Expr) -> Type<'item> {
-        match self.const_resolver.expr_value(node) {
-            ConstValue::TypeRef(type_) => Type::Struct(type_),
-            ConstValue::Param(type_) => Type::Param(type_),
-            ConstValue::I32(_)
-            | ConstValue::U32(_)
-            | ConstValue::F32(_)
-            | ConstValue::Bool(_)
-            | ConstValue::Unknown
-            | ConstValue::RuntimeValue => Type::Unknown,
-        }
-    }
-
     fn source_type(&mut self, node_id: u64, args: &[Expr]) -> Type<'item> {
         match self.indexes.sources.get(&node_id) {
             Some(source) => self.item_type(*source, args),
@@ -93,6 +80,19 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         };
         self.const_resolver.exit_scope();
         type_
+    }
+
+    pub(crate) fn expr_as_type(&mut self, node: &Expr) -> Type<'item> {
+        match self.const_resolver.expr_value(node) {
+            ConstValue::TypeRef(type_) => Type::Struct(type_),
+            ConstValue::Param(type_) => Type::Param(type_),
+            ConstValue::I32(_)
+            | ConstValue::U32(_)
+            | ConstValue::F32(_)
+            | ConstValue::Bool(_)
+            | ConstValue::Unknown
+            | ConstValue::RuntimeValue => Type::Unknown,
+        }
     }
 }
 
