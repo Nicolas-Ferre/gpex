@@ -3,10 +3,21 @@
 
 // =========================| Function signature |=========================
 
-const _RESULT1_CONST_FN_SIGNATURE = const_fn_signature(i32, 1); // expected: 1
-const _RESULT2_CONST_FN_SIGNATURE = const_fn_signature(u32, 2u); // expected: 2u
-const fn const_fn_signature(param: const typeref, value: param) -> param {
+const _RESULT1_FN_SIGNATURE = fn_signature(i32, 1); // expected: 1
+const _RESULT2_FN_SIGNATURE = fn_signature(u32, 2u); // expected: 2u
+const fn fn_signature(param: const typeref, value: param) -> param {
     return value;
+}
+
+// =========================| Function call in function signature |=========================
+
+const _RESULT1_FN_CALL_IN_FN_SIGNATURE = fn_call_in_fn_signature(i32, 3); // expected: 3
+const _RESULT2_FN_CALL_IN_FN_SIGNATURE = fn_call_in_fn_signature(u32, 4u); // expected: 4u
+const fn fn_call_in_fn_signature(param: const typeref, value: fn_signature_type(param)) -> fn_signature_type(param) {
+    return value;
+}
+const fn fn_signature_type(param: const typeref) -> typeref {
+    return param;
 }
 
 // =========================| Return statement value |=========================
