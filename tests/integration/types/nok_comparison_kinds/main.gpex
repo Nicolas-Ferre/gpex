@@ -1,0 +1,29 @@
+// Test type comparison for all possible tye kinds (must generate errors).
+
+// ====================| Returned type reference as type parameter |====================
+
+fn _fn_type_ref_type_param(param: const typeref) -> param {
+    return i32;
+}
+
+// ====================| Returned type parameter as other type parameter |====================
+
+fn _fn_type_param_type_param(param1: const typeref, param2: const typeref, value: param1) -> param2 {
+    return value;
+}
+
+// ====================| Returned type parameter as type reference |====================
+
+fn _fn_type_param_type_ref(param: const typeref, value: param) -> i32 {
+    return value;
+}
+
+// ====================| Returned type parameter through function as type reference |====================
+
+fn _fn_type_param_thought_fn_type_ref(param: const typeref, value: type_param_fn(param)) -> i32 {
+    return value;
+}
+const fn type_param_fn(other_name: const typeref) -> typeref {
+    return other_name;
+}
+

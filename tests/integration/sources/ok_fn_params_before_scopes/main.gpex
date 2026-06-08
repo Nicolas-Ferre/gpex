@@ -13,3 +13,13 @@ var _result_fn_signature = fn_signature(i32, 2); // expected: 2
 fn fn_signature(param: const typeref, value: param) -> param {
     return value;
 }
+
+// =========================| Function call in function signature |=========================
+
+var _result_fn_call_in_fn_signature = fn_call_in_fn_signature(u32, 3u); // expected: 3u
+fn fn_call_in_fn_signature(param: const typeref, value: called_fn(param)) -> called_fn(param) {
+    return value;
+}
+const fn called_fn(type_: const typeref) -> typeref {
+    return type_;
+}

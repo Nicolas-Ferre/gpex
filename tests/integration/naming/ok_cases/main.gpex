@@ -28,6 +28,10 @@ fn _snake_case_fn_return_typeref() -> typeref { return i32; }
 const fn _snake_case_fn_return_const_typeref() -> typeref { return i32; }
 const fn _PascalCaseFnReturnConstTyperef() -> typeref { return i32; }
 
+const fn _snake_case_fn_return_const_param(type_: const typeref, value: type_) -> type_ {
+    return value;
+}
+
 // =========================| Function parameter |=========================
 
 fn _fn_snake_case(_snake_case_param: i32) -> i32 { return 0; }
