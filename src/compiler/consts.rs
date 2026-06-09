@@ -42,8 +42,10 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
             ItemRef::Const(_) | ItemRef::Struct(_) => true,
             ItemRef::Fn(node) => node.const_keyword_span.is_some(),
             ItemRef::Param(node) => match self.location {
-                ConstLocation::FnSignature | ConstLocation::ConstFnBody => true,
-                ConstLocation::ConstCallArg => node.const_mark_span().is_some(),
+                ConstLocation::FnSignature | ConstLocation::ConstCallArg => {
+                    node.const_mark_span().is_some()
+                }
+                ConstLocation::ConstFnBody => true,
                 ConstLocation::Other => false,
             },
         }

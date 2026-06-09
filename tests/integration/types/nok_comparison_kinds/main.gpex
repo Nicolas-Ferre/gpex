@@ -26,4 +26,3 @@ fn _fn_type_param_thought_fn_type_ref(param: const typeref, value: type_param_fn
 const fn type_param_fn(other_name: const typeref) -> typeref {
     return other_name;
 }
-

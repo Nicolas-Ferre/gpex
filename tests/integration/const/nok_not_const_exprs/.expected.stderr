@@ -8,29 +8,38 @@ error: expression not constant
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:10:25
+│  → <root>/main.gpex:10:41
+│    ¦ fn _fn_param_ref(param: typeref, other: param) -> param {
+│    ¦                                         ^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:10:39
+│    ¦ fn _fn_param_ref(param: typeref, other: param) -> param {
+│    ¦                                       ^
+┴
+error: expression not constant
+│  → <root>/main.gpex:16:25
 │    ¦ const _RESULT_FN_CALL = not_const_fn();
 │    ¦                         ^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:10:1
+│  → <root>/main.gpex:16:1
 │    ¦ const _RESULT_FN_CALL = not_const_fn();
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:17:23
+│  → <root>/main.gpex:23:23
 │    ¦ const _RESULT_UNARY = -true;
 │    ¦                       ^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:17:1
+│  → <root>/main.gpex:23:1
 │    ¦ const _RESULT_UNARY = -true;
 │    ¦ ^^^^^
 ┴
 error: expression not constant
-│  → <root>/main.gpex:24:24
+│  → <root>/main.gpex:30:24
 │    ¦ const _RESULT_BINARY = true + false;
 │    ¦                        ^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:24:1
+│  → <root>/main.gpex:30:1
 │    ¦ const _RESULT_BINARY = true + false;
 │    ¦ ^^^^^
 ┴
