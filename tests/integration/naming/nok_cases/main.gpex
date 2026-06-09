@@ -62,6 +62,13 @@ fn _fn_camel_case_typeref(_camelCaseParamTyperef: typeref) -> i32 { return 0; }
 fn _fn_pascal_case_typeref(_PascalCaseParamTyperef: typeref) -> i32 { return 0; }
 fn _fn_screaming_snake_case_typeref(_SCREAMING_SNAKE_CASE_PARAM_TYPEREF: typeref) -> i32 { return 0; }
 
+fn _fn_camel_case_const_typeref(camelCaseParamConstTyperef: const typeref) -> typeref {
+    return camelCaseParamConstTyperef;
+}
+fn _fn_screaming_snake_case_const_typeref(SCREAMING_SNAKE_CASE_PARAM_CONST_TYPEREF: const typeref) -> typeref {
+    return SCREAMING_SNAKE_CASE_PARAM_CONST_TYPEREF;
+}
+
 fn _fn_camel_case_type_param(type_: const typeref, camelCaseParamTypeParam: type_) -> type_ {
     return camelCaseParamTypeParam;
 }

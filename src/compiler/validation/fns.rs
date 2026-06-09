@@ -4,7 +4,6 @@ use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use crate::compiler::types::Type;
-use crate::compiler::validation::validators::ident::Case;
 use crate::compiler::validation::{Validator, validators};
 use crate::utils::validation::ValidateError;
 
@@ -30,17 +29,7 @@ impl Validator<'_, '_> {
     }
 
     fn validate_fn_name(&mut self, node: &FnDefinition) {
-        let typeref_type = self.indexes.search_prelude_type("typeref");
-        let may_return_typeref = match self.type_resolver.fn_type(node) {
-            Type::Struct(struct_ref) => struct_ref == typeref_type,
-            Type::Param(_) | Type::NoReturn => false,
-            Type::Unknown => unreachable!("return type should be validated before"),
-        };
-        let allowed_cases: &[Case] = if may_return_typeref && node.const_keyword_span.is_some() {
-            &[Case::Snake, Case::Pascal]
-        } else {
-            &[Case::Snake]
-        };
+        let allowed_cases = self.fn_allowed_cases(node);
         validators::ident::check_case(node.name_span, allowed_cases, &mut self.context);
         validators::ident::check_char_count(node.name_span, &mut self.context);
     }

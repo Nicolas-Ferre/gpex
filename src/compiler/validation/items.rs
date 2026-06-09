@@ -6,7 +6,6 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::types::Type;
-use crate::compiler::validation::validators::ident::Case;
 use crate::compiler::validation::{Validator, validators};
 use crate::utils::indexing::ItemNodeRef;
 use crate::utils::validation::ValidateError;
@@ -50,7 +49,7 @@ impl Validator<'_, '_> {
         validators::item::check_unique_definition(ref_, &mut self.context, self.indexes)?;
         validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
         validators::ident::check_char_count(node.name_span, &mut self.context);
-        validators::ident::check_case(node.name_span, &[Case::Snake], &mut self.context);
+        validators::ident::check_case(node.name_span, Self::VAR_ALLOWED_CASES, &mut self.context);
         self.validate_expr(&node.default_value)?;
         Ok(())
     }
@@ -68,19 +67,6 @@ impl Validator<'_, '_> {
             self_.validate_expr(&node.value)
         })?;
         Ok(())
-    }
-
-    fn const_allowed_cases(&mut self, node: &ConstDefinition) -> &'static [Case] {
-        let may_be_typeref = self
-            .type_resolver
-            .expr_type(&node.value)
-            .struct_ref()
-            .is_none_or(|type_| type_ == self.indexes.search_prelude_type("typeref"));
-        if may_be_typeref {
-            &[Case::ScreamingSnake, Case::Pascal]
-        } else {
-            &[Case::ScreamingSnake]
-        }
     }
 
     fn validate_struct(&mut self, node: &StructDefinition) -> Result<(), ValidateError> {
@@ -123,7 +109,8 @@ impl Validator<'_, '_> {
             validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
         }
         validators::ident::check_char_count(param.name_span, &mut self.context);
-        validators::ident::check_case(param.name_span, &[Case::Snake], &mut self.context);
+        let allowed_cases = self.param_allowed_cases(param);
+        validators::ident::check_case(param.name_span, allowed_cases, &mut self.context);
         Ok(())
     }
 }

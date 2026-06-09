@@ -3,6 +3,7 @@
 mod exprs;
 mod fns;
 mod items;
+mod naming;
 mod validators;
 
 use crate::compiler::consts::{ConstChecker, ConstLocation};
@@ -12,7 +13,6 @@ use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::imports::{Import, ImportSegment};
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::types::TypeResolver;
-use crate::compiler::validation::validators::ident::Case;
 use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -112,7 +112,7 @@ impl<'item, 'index> Validator<'item, 'index> {
         );
         for &segment in &node.segments {
             if let ImportSegment::Name(span) = segment {
-                validators::ident::check_case(span, &[Case::Snake], &mut self.context);
+                validators::ident::check_case(span, Self::IMPORT_ALLOWED_CASES, &mut self.context);
             }
         }
         Ok(())
