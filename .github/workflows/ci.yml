@@ -130,7 +130,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Git check
-        run: git diff --check main
+        run: git diff main --check
       - name: Retrieve rust version
         id: rust_version
         run: bash -x .github/scripts/extract_rust_version.sh
