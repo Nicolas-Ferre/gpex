@@ -193,7 +193,7 @@ fn path_parent(path: &Path) -> &Path {
 
 fn check_wgsl_output(path: &Path, program: &Program) -> Result<(), Failed> {
     let actual_code = format!(
-        "// INIT SHADER\n\n{}\n\n// UPDATE SHADER\n\n{}\n",
+        "// INIT SHADER\n\n{}\n\n// UPDATE SHADER\n\n{}",
         format_wgsl(&program.init_shader)?,
         format_wgsl(&program.update_shader)?
     );
