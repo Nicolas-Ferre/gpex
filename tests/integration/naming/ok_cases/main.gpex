@@ -34,10 +34,21 @@ const fn _snake_case_fn_return_const_param(type_: const typeref, value: type_) -
 
 // =========================| Function parameter |=========================
 
-fn _fn_snake_case(_snake_case_param: i32) -> i32 { return 0; }
+fn _fn_snake_case_param(_snake_case_param: i32) -> i32 { return 0; }
 
-fn _fn_snake_case_typeref(_snake_case_param_typeref: typeref) -> i32 { return 0; }
+fn _fn_snake_case_typeref_param(_snake_case_typeref_param: typeref) -> i32 { return 0; }
 
-fn _fn_snake_case_type_param(type_: const typeref, snake_case_param_type_param: type_) -> type_ {
-    return snake_case_param_type_param;
+fn _fn_snake_case_const_param(snake_case_const_param: const i32) -> i32 {
+    return snake_case_const_param;
+}
+
+fn _fn_snake_case_const_typeref_param(snake_case_const_typeref_param: const typeref) -> typeref {
+    return snake_case_const_typeref_param;
+}
+fn _fn_pascal_case_const_typeref_param(PascalCaseConstTyperefParam: const typeref) -> typeref {
+    return PascalCaseConstTyperefParam;
+}
+
+fn _fn_snake_case_type_param(type_: const typeref, snake_case_type_param: type_) -> type_ {
+    return snake_case_type_param;
 }
