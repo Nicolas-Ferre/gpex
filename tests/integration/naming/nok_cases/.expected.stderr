@@ -154,72 +154,72 @@ warning: `_SCREAMING_SNAKE_CASE_FN_RETURN_CONST_PARAM` identifier not in snake_c
 │    ¦          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 warning: `_camelCaseParam` identifier not in snake_case
-│  → <root>/main.gpex:57:19
-│    ¦ fn _fn_camel_case(_camelCaseParam: i32) -> i32 { return 0; }
-│    ¦                   ^^^^^^^^^^^^^^^
+│  → <root>/main.gpex:57:25
+│    ¦ fn _fn_camel_case_param(_camelCaseParam: i32) -> i32 { return 0; }
+│    ¦                         ^^^^^^^^^^^^^^^
 ┴
 warning: `_PascalCaseParam` identifier not in snake_case
-│  → <root>/main.gpex:58:20
-│    ¦ fn _fn_pascal_case(_PascalCaseParam: i32) -> i32 { return 0; }
-│    ¦                    ^^^^^^^^^^^^^^^^
+│  → <root>/main.gpex:58:26
+│    ¦ fn _fn_pascal_case_param(_PascalCaseParam: i32) -> i32 { return 0; }
+│    ¦                          ^^^^^^^^^^^^^^^^
 ┴
 warning: `_SCREAMING_SNAKE_CASE_PARAM` identifier not in snake_case
-│  → <root>/main.gpex:59:29
-│    ¦ fn _fn_screaming_snake_case(_SCREAMING_SNAKE_CASE_PARAM: i32) -> i32 { return 0; }
-│    ¦                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│  → <root>/main.gpex:59:35
+│    ¦ fn _fn_screaming_snake_case_param(_SCREAMING_SNAKE_CASE_PARAM: i32) -> i32 { return 0; }
+│    ¦                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `_camelCaseParamTyperef` identifier not in snake_case
-│  → <root>/main.gpex:61:27
-│    ¦ fn _fn_camel_case_typeref(_camelCaseParamTyperef: typeref) -> i32 { return 0; }
-│    ¦                           ^^^^^^^^^^^^^^^^^^^^^^
+warning: `_camelCaseTyperefParam` identifier not in snake_case
+│  → <root>/main.gpex:61:33
+│    ¦ fn _fn_camel_case_typeref_param(_camelCaseTyperefParam: typeref) -> i32 { return 0; }
+│    ¦                                 ^^^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `_PascalCaseParamTyperef` identifier not in snake_case
-│  → <root>/main.gpex:62:28
-│    ¦ fn _fn_pascal_case_typeref(_PascalCaseParamTyperef: typeref) -> i32 { return 0; }
-│    ¦                            ^^^^^^^^^^^^^^^^^^^^^^^
+warning: `_PascalCaseTyperefParam` identifier not in snake_case
+│  → <root>/main.gpex:62:34
+│    ¦ fn _fn_pascal_case_typeref_param(_PascalCaseTyperefParam: typeref) -> i32 { return 0; }
+│    ¦                                  ^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `_SCREAMING_SNAKE_CASE_PARAM_TYPEREF` identifier not in snake_case
-│  → <root>/main.gpex:63:37
-│    ¦ fn _fn_screaming_snake_case_typeref(_SCREAMING_SNAKE_CASE_PARAM_TYPEREF: typeref) -> i32 { return 0; }
-│    ¦                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+warning: `_SCREAMING_SNAKE_CASE_TYPEREF_PARAM` identifier not in snake_case
+│  → <root>/main.gpex:63:43
+│    ¦ fn _fn_screaming_snake_case_typeref_param(_SCREAMING_SNAKE_CASE_TYPEREF_PARAM: typeref) -> i32 { return 0; }
+│    ¦                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `camelCaseParamConst` identifier not in snake_case
-│  → <root>/main.gpex:65:25
-│    ¦ fn _fn_camel_case_const(camelCaseParamConst: const i32) -> i32 {
-│    ¦                         ^^^^^^^^^^^^^^^^^^^
+warning: `camelCaseConstParam` identifier not in snake_case
+│  → <root>/main.gpex:65:31
+│    ¦ fn _fn_camel_case_const_param(camelCaseConstParam: const i32) -> i32 {
+│    ¦                               ^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `PascalCaseParamConst` identifier not in snake_case
-│  → <root>/main.gpex:68:26
-│    ¦ fn _fn_pascal_case_const(PascalCaseParamConst: const i32) -> i32 {
-│    ¦                          ^^^^^^^^^^^^^^^^^^^^
+warning: `PascalCaseConstParam` identifier not in snake_case
+│  → <root>/main.gpex:68:32
+│    ¦ fn _fn_pascal_case_const_param(PascalCaseConstParam: const i32) -> i32 {
+│    ¦                                ^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `SCREAMING_SNAKE_CASE_PARAM_CONST` identifier not in snake_case
-│  → <root>/main.gpex:71:35
-│    ¦ fn _fn_screaming_snake_case_const(SCREAMING_SNAKE_CASE_PARAM_CONST: const i32) -> i32 {
-│    ¦                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+warning: `SCREAMING_SNAKE_CASE_CONST_PARAM` identifier not in snake_case
+│  → <root>/main.gpex:71:41
+│    ¦ fn _fn_screaming_snake_case_const_param(SCREAMING_SNAKE_CASE_CONST_PARAM: const i32) -> i32 {
+│    ¦                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `camelCaseParamConstTyperef` identifier not in snake_case or PascalCase
-│  → <root>/main.gpex:75:33
-│    ¦ fn _fn_camel_case_const_typeref(camelCaseParamConstTyperef: const typeref) -> typeref {
-│    ¦                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+warning: `camelCaseConstTyperefParam` identifier not in snake_case or PascalCase
+│  → <root>/main.gpex:75:39
+│    ¦ fn _fn_camel_case_const_typeref_param(camelCaseConstTyperefParam: const typeref) -> typeref {
+│    ¦                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `SCREAMING_SNAKE_CASE_PARAM_CONST_TYPEREF` identifier not in snake_case or PascalCase
-│  → <root>/main.gpex:78:43
-│    ¦ fn _fn_screaming_snake_case_const_typeref(SCREAMING_SNAKE_CASE_PARAM_CONST_TYPEREF: const typeref) -> typeref {
-│    ¦                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+warning: `SCREAMING_SNAKE_CASE_CONST_TYPEREF_PARAM` identifier not in snake_case or PascalCase
+│  → <root>/main.gpex:78:49
+│    ¦ fn _fn_screaming_snake_case_const_typeref_param(SCREAMING_SNAKE_CASE_CONST_TYPEREF_PARAM: const typeref) -> typeref {
+│    ¦                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `camelCaseParamTypeParam` identifier not in snake_case
+warning: `camelCaseTypeParam` identifier not in snake_case
 │  → <root>/main.gpex:82:52
-│    ¦ fn _fn_camel_case_type_param(type_: const typeref, camelCaseParamTypeParam: type_) -> type_ {
-│    ¦                                                    ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ fn _fn_camel_case_type_param(type_: const typeref, camelCaseTypeParam: type_) -> type_ {
+│    ¦                                                    ^^^^^^^^^^^^^^^^^^
 ┴
-warning: `PascalCaseParamTypeParam` identifier not in snake_case
+warning: `PascalCaseTypeParam` identifier not in snake_case
 │  → <root>/main.gpex:85:53
-│    ¦ fn _fn_pascal_case_type_param(type_: const typeref, PascalCaseParamTypeParam: type_) -> type_ {
-│    ¦                                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ fn _fn_pascal_case_type_param(type_: const typeref, PascalCaseTypeParam: type_) -> type_ {
+│    ¦                                                     ^^^^^^^^^^^^^^^^^^^
 ┴
-warning: `SCREAMING_SNAKE_CASE_PARAM_TYPE_PARAM` identifier not in snake_case
+warning: `SCREAMING_SNAKE_CASE_TYPE_PARAM` identifier not in snake_case
 │  → <root>/main.gpex:88:62
-│    ¦ fn _fn_screaming_snake_case_type_param(type_: const typeref, SCREAMING_SNAKE_CASE_PARAM_TYPE_PARAM: type_) -> type_ {
-│    ¦                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ fn _fn_screaming_snake_case_type_param(type_: const typeref, SCREAMING_SNAKE_CASE_TYPE_PARAM: type_) -> type_ {
+│    ¦                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
