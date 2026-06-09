@@ -7,8 +7,11 @@ const _RESULT_VAR = var_;
 
 // =========================| Function parameter reference |=========================
 
-fn _fn_param_ref(param: typeref, other: param) -> param {
-    return other;
+fn _fn_with_param_as_param_type(param1: typeref, param2: param1) -> i32 {
+    return param2;
+}
+fn _fn_with_param_as_return_type(param: typeref) -> param {
+    return param;
 }
 
 // =========================| Function call |=========================
