@@ -38,6 +38,10 @@ fn _fn_snake_case(_snake_case_param: i32) -> i32 { return 0; }
 
 fn _fn_snake_case_typeref(_snake_case_param_typeref: typeref) -> i32 { return 0; }
 
+fn _fn_snake_case_const(snake_case_param_const: const i32) -> i32 {
+    return snake_case_param_const;
+}
+
 fn _fn_snake_case_const_typeref(snake_case_param_const_typeref: const typeref) -> typeref {
     return snake_case_param_const_typeref;
 }
