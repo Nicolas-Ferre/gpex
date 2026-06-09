@@ -113,7 +113,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
           fail_ci_if_error: true
@@ -129,6 +129,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Git check
+        run: git fetch origin ${{ github.base_ref }} && git diff FETCH_HEAD --check
       - name: Retrieve rust version
         id: rust_version
         run: bash -x .github/scripts/extract_rust_version.sh

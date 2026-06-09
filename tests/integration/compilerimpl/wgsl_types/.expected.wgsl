@@ -38,4 +38,3 @@ var<storage, read_write> b: Buffer;
 fn main() {
 
 }
-

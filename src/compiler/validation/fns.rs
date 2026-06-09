@@ -15,8 +15,11 @@ impl Validator<'_, '_> {
         let dependency_result = DependencyResolver::new(self.indexes).scan_fn(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_prelude_location(ref_, compilerimpl_span, &mut self.context)?;
-        self.validate_params(&node.params, compilerimpl_span.is_some())?;
-        self.validate_fn_return_type(node)?;
+        self.run_with_const_location(ConstLocation::FnSignature, |self_| {
+            self_.validate_params(&node.params, compilerimpl_span.is_some())?;
+            self_.validate_fn_return_type(node)?;
+            Ok(())
+        })?;
         validators::item::check_unary_operator_fn(node, &mut self.context, self.indexes)?;
         validators::item::check_binary_operator_fn(node, &mut self.context, self.indexes)?;
         self.validate_body(node)?;
@@ -30,7 +33,7 @@ impl Validator<'_, '_> {
         let typeref_type = self.indexes.search_prelude_type("typeref");
         let may_return_typeref = match self.type_resolver.fn_type(node) {
             Type::Struct(struct_ref) => struct_ref == typeref_type,
-            Type::NoReturn => false,
+            Type::Param(_) | Type::NoReturn => false,
             Type::Unknown => unreachable!("return type should be validated before"),
         };
         let allowed_cases: &[Case] = if may_return_typeref && node.const_keyword_span.is_some() {

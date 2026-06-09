@@ -3,3 +3,8 @@ error: `source` item not found
 │    ¦ var _result_global = source;
 │    ¦                      ^^^^^^
 ┴
+error: `source` item not found
+│  → <root>/main.gpex:12:22
+│    ¦ fn _own_type(source: source) -> i32 {
+│    ¦                      ^^^^^^
+┴

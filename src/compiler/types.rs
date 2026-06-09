@@ -1,4 +1,4 @@
-use crate::compiler::consts::ConstResolver;
+use crate::compiler::consts::{ConstResolver, ConstValue};
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
@@ -12,22 +12,26 @@ use derive_where::derive_where;
 #[derive(Debug)]
 pub(crate) struct TypeResolver<'item, 'index> {
     indexes: &'index Indexes<'item>,
+    pub(crate) const_resolver: ConstResolver<'item, 'index>,
 }
 
 impl<'item, 'index> TypeResolver<'item, 'index> {
     pub(crate) fn new(indexes: &'index Indexes<'item>) -> Self {
-        Self { indexes }
+        Self {
+            indexes,
+            const_resolver: ConstResolver::new(indexes),
+        }
     }
 
-    pub(crate) fn var_type(&self, node: &VarDefinition) -> Type<'item> {
+    pub(crate) fn var_type(&mut self, node: &VarDefinition) -> Type<'item> {
         self.expr_type(&node.default_value)
     }
 
-    pub(crate) fn param_type(&self, node: &Param) -> Type<'item> {
+    pub(crate) fn param_type(&mut self, node: &Param) -> Type<'item> {
         self.expr_as_type(&node.type_)
     }
 
-    pub(crate) fn fn_type(&self, node: &FnDefinition) -> Type<'item> {
+    pub(crate) fn fn_type(&mut self, node: &FnDefinition) -> Type<'item> {
         if let Some(return_type) = node.return_type.as_ref() {
             self.expr_as_type(return_type)
         } else {
@@ -35,46 +39,59 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         }
     }
 
-    pub(crate) fn expr_type(&self, node: &Expr) -> Type<'item> {
+    pub(crate) fn expr_type(&mut self, node: &Expr) -> Type<'item> {
         match node {
             Expr::F32Literal(_) => Type::Struct(self.indexes.search_prelude_type("f32")),
             Expr::U32Literal(_) => Type::Struct(self.indexes.search_prelude_type("u32")),
             Expr::I32Literal(_) => Type::Struct(self.indexes.search_prelude_type("i32")),
             Expr::BoolLiteral(_) => Type::Struct(self.indexes.search_prelude_type("bool")),
-            Expr::Call(node) => self.source_type(node.id),
-            Expr::Ident(node) => self.source_type(node.id),
+            Expr::Call(node) => self.source_type(node.id, &node.args),
+            Expr::Ident(node) => self.source_type(node.id, &[]),
         }
     }
 
-    pub(crate) fn expr_as_type(&self, node: &Expr) -> Type<'item> {
-        let type_ = ConstResolver::new(self.indexes).expr_value(node).type_ref();
-        if let Some(struct_) = type_ {
-            Type::Struct(struct_)
-        } else {
-            Type::Unknown
-        }
-    }
-
-    fn source_type(&self, node_id: u64) -> Type<'item> {
+    fn source_type(&mut self, node_id: u64, args: &[Expr]) -> Type<'item> {
         match self.indexes.sources.get(&node_id) {
-            Some(source) => self.item_type(*source),
+            Some(source) => self.item_type(*source, args),
             None => Type::Unknown,
         }
     }
 
-    fn item_type(&self, node: ItemRef<'_>) -> Type<'item> {
+    fn item_type(&mut self, node: ItemRef<'_>, args: &[Expr]) -> Type<'item> {
         match node {
             ItemRef::Var(node) => self.var_type(node),
             ItemRef::Const(node) => self.expr_type(&node.value),
             ItemRef::Struct(_) => Type::Struct(self.indexes.search_prelude_type("typeref")),
-            ItemRef::Fn(node) => {
-                if let Some(return_type) = &node.return_type {
-                    self.expr_as_type(return_type)
-                } else {
-                    Type::NoReturn
-                }
-            }
+            ItemRef::Fn(node) => self.const_fn_type(node, args),
             ItemRef::Param(node) => self.param_type(node),
+        }
+    }
+
+    pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
+        self.const_resolver.enter_scope();
+        for (param, arg) in node.params.params.iter().zip(args) {
+            let value = self.const_resolver.expr_value(arg);
+            self.const_resolver.add_value(param.id, value);
+        }
+        let type_ = if let Some(return_type) = node.return_type.as_ref() {
+            self.expr_as_type(return_type)
+        } else {
+            Type::NoReturn
+        };
+        self.const_resolver.exit_scope();
+        type_
+    }
+
+    pub(crate) fn expr_as_type(&mut self, node: &Expr) -> Type<'item> {
+        match self.const_resolver.expr_value(node) {
+            ConstValue::TypeRef(type_) => Type::Struct(type_),
+            ConstValue::Param(type_) => Type::Param(type_),
+            ConstValue::I32(_)
+            | ConstValue::U32(_)
+            | ConstValue::F32(_)
+            | ConstValue::Bool(_)
+            | ConstValue::Unknown
+            | ConstValue::RuntimeValue => Type::Unknown,
         }
     }
 }
@@ -83,6 +100,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
 #[derive_where(PartialEq)]
 pub(crate) enum Type<'item> {
     Struct(&'item StructDefinition),
+    Param(&'item Param),
     NoReturn,
     #[derive_where(incomparable)]
     Unknown,
@@ -90,10 +108,10 @@ pub(crate) enum Type<'item> {
 
 impl<'item> Type<'item> {
     pub(crate) fn name(self) -> Result<&'item str, ValidateError> {
-        if let Type::Struct(struct_) = self {
-            Ok(&struct_.name)
-        } else {
-            Err(ValidateError)
+        match self {
+            Type::Struct(struct_) => Ok(&struct_.name),
+            Type::Param(param) => Ok(&param.name),
+            Type::NoReturn | Type::Unknown => Err(ValidateError),
         }
     }
 

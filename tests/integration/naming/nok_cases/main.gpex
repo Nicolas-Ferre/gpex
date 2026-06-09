@@ -42,6 +42,16 @@ fn _SCREAMING_SNAKE_CASE_FN_RETURN_TYPEREF() -> typeref { return i32; }
 const fn _camelCaseFnReturnConstTyperef() -> typeref { return i32; }
 const fn _SCREAMING_SNAKE_CASE_FN_RETURN_CONST_TYPEREF() -> typeref { return i32; }
 
+const fn _camelCaseFnReturnConstParam(type_: const typeref, value: type_) -> type_ {
+    return value;
+}
+const fn _PascalCaseFnReturnConstParam(type_: const typeref, value: type_) -> type_ {
+    return value;
+}
+const fn _SCREAMING_SNAKE_CASE_FN_RETURN_CONST_PARAM(type_: const typeref, value: type_) -> type_ {
+    return value;
+}
+
 // =========================| Function parameter |=========================
 
 fn _fn_camel_case(_camelCaseParam: i32) -> i32 { return 0; }
@@ -51,3 +61,13 @@ fn _fn_screaming_snake_case(_SCREAMING_SNAKE_CASE_PARAM: i32) -> i32 { return 0;
 fn _fn_camel_case_typeref(_camelCaseParamTyperef: typeref) -> i32 { return 0; }
 fn _fn_pascal_case_typeref(_PascalCaseParamTyperef: typeref) -> i32 { return 0; }
 fn _fn_screaming_snake_case_typeref(_SCREAMING_SNAKE_CASE_PARAM_TYPEREF: typeref) -> i32 { return 0; }
+
+fn _fn_camel_case_type_param(type_: const typeref, camelCaseParamTypeParam: type_) -> type_ {
+    return camelCaseParamTypeParam;
+}
+fn _fn_pascal_case_type_param(type_: const typeref, PascalCaseParamTypeParam: type_) -> type_ {
+    return PascalCaseParamTypeParam;
+}
+fn _fn_screaming_snake_case_type_param(type_: const typeref, SCREAMING_SNAKE_CASE_PARAM_TYPE_PARAM: type_) -> type_ {
+    return SCREAMING_SNAKE_CASE_PARAM_TYPE_PARAM;
+}

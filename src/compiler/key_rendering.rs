@@ -16,7 +16,7 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
         }
     }
 
-    pub(crate) fn call_key(&self, node: &Call) -> Result<String, ValidateError> {
+    pub(crate) fn call_key(&mut self, node: &Call) -> Result<String, ValidateError> {
         let fn_name = &node.name;
         let arg_types = node
             .args
@@ -27,7 +27,7 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
         Ok(format!("{fn_name}({arg_types})"))
     }
 
-    pub(crate) fn fn_key(&self, node: &FnDefinition) -> Result<String, ValidateError> {
+    pub(crate) fn fn_key(&mut self, node: &FnDefinition) -> Result<String, ValidateError> {
         let fn_name = &node.name;
         let param_types = node
             .params

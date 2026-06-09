@@ -42,8 +42,10 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
             ItemRef::Const(_) | ItemRef::Struct(_) => true,
             ItemRef::Fn(node) => node.const_keyword_span.is_some(),
             ItemRef::Param(node) => match self.location {
+                ConstLocation::FnSignature | ConstLocation::ConstCallArg => {
+                    node.const_mark_span().is_some()
+                }
                 ConstLocation::ConstFnBody => true,
-                ConstLocation::ConstCallArg => node.const_mark_span().is_some(),
                 ConstLocation::Other => false,
             },
         }
@@ -67,6 +69,7 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum ConstLocation {
+    FnSignature,
     ConstFnBody,
     ConstCallArg,
     Other,
@@ -147,7 +150,14 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             Some(ItemRef::Var(_)) => ConstValue::RuntimeValue,
             Some(ItemRef::Const(child)) => self.expr_value(&child.value),
             Some(ItemRef::Struct(child)) => ConstValue::TypeRef(child),
-            Some(ItemRef::Param(child)) => self.value(child.id),
+            Some(ItemRef::Param(child)) => {
+                let value = self.value(child.id);
+                if value == ConstValue::RuntimeValue && child.const_mark_span().is_some() {
+                    ConstValue::Param(child)
+                } else {
+                    value
+                }
+            }
             Some(ItemRef::Fn(_)) => unreachable!("identifier should not refer to a function"),
             None => ConstValue::Unknown,
         }
@@ -175,6 +185,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             for (param_id, arg_value) in param_args {
                 match arg_value {
                     ConstValue::TypeRef(_)
+                    | ConstValue::Param(_)
                     | ConstValue::I32(_)
                     | ConstValue::U32(_)
                     | ConstValue::F32(_)
@@ -262,22 +273,13 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) enum ConstValue<'item> {
     TypeRef(&'item StructDefinition),
+    Param(&'item Param),
     I32(i32),
     U32(u32),
     F32(HashableF32),
     Bool(bool),
     Unknown,
     RuntimeValue,
-}
-
-impl<'item> ConstValue<'item> {
-    pub(crate) fn type_ref(&self) -> Option<&'item StructDefinition> {
-        if let Self::TypeRef(type_) = self {
-            Some(type_)
-        } else {
-            None
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy)]

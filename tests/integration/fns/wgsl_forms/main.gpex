@@ -1,0 +1,9 @@
+// Test all forms of function definitions (must be correctly transpiled).
+
+// =========================| Parametrized type |=========================
+
+var _result1_parametrized_type = parametrized_type(i32, 1); // expected: 1
+var _result2_parametrized_type = parametrized_type(u32, 2u); // expected: 2u
+fn parametrized_type(type_: const typeref, param: type_) -> type_ {
+    return param;
+}

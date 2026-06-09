@@ -70,7 +70,7 @@ impl Validator<'_, '_> {
         Ok(())
     }
 
-    fn const_allowed_cases(&self, node: &ConstDefinition) -> &'static [Case] {
+    fn const_allowed_cases(&mut self, node: &ConstDefinition) -> &'static [Case] {
         let may_be_typeref = self
             .type_resolver
             .expr_type(&node.value)

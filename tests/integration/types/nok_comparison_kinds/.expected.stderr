@@ -1,0 +1,36 @@
+error: expression with invalid type `typeref`
+│  → <root>/main.gpex:6:12
+│    ¦     return i32;
+│    ¦            ^^^
+├─ info: expected `param` type
+│  → <root>/main.gpex:5:53
+│    ¦ fn _fn_type_ref_type_param(param: const typeref) -> param {
+│    ¦                                                     ^^^^^
+┴
+error: expression with invalid type `param1`
+│  → <root>/main.gpex:12:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `param2` type
+│  → <root>/main.gpex:11:94
+│    ¦ fn _fn_type_param_type_param(param1: const typeref, param2: const typeref, value: param1) -> param2 {
+│    ¦                                                                                              ^^^^^^
+┴
+error: expression with invalid type `param`
+│  → <root>/main.gpex:18:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/main.gpex:17:67
+│    ¦ fn _fn_type_param_type_ref(param: const typeref, value: param) -> i32 {
+│    ¦                                                                   ^^^
+┴
+error: expression with invalid type `param`
+│  → <root>/main.gpex:24:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/main.gpex:23:93
+│    ¦ fn _fn_type_param_thought_fn_type_ref(param: const typeref, value: type_param_fn(param)) -> i32 {
+│    ¦                                                                                             ^^^
+┴
