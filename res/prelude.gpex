@@ -57,3 +57,12 @@ pub struct bool = compilerimpl {}
 /// var value = 1 + 2;
 /// ```
 pub const fn __add__(left: i32, right: i32) -> i32 = compilerimpl;
+
+/// Returns the size in bytes of a type.
+///
+/// # Examples
+///
+/// ```gpex
+/// const I32_SIZE = sizeof(i32); // 4u
+/// ```
+pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
