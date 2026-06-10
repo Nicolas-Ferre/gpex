@@ -1,5 +1,4 @@
 use crate::compiler::consts::{ConstChecker, ConstLocation};
-use crate::compiler::indexing::indexer::FN_CALL_SEARCH_CONFIG;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
@@ -10,7 +9,6 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::parsing::statements::Statement;
 use crate::utils::dependencies::Dependencies;
-use crate::utils::indexing::{SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 
 #[derive(Debug)]
@@ -113,8 +111,15 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
             };
             self.run_with_fn_config(fn_config, |self_| self_.scan_item(source, node.span))
         } else {
+            // TODO: to adapt or simplify
             // Covers case where there is function circular dependency from their signature.
-            for source in self.search_not_indexed_call_source(node) {
+            for &source in self
+                .indexes
+                .candidate_sources
+                .get(&node.id)
+                .into_iter()
+                .flatten()
+            {
                 let fn_config = FnConfig {
                     is_fn_const: false,
                     are_args_const: false,
@@ -147,20 +152,6 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
 
     fn scan_param(&mut self, node: &Param) -> Result<(), Vec<Span>> {
         self.scan_expr(&node.type_) // no-fn-check (recursivity)
-    }
-
-    fn search_not_indexed_call_source(&self, node: &Call) -> Vec<ItemRef<'item>> {
-        let search_params = SearchParams {
-            key: &node.key(),
-            location: node,
-            imports: &self.indexes.imports,
-            config: FN_CALL_SEARCH_CONFIG,
-        };
-        self.indexes
-            .items
-            .search(search_params, Visibility::Enforced)
-            .filter(|item| matches!(item, ItemRef::Fn(_)))
-            .collect()
     }
 
     fn run_with_fn_config<O>(
