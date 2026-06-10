@@ -12,6 +12,10 @@ error: `fn_param_type(i32)` item not found
 │  → <root>/main.gpex:16:29
 │    ¦ var _result_fn_param_type = fn_param_type(0);
 │    ¦                             ^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/main.gpex:17:4
+│    ¦ fn fn_param_type(param: _SOURCE) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `_SOURCE` item not found
 │  → <root>/main.gpex:17:25

@@ -7,9 +7,17 @@ error: `_mismatching_param_type(u32)` item not found
 │  → <root>/main.gpex:12:38
 │    ¦ var _result_mismatching_param_type = _mismatching_param_type(0u);
 │    ¦                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/main.gpex:16:4
+│    ¦ fn _mismatching_param_type(param: f32) -> f32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/main.gpex:13:4
+│    ¦ fn _mismatching_param_type(param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `unknown` item not found
-│  → <root>/main.gpex:19:35
+│  → <root>/main.gpex:22:35
 │    ¦ const fn unknown_return_type() -> unknown {
 │    ¦                                   ^^^^^^^
 ┴

@@ -82,6 +82,15 @@ impl<'item> ItemRef<'item> {
         }
     }
 
+    pub(crate) fn call_signature_span(self) -> Span {
+        match self {
+            Self::Fn(node) => node.signature_span,
+            Self::Var(_) | Self::Const(_) | Self::Struct(_) | Self::Param(_) => {
+                unreachable!("only functions can be called")
+            }
+        }
+    }
+
     pub(crate) fn has_same_param_types_as_args(self, args: &[Expr], indexes: &Indexes<'_>) -> bool {
         let params = self.params();
         debug_assert_eq!(params.params.len(), args.len());

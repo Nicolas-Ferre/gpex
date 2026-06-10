@@ -13,6 +13,9 @@ var _result_mismatching_param_type = _mismatching_param_type(0u);
 fn _mismatching_param_type(param: i32) -> i32 {
     return param;
 }
+fn _mismatching_param_type(param: f32) -> f32 {
+    return param;
+}
 
 // ==========================| Invalid return type as call argument |==========================
 
