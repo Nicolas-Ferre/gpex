@@ -190,6 +190,10 @@ impl<'item> Indexer<'item> {
             self.index_accessible_source(&call, call.span, source);
         } else if let Some(source) = self.search_not_accessible_call_source(call, search_params) {
             self.index_not_accessible_source(call.id, source);
+        } else if let candidates = self.search_candidate_call_sources(search_params)
+            && !candidates.is_empty()
+        {
+            self.index_candidate_sources(call.id, candidates);
         }
     }
 
@@ -220,6 +224,17 @@ impl<'item> Indexer<'item> {
             .items
             .search(search_params, Visibility::Enforced)
             .find(|item| item.has_same_param_types_as_args(&call.args, &self.indexes))
+    }
+
+    fn search_candidate_call_sources(
+        &self,
+        search_params: SearchParams<'_, &Call>,
+    ) -> Vec<ItemRef<'item>> {
+        self.indexes
+            .items
+            .search(search_params, Visibility::Enforced)
+            .filter(|item| matches!(item, ItemRef::Fn(_)))
+            .collect()
     }
 
     fn search_not_accessible_call_source(
@@ -273,6 +288,10 @@ impl<'item> Indexer<'item> {
             .item_first_refs
             .entry(source.id())
             .or_insert_with(|| ref_span);
+    }
+
+    fn index_candidate_sources(&mut self, node_id: u64, sources: Vec<ItemRef<'item>>) {
+        self.indexes.candidate_sources.insert(node_id, sources);
     }
 
     fn index_not_accessible_source(&mut self, node_id: u64, source: ItemRef<'item>) {

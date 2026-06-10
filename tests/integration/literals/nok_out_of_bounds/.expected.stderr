@@ -17,6 +17,10 @@ error: `out_of_bound_f32_param_type(i32)` item not found
 │  → <root>/main.gpex:10:8
 │    ¦ repeat out_of_bound_f32_param_type(0);
 │    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/main.gpex:11:4
+│    ¦ fn out_of_bound_f32_param_type(_param: 400000000000000000000000000000000000000.0) -> i32 { return 0; }
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `f32` literal out of bounds
 │  → <root>/main.gpex:11:40
@@ -42,6 +46,10 @@ error: `out_of_bound_i32_param_type(i32)` item not found
 │  → <root>/main.gpex:20:8
 │    ¦ repeat out_of_bound_i32_param_type(0);
 │    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/main.gpex:21:4
+│    ¦ fn out_of_bound_i32_param_type(_param: 2_147_483_648) -> i32 { return 0; }
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `i32` literal out of bounds
 │  → <root>/main.gpex:21:40
@@ -62,6 +70,10 @@ error: `out_of_bound_u32_param_type(i32)` item not found
 │  → <root>/main.gpex:29:8
 │    ¦ repeat out_of_bound_u32_param_type(0);
 │    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/main.gpex:30:4
+│    ¦ fn out_of_bound_u32_param_type(_param: 4_294_967_296u) -> i32 { return 0; }
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `u32` literal out of bounds
 │  → <root>/main.gpex:30:40

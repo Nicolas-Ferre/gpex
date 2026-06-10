@@ -188,7 +188,16 @@ pub(crate) fn check_found<'index>(
             level: LogLevel::Error,
             msg: format!("`{displayed_key}` item not found"),
             location: Some(context.location(span)),
-            inner: if let Some(priv_source) = indexes.priv_sources.get(&node.id()) {
+            inner: if let Some(candidates) = indexes.candidate_sources.get(&node.id()) {
+                candidates
+                    .iter()
+                    .map(|candidate| LogInner {
+                        level: LogLevel::Info,
+                        msg: "similar candidate".into(),
+                        location: Some(context.location(candidate.call_signature_span())),
+                    })
+                    .collect()
+            } else if let Some(priv_source) = indexes.priv_sources.get(&node.id()) {
                 vec![LogInner {
                     level: LogLevel::Info,
                     msg: "item not qualified with `pub`".into(),
