@@ -207,6 +207,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
         }
     }
 
+    #[allow(clippy::wildcard_enum_match_arm)]
     fn fn_compilerimpl_value(&self, node: &FnDefinition) -> ConstValue<'item> {
         match node.name.as_str() {
             "__add__" => {
@@ -221,15 +222,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             }
             "sizeof" => match self.value(node.params.params[0].id) {
                 ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
-                ConstValue::Param(_)
-                | ConstValue::I32(_)
-                | ConstValue::U32(_)
-                | ConstValue::F32(_)
-                | ConstValue::Bool(_)
-                | ConstValue::Unknown
-                | ConstValue::RuntimeValue => {
-                    unreachable!("not implemented `{}` constant GPU function", node.name)
-                }
+                _ => unreachable!("not implemented `{}` constant GPU function", node.name),
             },
             _ => unreachable!("not implemented `{}` constant GPU function", node.name),
         }
