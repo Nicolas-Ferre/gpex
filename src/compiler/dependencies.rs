@@ -111,8 +111,8 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
             };
             self.run_with_fn_config(fn_config, |self_| self_.scan_item(source, node.span))
         } else {
-            // TODO: to adapt or simplify
             // Covers case where there is function circular dependency from their signature.
+            // As call source resolution is not done in this case, candidates are followed instead.
             for &source in self
                 .indexes
                 .candidate_sources
