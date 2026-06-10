@@ -188,12 +188,12 @@ impl<'item> Indexer<'item> {
         };
         if let Some(source) = self.search_accessible_call_source(call, search_params) {
             self.index_accessible_source(&call, call.span, source);
+        } else if let Some(source) = self.search_not_accessible_call_source(call, search_params) {
+            self.index_not_accessible_source(call.id, source);
         } else if let candidates = self.search_candidate_call_sources(search_params)
             && !candidates.is_empty()
         {
             self.index_candidate_sources(call.id, candidates);
-        } else if let Some(source) = self.search_not_accessible_call_source(call, search_params) {
-            self.index_not_accessible_source(call.id, source);
         }
     }
 

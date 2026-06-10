@@ -6,3 +6,9 @@ const _RESULT_CONST = _CONST;
 var _result_var = _var;
 var _result_fn = _fn(0);
 var _result_param = param;
+
+// This function is here to confirm it is not listed as potential candidate
+// because there is an inaccessible but exact function elsewhere.
+fn _fn(param: u32) -> u32 {
+    return param;
+}
