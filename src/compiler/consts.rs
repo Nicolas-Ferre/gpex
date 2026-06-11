@@ -207,18 +207,24 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
         }
     }
 
+    #[allow(clippy::wildcard_enum_match_arm)]
     fn fn_compilerimpl_value(&self, node: &FnDefinition) -> ConstValue<'item> {
-        if node.name == "__add__" {
-            let left = self.value(node.params.params[0].id);
-            let right = self.value(node.params.params[1].id);
-            match (left, right) {
-                (ConstValue::I32(left), ConstValue::I32(right)) => {
-                    ConstValue::I32(left.wrapping_add(right))
+        match node.name.as_str() {
+            "__add__" => {
+                let left = self.value(node.params.params[0].id);
+                let right = self.value(node.params.params[1].id);
+                match (left, right) {
+                    (ConstValue::I32(left), ConstValue::I32(right)) => {
+                        ConstValue::I32(left.wrapping_add(right))
+                    }
+                    _ => unreachable!("not implemented `{}` constant GPU function", node.name),
                 }
-                _ => unreachable!("not implemented `{}` constant GPU function", node.name),
             }
-        } else {
-            unreachable!("not implemented `{}` constant GPU function", node.name)
+            "sizeof" => match self.value(node.params.params[0].id) {
+                ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
+                _ => unreachable!("not implemented `{}` constant GPU function", node.name),
+            },
+            _ => unreachable!("not implemented `{}` constant GPU function", node.name),
         }
     }
 
