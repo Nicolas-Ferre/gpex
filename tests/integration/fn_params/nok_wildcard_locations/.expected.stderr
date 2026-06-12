@@ -1,15 +1,18 @@
-error: wildcard expression is only allowed as a function parameter type
+error: invalid wildcard expression
 │  → <root>/main.gpex:5:21
 │    ¦ var _wildcard_var = ?;
 │    ¦                     ^
+├─ info: wildcards are ony allowed as function parameter types
 ┴
-error: wildcard expression is only allowed as a function parameter type
+error: invalid wildcard expression
 │  → <root>/main.gpex:9:34
 │    ¦ fn _fn_wildcard_return_type() -> ? {
 │    ¦                                  ^
+├─ info: wildcards are ony allowed as function parameter types
 ┴
-error: wildcard expression is only allowed as a function parameter type
+error: invalid wildcard expression
 │  → <root>/main.gpex:15:44
 │    ¦ fn _fn_nested_wildcard_type(_param: sizeof(?)) -> i32 {
 │    ¦                                            ^
+├─ info: wildcards are ony allowed as function parameter types
 ┴

@@ -132,9 +132,13 @@ pub(crate) fn report_invalid_wildcard_location(
 ) -> Result<(), ValidateError> {
     context.logs.push(Log {
         level: LogLevel::Error,
-        msg: "wildcard expression is only allowed as a function parameter type".into(),
+        msg: "invalid wildcard expression".into(),
         location: Some(context.location(span)),
-        inner: vec![],
+        inner: vec![LogInner {
+            level: LogLevel::Info,
+            msg: "wildcards are ony allowed as function parameter types".into(),
+            location: None,
+        }],
     });
     Err(ValidateError)
 }
