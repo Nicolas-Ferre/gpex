@@ -30,8 +30,8 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
             Expr::F32Literal(_)
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)
-            | Expr::BoolLiteral(_) => true,
-            Expr::Wildcard(_) => false, // TODO: true?
+            | Expr::BoolLiteral(_)
+            | Expr::Wildcard(_) => true,
             Expr::Call(node) => self.is_call_const(node),
             Expr::Ident(node) => self.is_ident_const(node),
         }

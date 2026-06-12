@@ -98,7 +98,7 @@ impl<'item> ItemRef<'item> {
         let mut type_resolver = TypeResolver::new(indexes);
         type_resolver.const_resolver.enter_scope();
         for (param, arg) in params.params.iter().zip(args) {
-            // TODO: to be made more flexible
+            // TODO: to include the whole in the comparison function
             if !matches!(param.type_, Expr::Wildcard(_))
                 && type_resolver.param_type(param) != type_resolver.expr_type(arg)
             {

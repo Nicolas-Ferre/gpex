@@ -137,8 +137,8 @@ pub(crate) enum Type<'item> {
 impl<'item> Type<'item> {
     pub(crate) fn name(self) -> Result<String, ValidateError> {
         match self {
-            Type::Struct(struct_) => Ok(struct_.name.to_string()),
-            Type::Param(param) => Ok(param.name.to_string()),
+            Type::Struct(struct_) => Ok(struct_.name.clone()),
+            Type::Param(param) => Ok(param.name.clone()),
             Type::Wildcard(param) => Ok(format!("typeof({})", param.name)),
             Type::NoReturn | Type::Unknown => Err(ValidateError),
         }
