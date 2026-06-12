@@ -8,11 +8,13 @@ use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct TypeResolver<'item, 'index> {
     indexes: &'index Indexes<'item>,
     pub(crate) const_resolver: ConstResolver<'item, 'index>,
+    scope_types: Vec<HashMap<u64, &'item StructDefinition>>,
 }
 
 impl<'item, 'index> TypeResolver<'item, 'index> {
@@ -20,7 +22,23 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         Self {
             indexes,
             const_resolver: ConstResolver::new(indexes),
+            scope_types: vec![],
         }
+    }
+
+    pub(crate) fn enter_scope(&mut self) {
+        self.scope_types.push(HashMap::new());
+    }
+
+    pub(crate) fn exit_scope(&mut self) {
+        self.scope_types.pop();
+    }
+
+    pub(crate) fn add_type(&mut self, id: u64, type_: &'item StructDefinition) {
+        self.scope_types
+            .last_mut()
+            .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
+            .insert(id, type_);
     }
 
     pub(crate) fn var_type(&mut self, node: &VarDefinition) -> Type<'item> {
@@ -28,7 +46,14 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
     }
 
     pub(crate) fn param_type(&mut self, node: &Param) -> Type<'item> {
-        self.expr_as_type(&node.type_)
+        if matches!(node.type_, Expr::Wildcard(_)) {
+            self.scope_types
+                .last()
+                .and_then(|types| types.get(&node.id).copied())
+                .map_or(Type::Unknown, Type::Struct)
+        } else {
+            self.expr_as_type(&node.type_)
+        }
     }
 
     pub(crate) fn fn_type(&mut self, node: &FnDefinition) -> Type<'item> {
@@ -45,7 +70,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
             Expr::U32Literal(_) => Type::Struct(self.indexes.search_prelude_type("u32")),
             Expr::I32Literal(_) => Type::Struct(self.indexes.search_prelude_type("i32")),
             Expr::BoolLiteral(_) => Type::Struct(self.indexes.search_prelude_type("bool")),
-            Expr::Wildcard(_) => Type::Unknown, // TODO: not new introduced type?
+            Expr::Wildcard(_) => Type::Unknown,
             Expr::Call(node) => self.source_type(node.id, &node.args),
             Expr::Ident(node) => self.source_type(node.id, &[]),
         }
@@ -97,6 +122,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
     }
 }
 
+// TODO: add wildcard type?
 #[derive(Debug, Clone, Copy)]
 #[derive_where(PartialEq)]
 pub(crate) enum Type<'item> {
@@ -107,6 +133,7 @@ pub(crate) enum Type<'item> {
     Unknown,
 }
 
+// TODO: create comparison function and replace all equalities of types
 impl<'item> Type<'item> {
     pub(crate) fn name(self) -> Result<&'item str, ValidateError> {
         match self {

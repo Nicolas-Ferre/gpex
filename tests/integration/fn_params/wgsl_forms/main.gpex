@@ -18,6 +18,8 @@ fn const_param(param: const f32, _other_param: u32) -> f32 {
 
 // =========================| Wildcard type |=========================
 
-fn _wildcard_param(_param: ?) -> i32 {
-    return 0;
+var _result_wildcard_1 = wildcard_param(5u); // expected: 5
+var _result_wildcard_2 = wildcard_param(6.0); // expected: 5
+fn wildcard_param(_param: ?) -> i32 {
+    return 5;
 }

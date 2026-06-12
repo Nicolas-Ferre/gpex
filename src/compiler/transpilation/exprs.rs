@@ -80,30 +80,6 @@ impl<'item> Transpiler<'item, '_> {
         self.shader += ")";
     }
 
-    fn register_specialized_fn(
-        &mut self,
-        node: &Call,
-        child: &'item FnDefinition,
-        body: &'item FnStatementsBody,
-    ) -> usize {
-        let const_param_values = node
-            .args
-            .iter()
-            .zip(&child.params.params)
-            .filter(|(_, param)| param.const_mark_span().is_some())
-            .map(|(arg, _)| self.type_resolver.const_resolver.expr_value(arg))
-            .collect::<Vec<_>>();
-        let specialized_fn_id = self.specialized_fns.len();
-        *self
-            .specialized_fns
-            .entry(SpecializedFn {
-                fn_: child,
-                const_param_values,
-                fn_body: body,
-            })
-            .or_insert(specialized_fn_id)
-    }
-
     fn transpile_ident(&mut self, node: &Ident) {
         match self.indexes.sources[&node.id] {
             ItemRef::Var(node) => self.transpile_var_ref(node),
@@ -138,5 +114,55 @@ impl<'item> Transpiler<'item, '_> {
     fn transpile_struct_ref(&mut self, node: &StructDefinition) {
         let [id_part1, id_part2] = endianness::to_portable_u32x2(node.id);
         _ = write!(self.shader, "vec2<u32>({id_part1}, {id_part2})");
+    }
+
+    fn register_specialized_fn(
+        &mut self,
+        node: &Call,
+        child: &'item FnDefinition,
+        body: &'item FnStatementsBody,
+    ) -> usize {
+        let specialized_fn_id = self.specialized_fns.len();
+        let specialized_fn = SpecializedFn {
+            fn_: child,
+            const_param_values: self.fn_const_param_values(node, child),
+            wildcard_param_types: self.fn_param_wildcard_types(node, child),
+            fn_body: body,
+        };
+        *self
+            .specialized_fns
+            .entry(specialized_fn)
+            .or_insert(specialized_fn_id)
+    }
+
+    fn fn_const_param_values(
+        &mut self,
+        node: &Call,
+        child: &FnDefinition,
+    ) -> Vec<ConstValue<'item>> {
+        node.args
+            .iter()
+            .zip(&child.params.params)
+            .filter(|(_, param)| param.const_mark_span().is_some())
+            .map(|(arg, _)| self.type_resolver.const_resolver.expr_value(arg))
+            .collect::<Vec<_>>()
+    }
+
+    fn fn_param_wildcard_types(
+        &mut self,
+        node: &Call,
+        child: &FnDefinition,
+    ) -> Vec<&'item StructDefinition> {
+        node.args
+            .iter()
+            .zip(&child.params.params)
+            .filter(|(_, param)| matches!(param.type_, Expr::Wildcard(_)))
+            .map(|(arg, _)| {
+                self.type_resolver
+                    .expr_type(arg)
+                    .struct_ref()
+                    .unwrap_or_else(|| unreachable!("argument type should be validated before"))
+            })
+            .collect::<Vec<_>>()
     }
 }

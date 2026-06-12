@@ -109,7 +109,7 @@ impl Validator<'_, '_> {
     fn validate_param_type(&mut self, param: &Param) -> Result<(), ValidateError> {
         if matches!(param.type_, Expr::Wildcard(_)) {
             return Ok(());
-        };
+        }
         self.with_const_mark_span(Some(param.colon_span), |self_| {
             self_.validate_expr(&param.type_)
         })?;
