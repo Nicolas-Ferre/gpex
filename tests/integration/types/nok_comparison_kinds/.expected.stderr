@@ -34,3 +34,48 @@ error: expression with invalid type `param`
 │    ¦ fn _fn_type_param_thought_fn_type_ref(param: const typeref, value: type_param_fn(param)) -> i32 {
 │    ¦                                                                                             ^^^
 ┴
+error: expression with invalid type `typeof(value)`
+│  → <root>/main.gpex:33:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/main.gpex:32:39
+│    ¦ fn _fn_wildcard_type_ref(value: ?) -> i32 {
+│    ¦                                       ^^^
+┴
+error: expression with invalid type `i32`
+│  → <root>/main.gpex:39:14
+│    ¦     target = value;
+│    ¦              ^^^^^
+├─ info: expected `typeof(target)` type
+│  → <root>/main.gpex:39:5
+│    ¦     target = value;
+│    ¦     ^^^^^^
+┴
+error: expression with invalid type `typeof(value)`
+│  → <root>/main.gpex:45:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `type_` type
+│  → <root>/main.gpex:44:63
+│    ¦ fn _fn_wildcard_type_param(type_: const typeref, value: ?) -> type_ {
+│    ¦                                                               ^^^^^
+┴
+error: expression with invalid type `type_`
+│  → <root>/main.gpex:51:14
+│    ¦     target = value;
+│    ¦              ^^^^^
+├─ info: expected `typeof(target)` type
+│  → <root>/main.gpex:51:5
+│    ¦     target = value;
+│    ¦     ^^^^^^
+┴
+error: expression with invalid type `typeof(value)`
+│  → <root>/main.gpex:57:14
+│    ¦     target = value;
+│    ¦              ^^^^^
+├─ info: expected `typeof(target)` type
+│  → <root>/main.gpex:57:5
+│    ¦     target = value;
+│    ¦     ^^^^^^
+┴

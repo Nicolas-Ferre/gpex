@@ -11,8 +11,8 @@ use crate::compiler::validation::{Validator, validators};
 use crate::utils::indexing::ItemNodeRef;
 use crate::utils::validation::ValidateError;
 
-impl Validator<'_, '_> {
-    pub(crate) fn validate_item(&mut self, node: &Item) -> Result<(), ValidateError> {
+impl<'item> Validator<'item, '_> {
+    pub(crate) fn validate_item(&mut self, node: &'item Item) -> Result<(), ValidateError> {
         debug_assert!(self.const_mark_span.is_none());
         match node {
             Item::Import(_) => Ok(()), // validated during previous pass
@@ -26,7 +26,7 @@ impl Validator<'_, '_> {
 
     pub(crate) fn validate_params(
         &mut self,
-        params: &ParamGroup,
+        params: &'item ParamGroup,
         is_compilerimpl: bool,
     ) -> Result<(), ValidateError> {
         let mut are_params_valid = true;
@@ -92,7 +92,7 @@ impl Validator<'_, '_> {
 
     fn validate_param(
         &mut self,
-        param: &Param,
+        param: &'item Param,
         is_compilerimpl: bool,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Param(param);

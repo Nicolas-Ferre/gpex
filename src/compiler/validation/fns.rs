@@ -7,8 +7,8 @@ use crate::compiler::types::Type;
 use crate::compiler::validation::{Validator, validators};
 use crate::utils::validation::ValidateError;
 
-impl Validator<'_, '_> {
-    pub(super) fn validate_fn(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
+impl<'item> Validator<'item, '_> {
+    pub(super) fn validate_fn(&mut self, node: &'item FnDefinition) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Fn(node);
         let compilerimpl_span = node.body.compilerimpl_keyword_span();
         let dependency_result = DependencyResolver::new(self.indexes).scan_fn(node);

@@ -45,12 +45,12 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         self.expr_type(&node.default_value)
     }
 
-    pub(crate) fn param_type(&mut self, node: &Param) -> Type<'item> {
+    pub(crate) fn param_type(&mut self, node: &'item Param) -> Type<'item> {
         if matches!(node.type_, Expr::Wildcard(_)) {
             self.scope_types
                 .last()
                 .and_then(|types| types.get(&node.id).copied())
-                .map_or(Type::Unknown, Type::Struct)
+                .map_or(Type::Wildcard(node), Type::Struct)
         } else {
             self.expr_as_type(&node.type_)
         }
@@ -83,7 +83,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         }
     }
 
-    fn item_type(&mut self, node: ItemRef<'_>, args: &[Expr]) -> Type<'item> {
+    fn item_type(&mut self, node: ItemRef<'item>, args: &[Expr]) -> Type<'item> {
         match node {
             ItemRef::Var(node) => self.var_type(node),
             ItemRef::Const(node) => self.expr_type(&node.value),
@@ -122,12 +122,12 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
     }
 }
 
-// TODO: add wildcard type?
 #[derive(Debug, Clone, Copy)]
 #[derive_where(PartialEq)]
 pub(crate) enum Type<'item> {
     Struct(&'item StructDefinition),
     Param(&'item Param),
+    Wildcard(&'item Param),
     NoReturn,
     #[derive_where(incomparable)]
     Unknown,
@@ -135,10 +135,11 @@ pub(crate) enum Type<'item> {
 
 // TODO: create comparison function and replace all equalities of types
 impl<'item> Type<'item> {
-    pub(crate) fn name(self) -> Result<&'item str, ValidateError> {
+    pub(crate) fn name(self) -> Result<String, ValidateError> {
         match self {
-            Type::Struct(struct_) => Ok(&struct_.name),
-            Type::Param(param) => Ok(&param.name),
+            Type::Struct(struct_) => Ok(struct_.name.to_string()),
+            Type::Param(param) => Ok(param.name.to_string()),
+            Type::Wildcard(param) => Ok(format!("typeof({})", param.name)),
             Type::NoReturn | Type::Unknown => Err(ValidateError),
         }
     }

@@ -81,7 +81,7 @@ impl<'item> Transpiler<'item, '_> {
 
     fn transpile_params(
         &mut self,
-        node: &ParamGroup,
+        node: &'item ParamGroup,
         mut const_param_values: impl Iterator<Item = ConstValue<'item>>,
         mut wildcard_param_types: impl Iterator<Item = &'item StructDefinition>,
     ) {
@@ -98,7 +98,7 @@ impl<'item> Transpiler<'item, '_> {
         self.shader += ")";
     }
 
-    fn transpile_param(&mut self, node: &Param) {
+    fn transpile_param(&mut self, node: &'item Param) {
         let id = node.id;
         let type_ = self
             .type_resolver

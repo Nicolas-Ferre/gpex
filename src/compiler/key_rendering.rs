@@ -37,7 +37,7 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
             .iter()
             .map(|param| {
                 if matches!(param.type_, Expr::Wildcard(_)) {
-                    Ok(QUESTION_MARK_SYMBOL.slice)
+                    Ok(QUESTION_MARK_SYMBOL.slice.into())
                 } else {
                     self.type_resolver.expr_as_type(&param.type_).name()
                 }

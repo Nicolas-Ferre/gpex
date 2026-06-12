@@ -17,8 +17,9 @@ pub(crate) fn check_types(
     expected_type: Type<'_>,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    if let Type::Struct(_) | Type::Param(_) = expected_type
-        && let Type::Struct(_) | Type::Param(_) = actual_type
+    // TODO: add method to Type to return if this is a comparable type
+    if let Type::Struct(_) | Type::Param(_) | Type::Wildcard(_) = expected_type
+        && let Type::Struct(_) | Type::Param(_) | Type::Wildcard(_) = actual_type
     {
         if actual_type == expected_type {
             Ok(())

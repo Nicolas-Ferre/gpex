@@ -47,7 +47,7 @@ impl<'item, 'index> Validator<'item, 'index> {
 
     pub(crate) fn validate_modules(
         mut self,
-        modules: &[Module],
+        modules: &'item [Module],
         is_warning_treated_as_error: bool,
     ) -> Result<Vec<Log>, Vec<Log>> {
         let mut is_error_detected = false;
@@ -79,7 +79,7 @@ impl<'item, 'index> Validator<'item, 'index> {
             || (is_warning_treated_as_error && log.level == LogLevel::Warning)
     }
 
-    fn validate_module(&mut self, node: &Module) -> Result<(), ValidateError> {
+    fn validate_module(&mut self, node: &'item Module) -> Result<(), ValidateError> {
         let mut is_module_valid = true;
         let mut are_imports_finished = false;
         for item in &node.items {
