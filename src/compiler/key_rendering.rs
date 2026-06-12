@@ -1,6 +1,8 @@
 use crate::compiler::indexing::indexes::Indexes;
+use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::parsing::symbols::QUESTION_MARK_SYMBOL;
 use crate::compiler::types::TypeResolver;
 use crate::utils::validation::ValidateError;
 
@@ -33,7 +35,13 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
             .params
             .params
             .iter()
-            .map(|param| self.type_resolver.expr_as_type(&param.type_).name())
+            .map(|param| {
+                if matches!(param.type_, Expr::Wildcard(_)) {
+                    Ok(QUESTION_MARK_SYMBOL.slice)
+                } else {
+                    self.type_resolver.expr_as_type(&param.type_).name()
+                }
+            })
             .collect::<Result<Vec<_>, _>>()?
             .join(", ");
         Ok(format!("{fn_name}({param_types})"))

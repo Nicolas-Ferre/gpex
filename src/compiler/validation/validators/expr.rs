@@ -124,3 +124,16 @@ pub(crate) fn check_ref(expr: &Expr, context: &mut ValidateContext<'_>, indexes:
         });
     }
 }
+
+pub(crate) fn report_invalid_wildcard_location(
+    span: Span,
+    context: &mut ValidateContext<'_>,
+) -> Result<(), ValidateError> {
+    context.logs.push(Log {
+        level: LogLevel::Error,
+        msg: "wildcard expression is only allowed as a function parameter type".into(),
+        location: Some(context.location(span)),
+        inner: vec![],
+    });
+    Err(ValidateError)
+}

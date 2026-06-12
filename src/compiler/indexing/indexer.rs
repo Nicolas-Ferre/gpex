@@ -167,7 +167,8 @@ impl<'item> Indexer<'item> {
             Expr::F32Literal(_)
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)
-            | Expr::BoolLiteral(_) => {}
+            | Expr::BoolLiteral(_)
+            | Expr::Wildcard(_) => {}
             Expr::Call(expr) => self.index_call(expr),
             Expr::Ident(expr) => self.index_ident(expr),
         }

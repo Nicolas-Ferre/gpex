@@ -31,6 +31,7 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)
             | Expr::BoolLiteral(_) => true,
+            Expr::Wildcard(_) => false, // TODO: true?
             Expr::Call(node) => self.is_call_const(node),
             Expr::Ident(node) => self.is_ident_const(node),
         }
@@ -116,6 +117,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             Expr::U32Literal(node) => Self::u32_literal_value(node),
             Expr::I32Literal(node) => Self::i32_literal_value(node),
             Expr::BoolLiteral(node) => ConstValue::Bool(node.value),
+            Expr::Wildcard(_) => ConstValue::Unknown,
             Expr::Call(node) => self.call_value(node),
             Expr::Ident(node) => self.ident_value(node),
         }
@@ -260,6 +262,7 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)
             | Expr::BoolLiteral(_)
+            | Expr::Wildcard(_)
             | Expr::Call(_) => None,
             Expr::Ident(ident) => match self.indexes.sources.get(&ident.id)? {
                 ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_) => None,

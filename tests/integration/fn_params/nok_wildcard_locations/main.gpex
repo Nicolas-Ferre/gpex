@@ -1,0 +1,17 @@
+// Test wildcard expressions in disallowed locations (must generate errors).
+
+// =========================| Global variable value |=========================
+
+var _wildcard_var = ?;
+
+// =========================| Function return type |=========================
+
+fn _fn_wildcard_return_type() -> ? {
+    return 0;
+}
+
+// =========================| Nested function parameter type |=========================
+
+fn _fn_nested_wildcard_type(_param: sizeof(?)) -> i32 {
+    return 0;
+}

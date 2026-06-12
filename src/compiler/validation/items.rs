@@ -1,5 +1,6 @@
 use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
@@ -95,6 +96,20 @@ impl Validator<'_, '_> {
         is_compilerimpl: bool,
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Param(param);
+        self.validate_param_type(param)?;
+        if !is_compilerimpl {
+            validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
+        }
+        validators::ident::check_char_count(param.name_span, &mut self.context);
+        let allowed_cases = self.param_allowed_cases(param);
+        validators::ident::check_case(param.name_span, allowed_cases, &mut self.context);
+        Ok(())
+    }
+
+    fn validate_param_type(&mut self, param: &Param) -> Result<(), ValidateError> {
+        if matches!(param.type_, Expr::Wildcard(_)) {
+            return Ok(());
+        };
         self.with_const_mark_span(Some(param.colon_span), |self_| {
             self_.validate_expr(&param.type_)
         })?;
@@ -105,12 +120,6 @@ impl Validator<'_, '_> {
             Type::Struct(self.indexes.search_prelude_type("typeref")),
             &mut self.context,
         )?;
-        if !is_compilerimpl {
-            validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
-        }
-        validators::ident::check_char_count(param.name_span, &mut self.context);
-        let allowed_cases = self.param_allowed_cases(param);
-        validators::ident::check_case(param.name_span, allowed_cases, &mut self.context);
         Ok(())
     }
 }

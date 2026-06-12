@@ -22,7 +22,8 @@ impl<'item> Transpiler<'item, '_> {
                 Expr::F32Literal(_)
                 | Expr::U32Literal(_)
                 | Expr::I32Literal(_)
-                | Expr::BoolLiteral(_) => unreachable!("literals should be constant"),
+                | Expr::BoolLiteral(_)
+                | Expr::Wildcard(_) => unreachable!("expression should be validated before"),
             }
         } else {
             self.transpile_const_value(&value);

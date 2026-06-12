@@ -45,6 +45,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
             Expr::U32Literal(_) => Type::Struct(self.indexes.search_prelude_type("u32")),
             Expr::I32Literal(_) => Type::Struct(self.indexes.search_prelude_type("i32")),
             Expr::BoolLiteral(_) => Type::Struct(self.indexes.search_prelude_type("bool")),
+            Expr::Wildcard(_) => Type::Unknown, // TODO: not new introduced type?
             Expr::Call(node) => self.source_type(node.id, &node.args),
             Expr::Ident(node) => self.source_type(node.id, &[]),
         }
