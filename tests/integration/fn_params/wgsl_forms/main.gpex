@@ -23,3 +23,11 @@ var _result_wildcard_2 = wildcard_param(6.0); // expected: 5
 fn wildcard_param(_param: ?) -> i32 {
     return 5;
 }
+
+// =========================| Constant wildcard type |=========================
+
+var _result_const_wildcard_1 = const_wildcard_param(7u); // expected: 8
+var _result_const_wildcard_2 = const_wildcard_param(8.0); // expected: 8
+fn const_wildcard_param(_param: const ?) -> i32 {
+    return 8;
+}

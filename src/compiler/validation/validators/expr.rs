@@ -136,7 +136,7 @@ pub(crate) fn report_invalid_wildcard_location(
         location: Some(context.location(span)),
         inner: vec![LogInner {
             level: LogLevel::Info,
-            msg: "wildcards are ony allowed as function parameter types".into(),
+            msg: "wildcards are only allowed as function parameter types".into(),
             location: None,
         }],
     });
