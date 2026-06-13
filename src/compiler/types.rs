@@ -7,8 +7,8 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::utils::validation::ValidateError;
-use derive_where::derive_where;
 use std::collections::HashMap;
+use derive_where::derive_where;
 
 #[derive(Debug)]
 pub(crate) struct TypeResolver<'item, 'index> {
@@ -133,8 +133,11 @@ pub(crate) enum Type<'item> {
     Unknown,
 }
 
-// TODO: create comparison function and replace all equalities of types
 impl<'item> Type<'item> {
+    pub(crate) fn is_comparable(self) -> bool {
+        matches!(self, Self::Struct(_) | Self::Param(_) | Self::Wildcard(_))
+    }
+
     pub(crate) fn name(self) -> Result<String, ValidateError> {
         match self {
             Type::Struct(struct_) => Ok(struct_.name.clone()),

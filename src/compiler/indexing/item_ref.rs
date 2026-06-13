@@ -4,7 +4,7 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::types::TypeResolver;
+use crate::compiler::types::{Type, TypeResolver};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 
@@ -98,10 +98,9 @@ impl<'item> ItemRef<'item> {
         let mut type_resolver = TypeResolver::new(indexes);
         type_resolver.const_resolver.enter_scope();
         for (param, arg) in params.params.iter().zip(args) {
-            // TODO: to include the whole in the comparison function
-            if !matches!(param.type_, Expr::Wildcard(_))
-                && type_resolver.param_type(param) != type_resolver.expr_type(arg)
-            {
+            let param_type = type_resolver.param_type(param);
+            let arg_type = type_resolver.expr_type(arg);
+            if !matches!(param_type, Type::Wildcard(_)) && param_type != arg_type {
                 return false;
             }
             if param.const_mark_span().is_some() {

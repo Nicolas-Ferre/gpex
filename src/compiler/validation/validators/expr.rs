@@ -17,26 +17,21 @@ pub(crate) fn check_types(
     expected_type: Type<'_>,
     context: &mut ValidateContext<'_>,
 ) -> Result<(), ValidateError> {
-    // TODO: add method to Type to return if this is a comparable type
-    if let Type::Struct(_) | Type::Param(_) | Type::Wildcard(_) = expected_type
-        && let Type::Struct(_) | Type::Param(_) | Type::Wildcard(_) = actual_type
-    {
-        if actual_type == expected_type {
-            Ok(())
-        } else {
-            context.logs.push(Log {
-                level: LogLevel::Error,
-                msg: format!("expression with invalid type `{}`", actual_type.name()?),
-                location: Some(context.location(actual_span)),
-                inner: vec![LogInner {
-                    level: LogLevel::Info,
-                    msg: format!("expected `{}` type", expected_type.name()?),
-                    location: expected_span.map(|span| context.location(span)),
-                }],
-            });
-            Err(ValidateError)
-        }
+    if !actual_type.is_comparable() || !expected_type.is_comparable() {
+        Err(ValidateError)
+    } else if actual_type == expected_type {
+        Ok(())
     } else {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            msg: format!("expression with invalid type `{}`", actual_type.name()?),
+            location: Some(context.location(actual_span)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                msg: format!("expected `{}` type", expected_type.name()?),
+                location: expected_span.map(|span| context.location(span)),
+            }],
+        });
         Err(ValidateError)
     }
 }
