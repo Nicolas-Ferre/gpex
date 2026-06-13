@@ -51,8 +51,8 @@ fn _fn_type_param_wildcard(type_: const typeref, target: ?, value: type_) {
     target = value;
 }
 
-// ====================| Assigned wildcard type as other wildcard type |====================
+// ====================| Returned wildcard type as other wildcard type |====================
 
-fn _fn_wildcard_other_wildcard(target: ?, value: ?) {
-    target = value;
+fn _fn_wildcard_other_wildcard(param1: ?, param2: ?) -> typeof(param2) {
+    return param1;
 }

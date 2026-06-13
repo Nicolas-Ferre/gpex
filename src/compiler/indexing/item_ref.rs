@@ -1,7 +1,7 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
@@ -132,5 +132,10 @@ impl<'item> ItemRef<'item> {
             ItemRef::Param(item) => item.name.clone(),
             ItemRef::Struct(_) => unreachable!("structs are not yet validated"),
         }
+    }
+
+    pub(crate) fn is_param_constness_ignored(self) -> bool {
+        matches!(self,ItemRef::Fn(fn_)
+            if matches!(fn_.body, FnBody::Compilerimpl(_)) && fn_.name == "typeof")
     }
 }

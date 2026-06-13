@@ -9,7 +9,7 @@ use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
 impl<'item> ValueResolver<'item, '_> {
-    pub(crate) fn add_type(&mut self, id: u64, type_: &'item StructDefinition) {
+    pub(crate) fn add_type(&mut self, id: u64, type_: Type<'item>) {
         self.scopes
             .last_mut()
             .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
@@ -25,8 +25,9 @@ impl<'item> ValueResolver<'item, '_> {
         if matches!(node.type_, Expr::Wildcard(_)) {
             self.scopes
                 .last()
-                .and_then(|scope| scope.wildcard_types.get(&node.id).copied())
-                .map_or(Type::Wildcard(node), Type::Struct)
+                .and_then(|scope| scope.wildcard_types.get(&node.id))
+                .copied()
+                .unwrap_or(Type::Wildcard(node))
         } else {
             self.expr_as_type(&node.type_)
         }
@@ -72,6 +73,10 @@ impl<'item> ValueResolver<'item, '_> {
     pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
         self.run_scoped(|self_| {
             for (param, arg) in node.params.params.iter().zip(args) {
+                if matches!(param.type_, Expr::Wildcard(_)) {
+                    let arg_type = self_.expr_type(arg);
+                    self_.add_type(param.id, arg_type);
+                }
                 let value = self_.expr_const_value(arg);
                 self_.add_value(param.id, value);
             }
@@ -87,6 +92,7 @@ impl<'item> ValueResolver<'item, '_> {
         match self.expr_const_value(node) {
             ConstValue::TypeRef(type_) => Type::Struct(type_),
             ConstValue::Param(type_) => Type::Param(type_),
+            ConstValue::WildcardType(type_) => Type::Wildcard(type_),
             ConstValue::I32(_)
             | ConstValue::U32(_)
             | ConstValue::F32(_)

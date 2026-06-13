@@ -100,7 +100,10 @@ impl<'item> Transpiler<'item, '_> {
                 _ = write!(self.shader, "f32({})", formatting::f32_to_string(value.0));
             }
             ConstValue::Bool(value) => _ = write!(self.shader, "u32({})", u32::from(*value)),
-            ConstValue::Param(_) | ConstValue::Unknown | ConstValue::RuntimeValue => {
+            ConstValue::Param(_)
+            | ConstValue::WildcardType(_)
+            | ConstValue::Unknown
+            | ConstValue::RuntimeValue => {
                 unreachable!("non-constant cannot be transpiled")
             }
         }

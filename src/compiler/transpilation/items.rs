@@ -6,6 +6,7 @@ use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement,
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::compiler::transpilation::{SpecializedFn, Transpiler};
 use crate::compiler::values::consts::ConstValue;
+use crate::compiler::values::types::Type;
 use std::fmt::Write;
 
 impl<'item> Transpiler<'item, '_> {
@@ -152,6 +153,6 @@ impl<'item> Transpiler<'item, '_> {
         let type_ = wildcard_param_types
             .next()
             .unwrap_or_else(|| unreachable!("mismatching number of wildcard params"));
-        self.value_resolver.add_type(param.id, type_);
+        self.value_resolver.add_type(param.id, Type::Struct(type_));
     }
 }

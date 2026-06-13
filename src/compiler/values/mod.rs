@@ -4,8 +4,8 @@ pub(crate) mod consts;
 pub(crate) mod types;
 
 use crate::compiler::indexing::indexes::Indexes;
-use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::values::consts::ConstValue;
+use crate::compiler::values::types::Type;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -41,5 +41,5 @@ impl<'item, 'index> ValueResolver<'item, 'index> {
 #[derive(Debug, Default)]
 struct Scope<'item> {
     const_values: HashMap<u64, ConstValue<'item>>,
-    wildcard_types: HashMap<u64, &'item StructDefinition>,
+    wildcard_types: HashMap<u64, Type<'item>>,
 }

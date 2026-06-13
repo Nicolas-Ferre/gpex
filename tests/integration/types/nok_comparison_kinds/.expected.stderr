@@ -70,12 +70,12 @@ error: expression with invalid type `type_`
 │    ¦     target = value;
 │    ¦     ^^^^^^
 ┴
-error: expression with invalid type `typeof(value)`
-│  → <root>/main.gpex:57:14
-│    ¦     target = value;
-│    ¦              ^^^^^
-├─ info: expected `typeof(target)` type
-│  → <root>/main.gpex:57:5
-│    ¦     target = value;
-│    ¦     ^^^^^^
+error: expression with invalid type `typeof(param1)`
+│  → <root>/main.gpex:57:12
+│    ¦     return param1;
+│    ¦            ^^^^^^
+├─ info: expected `typeof(param2)` type
+│  → <root>/main.gpex:56:57
+│    ¦ fn _fn_wildcard_other_wildcard(param1: ?, param2: ?) -> typeof(param2) {
+│    ¦                                                         ^^^^^^^^^^^^^^
 ┴
