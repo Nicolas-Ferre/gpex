@@ -156,7 +156,9 @@ impl<'item> Transpiler<'item, '_> {
         node.args
             .iter()
             .zip(&child.params.params)
-            .filter(|(_, param)| matches!(param.type_, Expr::Wildcard(_)))
+            .filter(|(_, param)| {
+                param.const_mark_span().is_none() && matches!(param.type_, Expr::Wildcard(_))
+            })
             .map(|(arg, _)| {
                 self.type_resolver
                     .expr_type(arg)
