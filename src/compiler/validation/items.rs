@@ -52,7 +52,7 @@ impl<'item> Validator<'item, '_> {
             &mut self.context,
             &mut self.key_renderer,
             self.indexes,
-        )?;
+        );
         validators::ident::check_char_count(node.name_span, &mut self.context);
         validators::ident::check_case(node.name_span, Self::VAR_ALLOWED_CASES, &mut self.context);
         self.validate_expr(&node.default_value)?;
@@ -69,7 +69,7 @@ impl<'item> Validator<'item, '_> {
             &mut self.context,
             &mut self.key_renderer,
             self.indexes,
-        )?;
+        );
         validators::ident::check_char_count(node.name_span, &mut self.context);
         let allowed_cases = self.const_allowed_cases(node);
         validators::ident::check_case(node.name_span, allowed_cases, &mut self.context);
@@ -112,7 +112,7 @@ impl<'item> Validator<'item, '_> {
                 &mut self.context,
                 &mut self.key_renderer,
                 self.indexes,
-            )?;
+            );
         }
         validators::ident::check_char_count(param.name_span, &mut self.context);
         let allowed_cases = self.param_allowed_cases(param);

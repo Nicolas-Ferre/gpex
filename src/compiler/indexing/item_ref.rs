@@ -8,7 +8,6 @@ use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::types::{Type, TypeResolver};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
-use crate::utils::validation::ValidateError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(crate) enum ItemRef<'item> {
@@ -78,7 +77,7 @@ impl<'item> ItemRef<'item> {
         match self {
             Self::Var(node) => node.name_span,
             Self::Const(node) => node.name_span,
-            Self::Struct(_) => unreachable!("struct name span is never used"),
+            Self::Struct(node) => node.name_span,
             Self::Fn(node) => node.name_span,
             Self::Param(node) => node.name_span,
         }
@@ -122,16 +121,15 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn displayed_key(
-        self,
-        key_renderer: &mut KeyRenderer<'_, '_>,
-    ) -> Result<String, ValidateError> {
+    pub(crate) fn displayed_key(self, key_renderer: &mut KeyRenderer<'_, '_>) -> String {
         match self {
-            ItemRef::Fn(item) => key_renderer.fn_key(item),
-            ItemRef::Var(item) => Ok(item.name.clone()),
-            ItemRef::Const(item) => Ok(item.name.clone()),
-            ItemRef::Param(item) => Ok(item.name.clone()),
-            ItemRef::Struct(item) => Ok(item.name.clone()),
+            ItemRef::Fn(item) => key_renderer
+                .fn_key(item)
+                .unwrap_or_else(|_| unreachable!("function should be validated before")),
+            ItemRef::Var(item) => item.name.clone(),
+            ItemRef::Const(item) => item.name.clone(),
+            ItemRef::Param(item) => item.name.clone(),
+            ItemRef::Struct(item) => item.name.clone(),
         }
     }
 }

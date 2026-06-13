@@ -28,7 +28,7 @@ impl<'item> Validator<'item, '_> {
             &mut self.context,
             &mut self.key_renderer,
             self.indexes,
-        )?;
+        );
         Ok(())
     }
 

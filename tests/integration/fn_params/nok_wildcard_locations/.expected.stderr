@@ -28,3 +28,9 @@ error: invalid wildcard expression
 │    ¦                                            ^
 ├─ info: wildcards are only allowed as function parameter types
 ┴
+error: invalid wildcard expression
+│  → <root>/main.gpex:31:39
+│    ¦ var _usage_const_arg = fn_const_param(?);
+│    ¦                                       ^
+├─ info: wildcards are only allowed as function parameter types
+┴

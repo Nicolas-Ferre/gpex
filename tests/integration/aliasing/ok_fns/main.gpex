@@ -64,10 +64,10 @@ var _result_wildcard_before_concrete = wildcard_before_concrete(0); // expected:
 
 // =========================| Wildcard after concrete parameter type |=========================
 
-fn concrete_before_wildcard(_param: i32) -> bool {
+fn wildcard_after_concrete(_param: i32) -> bool {
     return false;
 }
-fn concrete_before_wildcard(_param: ?) -> bool {
+fn wildcard_after_concrete(_param: ?) -> bool {
     return true;
 }
-var _result_concrete_before_wildcard = concrete_before_wildcard(0); // expected: true
+var _result_wildcard_after_concrete = wildcard_after_concrete(0); // expected: true
