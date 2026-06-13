@@ -70,18 +70,17 @@ impl<'item> ValueResolver<'item, '_> {
     }
 
     pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
-        self.enter_scope();
-        for (param, arg) in node.params.params.iter().zip(args) {
-            let value = self.expr_const_value(arg);
-            self.add_value(param.id, value);
-        }
-        let type_ = if let Some(return_type) = node.return_type.as_ref() {
-            self.expr_as_type(return_type)
-        } else {
-            Type::NoReturn
-        };
-        self.exit_scope();
-        type_
+        self.run_scoped(|self_| {
+            for (param, arg) in node.params.params.iter().zip(args) {
+                let value = self_.expr_const_value(arg);
+                self_.add_value(param.id, value);
+            }
+            if let Some(return_type) = node.return_type.as_ref() {
+                self_.expr_as_type(return_type)
+            } else {
+                Type::NoReturn
+            }
+        })
     }
 
     pub(crate) fn expr_as_type(&mut self, node: &Expr) -> Type<'item> {
