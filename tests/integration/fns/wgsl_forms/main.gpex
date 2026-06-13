@@ -18,3 +18,13 @@ fn forward_wildcard(param: ?) -> i32 {
 fn wildcard(_param: ?) -> i32 {
     return 3;
 }
+
+// =========================| Forwarded const to not const wildcard type |=========================
+
+var _result_forwarded_const_to_not_const_wildcard_type = forward_const_wildcard(1); // expected: 1
+fn forward_const_wildcard(value: const ?) -> i32 {
+    return not_const_wildcard(value);
+}
+fn not_const_wildcard(_value: ?) -> i32 {
+    return 1;
+}

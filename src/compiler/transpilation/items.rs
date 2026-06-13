@@ -87,10 +87,10 @@ impl<'item> Transpiler<'item, '_> {
     ) {
         self.shader += "(";
         for param in &node.params {
+            self.resolve_param_wildcard_type(param, &mut wildcard_param_types);
             if param.const_mark_span().is_some() {
                 self.resolve_const_param_value(param, &mut const_param_values);
             } else {
-                self.resolve_param_wildcard_type(param, &mut wildcard_param_types);
                 self.transpile_param(param);
                 self.shader += ", ";
             }
