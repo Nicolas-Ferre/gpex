@@ -33,8 +33,13 @@ warning: `__fn_with_double_underscore_prefix()` item unused
 │    ¦ fn __fn_with_double_underscore_prefix() -> i32 { return 0; }
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
+warning: `wildcard_param(?)` item unused
+│  → <root>/main.gpex:24:4
+│    ¦ fn wildcard_param(_param: ?) -> i32 { return 0; }
+│    ¦    ^^^^^^^^^^^^^^
+┴
 warning: `param` item unused
-│  → <root>/main.gpex:27:8
+│  → <root>/main.gpex:28:8
 │    ¦ fn _fn(param: i32) -> i32 { return 0; }
 │    ¦        ^^^^^
 ┴

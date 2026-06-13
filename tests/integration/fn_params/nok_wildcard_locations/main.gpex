@@ -20,6 +20,12 @@ fn _fn_wildcard_return() -> i32 {
     return ?;
 }
 
+// =========================| Assignment statement left value |=========================
+
+fn _fn_wildcard_assignment() {
+    ? = 0;
+}
+
 // =========================| Nested function parameter type |=========================
 
 fn _fn_nested_wildcard_type(_param: sizeof(?)) -> i32 {

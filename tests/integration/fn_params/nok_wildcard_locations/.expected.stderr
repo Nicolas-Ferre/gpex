@@ -23,13 +23,19 @@ error: invalid wildcard expression
 ├─ info: wildcards are only allowed as function parameter types
 ┴
 error: invalid wildcard expression
-│  → <root>/main.gpex:25:44
+│  → <root>/main.gpex:26:5
+│    ¦     ? = 0;
+│    ¦     ^
+├─ info: wildcards are only allowed as function parameter types
+┴
+error: invalid wildcard expression
+│  → <root>/main.gpex:31:44
 │    ¦ fn _fn_nested_wildcard_type(_param: sizeof(?)) -> i32 {
 │    ¦                                            ^
 ├─ info: wildcards are only allowed as function parameter types
 ┴
 error: invalid wildcard expression
-│  → <root>/main.gpex:31:39
+│  → <root>/main.gpex:37:39
 │    ¦ var _usage_const_arg = fn_const_param(?);
 │    ¦                                       ^
 ├─ info: wildcards are only allowed as function parameter types

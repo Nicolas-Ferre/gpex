@@ -146,8 +146,8 @@ impl<'item> Validator<'item, '_> {
         &mut self,
         node: &AssignmentStatement,
     ) -> Result<(), ValidateError> {
-        validators::expr::check_ref(&node.assigned, &mut self.context, self.indexes);
         self.validate_expr(&node.assigned)?;
+        validators::expr::check_ref(&node.assigned, &mut self.context, self.indexes);
         Ok(())
     }
 
