@@ -49,7 +49,7 @@ impl Validator<'_, '_> {
             let param = source.map(|source| &source.params().params[index]);
             let param_const_mark_span = param.and_then(Param::const_mark_span);
             let const_mark_span = if is_constness_ignored {
-                param_const_mark_span // TODO: None ? (+ add corresponding test)
+                None
             } else {
                 param_const_mark_span.or(self.const_mark_span)
             };
