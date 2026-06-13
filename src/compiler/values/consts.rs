@@ -11,14 +11,6 @@ use crate::compiler::values::ValueResolver;
 use std::hash::{Hash, Hasher};
 
 impl<'item> ValueResolver<'item, '_> {
-    fn const_value(&self, id: u64) -> ConstValue<'item> {
-        self.scopes
-            .last()
-            .and_then(|scope| scope.const_values.get(&id))
-            .cloned()
-            .unwrap_or(ConstValue::RuntimeValue)
-    }
-
     pub(crate) fn add_value(&mut self, id: u64, value: ConstValue<'item>) {
         self.scopes
             .last_mut()
@@ -187,6 +179,14 @@ impl<'item> ValueResolver<'item, '_> {
                 ItemRef::Param(param) => Some(param),
             },
         }
+    }
+
+    fn const_value(&self, id: u64) -> ConstValue<'item> {
+        self.scopes
+            .last()
+            .and_then(|scope| scope.const_values.get(&id))
+            .cloned()
+            .unwrap_or(ConstValue::RuntimeValue)
     }
 }
 
