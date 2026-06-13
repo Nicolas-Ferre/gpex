@@ -8,7 +8,6 @@ use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::types::Type;
 use crate::compiler::validation::{Validator, validators};
-use crate::utils::indexing::ItemNodeRef;
 use crate::utils::validation::ValidateError;
 
 impl<'item> Validator<'item, '_> {
@@ -48,7 +47,12 @@ impl<'item> Validator<'item, '_> {
         let dependency_result = DependencyResolver::new(self.indexes).scan_var(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_unique_definition(ref_, &mut self.context, self.indexes)?;
-        validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
+        validators::item::check_usage(
+            ref_,
+            &mut self.context,
+            &mut self.key_renderer,
+            self.indexes,
+        )?;
         validators::ident::check_char_count(node.name_span, &mut self.context);
         validators::ident::check_case(node.name_span, Self::VAR_ALLOWED_CASES, &mut self.context);
         self.validate_expr(&node.default_value)?;
@@ -60,7 +64,12 @@ impl<'item> Validator<'item, '_> {
         let dependency_result = DependencyResolver::new(self.indexes).scan_const(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_unique_definition(ref_, &mut self.context, self.indexes)?;
-        validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
+        validators::item::check_usage(
+            ref_,
+            &mut self.context,
+            &mut self.key_renderer,
+            self.indexes,
+        )?;
         validators::ident::check_char_count(node.name_span, &mut self.context);
         let allowed_cases = self.const_allowed_cases(node);
         validators::ident::check_case(node.name_span, allowed_cases, &mut self.context);
@@ -98,7 +107,12 @@ impl<'item> Validator<'item, '_> {
         let ref_ = ItemRef::Param(param);
         self.validate_param_type(param)?;
         if !is_compilerimpl {
-            validators::item::check_usage(ref_, &ref_.key(), &mut self.context, self.indexes);
+            validators::item::check_usage(
+                ref_,
+                &mut self.context,
+                &mut self.key_renderer,
+                self.indexes,
+            )?;
         }
         validators::ident::check_char_count(param.name_span, &mut self.context);
         let allowed_cases = self.param_allowed_cases(param);

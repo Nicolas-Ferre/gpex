@@ -1,4 +1,5 @@
 use crate::compiler::indexing::indexes::Indexes;
+use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
@@ -7,6 +8,7 @@ use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::types::{Type, TypeResolver};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
+use crate::utils::validation::ValidateError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(crate) enum ItemRef<'item> {
@@ -117,6 +119,19 @@ impl<'item> ItemRef<'item> {
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
                 unreachable!("only functions can have parameters")
             }
+        }
+    }
+
+    pub(crate) fn displayed_key(
+        self,
+        key_renderer: &mut KeyRenderer<'_, '_>,
+    ) -> Result<String, ValidateError> {
+        match self {
+            ItemRef::Fn(item) => key_renderer.fn_key(item),
+            ItemRef::Var(item) => Ok(item.name.clone()),
+            ItemRef::Const(item) => Ok(item.name.clone()),
+            ItemRef::Param(item) => Ok(item.name.clone()),
+            ItemRef::Struct(item) => Ok(item.name.clone()),
         }
     }
 }

@@ -23,8 +23,12 @@ impl<'item> Validator<'item, '_> {
         validators::item::check_binary_operator_fn(node, &mut self.context, self.indexes)?;
         self.validate_body(node)?;
         self.validate_fn_name(node);
-        let fn_key = self.key_renderer.fn_key(node)?;
-        validators::item::check_usage(ref_, &fn_key, &mut self.context, self.indexes);
+        validators::item::check_usage(
+            ref_,
+            &mut self.context,
+            &mut self.key_renderer,
+            self.indexes,
+        )?;
         Ok(())
     }
 
