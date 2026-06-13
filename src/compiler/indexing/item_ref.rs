@@ -129,7 +129,7 @@ impl<'item> ItemRef<'item> {
             ItemRef::Var(item) => item.name.clone(),
             ItemRef::Const(item) => item.name.clone(),
             ItemRef::Param(item) => item.name.clone(),
-            ItemRef::Struct(item) => item.name.clone(),
+            ItemRef::Struct(_) => unreachable!("structs are not yet validated"),
         }
     }
 }

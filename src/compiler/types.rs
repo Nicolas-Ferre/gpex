@@ -7,8 +7,8 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::utils::validation::ValidateError;
-use std::collections::HashMap;
 use derive_where::derive_where;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct TypeResolver<'item, 'index> {
