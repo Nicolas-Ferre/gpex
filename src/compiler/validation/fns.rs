@@ -3,8 +3,8 @@ use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
-use crate::compiler::types::Type;
 use crate::compiler::validation::{Validator, validators};
+use crate::compiler::values::types::Type;
 use crate::utils::validation::ValidateError;
 
 impl<'item> Validator<'item, '_> {
@@ -45,7 +45,7 @@ impl<'item> Validator<'item, '_> {
         self.with_const_mark_span(Some(arrow_span), |self_| self_.validate_expr(return_type))?;
         validators::expr::check_types(
             return_type.span(),
-            self.type_resolver.expr_type(return_type),
+            self.value_resolver.expr_type(return_type),
             None,
             Type::Struct(self.indexes.search_prelude_type("typeref")),
             &mut self.context,
@@ -106,9 +106,9 @@ impl<'item> Validator<'item, '_> {
             )?;
             validators::expr::check_types(
                 return_statement.value.span(),
-                self.type_resolver.expr_type(&return_statement.value),
+                self.value_resolver.expr_type(&return_statement.value),
                 Some(return_type.span()),
-                self.type_resolver.fn_type(node),
+                self.value_resolver.fn_type(node),
                 &mut self.context,
             )?;
         } else {
@@ -158,9 +158,9 @@ impl<'item> Validator<'item, '_> {
         self.validate_expr(&node.value)?;
         validators::expr::check_types(
             node.value.span(),
-            self.type_resolver.expr_type(&node.value),
+            self.value_resolver.expr_type(&node.value),
             Some(node.assigned.span()),
-            self.type_resolver.expr_type(&node.assigned),
+            self.value_resolver.expr_type(&node.assigned),
             &mut self.context,
         )?;
         Ok(())

@@ -6,8 +6,8 @@ use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::types::Type;
 use crate::compiler::validation::{Validator, validators};
+use crate::compiler::values::types::Type;
 use crate::utils::validation::ValidateError;
 
 impl<'item> Validator<'item, '_> {
@@ -129,7 +129,7 @@ impl<'item> Validator<'item, '_> {
         })?;
         validators::expr::check_types(
             param.type_.span(),
-            self.type_resolver.expr_type(&param.type_),
+            self.value_resolver.expr_type(&param.type_),
             None,
             Type::Struct(self.indexes.search_prelude_type("typeref")),
             &mut self.context,

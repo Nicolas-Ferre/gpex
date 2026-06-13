@@ -5,7 +5,8 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::types::{Type, TypeResolver};
+use crate::compiler::values::ValueResolver;
+use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 
@@ -96,17 +97,17 @@ impl<'item> ItemRef<'item> {
     pub(crate) fn has_same_param_types_as_args(self, args: &[Expr], indexes: &Indexes<'_>) -> bool {
         let params = self.params();
         debug_assert_eq!(params.params.len(), args.len());
-        let mut type_resolver = TypeResolver::new(indexes);
-        type_resolver.const_resolver.enter_const_scope();
+        let mut value_resolver = ValueResolver::new(indexes);
+        value_resolver.enter_scope();
         for (param, arg) in params.params.iter().zip(args) {
-            let param_type = type_resolver.param_type(param);
-            let arg_type = type_resolver.expr_type(arg);
+            let param_type = value_resolver.param_type(param);
+            let arg_type = value_resolver.expr_type(arg);
             if !matches!(param_type, Type::Wildcard(_)) && param_type != arg_type {
                 return false;
             }
             if param.const_mark_span().is_some() {
-                let value = type_resolver.const_resolver.expr_value(arg);
-                type_resolver.const_resolver.add_value(param.id, value);
+                let value = value_resolver.expr_const_value(arg);
+                value_resolver.add_value(param.id, value);
             }
         }
         true

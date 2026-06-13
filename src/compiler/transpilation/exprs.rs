@@ -1,4 +1,3 @@
-use crate::compiler::consts::ConstValue;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
@@ -9,12 +8,13 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::transpilation::{MAIN_BUFFER_NAME, SpecializedFn, Transpiler};
+use crate::compiler::values::consts::ConstValue;
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;
 
 impl<'item> Transpiler<'item, '_> {
     pub(crate) fn transpile_expr(&mut self, node: &Expr) {
-        let value = self.type_resolver.const_resolver.expr_value(node);
+        let value = self.value_resolver.expr_const_value(node);
         if value == ConstValue::RuntimeValue {
             match node {
                 Expr::Call(child) => self.transpile_call(child),
@@ -144,7 +144,7 @@ impl<'item> Transpiler<'item, '_> {
             .iter()
             .zip(&child.params.params)
             .filter(|(_, param)| param.const_mark_span().is_some())
-            .map(|(arg, _)| self.type_resolver.const_resolver.expr_value(arg))
+            .map(|(arg, _)| self.value_resolver.expr_const_value(arg))
             .collect::<Vec<_>>()
     }
 
@@ -158,7 +158,7 @@ impl<'item> Transpiler<'item, '_> {
             .zip(&child.params.params)
             .filter(|(_, param)| matches!(param.type_, Expr::Wildcard(_)))
             .map(|(arg, _)| {
-                self.type_resolver
+                self.value_resolver
                     .expr_type(arg)
                     .struct_ref()
                     .unwrap_or_else(|| unreachable!("argument type should be validated before"))

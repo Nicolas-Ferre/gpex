@@ -3,18 +3,18 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::symbols::QUESTION_MARK_SYMBOL;
-use crate::compiler::types::TypeResolver;
+use crate::compiler::values::ValueResolver;
 use crate::utils::validation::ValidateError;
 
 #[derive(Debug)]
 pub(crate) struct KeyRenderer<'item, 'index> {
-    type_resolver: TypeResolver<'item, 'index>,
+    value_resolver: ValueResolver<'item, 'index>,
 }
 
 impl<'item, 'index> KeyRenderer<'item, 'index> {
     pub(crate) fn new(indexes: &'index Indexes<'item>) -> Self {
         Self {
-            type_resolver: TypeResolver::new(indexes),
+            value_resolver: ValueResolver::new(indexes),
         }
     }
 
@@ -23,7 +23,7 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
         let arg_types = node
             .args
             .iter()
-            .map(|arg| self.type_resolver.expr_type(arg).name())
+            .map(|arg| self.value_resolver.expr_type(arg).name())
             .collect::<Result<Vec<_>, _>>()?
             .join(", ");
         Ok(format!("{fn_name}({arg_types})"))
@@ -39,7 +39,7 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
                 if matches!(param.type_, Expr::Wildcard(_)) {
                     Ok(QUESTION_MARK_SYMBOL.slice.into())
                 } else {
-                    self.type_resolver.expr_as_type(&param.type_).name()
+                    self.value_resolver.expr_as_type(&param.type_).name()
                 }
             })
             .collect::<Result<Vec<_>, _>>()?
