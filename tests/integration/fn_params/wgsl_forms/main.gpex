@@ -49,3 +49,11 @@ var _result_mixed_wildcards_2 = mixed_wildcard_params(17.0, 18u); // expected: 1
 fn mixed_wildcard_params(_const_param: const ?, param: ?) -> typeof(param) {
     return param;
 }
+
+// =========================| Dependent wildcard type |=========================
+
+var _result_dependent_type_1 = dependent_type(19u, 20u); // expected: 20u
+var _result_dependent_type_2 = dependent_type(21.0, 22.0); // expected: 22.0
+fn dependent_type(param: ?, value: typeof(param)) -> typeof(param) {
+    return value;
+}

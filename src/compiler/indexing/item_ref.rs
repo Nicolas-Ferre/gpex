@@ -102,6 +102,7 @@ impl<'item> ItemRef<'item> {
         for (param, arg) in params.params.iter().zip(args) {
             let param_type = value_resolver.param_type(param);
             let arg_type = value_resolver.expr_type(arg);
+            value_resolver.add_type(param.id, arg_type);
             if !matches!(param_type, Type::Wildcard(_)) && param_type != arg_type {
                 return false;
             }

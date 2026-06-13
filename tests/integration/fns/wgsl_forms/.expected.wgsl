@@ -1,11 +1,12 @@
 // INIT SHADER
 
 struct Buffer {
-    ident8: i32,
-    ident9: u32,
-    ident12: u32,
-    ident13: f32,
-    ident18: i32
+    ident10: i32,
+    ident11: u32,
+    ident14: u32,
+    ident15: f32,
+    ident20: u32,
+    ident21: f32
 }
 
 @group(0) @binding(0)
@@ -13,50 +14,60 @@ var<storage, read_write> b: Buffer;
 
 @compute @workgroup_size(1, 1, 1)
 fn main() {
-    b.ident18 = ident19ident0();
-    b.ident13 = ident14ident1(f32(4.0));
-    b.ident12 = ident14ident2(u32(3));
-    b.ident9 = ident10ident3(u32(2));
-    b.ident8 = ident10ident4(i32(1));
+    b.ident21 = ident22ident0();
+    b.ident20 = ident22ident1();
+    b.ident15 = ident16ident2(f32(4.0));
+    b.ident14 = ident16ident3(u32(3));
+    b.ident11 = ident12ident4(u32(2));
+    b.ident10 = ident12ident5(i32(1));
 }
 
-fn ident19ident0() -> i32 {
-    return ident20ident5(i32(1));
+fn ident22ident0() -> f32 {
+    return ident23ident6(f32(2.0));
 }
 
-fn ident14ident1(ident15_const: f32) -> f32 {
-    var ident15 = ident15_const;
-    return ident16ident6(ident15);
+fn ident22ident1() -> u32 {
+    return ident23ident7(u32(1));
 }
 
-fn ident14ident2(ident15_const: u32) -> u32 {
-    var ident15 = ident15_const;
-    return ident16ident7(ident15);
-}
-
-fn ident10ident3(ident11_const: u32) -> u32 {
-    var ident11 = ident11_const;
-    return ident11;
-}
-
-fn ident10ident4(ident11_const: i32) -> i32 {
-    var ident11 = ident11_const;
-    return ident11;
-}
-
-fn ident20ident5(ident21_const: i32) -> i32 {
-    var ident21 = ident21_const;
-    return i32(1);
-}
-
-fn ident16ident6(ident17_const: f32) -> f32 {
+fn ident16ident2(ident17_const: f32) -> f32 {
     var ident17 = ident17_const;
-    return ident17;
+    return ident18ident8(ident17);
 }
 
-fn ident16ident7(ident17_const: u32) -> u32 {
+fn ident16ident3(ident17_const: u32) -> u32 {
     var ident17 = ident17_const;
-    return ident17;
+    return ident18ident9(ident17);
+}
+
+fn ident12ident4(ident13_const: u32) -> u32 {
+    var ident13 = ident13_const;
+    return ident13;
+}
+
+fn ident12ident5(ident13_const: i32) -> i32 {
+    var ident13 = ident13_const;
+    return ident13;
+}
+
+fn ident23ident6(ident24_const: f32) -> f32 {
+    var ident24 = ident24_const;
+    return ident24;
+}
+
+fn ident23ident7(ident24_const: u32) -> u32 {
+    var ident24 = ident24_const;
+    return ident24;
+}
+
+fn ident18ident8(ident19_const: f32) -> f32 {
+    var ident19 = ident19_const;
+    return ident19;
+}
+
+fn ident18ident9(ident19_const: u32) -> u32 {
+    var ident19 = ident19_const;
+    return ident19;
 }
 
 
@@ -67,7 +78,8 @@ struct Buffer {
     ident1: u32,
     ident2: u32,
     ident3: f32,
-    ident4: i32
+    ident4: u32,
+    ident5: f32
 }
 
 @group(0) @binding(0)

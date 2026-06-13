@@ -29,3 +29,11 @@ const _RESULT_CONST_WILDCARD_2 = const_wildcard_param(6.0); // expected: 6.0
 const fn const_wildcard_param(param: const ?) -> typeof(param) {
     return param;
 }
+
+// =========================| Dependent wildcard type |=========================
+
+const _RESULT_DEPENDENT_TYPE_1 = dependent_type(7u, 8u); // expected: 8u
+const _RESULT_DEPENDENT_TYPE_2 = dependent_type(9.0, 10.0); // expected: 10.0
+const fn dependent_type(param: ?, value: typeof(param)) -> typeof(param) {
+    return value;
+}

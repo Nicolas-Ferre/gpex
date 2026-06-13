@@ -21,10 +21,11 @@ fn wildcard(param: ?) -> typeof(param) {
 
 // =========================| Forwarded const to not const wildcard type |=========================
 
-var _result_forwarded_const_to_not_const_wildcard_type = forward_const_wildcard(1); // expected: 1
-fn forward_const_wildcard(value: const ?) -> i32 {
+var _result1_forwarded_const_to_not_const_wildcard_type = forward_const_wildcard(1u); // expected: 1u
+var _result2_forwarded_const_to_not_const_wildcard_type = forward_const_wildcard(2.0); // expected: 2.0
+fn forward_const_wildcard(value: const ?) -> typeof(value) {
     return not_const_wildcard(value);
 }
-fn not_const_wildcard(_value: ?) -> i32 {
-    return 1;
+fn not_const_wildcard(value: ?) -> typeof(value) {
+    return value;
 }
