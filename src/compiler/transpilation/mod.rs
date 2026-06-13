@@ -3,7 +3,6 @@
 mod exprs;
 mod items;
 
-use crate::compiler::consts::ConstValue;
 use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
@@ -11,7 +10,7 @@ use crate::compiler::parsing::items::fns::{FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::types::TypeResolver;
+use crate::compiler::values::{ConstValue, ValueResolver};
 use crate::utils::reading::ReadFile;
 use itertools::Itertools;
 use petgraph::graphmap::DiGraphMap;
@@ -61,7 +60,7 @@ pub struct BufferField {
 pub(crate) struct Transpiler<'item, 'index> {
     indexes: &'index Indexes<'item>,
     shader: String,
-    type_resolver: TypeResolver<'item, 'index>,
+    value_resolver: ValueResolver<'item, 'index>,
     specialized_fns: HashMap<SpecializedFn<'item>, usize>,
     transpiled_specialized_fn_indexes: HashSet<usize>,
 }
@@ -71,7 +70,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
         Self {
             indexes,
             shader: String::new(),
-            type_resolver: TypeResolver::new(indexes),
+            value_resolver: ValueResolver::new(indexes),
             specialized_fns: HashMap::default(),
             transpiled_specialized_fn_indexes: HashSet::default(),
         }
@@ -90,7 +89,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
                 let dot_path = &files[var.name_span.file_index].dot_path;
                 let path = format!("{}:{}", dot_path, var.name);
                 let type_ = self
-                    .type_resolver
+                    .value_resolver
                     .var_type(var)
                     .struct_ref()
                     .unwrap_or_else(|| unreachable!("variable type should be validated before"));
@@ -123,7 +122,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
     ) -> u32 {
         if let Some(next_var) = fields.get(current_field_index + 1) {
             let next_var_type = self
-                .type_resolver
+                .value_resolver
                 .var_type(next_var)
                 .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"));
@@ -139,7 +138,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
     fn main_buffer_alignment(&mut self, vars: &[&VarDefinition]) -> u32 {
         vars.iter()
             .map(|var| {
-                self.type_resolver
+                self.value_resolver
                     .var_type(var)
                     .struct_ref()
                     .unwrap_or_else(|| unreachable!("variable type should be validated before"))

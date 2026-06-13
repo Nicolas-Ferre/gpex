@@ -6,8 +6,8 @@ pub(crate) mod parsing;
 pub(crate) mod prelude;
 pub(crate) mod refs;
 pub(crate) mod transpilation;
-pub(crate) mod types;
 pub(crate) mod validation;
+pub(crate) mod values;
 
 use crate::compiler::indexing::indexer::Indexer;
 use crate::compiler::transpilation::{Program, Transpiler};

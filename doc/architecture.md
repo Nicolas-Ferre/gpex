@@ -22,13 +22,13 @@ Key directories and files:
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...)
     - `transpilation/`: AST-to-WGSL conversion
-    - `consts.rs`: Constant evaluation
+    - `consts.rs`: Constness checking
     - `dependencies.rs`: Item dependencies resolution
     - `key_rendering.rs`: Rendering of item keys for compiler logs
     - `prelude.rs`: Built-in types and functions
     - `refs.rs`: Reference checking (in this context, a reference is an expression that is permitted
       on the left-hand side of an assignment statement)
-    - `types.rs`: Type resolution
+    - `values/`: Constant value and type resolution
 - `src/runner/`: GPU execution using wgpu (device setup, shader dispatch, buffer readback)
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
 - `res/prelude.gpex`: `GPEx` built-in types and functions

@@ -1,4 +1,3 @@
-use crate::compiler::consts::ConstValue;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -6,6 +5,7 @@ use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::compiler::transpilation::{SpecializedFn, Transpiler};
+use crate::compiler::values::ConstValue;
 use std::fmt::Write;
 
 impl<'item> Transpiler<'item, '_> {
@@ -13,8 +13,7 @@ impl<'item> Transpiler<'item, '_> {
         if !self.transpiled_specialized_fn_indexes.insert(fn_index) {
             return;
         }
-        self.type_resolver.const_resolver.enter_const_scope();
-        self.type_resolver.enter_type_scope();
+        self.value_resolver.enter_scope();
         let source = node.fn_;
         let id = source.id;
         _ = write!(self.shader, "fn _{id}_{fn_index}");
@@ -23,7 +22,7 @@ impl<'item> Transpiler<'item, '_> {
             node.const_param_values.into_iter(),
             node.wildcard_param_types.into_iter(),
         );
-        if let Some(return_type) = self.type_resolver.fn_type(source).struct_ref() {
+        if let Some(return_type) = self.value_resolver.fn_type(source).struct_ref() {
             let return_type_name = Self::transpile_type_name(return_type);
             _ = write!(self.shader, " -> {return_type_name} {{ ");
         } else {
@@ -34,8 +33,7 @@ impl<'item> Transpiler<'item, '_> {
             self.transpile_statement(statement);
         }
         _ = write!(self.shader, " }}");
-        self.type_resolver.exit_type_scope();
-        self.type_resolver.const_resolver.exit_const_scope();
+        self.value_resolver.exit_scope();
     }
 
     pub(crate) fn transpile_var_init(&mut self, node: &VarDefinition) {
@@ -47,7 +45,7 @@ impl<'item> Transpiler<'item, '_> {
 
     pub(crate) fn transpile_var_as_struct_field(&mut self, node: &VarDefinition) {
         let type_ = self
-            .type_resolver
+            .value_resolver
             .var_type(node)
             .struct_ref()
             .unwrap_or_else(|| unreachable!("variable type should be validated before"));
@@ -101,7 +99,7 @@ impl<'item> Transpiler<'item, '_> {
     fn transpile_param(&mut self, node: &'item Param) {
         let id = node.id;
         let type_ = self
-            .type_resolver
+            .value_resolver
             .param_type(node)
             .struct_ref()
             .unwrap_or_else(|| unreachable!("parameter type should be validated before"));
@@ -140,7 +138,7 @@ impl<'item> Transpiler<'item, '_> {
         let value = const_param_values
             .next()
             .unwrap_or_else(|| unreachable!("mismatching number of const params"));
-        self.type_resolver.const_resolver.add_value(param.id, value);
+        self.value_resolver.add_value(param.id, value);
     }
 
     fn resolve_param_wildcard_type(
@@ -154,6 +152,6 @@ impl<'item> Transpiler<'item, '_> {
         let type_ = wildcard_param_types
             .next()
             .unwrap_or_else(|| unreachable!("mismatching number of wildcard params"));
-        self.type_resolver.add_type(param.id, type_);
+        self.value_resolver.add_type(param.id, type_);
     }
 }

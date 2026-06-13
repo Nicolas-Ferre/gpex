@@ -12,7 +12,7 @@ use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::imports::{Import, ImportSegment};
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::types::TypeResolver;
+use crate::compiler::values::ValueResolver;
 use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -24,7 +24,7 @@ pub(crate) struct Validator<'item, 'index> {
     pub(crate) context: ValidateContext<'index>,
     indexes: &'index Indexes<'item>,
     const_mark_span: Option<Span>,
-    type_resolver: TypeResolver<'item, 'index>,
+    value_resolver: ValueResolver<'item, 'index>,
     key_renderer: KeyRenderer<'item, 'index>,
     const_checker: ConstChecker<'item, 'index>,
 }
@@ -39,7 +39,7 @@ impl<'item, 'index> Validator<'item, 'index> {
             context: ValidateContext::new(files, root_path),
             indexes,
             const_mark_span: None,
-            type_resolver: TypeResolver::new(indexes),
+            value_resolver: ValueResolver::new(indexes),
             key_renderer: KeyRenderer::new(indexes),
             const_checker: ConstChecker::new(indexes),
         }

@@ -1,43 +1,19 @@
-use crate::compiler::consts::{ConstResolver, ConstValue};
-use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
+use crate::compiler::values::{ConstValue, ValueResolver};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
-use std::collections::HashMap;
 
-#[derive(Debug)]
-pub(crate) struct TypeResolver<'item, 'index> {
-    indexes: &'index Indexes<'item>,
-    pub(crate) const_resolver: ConstResolver<'item, 'index>,
-    scope_types: Vec<HashMap<u64, &'item StructDefinition>>,
-}
-
-impl<'item, 'index> TypeResolver<'item, 'index> {
-    pub(crate) fn new(indexes: &'index Indexes<'item>) -> Self {
-        Self {
-            indexes,
-            const_resolver: ConstResolver::new(indexes),
-            scope_types: vec![],
-        }
-    }
-
-    pub(crate) fn enter_type_scope(&mut self) {
-        self.scope_types.push(HashMap::new());
-    }
-
-    pub(crate) fn exit_type_scope(&mut self) {
-        self.scope_types.pop();
-    }
-
+impl<'item> ValueResolver<'item, '_> {
     pub(crate) fn add_type(&mut self, id: u64, type_: &'item StructDefinition) {
-        self.scope_types
+        self.scopes
             .last_mut()
             .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
+            .wildcard_types
             .insert(id, type_);
     }
 
@@ -47,9 +23,9 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
 
     pub(crate) fn param_type(&mut self, node: &'item Param) -> Type<'item> {
         if matches!(node.type_, Expr::Wildcard(_)) {
-            self.scope_types
+            self.scopes
                 .last()
-                .and_then(|types| types.get(&node.id).copied())
+                .and_then(|scope| scope.wildcard_types.get(&node.id).copied())
                 .map_or(Type::Wildcard(node), Type::Struct)
         } else {
             self.expr_as_type(&node.type_)
@@ -94,22 +70,22 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
     }
 
     pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
-        self.const_resolver.enter_const_scope();
+        self.enter_scope();
         for (param, arg) in node.params.params.iter().zip(args) {
-            let value = self.const_resolver.expr_value(arg);
-            self.const_resolver.add_value(param.id, value);
+            let value = self.expr_const_value(arg);
+            self.add_value(param.id, value);
         }
         let type_ = if let Some(return_type) = node.return_type.as_ref() {
             self.expr_as_type(return_type)
         } else {
             Type::NoReturn
         };
-        self.const_resolver.exit_const_scope();
+        self.exit_scope();
         type_
     }
 
     pub(crate) fn expr_as_type(&mut self, node: &Expr) -> Type<'item> {
-        match self.const_resolver.expr_value(node) {
+        match self.expr_const_value(node) {
             ConstValue::TypeRef(type_) => Type::Struct(type_),
             ConstValue::Param(type_) => Type::Param(type_),
             ConstValue::I32(_)
