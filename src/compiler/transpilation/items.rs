@@ -5,7 +5,7 @@ use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::compiler::transpilation::{SpecializedFn, Transpiler};
-use crate::compiler::values::ConstValue;
+use crate::compiler::values::consts::ConstValue;
 use std::fmt::Write;
 
 impl<'item> Transpiler<'item, '_> {

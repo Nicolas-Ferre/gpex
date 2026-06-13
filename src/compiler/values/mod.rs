@@ -1,14 +1,11 @@
 #![expect(clippy::multiple_inherent_impl)]
 
-mod consts;
-mod types;
-
-// TODO: instead put all internal methods as pub(super) and pub consts and types modules pub(crate)
-pub(crate) use consts::ConstValue;
-pub(crate) use types::Type;
+pub(crate) mod consts;
+pub(crate) mod types;
 
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::parsing::items::types::StructDefinition;
+use crate::compiler::values::consts::ConstValue;
 use std::collections::HashMap;
 
 #[derive(Debug)]

@@ -7,7 +7,7 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::validation::{Validator, validators};
-use crate::compiler::values::Type;
+use crate::compiler::values::types::Type;
 use crate::utils::validation::ValidateError;
 
 impl<'item> Validator<'item, '_> {

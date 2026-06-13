@@ -8,7 +8,7 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::transpilation::{MAIN_BUFFER_NAME, SpecializedFn, Transpiler};
-use crate::compiler::values::ConstValue;
+use crate::compiler::values::consts::ConstValue;
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;
 

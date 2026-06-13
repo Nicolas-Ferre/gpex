@@ -3,7 +3,7 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::vars::ConstDefinition;
 use crate::compiler::validation::Validator;
 use crate::compiler::validation::validators::ident::Case;
-use crate::compiler::values::Type;
+use crate::compiler::values::types::Type;
 
 impl<'item> Validator<'item, '_> {
     pub(super) const IMPORT_ALLOWED_CASES: &'static [Case] = &[Case::Snake];
