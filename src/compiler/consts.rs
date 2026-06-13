@@ -90,11 +90,11 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
         }
     }
 
-    pub(crate) fn enter_scope(&mut self) {
+    pub(crate) fn enter_const_scope(&mut self) {
         self.scope_values.push(HashMap::new());
     }
 
-    pub(crate) fn exit_scope(&mut self) {
+    pub(crate) fn exit_const_scope(&mut self) {
         self.scope_values.pop();
     }
 
@@ -272,9 +272,9 @@ impl<'item, 'index> ConstResolver<'item, 'index> {
     }
 
     fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
-        self.enter_scope();
+        self.enter_const_scope();
         let output = callback(self);
-        self.exit_scope();
+        self.exit_const_scope();
         output
     }
 }

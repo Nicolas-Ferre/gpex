@@ -97,7 +97,7 @@ impl<'item> ItemRef<'item> {
         let params = self.params();
         debug_assert_eq!(params.params.len(), args.len());
         let mut type_resolver = TypeResolver::new(indexes);
-        type_resolver.const_resolver.enter_scope();
+        type_resolver.const_resolver.enter_const_scope();
         for (param, arg) in params.params.iter().zip(args) {
             let param_type = type_resolver.param_type(param);
             let arg_type = type_resolver.expr_type(arg);

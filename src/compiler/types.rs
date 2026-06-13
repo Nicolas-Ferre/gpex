@@ -26,11 +26,11 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         }
     }
 
-    pub(crate) fn enter_scope(&mut self) {
+    pub(crate) fn enter_type_scope(&mut self) {
         self.scope_types.push(HashMap::new());
     }
 
-    pub(crate) fn exit_scope(&mut self) {
+    pub(crate) fn exit_type_scope(&mut self) {
         self.scope_types.pop();
     }
 
@@ -94,7 +94,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
     }
 
     pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
-        self.const_resolver.enter_scope();
+        self.const_resolver.enter_const_scope();
         for (param, arg) in node.params.params.iter().zip(args) {
             let value = self.const_resolver.expr_value(arg);
             self.const_resolver.add_value(param.id, value);
@@ -104,7 +104,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         } else {
             Type::NoReturn
         };
-        self.const_resolver.exit_scope();
+        self.const_resolver.exit_const_scope();
         type_
     }
 
