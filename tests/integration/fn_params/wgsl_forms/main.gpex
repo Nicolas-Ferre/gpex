@@ -19,15 +19,25 @@ fn const_param(param: const f32, _other_param: u32) -> f32 {
 // =========================| Wildcard type |=========================
 
 var _result_wildcard_1 = wildcard_param(5u); // expected: 5
-var _result_wildcard_2 = wildcard_param(6.0); // expected: 5
+var _result_wildcard_2 = wildcard_param(6u); // expected: 5
+var _result_wildcard_3 = wildcard_param(7.0); // expected: 5
 fn wildcard_param(_param: ?) -> i32 {
     return 5;
 }
 
+// =========================| Multiple wildcard types |=========================
+
+var _result_wildcards_1 = wildcard_params(8u, 9.0); // expected: 6
+var _result_wildcards_2 = wildcard_params(10.0, 11u); // expected: 6
+fn wildcard_params(_param1: ?, _param2: ?) -> i32 {
+    return 6;
+}
+
 // =========================| Constant wildcard type |=========================
 
-var _result_const_wildcard_1 = const_wildcard_param(7u); // expected: 8
-var _result_const_wildcard_2 = const_wildcard_param(8.0); // expected: 8
+var _result_const_wildcard_1 = const_wildcard_param(12u); // expected: 7
+var _result_const_wildcard_2 = const_wildcard_param(13u); // expected: 7
+var _result_const_wildcard_3 = const_wildcard_param(14.0); // expected: 7
 fn const_wildcard_param(_param: const ?) -> i32 {
-    return 8;
+    return 7;
 }

@@ -5,13 +5,25 @@ error: invalid wildcard expression
 ├─ info: wildcards are only allowed as function parameter types
 ┴
 error: invalid wildcard expression
-│  → <root>/main.gpex:9:34
+│  → <root>/main.gpex:9:25
+│    ¦ const _WILDCARD_CONST = ?;
+│    ¦                         ^
+├─ info: wildcards are only allowed as function parameter types
+┴
+error: invalid wildcard expression
+│  → <root>/main.gpex:13:34
 │    ¦ fn _fn_wildcard_return_type() -> ? {
 │    ¦                                  ^
 ├─ info: wildcards are only allowed as function parameter types
 ┴
 error: invalid wildcard expression
-│  → <root>/main.gpex:15:44
+│  → <root>/main.gpex:20:12
+│    ¦     return ?;
+│    ¦            ^
+├─ info: wildcards are only allowed as function parameter types
+┴
+error: invalid wildcard expression
+│  → <root>/main.gpex:25:44
 │    ¦ fn _fn_nested_wildcard_type(_param: sizeof(?)) -> i32 {
 │    ¦                                            ^
 ├─ info: wildcards are only allowed as function parameter types

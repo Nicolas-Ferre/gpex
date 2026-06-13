@@ -4,10 +4,20 @@
 
 var _wildcard_var = ?;
 
+// =========================| Global constant value |=========================
+
+const _WILDCARD_CONST = ?;
+
 // =========================| Function return type |=========================
 
 fn _fn_wildcard_return_type() -> ? {
     return 0;
+}
+
+// =========================| Return statement value |=========================
+
+fn _fn_wildcard_return() -> i32 {
+    return ?;
 }
 
 // =========================| Nested function parameter type |=========================

@@ -12,7 +12,7 @@ fn no_param() -> bool {
 }
 var _result_no_param = no_param(); // expected: true
 
-// =========================| Same parameter types |=========================
+// =========================| Same explicit parameter types |=========================
 
 fn same_param_types(_param: i32) -> bool {
     return false;
@@ -21,6 +21,16 @@ fn same_param_types(_param: i32) -> bool {
     return true;
 }
 var _result_same_param_types = same_param_types(0); // expected: true
+
+// =========================| Same wildcard parameter types |=========================
+
+fn same_wildcard_param_types(_param: ?) -> bool {
+    return false;
+}
+fn same_wildcard_param_types(_param: ?) -> bool {
+    return true;
+}
+var _result_same_wildcard_param_types = same_wildcard_param_types(0); // expected: true
 
 // =========================| Different parameter types |=========================
 
@@ -41,3 +51,23 @@ fn different_param_count() -> bool {
     return false;
 }
 var _result_different_param_count = different_param_count(0); // expected: true
+
+// =========================| Wildcard before concrete parameter type |=========================
+
+fn wildcard_before_concrete(_param: ?) -> bool {
+    return false;
+}
+fn wildcard_before_concrete(_param: i32) -> bool {
+    return true;
+}
+var _result_wildcard_before_concrete = wildcard_before_concrete(0); // expected: true
+
+// =========================| Wildcard after concrete parameter type |=========================
+
+fn concrete_before_wildcard(_param: i32) -> bool {
+    return false;
+}
+fn concrete_before_wildcard(_param: ?) -> bool {
+    return true;
+}
+var _result_concrete_before_wildcard = concrete_before_wildcard(0); // expected: true
