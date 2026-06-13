@@ -143,6 +143,10 @@ pub(crate) const PLUS_SYMBOL: Symbol = Symbol {
     name: "`+`",
     slice: "+",
 };
+pub(crate) const QUESTION_MARK_SYMBOL: Symbol = Symbol {
+    name: "`?`",
+    slice: "?",
+};
 pub(crate) const SEMICOLON_SYMBOL: Symbol = Symbol {
     name: "`;`",
     slice: ";",

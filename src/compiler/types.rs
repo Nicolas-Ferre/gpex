@@ -8,11 +8,13 @@ use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct TypeResolver<'item, 'index> {
     indexes: &'index Indexes<'item>,
     pub(crate) const_resolver: ConstResolver<'item, 'index>,
+    scope_types: Vec<HashMap<u64, &'item StructDefinition>>,
 }
 
 impl<'item, 'index> TypeResolver<'item, 'index> {
@@ -20,15 +22,38 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         Self {
             indexes,
             const_resolver: ConstResolver::new(indexes),
+            scope_types: vec![],
         }
+    }
+
+    pub(crate) fn enter_type_scope(&mut self) {
+        self.scope_types.push(HashMap::new());
+    }
+
+    pub(crate) fn exit_type_scope(&mut self) {
+        self.scope_types.pop();
+    }
+
+    pub(crate) fn add_type(&mut self, id: u64, type_: &'item StructDefinition) {
+        self.scope_types
+            .last_mut()
+            .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
+            .insert(id, type_);
     }
 
     pub(crate) fn var_type(&mut self, node: &VarDefinition) -> Type<'item> {
         self.expr_type(&node.default_value)
     }
 
-    pub(crate) fn param_type(&mut self, node: &Param) -> Type<'item> {
-        self.expr_as_type(&node.type_)
+    pub(crate) fn param_type(&mut self, node: &'item Param) -> Type<'item> {
+        if matches!(node.type_, Expr::Wildcard(_)) {
+            self.scope_types
+                .last()
+                .and_then(|types| types.get(&node.id).copied())
+                .map_or(Type::Wildcard(node), Type::Struct)
+        } else {
+            self.expr_as_type(&node.type_)
+        }
     }
 
     pub(crate) fn fn_type(&mut self, node: &FnDefinition) -> Type<'item> {
@@ -45,6 +70,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
             Expr::U32Literal(_) => Type::Struct(self.indexes.search_prelude_type("u32")),
             Expr::I32Literal(_) => Type::Struct(self.indexes.search_prelude_type("i32")),
             Expr::BoolLiteral(_) => Type::Struct(self.indexes.search_prelude_type("bool")),
+            Expr::Wildcard(_) => Type::Unknown,
             Expr::Call(node) => self.source_type(node.id, &node.args),
             Expr::Ident(node) => self.source_type(node.id, &[]),
         }
@@ -57,7 +83,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         }
     }
 
-    fn item_type(&mut self, node: ItemRef<'_>, args: &[Expr]) -> Type<'item> {
+    fn item_type(&mut self, node: ItemRef<'item>, args: &[Expr]) -> Type<'item> {
         match node {
             ItemRef::Var(node) => self.var_type(node),
             ItemRef::Const(node) => self.expr_type(&node.value),
@@ -68,7 +94,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
     }
 
     pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
-        self.const_resolver.enter_scope();
+        self.const_resolver.enter_const_scope();
         for (param, arg) in node.params.params.iter().zip(args) {
             let value = self.const_resolver.expr_value(arg);
             self.const_resolver.add_value(param.id, value);
@@ -78,7 +104,7 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
         } else {
             Type::NoReturn
         };
-        self.const_resolver.exit_scope();
+        self.const_resolver.exit_const_scope();
         type_
     }
 
@@ -101,16 +127,22 @@ impl<'item, 'index> TypeResolver<'item, 'index> {
 pub(crate) enum Type<'item> {
     Struct(&'item StructDefinition),
     Param(&'item Param),
+    Wildcard(&'item Param),
     NoReturn,
     #[derive_where(incomparable)]
     Unknown,
 }
 
 impl<'item> Type<'item> {
-    pub(crate) fn name(self) -> Result<&'item str, ValidateError> {
+    pub(crate) fn is_comparable(self) -> bool {
+        matches!(self, Self::Struct(_) | Self::Param(_) | Self::Wildcard(_))
+    }
+
+    pub(crate) fn name(self) -> Result<String, ValidateError> {
         match self {
-            Type::Struct(struct_) => Ok(&struct_.name),
-            Type::Param(param) => Ok(&param.name),
+            Type::Struct(struct_) => Ok(struct_.name.clone()),
+            Type::Param(param) => Ok(param.name.clone()),
+            Type::Wildcard(param) => Ok(format!("typeof({})", param.name)),
             Type::NoReturn | Type::Unknown => Err(ValidateError),
         }
     }

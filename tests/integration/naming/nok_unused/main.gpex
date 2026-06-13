@@ -21,6 +21,7 @@ var var_ = 0;
 
 fn fn_() -> i32 { return 0; }
 fn __fn_with_double_underscore_prefix() -> i32 { return 0; }
+fn wildcard_param(_param: ?) -> i32 { return 0; }
 
 // =========================| Function parameter |=========================
 

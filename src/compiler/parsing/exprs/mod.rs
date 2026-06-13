@@ -5,7 +5,8 @@ pub(crate) mod literals;
 use crate::compiler::parsing::symbols::{
     AND_SYMBOL, ANGLE_BRACKET_CLOSE_SYMBOL, ANGLE_BRACKET_OPEN_SYMBOL, COMPARE_EQUAL_SYMBOL,
     COMPARE_GREATER_EQUAL_SYMBOL, COMPARE_LESS_EQUAL_SYMBOL, COMPARE_NOT_EQUAL_SYMBOL, DOT_SYMBOL,
-    HYPHEN_SYMBOL, OR_SYMBOL, PERCENT_SYMBOL, PLUS_SYMBOL, SLASH_SYMBOL, STAR_SYMBOL,
+    HYPHEN_SYMBOL, OR_SYMBOL, PERCENT_SYMBOL, PLUS_SYMBOL, QUESTION_MARK_SYMBOL, SLASH_SYMBOL,
+    STAR_SYMBOL,
 };
 use crate::utils::parsing::context::{ParseContext, Parser, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
@@ -64,6 +65,7 @@ pub(crate) enum Expr {
     U32Literal(U32Literal),
     I32Literal(I32Literal),
     BoolLiteral(BoolLiteral),
+    Wildcard(Span),
     Call(Call),
     Ident(Ident),
 }
@@ -92,6 +94,7 @@ impl Expr {
             Self::U32Literal(node) => node.span,
             Self::I32Literal(node) => node.span,
             Self::BoolLiteral(node) => node.span,
+            Self::Wildcard(span) => *span,
             Self::Call(node) => node.span,
             Self::Ident(node) => node.span,
         }
@@ -132,6 +135,7 @@ impl Expr {
             &|context| U32Literal::parse(context).map(Self::U32Literal),
             &|context| I32Literal::parse(context).map(Self::I32Literal),
             &|context| BoolLiteral::parse(context).map(Self::BoolLiteral),
+            &|context| Span::parse_symbol(context, QUESTION_MARK_SYMBOL).map(Self::Wildcard),
             &|context| Call::parse(context).map(Self::Call),
             &|context| Call::parse_unary(context, stop_excluded_parser).map(Self::Call),
             &|context| Ident::parse(context).map(Self::Ident),

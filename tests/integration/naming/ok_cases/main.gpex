@@ -38,6 +38,8 @@ fn _fn_snake_case_param(_snake_case_param: i32) -> i32 { return 0; }
 
 fn _fn_snake_case_typeref_param(_snake_case_typeref_param: typeref) -> i32 { return 0; }
 
+fn _fn_snake_case_wildcard_param(_snake_case_wildcard_param: ?) -> i32 { return 0; }
+
 fn _fn_snake_case_const_param(snake_case_const_param: const i32) -> i32 {
     return snake_case_const_param;
 }
@@ -47,6 +49,10 @@ fn _fn_snake_case_const_typeref_param(snake_case_const_typeref_param: const type
 }
 fn _fn_pascal_case_const_typeref_param(PascalCaseConstTyperefParam: const typeref) -> typeref {
     return PascalCaseConstTyperefParam;
+}
+
+fn _fn_snake_case_const_wildcard_param(_snake_case_const_wildcard_param: const ?) -> i32 {
+    return 0;
 }
 
 fn _fn_snake_case_type_param(type_: const typeref, snake_case_type_param: type_) -> type_ {

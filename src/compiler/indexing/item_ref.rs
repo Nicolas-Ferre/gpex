@@ -1,10 +1,11 @@
 use crate::compiler::indexing::indexes::Indexes;
+use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::types::TypeResolver;
+use crate::compiler::types::{Type, TypeResolver};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 
@@ -76,7 +77,7 @@ impl<'item> ItemRef<'item> {
         match self {
             Self::Var(node) => node.name_span,
             Self::Const(node) => node.name_span,
-            Self::Struct(_) => unreachable!("struct name span is never used"),
+            Self::Struct(node) => node.name_span,
             Self::Fn(node) => node.name_span,
             Self::Param(node) => node.name_span,
         }
@@ -96,9 +97,11 @@ impl<'item> ItemRef<'item> {
         let params = self.params();
         debug_assert_eq!(params.params.len(), args.len());
         let mut type_resolver = TypeResolver::new(indexes);
-        type_resolver.const_resolver.enter_scope();
+        type_resolver.const_resolver.enter_const_scope();
         for (param, arg) in params.params.iter().zip(args) {
-            if type_resolver.param_type(param) != type_resolver.expr_type(arg) {
+            let param_type = type_resolver.param_type(param);
+            let arg_type = type_resolver.expr_type(arg);
+            if !matches!(param_type, Type::Wildcard(_)) && param_type != arg_type {
                 return false;
             }
             if param.const_mark_span().is_some() {
@@ -115,6 +118,18 @@ impl<'item> ItemRef<'item> {
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
                 unreachable!("only functions can have parameters")
             }
+        }
+    }
+
+    pub(crate) fn displayed_key(self, key_renderer: &mut KeyRenderer<'_, '_>) -> String {
+        match self {
+            ItemRef::Fn(item) => key_renderer
+                .fn_key(item)
+                .unwrap_or_else(|_| unreachable!("function should be validated before")),
+            ItemRef::Var(item) => item.name.clone(),
+            ItemRef::Const(item) => item.name.clone(),
+            ItemRef::Param(item) => item.name.clone(),
+            ItemRef::Struct(_) => unreachable!("structs are not yet validated"),
         }
     }
 }

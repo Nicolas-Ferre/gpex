@@ -62,6 +62,10 @@ fn _fn_camel_case_typeref_param(_camelCaseTyperefParam: typeref) -> i32 { return
 fn _fn_pascal_case_typeref_param(_PascalCaseTyperefParam: typeref) -> i32 { return 0; }
 fn _fn_screaming_snake_case_typeref_param(_SCREAMING_SNAKE_CASE_TYPEREF_PARAM: typeref) -> i32 { return 0; }
 
+fn _fn_camel_case_wildcard_param(_camelCaseWildcardParam: ?) -> i32 { return 0; }
+fn _fn_pascal_case_wildcard_param(_PascalCaseWildcardParam: ?) -> i32 { return 0; }
+fn _fn_screaming_snake_case_wildcard_param(_SCREAMING_SNAKE_CASE_WILDCARD_PARAM: ?) -> i32 { return 0; }
+
 fn _fn_camel_case_const_param(camelCaseConstParam: const i32) -> i32 {
     return camelCaseConstParam;
 }
@@ -77,6 +81,16 @@ fn _fn_camel_case_const_typeref_param(camelCaseConstTyperefParam: const typeref)
 }
 fn _fn_screaming_snake_case_const_typeref_param(SCREAMING_SNAKE_CASE_CONST_TYPEREF_PARAM: const typeref) -> typeref {
     return SCREAMING_SNAKE_CASE_CONST_TYPEREF_PARAM;
+}
+
+fn _fn_camel_case_const_wildcard_param(_camelCaseConstWildcardParam: const ?) -> i32 {
+    return 0;
+}
+fn _fn_pascal_case_const_wildcard_param(_PascalCaseConstWildcardParam: const ?) -> i32 {
+    return 0;
+}
+fn _fn_screaming_snake_case_const_wildcard_param(_SCREAMING_SNAKE_CASE_CONST_WILDCARD_PARAM: const ?) -> i32 {
+    return 0;
 }
 
 fn _fn_camel_case_type_param(type_: const typeref, camelCaseTypeParam: type_) -> type_ {

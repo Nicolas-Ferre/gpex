@@ -133,8 +133,8 @@ pub(crate) fn check_prelude_location(
 
 pub(crate) fn check_usage(
     item: ItemRef<'_>,
-    displayed_key: &str,
     context: &mut ValidateContext<'_>,
+    key_renderer: &mut KeyRenderer<'_, '_>,
     indexes: &Indexes<'_>,
 ) {
     let name_span = item.name_span();
@@ -143,6 +143,7 @@ pub(crate) fn check_usage(
     let is_unused_lint_ignored =
         name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
+        let displayed_key = item.displayed_key(key_renderer);
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item unused"),
@@ -150,6 +151,7 @@ pub(crate) fn check_usage(
             inner: vec![],
         });
     } else if item.is_pub() && is_unused_lint_ignored {
+        let displayed_key = item.displayed_key(key_renderer);
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item public but name starting with `_`"),
@@ -159,6 +161,7 @@ pub(crate) fn check_usage(
     } else if let Some(&ref_span) = ref_span
         && is_unused_lint_ignored
     {
+        let displayed_key = item.displayed_key(key_renderer);
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item used but name starting with `_`"),

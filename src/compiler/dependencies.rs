@@ -83,7 +83,8 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
             Expr::F32Literal(_)
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)
-            | Expr::BoolLiteral(_) => Ok(()),
+            | Expr::BoolLiteral(_)
+            | Expr::Wildcard(_) => Ok(()),
             Expr::Call(node) => self.scan_call(node),
             Expr::Ident(node) => self.scan_ident(node),
         }

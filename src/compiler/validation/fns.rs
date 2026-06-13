@@ -7,8 +7,8 @@ use crate::compiler::types::Type;
 use crate::compiler::validation::{Validator, validators};
 use crate::utils::validation::ValidateError;
 
-impl Validator<'_, '_> {
-    pub(super) fn validate_fn(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
+impl<'item> Validator<'item, '_> {
+    pub(super) fn validate_fn(&mut self, node: &'item FnDefinition) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Fn(node);
         let compilerimpl_span = node.body.compilerimpl_keyword_span();
         let dependency_result = DependencyResolver::new(self.indexes).scan_fn(node);
@@ -23,8 +23,12 @@ impl Validator<'_, '_> {
         validators::item::check_binary_operator_fn(node, &mut self.context, self.indexes)?;
         self.validate_body(node)?;
         self.validate_fn_name(node);
-        let fn_key = self.key_renderer.fn_key(node)?;
-        validators::item::check_usage(ref_, &fn_key, &mut self.context, self.indexes);
+        validators::item::check_usage(
+            ref_,
+            &mut self.context,
+            &mut self.key_renderer,
+            self.indexes,
+        );
         Ok(())
     }
 
@@ -142,8 +146,8 @@ impl Validator<'_, '_> {
         &mut self,
         node: &AssignmentStatement,
     ) -> Result<(), ValidateError> {
-        validators::expr::check_ref(&node.assigned, &mut self.context, self.indexes);
         self.validate_expr(&node.assigned)?;
+        validators::expr::check_ref(&node.assigned, &mut self.context, self.indexes);
         Ok(())
     }
 

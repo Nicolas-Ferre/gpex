@@ -34,6 +34,20 @@ error: `_duplicated` parameter defined multiple times
 │    ¦ fn _fn(_duplicated: i32, _other: u32, _duplicated: f32) {}
 │    ¦        ^^^^^^^^^^^
 ┴
+error: forbidden `compilerimpl` item outside prelude
+│  → <root>/main.gpex:19:20
+│    ¦ struct duplicate = compilerimpl {}
+│    ¦                    ^^^^^^^^^^^^
+┴
+error: `duplicate` item defined multiple times
+│  → <root>/main.gpex:20:5
+│    ¦ var duplicate = 0;
+│    ¦     ^^^^^^^^^
+├─ info: item also defined here
+│  → <root>/main.gpex:19:8
+│    ¦ struct duplicate = compilerimpl {}
+│    ¦        ^^^^^^^^^
+┴
 warning: `_duplicated` identifier not in SCREAMING_SNAKE_CASE
 │  → <root>/main.gpex:5:7
 │    ¦ const _duplicated = 0;

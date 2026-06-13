@@ -14,6 +14,9 @@ impl Validator<'_, '_> {
             Expr::U32Literal(child) => self.validate_u32_literal(child),
             Expr::I32Literal(child) => self.validate_i32_literal(child),
             Expr::BoolLiteral(_) => Ok(()),
+            Expr::Wildcard(span) => {
+                validators::expr::report_invalid_wildcard_location(*span, &mut self.context)
+            }
             Expr::Call(child) => validators::expr::check_no_return_type(
                 child,
                 child.span,

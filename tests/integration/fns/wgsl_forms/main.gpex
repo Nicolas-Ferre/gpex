@@ -7,3 +7,24 @@ var _result2_parametrized_type = parametrized_type(u32, 2u); // expected: 2u
 fn parametrized_type(type_: const typeref, param: type_) -> type_ {
     return param;
 }
+
+// =========================| Forwarded wildcard type |=========================
+
+var _result1_forwarded_wildcard_type = forward_wildcard(3u); // expected: 3
+var _result2_forwarded_wildcard_type = forward_wildcard(4.0); // expected: 3
+fn forward_wildcard(param: ?) -> i32 {
+    return wildcard(param);
+}
+fn wildcard(_param: ?) -> i32 {
+    return 3;
+}
+
+// =========================| Forwarded const to not const wildcard type |=========================
+
+var _result_forwarded_const_to_not_const_wildcard_type = forward_const_wildcard(1); // expected: 1
+fn forward_const_wildcard(value: const ?) -> i32 {
+    return not_const_wildcard(value);
+}
+fn not_const_wildcard(_value: ?) -> i32 {
+    return 1;
+}

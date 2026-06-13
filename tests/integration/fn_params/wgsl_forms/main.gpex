@@ -15,3 +15,37 @@ var _result_const_other_value = const_param(3.0, 4u); // expected: 3.0
 fn const_param(param: const f32, _other_param: u32) -> f32 {
     return param;
 }
+
+// =========================| Wildcard type |=========================
+
+var _result_wildcard_1 = wildcard_param(5u); // expected: 5
+var _result_wildcard_2 = wildcard_param(6u); // expected: 5
+var _result_wildcard_3 = wildcard_param(7.0); // expected: 5
+fn wildcard_param(_param: ?) -> i32 {
+    return 5;
+}
+
+// =========================| Multiple wildcard types |=========================
+
+var _result_wildcards_1 = wildcard_params(8u, 9.0); // expected: 6
+var _result_wildcards_2 = wildcard_params(10.0, 11u); // expected: 6
+fn wildcard_params(_param1: ?, _param2: ?) -> i32 {
+    return 6;
+}
+
+// =========================| Constant wildcard type |=========================
+
+var _result_const_wildcard_1 = const_wildcard_param(12u); // expected: 7
+var _result_const_wildcard_2 = const_wildcard_param(13u); // expected: 7
+var _result_const_wildcard_3 = const_wildcard_param(14.0); // expected: 7
+fn const_wildcard_param(_param: const ?) -> i32 {
+    return 7;
+}
+
+// =========================| Mixed constant and runtime wildcard types |=========================
+
+var _result_mixed_wildcards_1 = mixed_wildcard_params(15u, 16.0); // expected: 8
+var _result_mixed_wildcards_2 = mixed_wildcard_params(17.0, 18u); // expected: 8
+fn mixed_wildcard_params(_const_param: const ?, _param: ?) -> i32 {
+    return 8;
+}

@@ -262,6 +262,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
 pub(crate) struct SpecializedFn<'item> {
     fn_: &'item FnDefinition,
     const_param_values: Vec<ConstValue<'item>>,
+    wildcard_param_types: Vec<&'item StructDefinition>,
     #[derive_where(skip)]
     fn_body: &'item FnStatementsBody,
 }

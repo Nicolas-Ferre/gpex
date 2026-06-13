@@ -19,6 +19,7 @@ impl<'item, 'index> RefChecker<'item, 'index> {
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)
             | Expr::BoolLiteral(_)
+            | Expr::Wildcard(_)
             | Expr::Call(_) => Some(false),
             Expr::Ident(node) => self.is_ident_ref(node),
         }

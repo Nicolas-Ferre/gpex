@@ -6,6 +6,10 @@ pub fn same_param_types(_param: i32) -> bool {
     return false;
 }
 
+pub fn same_wildcard_param_types(_param: ?) -> bool {
+    return false;
+}
+
 pub fn different_param_types(_param: i32) -> bool {
     return false;
 }

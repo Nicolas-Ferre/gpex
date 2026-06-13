@@ -13,3 +13,19 @@ const _RESULT_CONST = const_param(2); // expected: 2
 const fn const_param(param: const i32) -> i32 {
     return param;
 }
+
+// =========================| Wildcard type |=========================
+
+const _RESULT_WILDCARD_1 = wildcard_param(3u); // expected: 3
+const _RESULT_WILDCARD_2 = wildcard_param(4.0); // expected: 3
+const fn wildcard_param(_param: ?) -> i32 {
+    return 3;
+}
+
+// =========================| Constant wildcard type |=========================
+
+const _RESULT_CONST_WILDCARD_1 = const_wildcard_param(5u); // expected: 4
+const _RESULT_CONST_WILDCARD_2 = const_wildcard_param(6.0); // expected: 4
+const fn const_wildcard_param(_param: const ?) -> i32 {
+    return 4;
+}
