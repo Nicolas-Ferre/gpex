@@ -31,7 +31,7 @@ error: expression with invalid type `param`
 │    ¦            ^^^^^
 ├─ info: expected `i32` type
 │  → <root>/main.gpex:23:93
-│    ¦ fn _fn_type_param_thought_fn_type_ref(param: const typeref, value: type_param_fn(param)) -> i32 {
+│    ¦ fn _fn_type_param_through_fn_type_ref(param: const typeref, value: type_param_fn(param)) -> i32 {
 │    ¦                                                                                             ^^^
 ┴
 error: expression with invalid type `typeof(param)`

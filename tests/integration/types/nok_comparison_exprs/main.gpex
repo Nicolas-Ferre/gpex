@@ -20,27 +20,27 @@ fn _fn_u32() -> i32 {
 
 // =========================| Type reference |=========================
 
-fn _fn_typeref() -> i32 {
+fn _fn_type_ref() -> i32 {
     return i32;
 }
 
 // =========================| Constant |=========================
 
 const CONST = 0.0;
-fn _fn_typeref() -> i32 {
+fn _fn_const() -> i32 {
     return CONST;
 }
 
 // =========================| Variable |=========================
 
 var var_ = 0.0;
-fn _fn_typeref() -> i32 {
+fn _fn_var() -> i32 {
     return var_;
 }
 
 // =========================| Function parameter |=========================
 
-fn _fn_typeref(param: f32) -> i32 {
+fn _fn_param(param: f32) -> i32 {
     return param;
 }
 

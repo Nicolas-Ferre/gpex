@@ -1,4 +1,4 @@
-// Test all forms of function definitions (must behave correctly).
+// Test forwarding of function parameter types (must behave correctly).
 
 // =========================| Parametrized type |=========================
 

@@ -1,4 +1,4 @@
-// Test variable sources before all possible scopes (must generate errors).
+// Test constant sources before all possible scopes (must generate errors).
 
 // =========================| Child scope |=========================
 
