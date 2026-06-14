@@ -39,7 +39,7 @@ impl<'item> ValueResolver<'item, '_> {
         args: &[Expr],
     ) -> Type<'item> {
         self.run_scoped(|self_| {
-            self_.bind_params_to_args(&node.params, args);
+            self_.bind_params_to_args(&node.params, args).for_each(drop);
             if let Some(return_type) = node.return_type.as_ref() {
                 self_.expr_as_type(return_type)
             } else {

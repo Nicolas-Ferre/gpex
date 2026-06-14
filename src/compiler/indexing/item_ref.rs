@@ -100,7 +100,6 @@ impl<'item> ItemRef<'item> {
         value_resolver.enter_scope();
         value_resolver
             .bind_params_to_args(params, args)
-            .into_iter()
             .all(|(param_type, arg_type)| {
                 matches!(param_type, Type::Wildcard(_)) || param_type == arg_type
             })
