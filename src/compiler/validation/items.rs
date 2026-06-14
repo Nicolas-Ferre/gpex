@@ -101,11 +101,11 @@ impl<'item> Validator<'item, '_> {
 
     fn validate_param(
         &mut self,
-        param: &'item Param,
+        node: &'item Param,
         is_compilerimpl: bool,
     ) -> Result<(), ValidateError> {
-        let ref_ = ItemRef::Param(param);
-        self.validate_param_type(param)?;
+        let ref_ = ItemRef::Param(node);
+        self.validate_param_type(node)?;
         if !is_compilerimpl {
             validators::item::check_usage(
                 ref_,
@@ -114,22 +114,22 @@ impl<'item> Validator<'item, '_> {
                 self.indexes,
             );
         }
-        validators::ident::check_char_count(param.name_span, &mut self.context);
-        let allowed_cases = self.param_allowed_cases(param);
-        validators::ident::check_case(param.name_span, allowed_cases, &mut self.context);
+        validators::ident::check_char_count(node.name_span, &mut self.context);
+        let allowed_cases = self.param_allowed_cases(node);
+        validators::ident::check_case(node.name_span, allowed_cases, &mut self.context);
         Ok(())
     }
 
-    fn validate_param_type(&mut self, param: &Param) -> Result<(), ValidateError> {
-        if matches!(param.type_, Expr::Wildcard(_)) {
+    fn validate_param_type(&mut self, node: &Param) -> Result<(), ValidateError> {
+        if matches!(node.type_, Expr::Wildcard(_)) {
             return Ok(());
         }
-        self.with_const_mark_span(Some(param.colon_span), |self_| {
-            self_.validate_expr(&param.type_)
+        self.with_const_mark_span(Some(node.colon_span), |self_| {
+            self_.validate_expr(&node.type_)
         })?;
         validators::expr::check_types(
-            param.type_.span(),
-            self.value_resolver.expr_type(&param.type_),
+            node.type_.span(),
+            self.value_resolver.expr_type(&node.type_),
             None,
             Type::Struct(self.indexes.search_prelude_type("typeref")),
             &mut self.context,

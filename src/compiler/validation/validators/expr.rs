@@ -110,12 +110,12 @@ pub(crate) fn check_has_return_type(
     Ok(())
 }
 
-pub(crate) fn check_ref(expr: &Expr, context: &mut ValidateContext<'_>, indexes: &Indexes<'_>) {
-    if RefChecker::new(indexes).is_expr_ref(expr) == Some(false) {
+pub(crate) fn check_ref(node: &Expr, context: &mut ValidateContext<'_>, indexes: &Indexes<'_>) {
+    if RefChecker::new(indexes).is_expr_ref(node) == Some(false) {
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: "expression is not a reference".into(),
-            location: Some(context.location(expr.span())),
+            location: Some(context.location(node.span())),
             inner: vec![],
         });
     }

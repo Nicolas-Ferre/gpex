@@ -50,11 +50,11 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_module_imports(&mut self, module: &Module) {
+    fn index_module_imports(&mut self, node: &Module) {
         self.indexes
             .imports
-            .register(None, None, module.file_index, PRELUDE_FILE_INDEX, false);
-        for item in &module.items {
+            .register(None, None, node.file_index, PRELUDE_FILE_INDEX, false);
+        for item in &node.items {
             let Item::Import(import) = item else { continue };
             let Some(file_index) = import.imported_file_index else {
                 continue;
@@ -70,8 +70,8 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_module_items(&mut self, module: &'item Module) {
-        for item in &module.items {
+    fn index_module_items(&mut self, node: &'item Module) {
+        for item in &node.items {
             match item {
                 Item::Import(_) | Item::Repeat(_) => (),
                 Item::Var(item) => self.indexes.items.register(ItemRef::Var(item)),
@@ -105,8 +105,8 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_consts(&mut self, module: &'item Module) {
-        for item in &module.items {
+    fn index_consts(&mut self, node: &'item Module) {
+        for item in &node.items {
             match item {
                 Item::Const(item) => self.index_expr(&item.value),
                 Item::Fn(item) => self.index_fn_const_parts(item),
@@ -115,8 +115,8 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_not_consts(&mut self, module: &'item Module) {
-        for item in &module.items {
+    fn index_not_consts(&mut self, node: &'item Module) {
+        for item in &node.items {
             match item {
                 Item::Import(_) | Item::Struct(_) | Item::Const(_) => (),
                 Item::Var(item) => self.index_expr(&item.default_value),
@@ -126,15 +126,15 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_fn_const_parts(&mut self, item: &'item FnDefinition) {
-        for param in &item.params.params {
+    fn index_fn_const_parts(&mut self, node: &'item FnDefinition) {
+        for param in &node.params.params {
             self.index_expr(&param.type_);
         }
-        if let Some(return_type) = &item.return_type {
+        if let Some(return_type) = &node.return_type {
             self.index_expr(return_type);
         }
-        if item.const_keyword_span.is_some()
-            && let FnBody::Statements(body) = &item.body
+        if node.const_keyword_span.is_some()
+            && let FnBody::Statements(body) = &node.body
         {
             for statement in &body.statements {
                 self.index_statement_refs(statement);
@@ -142,9 +142,9 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_fn_not_const_parts(&mut self, item: &'item FnDefinition) {
-        if item.const_keyword_span.is_none()
-            && let FnBody::Statements(body) = &item.body
+    fn index_fn_not_const_parts(&mut self, node: &'item FnDefinition) {
+        if node.const_keyword_span.is_none()
+            && let FnBody::Statements(body) = &node.body
         {
             for statement in &body.statements {
                 self.index_statement_refs(statement);
@@ -152,8 +152,8 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_statement_refs(&mut self, statement: &'item Statement) {
-        match statement {
+    fn index_statement_refs(&mut self, node: &'item Statement) {
+        match node {
             Statement::Return(statement) => self.index_expr(&statement.value),
             Statement::Assignment(statement) => {
                 self.index_expr(&statement.assigned);
@@ -162,8 +162,8 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_expr(&mut self, expr: &'item Expr) {
-        match expr {
+    fn index_expr(&mut self, node: &'item Expr) {
+        match node {
             Expr::F32Literal(_)
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)
@@ -174,45 +174,45 @@ impl<'item> Indexer<'item> {
         }
     }
 
-    fn index_call(&mut self, call: &'item Call) {
-        if self.is_indexation_source_only && self.indexes.sources.contains_key(&call.id) {
+    fn index_call(&mut self, node: &'item Call) {
+        if self.is_indexation_source_only && self.indexes.sources.contains_key(&node.id) {
             return;
         }
-        for arg in &call.args {
+        for arg in &node.args {
             self.index_expr(arg); // no-fn-check (recursivity)
         }
         let search_params = SearchParams {
-            key: &call.key(),
-            location: call,
+            key: &node.key(),
+            location: node,
             imports: &self.indexes.imports,
             config: FN_CALL_SEARCH_CONFIG,
         };
-        if let Some(source) = self.search_accessible_call_source(call, search_params) {
-            self.index_accessible_source(&call, call.span, source);
-        } else if let Some(source) = self.search_not_accessible_call_source(call, search_params) {
-            self.index_not_accessible_source(call.id, source);
+        if let Some(source) = self.search_accessible_call_source(node, search_params) {
+            self.index_accessible_source(&node, node.span, source);
+        } else if let Some(source) = self.search_not_accessible_call_source(node, search_params) {
+            self.index_not_accessible_source(node.id, source);
         } else if let candidates = self.search_candidate_call_sources(search_params)
             && !candidates.is_empty()
         {
-            self.index_candidate_sources(call.id, candidates);
+            self.index_candidate_sources(node.id, candidates);
         }
     }
 
-    fn index_ident(&mut self, ident: &'item Ident) {
-        if self.is_indexation_source_only && self.indexes.sources.contains_key(&ident.id) {
+    fn index_ident(&mut self, node: &'item Ident) {
+        if self.is_indexation_source_only && self.indexes.sources.contains_key(&node.id) {
             return;
         }
         let search_params = SearchParams {
-            key: &ident.slice,
-            location: ident,
+            key: &node.slice,
+            location: node,
             imports: &self.indexes.imports,
             config: IDENT_SEARCH_CONFIG,
         };
         let matching_value = self.search_accessible_ident_source(search_params);
         if let Some(source) = matching_value {
-            self.index_accessible_source(&ident, ident.span, source);
+            self.index_accessible_source(&node, node.span, source);
         } else if let Some(source) = self.search_not_accessible_ident_source(search_params) {
-            self.index_not_accessible_source(ident.id, source);
+            self.index_not_accessible_source(node.id, source);
         }
     }
 
@@ -274,17 +274,17 @@ impl<'item> Indexer<'item> {
 
     fn index_accessible_source(
         &mut self,
-        ref_: &impl NodeRef,
+        node: &impl NodeRef,
         ref_span: Span,
         source: ItemRef<'item>,
     ) {
-        self.indexes.sources.insert(ref_.id(), source);
+        self.indexes.sources.insert(node.id(), source);
         if self.is_indexation_source_only {
             return;
         }
         self.indexes
             .imports
-            .mark_as_used(ref_.file_index(), source.file_index());
+            .mark_as_used(node.file_index(), source.file_index());
         self.indexes
             .item_first_refs
             .entry(source.id())
