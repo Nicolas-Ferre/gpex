@@ -1,4 +1,4 @@
-use crate::compiler::consts::ConstLocation;
+use crate::compiler::consts::ParamConstness;
 use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
@@ -14,7 +14,7 @@ impl<'item> Validator<'item, '_> {
         let dependency_result = DependencyResolver::new(self.indexes).scan_fn(node);
         validators::item::check_circular_dependencies(ref_, dependency_result, &mut self.context)?;
         validators::item::check_prelude_location(ref_, compilerimpl_span, &mut self.context)?;
-        self.run_with_const_location(ConstLocation::FnSignature, |self_| {
+        self.run_with_param_constness(ParamConstness::ExplicitOnly, |self_| {
             self_.validate_params(&node.params, compilerimpl_span.is_some())?;
             self_.validate_fn_return_type(node)?;
             Ok(())
@@ -54,14 +54,12 @@ impl<'item> Validator<'item, '_> {
     }
 
     fn validate_body(&mut self, node: &FnDefinition) -> Result<(), ValidateError> {
-        let body_const_location = if node.const_keyword_span.is_some() {
-            ConstLocation::ConstFnBody
+        let param_constness = if node.const_keyword_span.is_some() {
+            ParamConstness::All
         } else {
-            ConstLocation::Other
+            ParamConstness::ExplicitOnly
         };
-        self.run_with_const_location(body_const_location, |self_| {
-            self_.validate_fn_statements(node)
-        })?;
+        self.run_with_param_constness(param_constness, |self_| self_.validate_fn_statements(node))?;
         Ok(())
     }
 
