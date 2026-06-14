@@ -3,7 +3,7 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
+use crate::compiler::parsing::items::fns::{CompilerImpl, FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
@@ -43,7 +43,7 @@ impl<'item> Transpiler<'item, '_> {
     fn transpile_call(&mut self, node: &Call) {
         match self.indexes.sources[&node.id] {
             ItemRef::Fn(child) => match &child.body {
-                FnBody::Compilerimpl(_) => self.transpile_compilerimpl_fn_call(node),
+                FnBody::Compilerimpl(_) => self.transpile_compilerimpl_fn_call(node, child),
                 FnBody::Statements(body) => self.transpile_custom_fn_call(node, child, body),
             },
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
@@ -52,13 +52,16 @@ impl<'item> Transpiler<'item, '_> {
         }
     }
 
-    fn transpile_compilerimpl_fn_call(&mut self, node: &Call) {
-        if node.name == "__add__" {
-            self.transpile_expr(&node.args[0]);
-            self.shader += " + ";
-            self.transpile_expr(&node.args[1]);
-        } else {
-            unreachable!("not implemented `{}` GPU function", node.name);
+    fn transpile_compilerimpl_fn_call(&mut self, node: &Call, source: &FnDefinition) {
+        match source.compilerimpl() {
+            Some(CompilerImpl::Add) => {
+                self.transpile_expr(&node.args[0]);
+                self.shader += " + ";
+                self.transpile_expr(&node.args[1]);
+            }
+            Some(CompilerImpl::Typeof | CompilerImpl::Sizeof) | None => {
+                unreachable!("not implemented `{}` GPU function", source.name)
+            }
         }
     }
 

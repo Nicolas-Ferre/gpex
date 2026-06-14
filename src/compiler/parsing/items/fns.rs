@@ -78,6 +78,18 @@ impl FnDefinition {
         format!("{}({})", self.name, self.params.params.len())
     }
 
+    pub(crate) fn compilerimpl(&self) -> Option<CompilerImpl> {
+        if !matches!(self.body, FnBody::Compilerimpl(_)) {
+            return None;
+        }
+        match self.name.as_str() {
+            "__add__" => Some(CompilerImpl::Add),
+            "typeof" => Some(CompilerImpl::Typeof),
+            "sizeof" => Some(CompilerImpl::Sizeof),
+            _ => None,
+        }
+    }
+
     fn parse_return_type_stop<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<(), ParseError<'context>> {
@@ -112,6 +124,13 @@ impl FnDefinition {
         Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
         Ok(FnBody::Compilerimpl(compilerimpl_keyword_span))
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum CompilerImpl {
+    Add,
+    Typeof,
+    Sizeof,
 }
 
 #[derive(Debug)]
