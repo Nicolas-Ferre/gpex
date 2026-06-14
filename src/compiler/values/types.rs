@@ -92,7 +92,7 @@ impl<'item> ValueResolver<'item, '_> {
     fn item_type(&mut self, node: ItemRef<'item>, args: &[Expr]) -> Type<'item> {
         match node {
             ItemRef::Var(node) => self.var_type(node),
-            ItemRef::Const(node) => self.expr_type(&node.value), // no-fn-check (function more public)
+            ItemRef::Const(node) => self.expr_type(&node.value),
             ItemRef::Struct(_) => Type::Struct(self.indexes.search_prelude_type("typeref")),
             ItemRef::Fn(node) => self.const_fn_type(node, args),
             ItemRef::Param(node) => self.param_type(node),

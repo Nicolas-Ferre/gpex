@@ -83,4 +83,5 @@ while read -r -d '' file; do
         fi
     done <"$file"
 done < <(find src/ tests/ -type f -name "*.rs" -print0)
+
 exit $exit_code
