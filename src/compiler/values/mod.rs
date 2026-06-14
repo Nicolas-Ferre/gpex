@@ -1,5 +1,6 @@
 #![expect(clippy::multiple_inherent_impl)]
 
+pub(crate) mod compilerimpl;
 pub(crate) mod consts;
 pub(crate) mod types;
 
