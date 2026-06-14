@@ -1,11 +1,10 @@
-use crate::compiler::consts::ConstLocation;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::validation::{Validator, validators};
+use crate::compiler::validation::{ParamConstness, Validator, validators};
 use crate::utils::validation::ValidateError;
 
 impl Validator<'_, '_> {
@@ -53,12 +52,12 @@ impl Validator<'_, '_> {
             } else {
                 param_const_mark_span.or(self.const_mark_span)
             };
-            let const_location = if param_const_mark_span.is_some() {
-                ConstLocation::ConstCallArg
+            let param_constness = if param_const_mark_span.is_some() {
+                ParamConstness::ExplicitOnly
             } else {
-                self.const_checker.location
+                self.param_constness
             };
-            self.run_with_const_location(const_location, |self_| {
+            self.run_with_param_constness(param_constness, |self_| {
                 self_.with_const_mark_span(const_mark_span, |self_| {
                     is_error_detected |= self_.validate_expr(arg).is_err(); // no-fn-check (recursivity)
                 });
@@ -82,7 +81,7 @@ impl Validator<'_, '_> {
                 node.span,
                 const_mark_span,
                 &mut self.context,
-                &self.const_checker,
+                self.param_constness,
             )?;
         }
         Ok(())
@@ -105,7 +104,7 @@ impl Validator<'_, '_> {
                 node.span,
                 const_mark_span,
                 &mut self.context,
-                &self.const_checker,
+                self.param_constness,
             )?;
         }
         Ok(())

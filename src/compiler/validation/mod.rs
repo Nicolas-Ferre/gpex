@@ -6,7 +6,6 @@ mod items;
 mod naming;
 mod validators;
 
-use crate::compiler::consts::{ConstChecker, ConstLocation};
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::items::Item;
@@ -24,9 +23,9 @@ pub(crate) struct Validator<'item, 'index> {
     pub(crate) context: ValidateContext<'index>,
     indexes: &'index Indexes<'item>,
     const_mark_span: Option<Span>,
+    param_constness: ParamConstness,
     value_resolver: ValueResolver<'item, 'index>,
     key_renderer: KeyRenderer<'item, 'index>,
-    const_checker: ConstChecker<'item, 'index>,
 }
 
 impl<'item, 'index> Validator<'item, 'index> {
@@ -39,9 +38,9 @@ impl<'item, 'index> Validator<'item, 'index> {
             context: ValidateContext::new(files, root_path),
             indexes,
             const_mark_span: None,
+            param_constness: ParamConstness::ExplicitOnly,
             value_resolver: ValueResolver::new(indexes),
             key_renderer: KeyRenderer::new(indexes),
-            const_checker: ConstChecker::new(indexes),
         }
     }
 
@@ -134,15 +133,15 @@ impl<'item, 'index> Validator<'item, 'index> {
         }
     }
 
-    fn run_with_const_location<O>(
+    fn run_with_param_constness<O>(
         &mut self,
-        location: ConstLocation,
+        param_constness: ParamConstness,
         callback: impl FnOnce(&mut Self) -> O,
     ) -> O {
-        let previous_const_location = self.const_checker.location;
-        self.const_checker.location = location;
+        let previous_param_constness = self.param_constness;
+        self.param_constness = param_constness;
         let result = callback(self);
-        self.const_checker.location = previous_const_location;
+        self.param_constness = previous_param_constness;
         result
     }
 
@@ -157,4 +156,10 @@ impl<'item, 'index> Validator<'item, 'index> {
         self.const_mark_span = previous_const_mark_span;
         output
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum ParamConstness {
+    ExplicitOnly,
+    All,
 }
