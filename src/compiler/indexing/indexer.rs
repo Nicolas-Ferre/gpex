@@ -23,14 +23,14 @@ const IDENT_SEARCH_CONFIG: SearchConfig = SearchConfig {
 #[derive(Debug)]
 pub(crate) struct Indexer<'item> {
     indexes: Indexes<'item>,
-    is_indexation_source_only: bool,
+    is_indexing_source_only: bool,
 }
 
 impl<'item> Indexer<'item> {
     pub(crate) fn run(modules: &'item [Module]) -> Indexes<'item> {
         let mut indexer = Self {
             indexes: Indexes::new(modules.len()),
-            is_indexation_source_only: false,
+            is_indexing_source_only: false,
         };
         indexer.index_modules(modules);
         indexer.indexes
@@ -88,7 +88,7 @@ impl<'item> Indexer<'item> {
     }
 
     fn index_consts_until_full_registration(&mut self, modules: &'item [Module]) {
-        self.is_indexation_source_only = true;
+        self.is_indexing_source_only = true;
         // loop is used to support items referred in function signatures but defined later
         loop {
             let source_count = self.indexes.sources.len();
@@ -99,7 +99,7 @@ impl<'item> Indexer<'item> {
                 break;
             }
         }
-        self.is_indexation_source_only = false;
+        self.is_indexing_source_only = false;
         for module in modules {
             self.index_consts(module);
         }
@@ -175,7 +175,7 @@ impl<'item> Indexer<'item> {
     }
 
     fn index_call(&mut self, node: &'item Call) {
-        if self.is_indexation_source_only && self.indexes.sources.contains_key(&node.id) {
+        if self.is_indexing_source_only && self.indexes.sources.contains_key(&node.id) {
             return;
         }
         for arg in &node.args {
@@ -199,7 +199,7 @@ impl<'item> Indexer<'item> {
     }
 
     fn index_ident(&mut self, node: &'item Ident) {
-        if self.is_indexation_source_only && self.indexes.sources.contains_key(&node.id) {
+        if self.is_indexing_source_only && self.indexes.sources.contains_key(&node.id) {
             return;
         }
         let search_params = SearchParams {
@@ -279,7 +279,7 @@ impl<'item> Indexer<'item> {
         source: ItemRef<'item>,
     ) {
         self.indexes.sources.insert(node.id(), source);
-        if self.is_indexation_source_only {
+        if self.is_indexing_source_only {
             return;
         }
         self.indexes
@@ -296,7 +296,7 @@ impl<'item> Indexer<'item> {
     }
 
     fn index_not_accessible_source(&mut self, node_id: u64, source: ItemRef<'item>) {
-        if self.is_indexation_source_only {
+        if self.is_indexing_source_only {
             return;
         }
         self.indexes.priv_sources.insert(node_id, source);
