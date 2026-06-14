@@ -86,7 +86,7 @@ impl<'item> ValueResolver<'item, '_> {
 
     fn fn_call_const_value(&mut self, node: &Call, source: &FnDefinition) -> ConstValue<'item> {
         debug_assert_eq!(node.args.len(), source.params.params.len());
-        if matches!(source.body, FnBody::Compilerimpl(_)) && source.name == "typeof" {
+        if ItemRef::Fn(source).is_param_constness_ignored() {
             return self.fn_compilerimpl_const_value(node, source);
         }
         let param_args = node

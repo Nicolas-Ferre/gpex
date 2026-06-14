@@ -8,6 +8,14 @@ fn parametrized_type(type_: const typeref, param: type_) -> type_ {
     return param;
 }
 
+// =========================| Returned parametrized type via typeof |=========================
+
+var _result1_parametrized_type_via_typeof = parametrized_type_via_typeof(i32, 3); // expected: 3
+var _result2_parametrized_type_via_typeof = parametrized_type_via_typeof(u32, 4u); // expected: 4u
+fn parametrized_type_via_typeof(type_: const typeref, value: type_) -> typeof(value) {
+    return value;
+}
+
 // =========================| Forwarded wildcard type |=========================
 
 var _result1_forwarded_wildcard_type = forward_wildcard(3u); // expected: 3u
