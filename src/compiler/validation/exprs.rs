@@ -1,11 +1,10 @@
-use crate::compiler::consts::ParamConstness;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::validation::{Validator, validators};
+use crate::compiler::validation::{ParamConstness, Validator, validators};
 use crate::utils::validation::ValidateError;
 
 impl Validator<'_, '_> {
@@ -56,7 +55,7 @@ impl Validator<'_, '_> {
             let param_constness = if param_const_mark_span.is_some() {
                 ParamConstness::ExplicitOnly
             } else {
-                self.const_checker.param_constness
+                self.param_constness
             };
             self.run_with_param_constness(param_constness, |self_| {
                 self_.with_const_mark_span(const_mark_span, |self_| {
@@ -82,7 +81,7 @@ impl Validator<'_, '_> {
                 node.span,
                 const_mark_span,
                 &mut self.context,
-                &self.const_checker,
+                self.param_constness,
             )?;
         }
         Ok(())
@@ -105,7 +104,7 @@ impl Validator<'_, '_> {
                 node.span,
                 const_mark_span,
                 &mut self.context,
-                &self.const_checker,
+                self.param_constness,
             )?;
         }
         Ok(())

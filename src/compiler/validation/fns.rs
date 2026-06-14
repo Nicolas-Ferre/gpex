@@ -1,9 +1,8 @@
-use crate::compiler::consts::ParamConstness;
 use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
-use crate::compiler::validation::{Validator, validators};
+use crate::compiler::validation::{ParamConstness, Validator, validators};
 use crate::compiler::values::types::Type;
 use crate::utils::validation::ValidateError;
 

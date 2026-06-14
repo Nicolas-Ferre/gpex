@@ -1,9 +1,9 @@
-use crate::compiler::consts::ConstChecker;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::refs::RefChecker;
+use crate::compiler::validation::ParamConstness;
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::span::Span;
@@ -41,9 +41,9 @@ pub(crate) fn check_const_value(
     span: Span,
     const_mark_span: Span,
     context: &mut ValidateContext<'_>,
-    const_checker: &ConstChecker,
+    param_constness: ParamConstness,
 ) -> Result<(), ValidateError> {
-    if const_checker.is_item_const(source) {
+    if is_item_const(source, param_constness) {
         Ok(())
     } else {
         context.logs.push(Log {
@@ -136,4 +136,16 @@ pub(crate) fn report_invalid_wildcard_location(
         }],
     });
     Err(ValidateError)
+}
+
+fn is_item_const(node: ItemRef<'_>, param_constness: ParamConstness) -> bool {
+    match node {
+        ItemRef::Var(_) => false,
+        ItemRef::Const(_) | ItemRef::Struct(_) => true,
+        ItemRef::Fn(node) => node.const_keyword_span.is_some(),
+        ItemRef::Param(node) => match param_constness {
+            ParamConstness::ExplicitOnly => node.const_mark_span().is_some(),
+            ParamConstness::All => true,
+        },
+    }
 }
