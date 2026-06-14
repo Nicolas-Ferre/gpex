@@ -1,5 +1,6 @@
 #![expect(clippy::multiple_inherent_impl)]
 
+mod compilerimpl;
 mod exprs;
 mod items;
 

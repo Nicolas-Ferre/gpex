@@ -3,12 +3,11 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
-use crate::compiler::parsing::items::fns::{CompilerImpl, FnBody, FnDefinition, FnStatementsBody};
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use crate::compiler::values::ValueResolver;
-use crate::compiler::values::types::Type;
 use std::hash::{Hash, Hasher};
 
 impl<'item> ValueResolver<'item, '_> {
@@ -125,37 +124,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[allow(clippy::wildcard_enum_match_arm)]
-    fn fn_compilerimpl_const_value(
-        &mut self,
-        call: &Call,
-        source: &FnDefinition,
-    ) -> ConstValue<'item> {
-        match source.compilerimpl() {
-            Some(CompilerImpl::Add) => {
-                let left = self.const_value(source.params.params[0].id);
-                let right = self.const_value(source.params.params[1].id);
-                match (left, right) {
-                    (ConstValue::I32(left), ConstValue::I32(right)) => {
-                        ConstValue::I32(left.wrapping_add(right))
-                    }
-                    _ => unreachable!("not implemented `{}` constant GPU function", source.name),
-                }
-            }
-            Some(CompilerImpl::Typeof) => match self.expr_type(&call.args[0]) {
-                Type::Struct(type_) => ConstValue::TypeRef(type_),
-                Type::Param(param) => ConstValue::Param(param),
-                Type::Wildcard(param) => ConstValue::WildcardType(param),
-                Type::NoReturn | Type::Unknown => ConstValue::Unknown,
-            },
-            Some(CompilerImpl::Sizeof) => match self.const_value(source.params.params[0].id) {
-                ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
-                _ => unreachable!("not implemented `{}` constant GPU function", source.name),
-            },
-            None => unreachable!("not implemented `{}` constant GPU function", source.name),
-        }
-    }
-
     fn fn_body_const_value(&mut self, body: &FnStatementsBody) -> ConstValue<'item> {
         for statement in &body.statements {
             match statement {
@@ -199,7 +167,7 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    fn const_value(&self, id: u64) -> ConstValue<'item> {
+    pub(crate) fn const_value(&self, id: u64) -> ConstValue<'item> {
         self.scopes
             .last()
             .and_then(|scope| scope.const_values.get(&id))
