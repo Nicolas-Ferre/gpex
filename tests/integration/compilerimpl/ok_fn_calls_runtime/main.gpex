@@ -1,4 +1,4 @@
-// Test prelude function calls at runtime (must be transpiled correctly).
+// Test prelude function calls at runtime (must be correctly calculated).
 
 var one = 1;
 

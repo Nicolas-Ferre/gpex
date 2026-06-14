@@ -1,4 +1,4 @@
-// Test prelude function calls at `const`-time (must be transpiled correctly).
+// Test prelude function calls at `const`-time (must correctly be calculated).
 
 var runtime_value = 2u;
 fn runtime_fn() -> u32 {
