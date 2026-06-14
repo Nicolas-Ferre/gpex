@@ -1,4 +1,4 @@
-// Test access to types defined in prelude (must be transpiled correctly).
+// Test access to types defined in prelude (must exist).
 
 var _f32_type = f32; // expected: f32
 var _i32_type = i32; // expected: i32

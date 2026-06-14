@@ -1,4 +1,4 @@
-// Test all forms of function definitions (must be correctly transpiled).
+// Test all forms of function definitions (must behave correctly).
 
 // =========================| Parametrized type |=========================
 
