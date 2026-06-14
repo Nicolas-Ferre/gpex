@@ -33,13 +33,6 @@ impl<'item, 'index> ValueResolver<'item, 'index> {
         self.scopes.pop();
     }
 
-    fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
-        self.enter_scope();
-        let output = callback(self);
-        self.exit_scope();
-        output
-    }
-
     pub(crate) fn bind_params_to_args(
         &mut self,
         params: &'item ParamGroup,
@@ -58,6 +51,13 @@ impl<'item, 'index> ValueResolver<'item, 'index> {
             }
             (param_type, arg_type)
         })
+    }
+
+    fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
+        self.enter_scope();
+        let output = callback(self);
+        self.exit_scope();
+        output
     }
 }
 

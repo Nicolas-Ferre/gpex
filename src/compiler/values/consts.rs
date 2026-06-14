@@ -31,6 +31,14 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
+    pub(crate) fn const_value(&self, id: u64) -> ConstValue<'item> {
+        self.scopes
+            .last()
+            .and_then(|scope| scope.const_values.get(&id))
+            .cloned()
+            .unwrap_or(ConstValue::RuntimeValue)
+    }
+
     fn i32_literal_value(node: &I32Literal) -> ConstValue<'static> {
         if let Some(value) = node.value {
             ConstValue::I32(value)
@@ -165,14 +173,6 @@ impl<'item> ValueResolver<'item, '_> {
                 ItemRef::Param(param) => Some(param),
             },
         }
-    }
-
-    pub(crate) fn const_value(&self, id: u64) -> ConstValue<'item> {
-        self.scopes
-            .last()
-            .and_then(|scope| scope.const_values.get(&id))
-            .cloned()
-            .unwrap_or(ConstValue::RuntimeValue)
     }
 }
 

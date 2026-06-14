@@ -176,7 +176,9 @@ jobs:
       - name: Detect inline mod statements that are not at the top of a file
         run: bash .github/scripts/check_mod_location.sh
       - name: Detect function called after their definition
-        run: bash .github/scripts/check_function_order.sh
+        run: bash .github/scripts/check_function_call_order.sh
+      - name: Detect incorrect function visibility ordering
+        run: bash .github/scripts/check_function_visibility_order.sh
       - name: Generate documentation
         run: cargo doc --no-deps
         env:
