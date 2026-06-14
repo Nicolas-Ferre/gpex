@@ -38,4 +38,5 @@ export FORBIDDEN_WORDS=(
     "stmt"           # use "statement" instead
     "lit"            # use "literal" instead
     "prev"           # use "previous" instead
+    "indexation"     # use "indexing" instead
 )
