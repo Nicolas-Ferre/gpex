@@ -3,9 +3,9 @@ error: expression with invalid type `bool`
 │    ¦     return true;
 │    ¦            ^^^^
 ├─ info: expected `i32` type
-│  → <root>/main.gpex:5:21
-│    ¦ fn _fn_typeref() -> i32 {
-│    ¦                     ^^^
+│  → <root>/main.gpex:5:20
+│    ¦ fn _fn_return() -> i32 {
+│    ¦                    ^^^
 ┴
 error: expression with invalid type `bool`
 │  → <root>/main.gpex:12:13
@@ -23,8 +23,8 @@ error: expression with invalid type `bool`
 ├─ info: expected `typeref` type
 ┴
 error: expression with invalid type `bool`
-│  → <root>/main.gpex:23:24
-│    ¦ fn _fn_param_type() -> true {
-│    ¦                        ^^^^
+│  → <root>/main.gpex:23:25
+│    ¦ fn _fn_return_type() -> true {
+│    ¦                         ^^^^
 ├─ info: expected `typeref` type
 ┴

@@ -1,5 +1,5 @@
 var result = 0; // expected: 42
 
 pub fn set_value() {
-	result = 42;
+    result = 42;
 }

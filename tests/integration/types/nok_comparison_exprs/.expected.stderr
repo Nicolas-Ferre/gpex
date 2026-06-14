@@ -48,36 +48,36 @@ error: expression with invalid type `typeref`
 │    ¦     return i32;
 │    ¦            ^^^
 ├─ info: expected `i32` type
-│  → <root>/main.gpex:23:21
-│    ¦ fn _fn_typeref() -> i32 {
-│    ¦                     ^^^
+│  → <root>/main.gpex:23:22
+│    ¦ fn _fn_type_ref() -> i32 {
+│    ¦                      ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:31:12
 │    ¦     return CONST;
 │    ¦            ^^^^^
 ├─ info: expected `i32` type
-│  → <root>/main.gpex:30:21
-│    ¦ fn _fn_typeref() -> i32 {
-│    ¦                     ^^^
+│  → <root>/main.gpex:30:19
+│    ¦ fn _fn_const() -> i32 {
+│    ¦                   ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:38:12
 │    ¦     return var_;
 │    ¦            ^^^^
 ├─ info: expected `i32` type
-│  → <root>/main.gpex:37:21
-│    ¦ fn _fn_typeref() -> i32 {
-│    ¦                     ^^^
+│  → <root>/main.gpex:37:17
+│    ¦ fn _fn_var() -> i32 {
+│    ¦                 ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:44:12
 │    ¦     return param;
 │    ¦            ^^^^^
 ├─ info: expected `i32` type
-│  → <root>/main.gpex:43:31
-│    ¦ fn _fn_typeref(param: f32) -> i32 {
-│    ¦                               ^^^
+│  → <root>/main.gpex:43:29
+│    ¦ fn _fn_param(param: f32) -> i32 {
+│    ¦                             ^^^
 ┴
 error: expression with invalid type `f32`
 │  → <root>/main.gpex:50:12

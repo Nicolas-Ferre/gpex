@@ -2,7 +2,7 @@
 
 // =========================| Return statement |=========================
 
-fn _fn_typeref() -> i32 {
+fn _fn_return() -> i32 {
     return true;
 }
 
@@ -20,6 +20,6 @@ fn _fn_param_type(param: true) -> i32 {
 
 // =========================| Function return type |=========================
 
-fn _fn_param_type() -> true {
+fn _fn_return_type() -> true {
     return 0;
 }
