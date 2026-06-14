@@ -93,10 +93,13 @@ impl<'item> ValueResolver<'item, '_> {
             .args
             .iter()
             .zip(&source.params.params)
-            .map(|(arg, param)| (param.id, self.expr_const_value(arg)))
+            .map(|(arg, param)| (param, self.expr_const_value(arg), self.expr_type(arg)))
             .collect::<Vec<_>>();
         self.run_scoped(|self_| {
-            for (param_id, arg_value) in param_args {
+            for (param, arg_value, arg_type) in param_args {
+                if matches!(param.type_, Expr::Wildcard(_)) {
+                    self_.add_type(param.id, arg_type);
+                }
                 match arg_value {
                     ConstValue::TypeRef(_)
                     | ConstValue::Param(_)
@@ -104,7 +107,7 @@ impl<'item> ValueResolver<'item, '_> {
                     | ConstValue::I32(_)
                     | ConstValue::U32(_)
                     | ConstValue::F32(_)
-                    | ConstValue::Bool(_) => self_.add_value(param_id, arg_value),
+                    | ConstValue::Bool(_) => self_.add_value(param.id, arg_value),
                     ConstValue::Unknown | ConstValue::RuntimeValue => return arg_value,
                 }
             }

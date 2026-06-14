@@ -30,6 +30,13 @@ const fn const_wildcard_param(param: const ?) -> typeof(param) {
     return param;
 }
 
+// =========================| Constant wildcard type reference |=========================
+
+const _RESULT_CONST_WILDCARD_TYPE = sizeof(type_of(1)); // expected: 4u
+const fn type_of(value: const ?) -> typeref {
+    return typeof(value);
+}
+
 // =========================| Dependent wildcard type |=========================
 
 const _RESULT_DEPENDENT_TYPE_1 = dependent_type(7u, 8u); // expected: 8u
