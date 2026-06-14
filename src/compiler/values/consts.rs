@@ -20,8 +20,8 @@ impl<'item> ValueResolver<'item, '_> {
             .insert(id, value);
     }
 
-    pub(crate) fn expr_const_value(&mut self, expr: &Expr) -> ConstValue<'item> {
-        match expr {
+    pub(crate) fn expr_const_value(&mut self, node: &Expr) -> ConstValue<'item> {
+        match node {
             Expr::F32Literal(node) => Self::f32_literal_value(node),
             Expr::U32Literal(node) => Self::u32_literal_value(node),
             Expr::I32Literal(node) => Self::i32_literal_value(node),
