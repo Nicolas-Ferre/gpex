@@ -96,22 +96,14 @@ impl<'item> ItemRef<'item> {
 
     pub(crate) fn has_same_param_types_as_args(self, args: &[Expr], indexes: &Indexes<'_>) -> bool {
         let params = self.params();
-        debug_assert_eq!(params.params.len(), args.len());
         let mut value_resolver = ValueResolver::new(indexes);
         value_resolver.enter_scope();
-        for (param, arg) in params.params.iter().zip(args) {
-            let param_type = value_resolver.param_type(param);
-            let arg_type = value_resolver.expr_type(arg);
-            value_resolver.add_type(param.id, arg_type);
-            if !matches!(param_type, Type::Wildcard(_)) && param_type != arg_type {
-                return false;
-            }
-            if param.const_mark_span().is_some() {
-                let value = value_resolver.expr_const_value(arg);
-                value_resolver.add_value(param.id, value);
-            }
-        }
-        true
+        value_resolver
+            .bind_params_to_args(params, args)
+            .into_iter()
+            .all(|(param_type, arg_type)| {
+                matches!(param_type, Type::Wildcard(_)) || param_type == arg_type
+            })
     }
 
     pub(crate) fn params(self) -> &'item ParamGroup {

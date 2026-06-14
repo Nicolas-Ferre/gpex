@@ -33,16 +33,13 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
+    pub(crate) fn const_fn_type(
+        &mut self,
+        node: &'item FnDefinition,
+        args: &[Expr],
+    ) -> Type<'item> {
         self.run_scoped(|self_| {
-            for (param, arg) in node.params.params.iter().zip(args) {
-                if matches!(param.type_, Expr::Wildcard(_)) {
-                    let arg_type = self_.expr_type(arg);
-                    self_.add_type(param.id, arg_type);
-                }
-                let value = self_.expr_const_value(arg);
-                self_.add_value(param.id, value);
-            }
+            self_.bind_params_to_args(&node.params, args);
             if let Some(return_type) = node.return_type.as_ref() {
                 self_.expr_as_type(return_type)
             } else {
