@@ -53,11 +53,11 @@ impl<'item, 'index> ConstChecker<'item, 'index> {
     }
 
     fn is_call_const(&self, node: &Call) -> bool {
-        self.indexes
-            .sources
-            .get(&node.id)
-            .is_some_and(|source| self.is_item_const(*source))
-            && node.args.iter().all(|arg| self.is_expr_const(arg))
+        self.indexes.sources.get(&node.id).is_some_and(|source| {
+            let are_args_const = source.is_param_constness_ignored()
+                || node.args.iter().all(|arg| self.is_expr_const(arg));
+            are_args_const && self.is_item_const(*source)
+        })
     }
 }
 

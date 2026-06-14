@@ -84,9 +84,9 @@ error: expression not constant
 │    ¦ var _result_const_wildcard_param = const_wildcard_param(not_const_value);
 │    ¦                                                         ^^^^^^^^^^^^^^^
 ├─ info: expression must be constant
-│  → <root>/main.gpex:65:39
-│    ¦ const fn const_wildcard_param(_param: const ?) -> i32 {
-│    ¦                                       ^^^^^
+│  → <root>/main.gpex:65:38
+│    ¦ const fn const_wildcard_param(param: const ?) -> typeof(param) {
+│    ¦                                      ^^^^^
 ┴
 error: expression not constant
 │  → <root>/main.gpex:71:25

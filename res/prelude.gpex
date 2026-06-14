@@ -58,6 +58,16 @@ pub struct bool = compilerimpl {}
 /// ```
 pub const fn __add__(left: i32, right: i32) -> i32 = compilerimpl;
 
+/// Returns the type of a value.
+///
+/// # Examples
+///
+/// ```gpex
+/// var value = 1;
+/// const ValueType = typeof(value); // i32
+/// ```
+pub const fn typeof(value: ?) -> typeref = compilerimpl;
+
 /// Returns the size in bytes of a type.
 ///
 /// # Examples

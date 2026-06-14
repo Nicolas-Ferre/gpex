@@ -1,4 +1,5 @@
 use crate::compiler::consts::ConstLocation;
+use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -42,11 +43,16 @@ impl Validator<'_, '_> {
 
     pub(crate) fn validate_call(&mut self, node: &Call) -> Result<(), ValidateError> {
         let source = self.indexes.sources.get(&node.id).copied();
+        let is_constness_ignored = source.is_some_and(ItemRef::is_param_constness_ignored);
         let mut is_error_detected = false;
         for (index, arg) in node.args.iter().enumerate() {
             let param = source.map(|source| &source.params().params[index]);
             let param_const_mark_span = param.and_then(Param::const_mark_span);
-            let const_mark_span = param_const_mark_span.or(self.const_mark_span);
+            let const_mark_span = if is_constness_ignored {
+                None
+            } else {
+                param_const_mark_span.or(self.const_mark_span)
+            };
             let const_location = if param_const_mark_span.is_some() {
                 ConstLocation::ConstCallArg
             } else {

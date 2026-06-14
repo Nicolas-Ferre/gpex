@@ -3,11 +3,12 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
+use crate::compiler::parsing::items::fns::{CompilerImpl, FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use crate::compiler::values::ValueResolver;
+use crate::compiler::values::types::Type;
 use std::hash::{Hash, Hasher};
 
 impl<'item> ValueResolver<'item, '_> {
@@ -85,56 +86,73 @@ impl<'item> ValueResolver<'item, '_> {
 
     fn fn_call_const_value(&mut self, node: &Call, source: &FnDefinition) -> ConstValue<'item> {
         debug_assert_eq!(node.args.len(), source.params.params.len());
+        if ItemRef::Fn(source).is_param_constness_ignored() {
+            return self.fn_compilerimpl_const_value(node, source);
+        }
         let param_args = node
             .args
             .iter()
             .zip(&source.params.params)
-            .map(|(arg, param)| (param.id, self.expr_const_value(arg)))
+            .map(|(arg, param)| (param, self.expr_const_value(arg), self.expr_type(arg)))
             .collect::<Vec<_>>();
         self.run_scoped(|self_| {
-            for (param_id, arg_value) in param_args {
+            for (param, arg_value, arg_type) in param_args {
+                if matches!(param.type_, Expr::Wildcard(_)) {
+                    self_.add_type(param.id, arg_type);
+                }
                 match arg_value {
                     ConstValue::TypeRef(_)
                     | ConstValue::Param(_)
+                    | ConstValue::WildcardType(_)
                     | ConstValue::I32(_)
                     | ConstValue::U32(_)
                     | ConstValue::F32(_)
-                    | ConstValue::Bool(_) => self_.add_value(param_id, arg_value),
+                    | ConstValue::Bool(_) => self_.add_value(param.id, arg_value),
                     ConstValue::Unknown | ConstValue::RuntimeValue => return arg_value,
                 }
             }
-            self_.fn_const_value(source)
+            self_.fn_const_value(node, source)
         })
     }
 
-    fn fn_const_value(&mut self, node: &FnDefinition) -> ConstValue<'item> {
-        if node.const_keyword_span.is_none() {
+    fn fn_const_value(&mut self, call: &Call, source: &FnDefinition) -> ConstValue<'item> {
+        if source.const_keyword_span.is_none() {
             return ConstValue::RuntimeValue;
         }
-        match &node.body {
-            FnBody::Compilerimpl(_) => self.fn_compilerimpl_const_value(node),
+        match &source.body {
+            FnBody::Compilerimpl(_) => self.fn_compilerimpl_const_value(call, source),
             FnBody::Statements(body) => self.fn_body_const_value(body),
         }
     }
 
     #[allow(clippy::wildcard_enum_match_arm)]
-    fn fn_compilerimpl_const_value(&self, node: &FnDefinition) -> ConstValue<'item> {
-        match node.name.as_str() {
-            "__add__" => {
-                let left = self.const_value(node.params.params[0].id);
-                let right = self.const_value(node.params.params[1].id);
+    fn fn_compilerimpl_const_value(
+        &mut self,
+        call: &Call,
+        source: &FnDefinition,
+    ) -> ConstValue<'item> {
+        match source.compilerimpl() {
+            Some(CompilerImpl::Add) => {
+                let left = self.const_value(source.params.params[0].id);
+                let right = self.const_value(source.params.params[1].id);
                 match (left, right) {
                     (ConstValue::I32(left), ConstValue::I32(right)) => {
                         ConstValue::I32(left.wrapping_add(right))
                     }
-                    _ => unreachable!("not implemented `{}` constant GPU function", node.name),
+                    _ => unreachable!("not implemented `{}` constant GPU function", source.name),
                 }
             }
-            "sizeof" => match self.const_value(node.params.params[0].id) {
-                ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
-                _ => unreachable!("not implemented `{}` constant GPU function", node.name),
+            Some(CompilerImpl::Typeof) => match self.expr_type(&call.args[0]) {
+                Type::Struct(type_) => ConstValue::TypeRef(type_),
+                Type::Param(param) => ConstValue::Param(param),
+                Type::Wildcard(param) => ConstValue::WildcardType(param),
+                Type::NoReturn | Type::Unknown => ConstValue::Unknown,
             },
-            _ => unreachable!("not implemented `{}` constant GPU function", node.name),
+            Some(CompilerImpl::Sizeof) => match self.const_value(source.params.params[0].id) {
+                ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
+                _ => unreachable!("not implemented `{}` constant GPU function", source.name),
+            },
+            None => unreachable!("not implemented `{}` constant GPU function", source.name),
         }
     }
 
@@ -194,6 +212,7 @@ impl<'item> ValueResolver<'item, '_> {
 pub(crate) enum ConstValue<'item> {
     TypeRef(&'item StructDefinition),
     Param(&'item Param),
+    WildcardType(&'item Param),
     I32(i32),
     U32(u32),
     F32(HashableF32),

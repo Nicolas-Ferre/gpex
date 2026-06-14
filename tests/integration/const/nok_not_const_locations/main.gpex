@@ -62,8 +62,8 @@ const fn inner_fn_call_arg_non_const_context(param: const i32) -> i32 {
 // =========================| Function call argument with wildcard type |=========================
 
 var _result_const_wildcard_param = const_wildcard_param(not_const_value);
-const fn const_wildcard_param(_param: const ?) -> i32 {
-    return 0;
+const fn const_wildcard_param(param: const ?) -> typeof(param) {
+    return param;
 }
 
 // =========================| Unary operator operand |=========================
