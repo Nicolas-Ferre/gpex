@@ -41,7 +41,7 @@ pub(crate) fn check_const_value(
     span: Span,
     const_mark_span: Span,
     context: &mut ValidateContext<'_>,
-    const_checker: &ConstChecker<'_, '_>,
+    const_checker: &ConstChecker,
 ) -> Result<(), ValidateError> {
     if const_checker.is_item_const(source) {
         Ok(())

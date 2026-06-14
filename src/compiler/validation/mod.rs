@@ -26,7 +26,7 @@ pub(crate) struct Validator<'item, 'index> {
     const_mark_span: Option<Span>,
     value_resolver: ValueResolver<'item, 'index>,
     key_renderer: KeyRenderer<'item, 'index>,
-    const_checker: ConstChecker<'item, 'index>,
+    const_checker: ConstChecker,
 }
 
 impl<'item, 'index> Validator<'item, 'index> {
@@ -41,7 +41,7 @@ impl<'item, 'index> Validator<'item, 'index> {
             const_mark_span: None,
             value_resolver: ValueResolver::new(indexes),
             key_renderer: KeyRenderer::new(indexes),
-            const_checker: ConstChecker::new(indexes),
+            const_checker: ConstChecker::new(),
         }
     }
 

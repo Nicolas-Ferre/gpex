@@ -1,4 +1,3 @@
-use crate::compiler::consts::{ConstChecker, ConstLocation};
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
@@ -14,8 +13,6 @@ use crate::utils::parsing::span::Span;
 #[derive(Debug)]
 pub(crate) struct DependencyResolver<'item, 'index> {
     pub(crate) dependencies: Dependencies<ItemRef<'item>>,
-    const_checker: ConstChecker<'item, 'index>,
-    fn_config: FnConfig,
     indexes: &'index Indexes<'item>,
 }
 
@@ -23,48 +20,29 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
     pub(crate) fn new(indexes: &'index Indexes<'item>) -> Self {
         Self {
             dependencies: Dependencies::new(),
-            const_checker: ConstChecker::new(indexes),
-            fn_config: FnConfig {
-                is_fn_const: false,
-                are_args_const: false,
-            },
             indexes,
         }
     }
 
     pub(crate) fn scan_var(&mut self, node: &VarDefinition) -> Result<(), Vec<Span>> {
-        let fn_config = FnConfig {
-            is_fn_const: false,
-            are_args_const: false,
-        };
-        self.run_with_fn_config(fn_config, |self_| self_.scan_expr(&node.default_value))
+        self.scan_expr(&node.default_value)
     }
 
     pub(crate) fn scan_const(&mut self, node: &ConstDefinition) -> Result<(), Vec<Span>> {
-        let fn_config = FnConfig {
-            is_fn_const: false,
-            are_args_const: false,
-        };
-        self.run_with_fn_config(fn_config, |self_| self_.scan_expr(&node.value))
+        self.scan_expr(&node.value)
     }
 
     pub(crate) fn scan_fn(&mut self, node: &FnDefinition) -> Result<(), Vec<Span>> {
-        let fn_config = FnConfig {
-            is_fn_const: node.const_keyword_span.is_some(),
-            are_args_const: self.fn_config.are_args_const,
-        };
-        self.run_with_fn_config(fn_config, |self_| {
-            self_.scan_params(&node.params)?;
-            if let Some(return_type) = &node.return_type {
-                self_.scan_expr(return_type)?;
+        self.scan_params(&node.params)?;
+        if let Some(return_type) = &node.return_type {
+            self.scan_expr(return_type)?;
+        }
+        if let FnBody::Statements(body) = &node.body {
+            for statement in &body.statements {
+                self.scan_statement(statement)?;
             }
-            if let FnBody::Statements(body) = &node.body {
-                for statement in &body.statements {
-                    self_.scan_statement(statement)?;
-                }
-            }
-            Ok(())
-        })
+        }
+        Ok(())
     }
 
     fn scan_statement(&mut self, node: &Statement) -> Result<(), Vec<Span>> {
@@ -103,14 +81,7 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
             self.scan_expr(arg)?; // no-fn-check (recursivity)
         }
         if let Some(&source) = self.indexes.sources.get(&node.id) {
-            let fn_config = FnConfig {
-                is_fn_const: false,
-                are_args_const: node
-                    .args
-                    .iter()
-                    .all(|arg| self.const_checker.is_expr_const(arg)),
-            };
-            self.run_with_fn_config(fn_config, |self_| self_.scan_item(source, node.span))
+            self.scan_item(source, node.span)
         } else {
             // Covers case where there is function circular dependency from their signature.
             // As call source resolution is not done in this case, candidates are followed instead.
@@ -121,11 +92,7 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
                 .into_iter()
                 .flatten()
             {
-                let fn_config = FnConfig {
-                    is_fn_const: false,
-                    are_args_const: false,
-                };
-                self.run_with_fn_config(fn_config, |self_| self_.scan_item(source, node.span))?;
+                self.scan_item(source, node.span)?;
             }
             Ok(())
         }
@@ -154,30 +121,4 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
     fn scan_param(&mut self, node: &Param) -> Result<(), Vec<Span>> {
         self.scan_expr(&node.type_) // no-fn-check (recursivity)
     }
-
-    fn run_with_fn_config<O>(
-        &mut self,
-        config: FnConfig,
-        callback: impl FnOnce(&mut Self) -> O,
-    ) -> O {
-        let previous_fn_config = self.fn_config;
-        let previous_const_location = self.const_checker.location;
-        self.fn_config = config;
-        self.const_checker.location = if self.fn_config.is_fn_const && self.fn_config.are_args_const
-        {
-            ConstLocation::ConstFnBody
-        } else {
-            ConstLocation::Other
-        };
-        let output = callback(self);
-        self.fn_config = previous_fn_config;
-        self.const_checker.location = previous_const_location;
-        output
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-struct FnConfig {
-    is_fn_const: bool,
-    are_args_const: bool,
 }
