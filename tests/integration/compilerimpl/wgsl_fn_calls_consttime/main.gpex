@@ -1,5 +1,10 @@
 // Test prelude function calls at `const`-time (must be transpiled correctly).
 
+var runtime_value = 2u;
+fn runtime_fn() -> u32 {
+    return 3u;
+}
+
 const _I32_SIZE = sizeof(i32); // expected: 4u
 const _U32_SIZE = sizeof(u32); // expected: 4u
 const _F32_SIZE = sizeof(f32); // expected: 4u
@@ -8,8 +13,8 @@ const _TYPEREF_SIZE = sizeof(typeref); // expected: 8u
 
 const _I32_LITERAL_TYPE = typeof(1); // expected: i32
 const _TYPE_REF_TYPE = typeof(i32); // expected: typeref
-var runtime_value = 2u;
 const _RUNTIME_VALUE_TYPE = typeof(runtime_value); // expected: u32
+const _RUNTIME_FN_TYPE = typeof(runtime_fn()); // expected: u32
 
 const _I32_ADD = 2 + 1; // expected: 3
 const _I32_ADD_OVERFLOW = 2_147_483_647 + 1; // expected: -2147483648
