@@ -9,14 +9,6 @@ use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
 impl<'item> ValueResolver<'item, '_> {
-    pub(crate) fn add_type(&mut self, id: u64, type_: Type<'item>) {
-        self.scopes
-            .last_mut()
-            .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
-            .wildcard_types
-            .insert(id, type_);
-    }
-
     pub(crate) fn var_type(&mut self, node: &VarDefinition) -> Type<'item> {
         self.expr_type(&node.default_value)
     }
@@ -41,35 +33,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    pub(crate) fn expr_type(&mut self, node: &Expr) -> Type<'item> {
-        match node {
-            Expr::F32Literal(_) => Type::Struct(self.indexes.search_prelude_type("f32")),
-            Expr::U32Literal(_) => Type::Struct(self.indexes.search_prelude_type("u32")),
-            Expr::I32Literal(_) => Type::Struct(self.indexes.search_prelude_type("i32")),
-            Expr::BoolLiteral(_) => Type::Struct(self.indexes.search_prelude_type("bool")),
-            Expr::Wildcard(_) => Type::Unknown,
-            Expr::Call(node) => self.source_type(node.id, &node.args),
-            Expr::Ident(node) => self.source_type(node.id, &[]),
-        }
-    }
-
-    fn source_type(&mut self, node_id: u64, args: &[Expr]) -> Type<'item> {
-        match self.indexes.sources.get(&node_id) {
-            Some(source) => self.item_type(*source, args),
-            None => Type::Unknown,
-        }
-    }
-
-    fn item_type(&mut self, node: ItemRef<'item>, args: &[Expr]) -> Type<'item> {
-        match node {
-            ItemRef::Var(node) => self.var_type(node),
-            ItemRef::Const(node) => self.expr_type(&node.value),
-            ItemRef::Struct(_) => Type::Struct(self.indexes.search_prelude_type("typeref")),
-            ItemRef::Fn(node) => self.const_fn_type(node, args),
-            ItemRef::Param(node) => self.param_type(node),
-        }
-    }
-
     pub(crate) fn const_fn_type(&mut self, node: &FnDefinition, args: &[Expr]) -> Type<'item> {
         self.run_scoped(|self_| {
             for (param, arg) in node.params.params.iter().zip(args) {
@@ -88,6 +51,18 @@ impl<'item> ValueResolver<'item, '_> {
         })
     }
 
+    pub(crate) fn expr_type(&mut self, node: &Expr) -> Type<'item> {
+        match node {
+            Expr::F32Literal(_) => Type::Struct(self.indexes.search_prelude_type("f32")),
+            Expr::U32Literal(_) => Type::Struct(self.indexes.search_prelude_type("u32")),
+            Expr::I32Literal(_) => Type::Struct(self.indexes.search_prelude_type("i32")),
+            Expr::BoolLiteral(_) => Type::Struct(self.indexes.search_prelude_type("bool")),
+            Expr::Wildcard(_) => Type::Unknown,
+            Expr::Call(node) => self.source_type(node.id, &node.args),
+            Expr::Ident(node) => self.source_type(node.id, &[]),
+        }
+    }
+
     pub(crate) fn expr_as_type(&mut self, node: &Expr) -> Type<'item> {
         match self.expr_const_value(node) {
             ConstValue::TypeRef(type_) => Type::Struct(type_),
@@ -99,6 +74,31 @@ impl<'item> ValueResolver<'item, '_> {
             | ConstValue::Bool(_)
             | ConstValue::Unknown
             | ConstValue::RuntimeValue => Type::Unknown,
+        }
+    }
+
+    pub(crate) fn add_type(&mut self, id: u64, type_: Type<'item>) {
+        self.scopes
+            .last_mut()
+            .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
+            .wildcard_types
+            .insert(id, type_);
+    }
+
+    fn source_type(&mut self, node_id: u64, args: &[Expr]) -> Type<'item> {
+        match self.indexes.sources.get(&node_id) {
+            Some(source) => self.item_type(*source, args),
+            None => Type::Unknown,
+        }
+    }
+
+    fn item_type(&mut self, node: ItemRef<'item>, args: &[Expr]) -> Type<'item> {
+        match node {
+            ItemRef::Var(node) => self.var_type(node),
+            ItemRef::Const(node) => self.expr_type(&node.value), // no-fn-check (function more public)
+            ItemRef::Struct(_) => Type::Struct(self.indexes.search_prelude_type("typeref")),
+            ItemRef::Fn(node) => self.const_fn_type(node, args),
+            ItemRef::Param(node) => self.param_type(node),
         }
     }
 }
