@@ -1,0 +1,21 @@
+// Test invalid function call argument names (must generate errors).
+
+fn add(left: i32, right: i32) -> i32 {
+    return left + right;
+}
+
+// ==========================| Mismatching parameter name |==========================
+
+var _result_mismatching_name = add(right: 0, 0);
+
+// =====================| Mismatching uniform call parameter name |=====================
+
+var _result_mismatching_uniform_name = 0.add(left: 0);
+
+// ======================| Parameter name ignored for overload |======================
+
+var _result_name_ignored_for_overload = add(_left_u32: 0, _right_u32: 0);
+var _used_overload = add(0u, 0u); // Use the function to avoid a warning
+fn add(_left_u32: u32, _right_u32: u32) -> i32 {
+    return 0;
+}
