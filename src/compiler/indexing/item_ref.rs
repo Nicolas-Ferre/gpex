@@ -99,7 +99,7 @@ impl<'item> ItemRef<'item> {
         let mut value_resolver = ValueResolver::new(indexes);
         value_resolver.enter_scope();
         value_resolver
-            .bind_params_to_args(params, args.iter().map(|arg| &arg.value))
+            .bind_params_to_args(params, args)
             .all(|(param_type, arg_type)| {
                 matches!(param_type, Type::Wildcard(_)) || param_type == arg_type
             })

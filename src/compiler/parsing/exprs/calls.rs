@@ -151,20 +151,26 @@ pub(crate) struct Arg {
 }
 
 impl Arg {
-    // TODO: split in two functions parse_unnamed and parse_named, and use context.parse_any()
     fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
-        let mut named_context = context.clone();
-        let name_span = Span::parse_pattern(&mut named_context, IDENT_PATTERN);
-        if let Ok(name_span) = name_span
-            && Span::parse_symbol(&mut named_context, COLON_SYMBOL).is_ok()
-        {
-            *context = named_context;
-            return Ok(Self {
-                name: Some(context.slice(name_span).into()),
-                name_span: Some(name_span),
-                value: Expr::parse(context, parsing::arg_stop_excluded_parser)?,
-            });
-        }
+        context.parse_any(&[&Self::parse_named, &Self::parse_unnamed])
+    }
+
+    fn parse_named<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Self, ParseError<'context>> {
+        let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
+        Span::parse_symbol(context, COLON_SYMBOL)?;
+        context.force_parse_any_error();
+        Ok(Self {
+            name: Some(context.slice(name_span).into()),
+            name_span: Some(name_span),
+            value: Expr::parse(context, parsing::arg_stop_excluded_parser)?,
+        })
+    }
+
+    fn parse_unnamed<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Self, ParseError<'context>> {
         Ok(Self {
             name: None,
             name_span: None,

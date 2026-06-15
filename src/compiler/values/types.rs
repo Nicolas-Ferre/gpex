@@ -36,9 +36,7 @@ impl<'item> ValueResolver<'item, '_> {
 
     pub(crate) fn const_fn_type(&mut self, node: &'item FnDefinition, args: &[Arg]) -> Type<'item> {
         self.run_scoped(|self_| {
-            self_
-                .bind_params_to_args(&node.params, args.iter().map(|arg| &arg.value))
-                .for_each(drop);
+            self_.bind_params_to_args(&node.params, args).for_each(drop);
             if let Some(return_type) = node.return_type.as_ref() {
                 self_.expr_as_type(return_type)
             } else {
