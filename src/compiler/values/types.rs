@@ -1,5 +1,6 @@
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
+use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -33,13 +34,11 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    pub(crate) fn const_fn_type(
-        &mut self,
-        node: &'item FnDefinition,
-        args: &[Expr],
-    ) -> Type<'item> {
+    pub(crate) fn const_fn_type(&mut self, node: &'item FnDefinition, args: &[Arg]) -> Type<'item> {
         self.run_scoped(|self_| {
-            self_.bind_params_to_args(&node.params, args).for_each(drop);
+            self_
+                .bind_params_to_args(&node.params, args.iter().map(|arg| &arg.value))
+                .for_each(drop);
             if let Some(return_type) = node.return_type.as_ref() {
                 self_.expr_as_type(return_type)
             } else {
@@ -82,14 +81,14 @@ impl<'item> ValueResolver<'item, '_> {
             .insert(id, type_);
     }
 
-    fn source_type(&mut self, node_id: u64, args: &[Expr]) -> Type<'item> {
+    fn source_type(&mut self, node_id: u64, args: &[Arg]) -> Type<'item> {
         match self.indexes.sources.get(&node_id) {
             Some(source) => self.item_type(*source, args),
             None => Type::Unknown,
         }
     }
 
-    fn item_type(&mut self, node: ItemRef<'item>, args: &[Expr]) -> Type<'item> {
+    fn item_type(&mut self, node: ItemRef<'item>, args: &[Arg]) -> Type<'item> {
         match node {
             ItemRef::Var(node) => self.var_type(node),
             ItemRef::Const(node) => self.expr_type(&node.value),

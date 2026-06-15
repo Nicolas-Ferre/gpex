@@ -63,7 +63,7 @@ impl<'item> Transpiler<'item, '_> {
         self.shader += "(";
         for (arg, param) in node.args.iter().zip(&child.params.params) {
             if param.const_mark_span().is_none() {
-                self.transpile_expr(arg);
+                self.transpile_expr(&arg.value);
                 self.shader += ", ";
             }
         }
@@ -137,7 +137,7 @@ impl<'item> Transpiler<'item, '_> {
             .iter()
             .zip(&child.params.params)
             .filter(|(_, param)| param.const_mark_span().is_some())
-            .map(|(arg, _)| self.value_resolver.expr_const_value(arg))
+            .map(|(arg, _)| self.value_resolver.expr_const_value(&arg.value))
             .collect::<Vec<_>>()
     }
 
@@ -152,7 +152,7 @@ impl<'item> Transpiler<'item, '_> {
             .filter(|(_, param)| matches!(param.type_, Expr::Wildcard(_)))
             .map(|(arg, _)| {
                 self.value_resolver
-                    .expr_type(arg)
+                    .expr_type(&arg.value)
                     .struct_ref()
                     .unwrap_or_else(|| unreachable!("argument type should be validated before"))
             })

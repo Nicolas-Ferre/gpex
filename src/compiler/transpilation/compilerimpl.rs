@@ -13,8 +13,8 @@ impl Transpiler<'_, '_> {
     }
 
     fn transpile_compilerimpl_fn_call_add(&mut self, node: &Call) {
-        self.transpile_expr(&node.args[0]);
+        self.transpile_expr(&node.args[0].value);
         self.shader += " + ";
-        self.transpile_expr(&node.args[1]);
+        self.transpile_expr(&node.args[1].value);
     }
 }

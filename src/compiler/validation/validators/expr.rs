@@ -2,6 +2,8 @@ use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::Expr;
+use crate::compiler::parsing::exprs::calls::Arg;
+use crate::compiler::parsing::items::params::Param;
 use crate::compiler::refs::RefChecker;
 use crate::compiler::validation::ParamConstness;
 use crate::compiler::values::types::Type;
@@ -54,6 +56,31 @@ pub(crate) fn check_const_value(
                 level: LogLevel::Info,
                 msg: "expression must be constant".into(),
                 location: Some(context.location(const_mark_span)),
+            }],
+        });
+        Err(ValidateError)
+    }
+}
+
+pub(crate) fn check_arg_name(
+    arg: &Arg,
+    param: &Param,
+    context: &mut ValidateContext<'_>,
+) -> Result<(), ValidateError> {
+    let Some(name) = &arg.name else {
+        return Ok(());
+    };
+    if name == &param.name {
+        Ok(())
+    } else {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            msg: format!("`{name}` argument name not matching parameter"),
+            location: arg.name_span.map(|span| context.location(span)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                msg: format!("expected `{}` parameter name", param.name),
+                location: Some(context.location(param.name_span)),
             }],
         });
         Err(ValidateError)

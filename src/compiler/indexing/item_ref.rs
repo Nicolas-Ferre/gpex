@@ -1,6 +1,6 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::key_rendering::KeyRenderer;
-use crate::compiler::parsing::exprs::Expr;
+use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::{CompilerImpl, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -94,12 +94,12 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn has_same_param_types_as_args(self, args: &[Expr], indexes: &Indexes<'_>) -> bool {
+    pub(crate) fn has_same_param_types_as_args(self, args: &[Arg], indexes: &Indexes<'_>) -> bool {
         let params = self.params();
         let mut value_resolver = ValueResolver::new(indexes);
         value_resolver.enter_scope();
         value_resolver
-            .bind_params_to_args(params, args)
+            .bind_params_to_args(params, args.iter().map(|arg| &arg.value))
             .all(|(param_type, arg_type)| {
                 matches!(param_type, Type::Wildcard(_)) || param_type == arg_type
             })

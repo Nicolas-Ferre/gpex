@@ -23,7 +23,7 @@ impl<'item, 'index> KeyRenderer<'item, 'index> {
         let arg_types = node
             .args
             .iter()
-            .map(|arg| self.value_resolver.expr_type(arg).name())
+            .map(|arg| self.value_resolver.expr_type(&arg.value).name())
             .collect::<Result<Vec<_>, _>>()?
             .join(", ");
         Ok(format!("{fn_name}({arg_types})"))

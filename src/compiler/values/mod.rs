@@ -33,10 +33,11 @@ impl<'item, 'index> ValueResolver<'item, 'index> {
         self.scopes.pop();
     }
 
-    pub(crate) fn bind_params_to_args(
+    // TODO: take &[Arg] instead or iterator for `args` params
+    pub(crate) fn bind_params_to_args<'arg>(
         &mut self,
         params: &'item ParamGroup,
-        args: &[Expr],
+        args: impl ExactSizeIterator<Item = &'arg Expr>,
     ) -> impl Iterator<Item = (Type<'item>, Type<'item>)> {
         debug_assert_eq!(params.params.len(), args.len());
         params.params.iter().zip(args).map(|(param, arg)| {

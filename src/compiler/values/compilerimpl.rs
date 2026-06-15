@@ -30,7 +30,7 @@ impl<'item> ValueResolver<'item, '_> {
     }
 
     fn fn_compilerimpl_typeof_const_value(&mut self, call: &Call) -> ConstValue<'item> {
-        match self.expr_type(&call.args[0]) {
+        match self.expr_type(&call.args[0].value) {
             Type::Struct(type_) => ConstValue::TypeRef(type_),
             Type::Param(param) => ConstValue::Param(param),
             Type::Wildcard(param) => ConstValue::WildcardType(param),

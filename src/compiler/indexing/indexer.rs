@@ -179,7 +179,7 @@ impl<'item> Indexer<'item> {
             return;
         }
         for arg in &node.args {
-            self.index_expr(arg); // no-fn-check (recursivity)
+            self.index_expr(&arg.value); // no-fn-check (recursivity)
         }
         let search_params = SearchParams {
             key: &node.key(),

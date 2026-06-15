@@ -100,7 +100,13 @@ impl<'item> ValueResolver<'item, '_> {
             .args
             .iter()
             .zip(&source.params.params)
-            .map(|(arg, param)| (param, self.expr_const_value(arg), self.expr_type(arg)))
+            .map(|(arg, param)| {
+                (
+                    param,
+                    self.expr_const_value(&arg.value),
+                    self.expr_type(&arg.value),
+                )
+            })
             .collect::<Vec<_>>();
         self.run_scoped(|self_| {
             for (param, arg_value, arg_type) in param_args {
