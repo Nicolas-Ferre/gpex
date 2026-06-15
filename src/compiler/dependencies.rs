@@ -78,7 +78,7 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
 
     fn scan_call(&mut self, node: &Call) -> Result<(), Vec<Span>> {
         for arg in &node.args {
-            self.scan_expr(arg)?; // no-fn-check (recursivity)
+            self.scan_expr(&arg.value)?; // no-fn-check (recursivity)
         }
         if let Some(&source) = self.indexes.sources.get(&node.id) {
             self.scan_item(source, node.span)

@@ -6,7 +6,7 @@ use crate::compiler::parsing::exprs::{
 };
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::symbols::{
-    AND_SYMBOL, ANGLE_BRACKET_CLOSE_SYMBOL, ANGLE_BRACKET_OPEN_SYMBOL, COMMA_SYMBOL,
+    AND_SYMBOL, ANGLE_BRACKET_CLOSE_SYMBOL, ANGLE_BRACKET_OPEN_SYMBOL, COLON_SYMBOL, COMMA_SYMBOL,
     COMPARE_EQUAL_SYMBOL, COMPARE_GREATER_EQUAL_SYMBOL, COMPARE_LESS_EQUAL_SYMBOL,
     COMPARE_NOT_EQUAL_SYMBOL, EXCLAMATION_MARK_SYMBOL, HYPHEN_SYMBOL, OR_SYMBOL,
     PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL, PERCENT_SYMBOL, PLUS_SYMBOL, SLASH_SYMBOL,
@@ -27,7 +27,7 @@ pub(crate) struct Call {
     pub(crate) scope: Vec<u64>,
     pub(crate) span: Span,
     pub(crate) name: String,
-    pub(crate) args: Vec<Expr>,
+    pub(crate) args: Vec<Arg>,
 }
 
 impl NodeRef for &Call {
@@ -54,7 +54,7 @@ impl Call {
         Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
         context.force_parse_any_error();
         let args = context.parse_many(
-            |context| Expr::parse(context, parsing::arg_stop_excluded_parser),
+            Arg::parse,
             SeparatorParser::MaybeTrailing(|context| {
                 Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())
             }),
@@ -90,7 +90,7 @@ impl Call {
             scope: context.scope().to_vec(),
             span: operator.until(operand.span()),
             name,
-            args: vec![operand],
+            args: vec![Arg::unnamed(operand)],
         })
     }
 
@@ -121,13 +121,13 @@ impl Call {
             scope: context.scope().to_vec(),
             span: left_operand.span().until(right_operand.span()),
             name,
-            args: vec![left_operand, right_operand],
+            args: vec![Arg::unnamed(left_operand), Arg::unnamed(right_operand)],
         }
     }
 
     pub(super) fn from_uniform_syntax(receiver: Expr, call: Self) -> Self {
         let receiver_span = receiver.span();
-        let mut args = vec![receiver];
+        let mut args = vec![Arg::unnamed(receiver)];
         args.extend(call.args);
         Self {
             id: call.id,
@@ -140,5 +140,49 @@ impl Call {
 
     pub(crate) fn key(&self) -> String {
         format!("{}({})", self.name, self.args.len())
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct Arg {
+    pub(crate) name: Option<String>,
+    pub(crate) name_span: Option<Span>,
+    pub(crate) value: Expr,
+}
+
+impl Arg {
+    fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
+        context.parse_any(&[&Self::parse_named, &Self::parse_unnamed])
+    }
+
+    fn parse_named<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Self, ParseError<'context>> {
+        let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
+        Span::parse_symbol(context, COLON_SYMBOL)?;
+        context.force_parse_any_error();
+        Ok(Self {
+            name: Some(context.slice(name_span).into()),
+            name_span: Some(name_span),
+            value: Expr::parse(context, parsing::arg_stop_excluded_parser)?,
+        })
+    }
+
+    fn parse_unnamed<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<Self, ParseError<'context>> {
+        Ok(Self {
+            name: None,
+            name_span: None,
+            value: Expr::parse(context, parsing::arg_stop_excluded_parser)?,
+        })
+    }
+
+    fn unnamed(value: Expr) -> Self {
+        Self {
+            name: None,
+            name_span: None,
+            value,
+        }
     }
 }

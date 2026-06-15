@@ -59,7 +59,7 @@ impl Validator<'_, '_> {
             };
             self.run_with_param_constness(param_constness, |self_| {
                 self_.with_const_mark_span(const_mark_span, |self_| {
-                    is_error_detected |= self_.validate_expr(arg).is_err(); // no-fn-check (recursivity)
+                    is_error_detected |= self_.validate_expr(&arg.value).is_err(); // no-fn-check (recursivity)
                 });
             });
         }
@@ -75,6 +75,10 @@ impl Validator<'_, '_> {
             &mut self.context,
             self.indexes,
         )?;
+        for (arg, param) in node.args.iter().zip(&source.params().params) {
+            // Error is ignored because it is isolated from other errors
+            _ = validators::expr::check_arg_name(arg, param, &mut self.context);
+        }
         if let Some(const_mark_span) = self.const_mark_span {
             validators::expr::check_const_value(
                 source,
