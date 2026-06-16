@@ -118,46 +118,18 @@ pub(crate) fn check_unique_fn_signature(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
-    // TODO: previous fn search can be isolated in a dedicated function, so that current function don't become too big
-    let search_params = SearchParams {
-        key: &fn_.key(),
-        location: ItemRef::Fn(fn_),
-        imports: &indexes.imports,
-        config: SearchConfig {
-            can_be_after: false,
-            can_be_parent_node: false,
-        },
-    };
-    let previous_fn = indexes
-        .items
-        .search(search_params, Visibility::Enforced)
-        .filter_map(|item| match item {
-            ItemRef::Fn(previous_fn)
-                if previous_fn.name_span.file_index == fn_.name_span.file_index =>
-            {
-                Some(previous_fn)
-            }
-            ItemRef::Var(_)
-            | ItemRef::Const(_)
-            | ItemRef::Struct(_)
-            | ItemRef::Fn(_)
-            | ItemRef::Param(_) => None,
-        })
-        .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes));
-    if let Some(previous_fn) = previous_fn {
+    if let Some(previous_fn) = find_previous_similar_fn_signature(fn_, indexes) {
         let fn_key = KeyRenderer::new(indexes)
             .fn_key(fn_)
             .unwrap_or_else(|_| unreachable!("function should be validated before"));
-        // TODO: align messages with existing warning for duplicated variables
-        // TODO: the signature span used specifically here shouldn't highlight the return type, as this can be misleading
         context.logs.push(Log {
             level: LogLevel::Warning,
-            msg: format!("`{fn_key}` function redefined with same signature"),
-            location: Some(context.location(fn_.signature_span)),
+            msg: format!("`{fn_key}` function defined multiple times"),
+            location: Some(context.location(fn_.signature_span_without_return)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
-                msg: "previous matching definition here".into(),
-                location: Some(context.location(previous_fn.signature_span)),
+                msg: "function also defined here".into(),
+                location: Some(context.location(previous_fn.signature_span_without_return)),
             }],
         });
     }
@@ -249,7 +221,7 @@ pub(crate) fn check_found<'index>(
                     .map(|candidate| LogInner {
                         level: LogLevel::Info,
                         msg: "similar candidate".into(),
-                        location: Some(context.location(candidate.call_signature_span())),
+                        location: Some(context.location(candidate.signature_span_with_return())),
                     })
                     .collect()
             } else if let Some(priv_source) = indexes.priv_sources.get(&node.id()) {
@@ -290,7 +262,7 @@ pub(crate) fn check_unary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function must have exactly one parameter"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -299,7 +271,7 @@ pub(crate) fn check_unary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function without return type"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -320,7 +292,7 @@ pub(crate) fn check_binary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function must have exactly two parameters"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -329,7 +301,7 @@ pub(crate) fn check_binary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function without return type"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -357,6 +329,37 @@ fn are_same_fn_signatures(
             let other_type = other_value_resolver.param_type(other_param);
             are_same_param_types(type_, other_type)
         })
+}
+
+fn find_previous_similar_fn_signature<'index>(
+    fn_: &FnDefinition,
+    indexes: &'index Indexes<'_>,
+) -> Option<&'index FnDefinition> {
+    let search_params = SearchParams {
+        key: &fn_.key(),
+        location: ItemRef::Fn(fn_),
+        imports: &indexes.imports,
+        config: SearchConfig {
+            can_be_after: false,
+            can_be_parent_node: false,
+        },
+    };
+    indexes
+        .items
+        .search(search_params, Visibility::Enforced)
+        .filter_map(|item| match item {
+            ItemRef::Fn(previous_fn)
+                if previous_fn.name_span.file_index == fn_.name_span.file_index =>
+            {
+                Some(previous_fn)
+            }
+            ItemRef::Var(_)
+            | ItemRef::Const(_)
+            | ItemRef::Struct(_)
+            | ItemRef::Fn(_)
+            | ItemRef::Param(_) => None,
+        })
+        .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
 }
 
 fn are_same_param_types(type_: Type<'_>, other_type: Type<'_>) -> bool {

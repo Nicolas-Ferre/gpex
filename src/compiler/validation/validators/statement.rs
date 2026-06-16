@@ -68,7 +68,7 @@ pub(crate) fn check_disallowed_return(
                 inner: vec![LogInner {
                     level: LogLevel::Info,
                     msg: "function has no return type".into(),
-                    location: Some(context.location(fn_.signature_span)),
+                    location: Some(context.location(fn_.signature_span_with_return)),
                 }],
             });
             result = Err(ValidateError);

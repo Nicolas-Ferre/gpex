@@ -25,7 +25,9 @@ pub(crate) struct FnDefinition {
     #[derive_where(skip)]
     pub(crate) name_span: Span,
     #[derive_where(skip)]
-    pub(crate) signature_span: Span,
+    pub(crate) signature_span_with_return: Span,
+    #[derive_where(skip)]
+    pub(crate) signature_span_without_return: Span,
     #[derive_where(skip)]
     pub(crate) params: ParamGroup,
     #[derive_where(skip)]
@@ -65,7 +67,8 @@ impl FnDefinition {
                 const_keyword_span,
                 name_span,
                 name: context.slice(name_span).into(),
-                signature_span: name_span.until(signature_end_span),
+                signature_span_with_return: name_span.until(signature_end_span),
+                signature_span_without_return: name_span.until(params.span),
                 params,
                 arrow_span,
                 return_type,

@@ -104,7 +104,7 @@ pub(crate) fn check_no_return_type(
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "function has no return type".into(),
-                location: Some(context.location(fn_.signature_span)),
+                location: Some(context.location(fn_.signature_span_with_return)),
             }],
         });
         return Err(ValidateError);
@@ -129,7 +129,7 @@ pub(crate) fn check_has_return_type(
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "function has a return type".into(),
-                location: Some(context.location(fn_.signature_span)),
+                location: Some(context.location(fn_.signature_span_with_return)),
             }],
         });
         return Err(ValidateError);

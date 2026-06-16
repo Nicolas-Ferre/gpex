@@ -84,9 +84,9 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn call_signature_span(self) -> Span {
+    pub(crate) fn signature_span_with_return(self) -> Span {
         match self {
-            Self::Fn(node) => node.signature_span,
+            Self::Fn(node) => node.signature_span_with_return,
             // coverage: off (only functions can be called)
             Self::Var(_) | Self::Const(_) | Self::Struct(_) | Self::Param(_) => {
                 unreachable!("only functions can be called")
