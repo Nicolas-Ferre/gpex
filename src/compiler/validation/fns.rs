@@ -18,6 +18,7 @@ impl<'item> Validator<'item, '_> {
             self_.validate_fn_return_type(node)?;
             Ok(())
         })?;
+        validators::item::check_unique_fn_signature(node, &mut self.context, self.indexes);
         validators::item::check_unary_operator_fn(node, &mut self.context, self.indexes)?;
         validators::item::check_binary_operator_fn(node, &mut self.context, self.indexes)?;
         self.validate_body(node)?;

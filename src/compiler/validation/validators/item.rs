@@ -6,6 +6,8 @@ use crate::compiler::parsing::exprs::{BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
+use crate::compiler::values::ValueResolver;
+use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -109,6 +111,56 @@ pub(crate) fn check_unique_params(
         }
     }
     if is_error { Err(ValidateError) } else { Ok(()) }
+}
+
+pub(crate) fn check_unique_fn_signature(
+    fn_: &FnDefinition,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) {
+    // TODO: previous fn search can be isolated in a dedicated function, so that current function don't become too big
+    let search_params = SearchParams {
+        key: &fn_.key(),
+        location: ItemRef::Fn(fn_),
+        imports: &indexes.imports,
+        config: SearchConfig {
+            can_be_after: false,
+            can_be_parent_node: false,
+        },
+    };
+    let previous_fn = indexes
+        .items
+        .search(search_params, Visibility::Enforced)
+        .filter_map(|item| match item {
+            ItemRef::Fn(previous_fn)
+                if previous_fn.name_span.file_index == fn_.name_span.file_index =>
+            {
+                Some(previous_fn)
+            }
+            ItemRef::Var(_)
+            | ItemRef::Const(_)
+            | ItemRef::Struct(_)
+            | ItemRef::Fn(_)
+            | ItemRef::Param(_) => None,
+        })
+        .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes));
+    if let Some(previous_fn) = previous_fn {
+        let fn_key = KeyRenderer::new(indexes)
+            .fn_key(fn_)
+            .unwrap_or_else(|_| unreachable!("function should be validated before"));
+        // TODO: align messages with existing warning for duplicated variables
+        // TODO: the signature span used specifically here shouldn't highlight the return type, as this can be misleading
+        context.logs.push(Log {
+            level: LogLevel::Warning,
+            msg: format!("`{fn_key}` function redefined with same signature"),
+            location: Some(context.location(fn_.signature_span)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                msg: "previous matching definition here".into(),
+                location: Some(context.location(previous_fn.signature_span)),
+            }],
+        });
+    }
 }
 
 pub(crate) fn check_prelude_location(
@@ -283,5 +335,37 @@ pub(crate) fn check_binary_operator_fn(
         Err(ValidateError)
     } else {
         Ok(())
+    }
+}
+
+fn are_same_fn_signatures(
+    fn_: &FnDefinition,
+    other_fn: &FnDefinition,
+    indexes: &Indexes<'_>,
+) -> bool {
+    if fn_.name != other_fn.name || fn_.params.params.len() != other_fn.params.params.len() {
+        return false;
+    }
+    let mut value_resolver = ValueResolver::new(indexes);
+    let mut other_value_resolver = ValueResolver::new(indexes);
+    fn_.params
+        .params
+        .iter()
+        .zip(&other_fn.params.params)
+        .all(|(param, other_param)| {
+            let type_ = value_resolver.param_type(param);
+            let other_type = other_value_resolver.param_type(other_param);
+            are_same_param_types(type_, other_type)
+        })
+}
+
+fn are_same_param_types(type_: Type<'_>, other_type: Type<'_>) -> bool {
+    match (type_, other_type) {
+        (Type::Struct(struct_), Type::Struct(other_struct)) => struct_.id == other_struct.id,
+        (Type::Param(param), Type::Param(other_param))
+        | (Type::Wildcard(param), Type::Wildcard(other_param)) => {
+            param.position == other_param.position
+        }
+        _ => false,
     }
 }

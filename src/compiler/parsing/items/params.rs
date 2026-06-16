@@ -19,13 +19,16 @@ impl ParamGroup {
         context: &mut ParseContext<'context>,
     ) -> Result<Self, ParseError<'context>> {
         let start_span = Span::parse_symbol(context, PARENTHESIS_OPEN_SYMBOL)?;
-        let params = context.parse_many(
+        let mut params = context.parse_many(
             Param::parse,
             SeparatorParser::MaybeTrailing(|context| {
                 Span::parse_symbol(context, COMMA_SYMBOL).map(|_| ())
             }),
             |context| Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL).map(|_| ()),
         )?;
+        for (index, param) in params.iter_mut().enumerate() {
+            param.position = index;
+        }
         let end_span = Span::parse_symbol(context, PARENTHESIS_CLOSE_SYMBOL)?;
         Ok(Self {
             params,
@@ -40,6 +43,8 @@ pub(crate) struct Param {
     pub(crate) id: u64,
     #[derive_where(skip)]
     pub(crate) scope: Vec<u64>,
+    #[derive_where(skip)]
+    pub(crate) position: usize,
     #[derive_where(skip)]
     pub(crate) name: String,
     #[derive_where(skip)]
@@ -68,8 +73,9 @@ impl Param {
         Ok(Self {
             id: context.next_id(),
             scope: context.scope().to_vec(),
-            name_span,
+            position: 0,
             name: context.slice(name_span).into(),
+            name_span,
             colon_span,
             qualifier,
             type_,
