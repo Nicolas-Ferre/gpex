@@ -2,12 +2,12 @@
 
 // =========================| Empty body |=========================
 
-fn _fn() -> i32 {
+fn _fn_empty_body() -> i32 {
 }
 
 // =========================| Not empty body |=========================
 
-const fn _fn(param: i32) -> u32 {
+const fn _fn_not_empty_body(param: i32) -> u32 {
     param = 0;
 }
 
@@ -16,7 +16,7 @@ const fn _fn(param: i32) -> u32 {
 const fn UsedInFnSignature(param: i32) -> typeref {
     param = 0;
 }
-fn _fn() -> UsedInFnSignature(0) {
+fn _fn_usage_in_signature() -> UsedInFnSignature(0) {
     return 0;
 }
 

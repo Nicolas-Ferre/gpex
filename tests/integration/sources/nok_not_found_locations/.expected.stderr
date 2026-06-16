@@ -14,14 +14,14 @@ error: `error()` item not found
 │    ¦        ^^^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:19:15
-│    ¦ fn _fn(param: error) -> i32 {
-│    ¦               ^^^^^
+│  → <root>/main.gpex:19:26
+│    ¦ fn _fn_param_type(param: error) -> i32 {
+│    ¦                          ^^^^^
 ┴
 error: `error` item not found
-│  → <root>/main.gpex:25:13
-│    ¦ fn _fn() -> error {
-│    ¦             ^^^^^
+│  → <root>/main.gpex:25:25
+│    ¦ fn _fn_return_type() -> error {
+│    ¦                         ^^^^^
 ┴
 error: `error` item not found
 │  → <root>/main.gpex:32:12
@@ -182,22 +182,4 @@ error: `error` item not found
 │  → <root>/main.gpex:70:20
 │    ¦ var _or = error || error;
 │    ¦                    ^^^^^
-┴
-warning: `_fn()` function defined multiple times
-│  → <root>/main.gpex:31:4
-│    ¦ fn _fn() -> i32 {
-│    ¦    ^^^^^
-├─ info: function also defined here
-│  → <root>/main.gpex:25:4
-│    ¦ fn _fn() -> error {
-│    ¦    ^^^^^
-┴
-warning: `_fn()` function defined multiple times
-│  → <root>/main.gpex:37:4
-│    ¦ fn _fn() {
-│    ¦    ^^^^^
-├─ info: function also defined here
-│  → <root>/main.gpex:31:4
-│    ¦ fn _fn() -> i32 {
-│    ¦    ^^^^^
 ┴
