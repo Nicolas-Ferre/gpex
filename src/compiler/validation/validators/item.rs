@@ -310,27 +310,6 @@ pub(crate) fn check_binary_operator_fn(
     }
 }
 
-fn are_same_fn_signatures(
-    fn_: &FnDefinition,
-    other_fn: &FnDefinition,
-    indexes: &Indexes<'_>,
-) -> bool {
-    if fn_.name != other_fn.name || fn_.params.params.len() != other_fn.params.params.len() {
-        return false;
-    }
-    let mut value_resolver = ValueResolver::new(indexes);
-    let mut other_value_resolver = ValueResolver::new(indexes);
-    fn_.params
-        .params
-        .iter()
-        .zip(&other_fn.params.params)
-        .all(|(param, other_param)| {
-            let type_ = value_resolver.param_type(param);
-            let other_type = other_value_resolver.param_type(other_param);
-            are_same_param_types(type_, other_type)
-        })
-}
-
 fn find_previous_similar_fn_signature<'index>(
     fn_: &FnDefinition,
     indexes: &'index Indexes<'_>,
@@ -360,6 +339,26 @@ fn find_previous_similar_fn_signature<'index>(
             | ItemRef::Param(_) => None,
         })
         .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
+}
+
+fn are_same_fn_signatures(
+    fn_: &FnDefinition,
+    other_fn: &FnDefinition,
+    indexes: &Indexes<'_>,
+) -> bool {
+    debug_assert!(fn_.name == other_fn.name);
+    debug_assert!(fn_.params.params.len() == other_fn.params.params.len());
+    let mut value_resolver = ValueResolver::new(indexes);
+    let mut other_value_resolver = ValueResolver::new(indexes);
+    fn_.params
+        .params
+        .iter()
+        .zip(&other_fn.params.params)
+        .all(|(param, other_param)| {
+            let type_ = value_resolver.param_type(param);
+            let other_type = other_value_resolver.param_type(other_param);
+            are_same_param_types(type_, other_type)
+        })
 }
 
 fn are_same_param_types(type_: Type<'_>, other_type: Type<'_>) -> bool {
