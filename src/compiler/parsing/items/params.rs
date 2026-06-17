@@ -68,8 +68,8 @@ impl Param {
         Ok(Self {
             id: context.next_id(),
             scope: context.scope().to_vec(),
-            name_span,
             name: context.slice(name_span).into(),
+            name_span,
             colon_span,
             qualifier,
             type_,

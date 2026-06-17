@@ -1,0 +1,81 @@
+warning: `_concrete(i32)` function defined multiple times
+│  → <root>/main.gpex:10:4
+│    ¦ fn _concrete(_other: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:7:4
+│    ¦ fn _concrete(_value: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_typeof_concrete(i32)` function defined multiple times
+│  → <root>/main.gpex:19:4
+│    ¦ fn _typeof_concrete(_value: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:16:4
+│    ¦ fn _typeof_concrete(_value: typeof(0)) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_wildcard(?)` function defined multiple times
+│  → <root>/main.gpex:28:4
+│    ¦ fn _wildcard(other: ?) -> typeof(other) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:25:4
+│    ¦ fn _wildcard(value: ?) -> typeof(value) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_typeof_wildcard(?, typeof(other))` function defined multiple times
+│  → <root>/main.gpex:37:4
+│    ¦ fn _typeof_wildcard(other: ?, other_copy: typeof(other)) -> typeof(other) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:34:4
+│    ¦ fn _typeof_wildcard(value: ?, copy: typeof(value)) -> typeof(value) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_type_param(typeref, other_type)` function defined multiple times
+│  → <root>/main.gpex:46:4
+│    ¦ fn _type_param(other_type: const typeref, other_value: other_type) -> other_type {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:43:4
+│    ¦ fn _type_param(type_: const typeref, value: type_) -> type_ {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_typeof_param(typeref, other_type, other_type)` function defined multiple times
+│  → <root>/main.gpex:55:4
+│    ¦ fn _typeof_param(other_type: const typeref, other_value: other_type, other_copy: typeof(other_value)) -> other_type {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:52:4
+│    ¦ fn _typeof_param(type_: const typeref, value: type_, copy: typeof(value)) -> type_ {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_previous_matching(i32)` function defined multiple times
+│  → <root>/main.gpex:64:4
+│    ¦ fn _previous_matching(value: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:61:4
+│    ¦ fn _previous_matching(value: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_previous_matching(i32)` function defined multiple times
+│  → <root>/main.gpex:67:4
+│    ¦ fn _previous_matching(value: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:64:4
+│    ¦ fn _previous_matching(value: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `attributes(i32)` function defined multiple times
+│  → <root>/main.gpex:76:4
+│    ¦ fn attributes(_other: i32) -> u32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/main.gpex:73:14
+│    ¦ pub const fn attributes(_value: const i32) -> i32 {
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴

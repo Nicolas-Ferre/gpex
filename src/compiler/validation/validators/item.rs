@@ -6,6 +6,8 @@ use crate::compiler::parsing::exprs::{BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
+use crate::compiler::values::ValueResolver;
+use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
@@ -65,9 +67,8 @@ pub(crate) fn check_unique_definition(
     };
     if let Some(duplicated_item) = indexes
         .items
-        .search(search_params, Visibility::Enforced)
+        .search_in_same_file(search_params, Visibility::Enforced)
         .next()
-        && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
@@ -109,6 +110,28 @@ pub(crate) fn check_unique_params(
         }
     }
     if is_error { Err(ValidateError) } else { Ok(()) }
+}
+
+pub(crate) fn check_unique_fn_signature(
+    fn_: &FnDefinition,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) {
+    if let Some(previous_fn) = find_previous_similar_fn_signature(fn_, indexes) {
+        let fn_key = KeyRenderer::new(indexes)
+            .fn_key(fn_)
+            .unwrap_or_else(|_| unreachable!("function should be validated before"));
+        context.logs.push(Log {
+            level: LogLevel::Warning,
+            msg: format!("`{fn_key}` function defined multiple times"),
+            location: Some(context.location(fn_.signature_span_without_return)),
+            inner: vec![LogInner {
+                level: LogLevel::Info,
+                msg: "function also defined here".into(),
+                location: Some(context.location(previous_fn.signature_span_without_return)),
+            }],
+        });
+    }
 }
 
 pub(crate) fn check_prelude_location(
@@ -197,7 +220,7 @@ pub(crate) fn check_found<'index>(
                     .map(|candidate| LogInner {
                         level: LogLevel::Info,
                         msg: "similar candidate".into(),
-                        location: Some(context.location(candidate.call_signature_span())),
+                        location: Some(context.location(candidate.signature_span_with_return())),
                     })
                     .collect()
             } else if let Some(priv_source) = indexes.priv_sources.get(&node.id()) {
@@ -238,7 +261,7 @@ pub(crate) fn check_unary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function must have exactly one parameter"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -247,7 +270,7 @@ pub(crate) fn check_unary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function without return type"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -268,7 +291,7 @@ pub(crate) fn check_binary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function must have exactly two parameters"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -277,11 +300,80 @@ pub(crate) fn check_binary_operator_fn(
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function without return type"),
-            location: Some(context.location(fn_.signature_span)),
+            location: Some(context.location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
     } else {
         Ok(())
     }
+}
+
+fn find_previous_similar_fn_signature<'index>(
+    fn_: &FnDefinition,
+    indexes: &'index Indexes<'_>,
+) -> Option<&'index FnDefinition> {
+    let search_params = SearchParams {
+        key: &fn_.key(),
+        location: ItemRef::Fn(fn_),
+        imports: &indexes.imports,
+        config: SearchConfig {
+            can_be_after: false,
+            can_be_parent_node: false,
+        },
+    };
+    indexes
+        .items
+        .search_in_same_file(search_params, Visibility::Enforced)
+        .map(|item| match item {
+            ItemRef::Fn(previous_fn) => previous_fn,
+            ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
+                unreachable!("only functions are searched with parameter types")
+            }
+        })
+        .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
+}
+
+fn are_same_fn_signatures(
+    fn_: &FnDefinition,
+    other_fn: &FnDefinition,
+    indexes: &Indexes<'_>,
+) -> bool {
+    debug_assert!(fn_.name == other_fn.name);
+    debug_assert!(fn_.params.params.len() == other_fn.params.params.len());
+    let mut value_resolver = ValueResolver::new(indexes);
+    let mut other_value_resolver = ValueResolver::new(indexes);
+    fn_.params
+        .params
+        .iter()
+        .zip(&other_fn.params.params)
+        .all(|(param, other_param)| {
+            let type_ = value_resolver.param_type(param);
+            let other_type = other_value_resolver.param_type(other_param);
+            are_same_param_types(type_, other_type, fn_, other_fn)
+        })
+}
+
+fn are_same_param_types(
+    type_: Type<'_>,
+    other_type: Type<'_>,
+    fn_: &FnDefinition,
+    other_fn: &FnDefinition,
+) -> bool {
+    match (type_, other_type) {
+        (Type::Struct(struct_), Type::Struct(other_struct)) => struct_.id == other_struct.id,
+        (Type::Param(param), Type::Param(other_param))
+        | (Type::Wildcard(param), Type::Wildcard(other_param)) => {
+            param_index(fn_, param) == param_index(other_fn, other_param)
+        }
+        _ => false,
+    }
+}
+
+fn param_index(fn_: &FnDefinition, param: &Param) -> usize {
+    fn_.params
+        .params
+        .iter()
+        .position(|fn_param| fn_param.id == param.id)
+        .unwrap_or_else(|| unreachable!("param should be found in the function"))
 }

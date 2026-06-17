@@ -1,6 +1,7 @@
 // Test not constant expressions in all constant locations (must generate errors).
 
 var not_const_value = 0;
+var not_const_type = i32;
 
 // =========================| Global constant value |=========================
 
@@ -34,6 +35,16 @@ const fn _fn_assignment_left(){
 
 const fn _fn_assignment_right(param: i32) {
     param = not_const_value;
+}
+
+// =========================| Signature calling function with assignment statement right value |=========================
+
+fn _fn_signature_assignment_right(type_: const typeref, _value: signature_assignment_right(type_)) -> i32 {
+    return 0;
+}
+const fn signature_assignment_right(type_: typeref) -> typeref {
+    type_ = not_const_type;
+    return type_;
 }
 
 // =========================| Function call argument |=========================
