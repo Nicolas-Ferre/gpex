@@ -325,9 +325,11 @@ fn find_previous_similar_fn_signature<'index>(
     indexes
         .items
         .search_in_same_file(search_params, Visibility::Enforced)
-        .filter_map(|item| match item {
-            ItemRef::Fn(previous_fn) => Some(previous_fn),
-            ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => None,
+        .map(|item| match item {
+            ItemRef::Fn(previous_fn) => previous_fn,
+            ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
+                unreachable!("only functions are searched with parameter types")
+            }
         })
         .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
 }
@@ -362,18 +364,16 @@ fn are_same_param_types(
         (Type::Struct(struct_), Type::Struct(other_struct)) => struct_.id == other_struct.id,
         (Type::Param(param), Type::Param(other_param))
         | (Type::Wildcard(param), Type::Wildcard(other_param)) => {
-            match (param_index(fn_, param), param_index(other_fn, other_param)) {
-                (Some(index), Some(other_index)) => index == other_index,
-                _ => false,
-            }
+            param_index(fn_, param) == param_index(other_fn, other_param)
         }
         _ => false,
     }
 }
 
-fn param_index(fn_: &FnDefinition, param: &Param) -> Option<usize> {
+fn param_index(fn_: &FnDefinition, param: &Param) -> usize {
     fn_.params
         .params
         .iter()
         .position(|fn_param| fn_param.id == param.id)
+        .unwrap_or_else(|| unreachable!("param should be found in the function"))
 }

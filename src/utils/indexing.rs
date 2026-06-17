@@ -143,6 +143,15 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
             .copied()
     }
 
+    pub(crate) fn search_in_same_file(
+        &self,
+        params: SearchParams<'_, impl NodeRef>,
+        visibility: Visibility,
+    ) -> impl Iterator<Item = Item> {
+        self.search(params, visibility)
+            .take_while(move |item| item.file_index() == params.location.file_index())
+    }
+
     pub(crate) fn search(
         &self,
         params: SearchParams<'_, impl NodeRef>,
@@ -157,15 +166,6 @@ impl<Item: ItemNodeRef> NodeIndex<Item> {
                 Self::is_item_visible(item, params.location, visibility, params.config)
             })
             .copied()
-    }
-
-    pub(crate) fn search_in_same_file(
-        &self,
-        params: SearchParams<'_, impl NodeRef>,
-        visibility: Visibility,
-    ) -> impl Iterator<Item = Item> {
-        self.search(params, visibility)
-            .take_while(move |item| item.file_index() == params.location.file_index())
     }
 
     fn is_item_visible(

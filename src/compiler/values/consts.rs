@@ -162,7 +162,11 @@ impl<'item> ValueResolver<'item, '_> {
             .last_mut()
             .and_then(|scope| scope.const_values.get_mut(&assigned_param.id))
             .unwrap_or_else(|| unreachable!("param should be registered before"));
-        *param_value = new_value;
+        *param_value = if matches!(new_value, ConstValue::RuntimeValue) {
+            ConstValue::Unknown // runtime value in a constant assignment means the code is invalid
+        } else {
+            new_value
+        };
         Ok(())
     }
 
