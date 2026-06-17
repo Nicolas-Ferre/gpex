@@ -67,9 +67,8 @@ pub(crate) fn check_unique_definition(
     };
     if let Some(duplicated_item) = indexes
         .items
-        .search(search_params, Visibility::Enforced)
+        .search_in_same_file(search_params, Visibility::Enforced)
         .next()
-        && duplicated_item.file_index() == item.file_index()
     {
         context.logs.push(Log {
             level: LogLevel::Error,
@@ -325,18 +324,10 @@ fn find_previous_similar_fn_signature<'index>(
     };
     indexes
         .items
-        .search(search_params, Visibility::Enforced)
+        .search_in_same_file(search_params, Visibility::Enforced)
         .filter_map(|item| match item {
-            ItemRef::Fn(previous_fn)
-                if previous_fn.name_span.file_index == fn_.name_span.file_index =>
-            {
-                Some(previous_fn)
-            }
-            ItemRef::Var(_)
-            | ItemRef::Const(_)
-            | ItemRef::Struct(_)
-            | ItemRef::Fn(_)
-            | ItemRef::Param(_) => None,
+            ItemRef::Fn(previous_fn) => Some(previous_fn),
+            ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => None,
         })
         .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
 }
