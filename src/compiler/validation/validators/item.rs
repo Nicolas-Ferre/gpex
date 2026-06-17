@@ -357,17 +357,32 @@ fn are_same_fn_signatures(
         .all(|(param, other_param)| {
             let type_ = value_resolver.param_type(param);
             let other_type = other_value_resolver.param_type(other_param);
-            are_same_param_types(type_, other_type)
+            are_same_param_types(type_, other_type, fn_, other_fn)
         })
 }
 
-fn are_same_param_types(type_: Type<'_>, other_type: Type<'_>) -> bool {
+fn are_same_param_types(
+    type_: Type<'_>,
+    other_type: Type<'_>,
+    fn_: &FnDefinition,
+    other_fn: &FnDefinition,
+) -> bool {
     match (type_, other_type) {
         (Type::Struct(struct_), Type::Struct(other_struct)) => struct_.id == other_struct.id,
         (Type::Param(param), Type::Param(other_param))
         | (Type::Wildcard(param), Type::Wildcard(other_param)) => {
-            param.position == other_param.position
+            match (param_index(fn_, param), param_index(other_fn, other_param)) {
+                (Some(index), Some(other_index)) => index == other_index,
+                _ => false,
+            }
         }
         _ => false,
     }
+}
+
+fn param_index(fn_: &FnDefinition, param: &Param) -> Option<usize> {
+    fn_.params
+        .params
+        .iter()
+        .position(|fn_param| fn_param.id == param.id)
 }
