@@ -85,6 +85,15 @@ fn imported(value: i32) -> i32 {
 }
 var _imported_usage = imported(0);
 
+// =========================| Ignored wildcard and concrete types |=========================
+
+fn _wildcard_concrete(input: ?) -> typeof(input) {
+    return input;
+}
+fn _wildcard_concrete(input: i32) -> i32 {
+    return input;
+}
+
 // =========================| Different parameter positions |=========================
 
 fn _different_param_positions(type1: const typeref, type2: const typeref, value1: type1, _value2: type2) -> type1 {
