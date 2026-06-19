@@ -42,7 +42,7 @@ for i in "${!pids[@]}"; do
         echo "✓ $command"
     else
         echo "✗ $command"
-        cat "target/lints/lint-$command.log"
+        cat "target/lints/lint-$(command_name "$command").log"
         failed=1
     fi
 done
