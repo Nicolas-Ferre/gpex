@@ -18,6 +18,12 @@ fn _fn_param_type(param: true) -> i32 {
     return param;
 }
 
+// =========================| Function parameter requirement |=========================
+
+fn _fn_param_requirement(param: i32 require 0) -> i32 {
+    return param;
+}
+
 // =========================| Function return type |=========================
 
 fn _fn_return_type() -> true {

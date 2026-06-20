@@ -69,7 +69,9 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
     }
 
     fn scan_ident(&mut self, node: &Ident) -> Result<(), Vec<Span>> {
-        if let Some(&source) = self.indexes.sources.get(&node.id) {
+        if let Some(&source) = self.indexes.sources.get(&node.id)
+            && !matches!(source, ItemRef::Param(_))
+        {
             self.scan_item(source, node.span)
         } else {
             Ok(())
@@ -119,6 +121,10 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
     }
 
     fn scan_param(&mut self, node: &Param) -> Result<(), Vec<Span>> {
-        self.scan_expr(&node.type_) // no-fn-check (recursivity)
+        self.scan_expr(&node.type_)?; // no-fn-check (recursivity)
+        if let Some(requirement) = &node.requirement {
+            self.scan_expr(&requirement.condition)?; // no-fn-check (recursivity)
+        }
+        Ok(())
     }
 }

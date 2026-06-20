@@ -14,8 +14,14 @@ pub var call2 = called(fn1_param_type(0));
 
 // =========================| Function parameter type |=========================
 
-pub fn fn2_param_type(param: fn1_return_type()) -> i32 {
+pub fn fn2_param_type(param: fn1_param_requirement(0)) -> i32 {
     return fn2_return();
+}
+
+// =========================| Function parameter requirement |=========================
+
+pub fn fn2_param_requirement(param: i32 require fn1_return_type()) -> bool {
+    return true;
 }
 
 // =========================| Function return type |=========================

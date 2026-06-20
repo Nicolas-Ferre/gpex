@@ -3,6 +3,7 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::symbols::{
     COLON_SYMBOL, COMMA_SYMBOL, CONST_KEYWORD, PARENTHESIS_CLOSE_SYMBOL, PARENTHESIS_OPEN_SYMBOL,
+    REQUIRE_KEYWORD,
 };
 use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
@@ -50,6 +51,8 @@ pub(crate) struct Param {
     pub(crate) qualifier: ParamQualifier,
     #[derive_where(skip)]
     pub(crate) type_: Expr,
+    #[derive_where(skip)]
+    pub(crate) requirement: Option<ParamRequirement>,
 }
 
 impl Param {
@@ -64,16 +67,30 @@ impl Param {
         let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
         let colon_span = Span::parse_symbol(context, COLON_SYMBOL)?;
         let qualifier = ParamQualifier::parse(context)?;
-        let type_ = Expr::parse(context, parsing::arg_stop_excluded_parser)?;
+        let type_ = Expr::parse(context, Self::type_stop_excluded_parser)?;
+        let id = context.next_id();
+        let requirement = context.parse_any(&[
+            &|context| ParamRequirement::parse(context).map(Some),
+            &|_| Ok(None),
+        ])?;
         Ok(Self {
-            id: context.next_id(),
+            id,
             scope: context.scope().to_vec(),
             name: context.slice(name_span).into(),
             name_span,
             colon_span,
             qualifier,
             type_,
+            requirement,
         })
+    }
+
+    fn type_stop_excluded_parser<'context>(
+        context: &mut ParseContext<'context>,
+    ) -> Result<(), ParseError<'context>> {
+        context.parse_any(&[&parsing::arg_stop_excluded_parser, &|context| {
+            Span::parse_symbol(context, REQUIRE_KEYWORD).map(|_| ())
+        }])
     }
 }
 
@@ -89,5 +106,23 @@ impl ParamQualifier {
             &|context| Span::parse_symbol(context, CONST_KEYWORD).map(Self::Const),
             &|_| Ok(Self::None),
         ])
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct ParamRequirement {
+    pub(crate) require_span: Span,
+    pub(crate) condition: Expr,
+}
+
+impl ParamRequirement {
+    fn parse<'context>(context: &mut ParseContext<'context>) -> Result<Self, ParseError<'context>> {
+        let require_span = Span::parse_symbol(context, REQUIRE_KEYWORD)?;
+        context.force_parse_any_error();
+        let condition = Expr::parse(context, parsing::arg_stop_excluded_parser)?;
+        Ok(Self {
+            require_span,
+            condition,
+        })
     }
 }

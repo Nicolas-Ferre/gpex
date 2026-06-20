@@ -106,6 +106,7 @@ impl<'item> Validator<'item, '_> {
     ) -> Result<(), ValidateError> {
         let ref_ = ItemRef::Param(node);
         self.validate_param_type(node)?;
+        self.validate_param_requirement(node)?;
         if !is_compilerimpl {
             validators::item::check_usage(
                 ref_,
@@ -132,6 +133,23 @@ impl<'item> Validator<'item, '_> {
             self.value_resolver.expr_type(&node.type_),
             None,
             Type::Struct(self.indexes.search_prelude_type("typeref")),
+            &mut self.context,
+        )?;
+        Ok(())
+    }
+
+    fn validate_param_requirement(&mut self, node: &Param) -> Result<(), ValidateError> {
+        let Some(requirement) = &node.requirement else {
+            return Ok(());
+        };
+        self.with_const_mark_span(Some(requirement.require_span), |self_| {
+            self_.validate_expr(&requirement.condition)
+        })?;
+        validators::expr::check_types(
+            requirement.condition.span(),
+            self.value_resolver.expr_type(&requirement.condition),
+            None,
+            Type::Struct(self.indexes.search_prelude_type("bool")),
             &mut self.context,
         )?;
         Ok(())

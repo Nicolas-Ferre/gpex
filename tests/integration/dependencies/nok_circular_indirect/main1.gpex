@@ -20,6 +20,12 @@ pub fn fn1_param_type(param: fn2_param_type(0)) -> i32 {
     return fn2_return();
 }
 
+// =========================| Function parameter requirement |=========================
+
+pub fn fn1_param_requirement(param: i32 require fn2_param_requirement(0)) -> i32 {
+    return fn2_return();
+}
+
 // =========================| Function return type |=========================
 
 pub fn fn1_return_type() -> fn2_return_type() {

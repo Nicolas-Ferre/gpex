@@ -17,3 +17,8 @@ error: `_source` item not found
 │    ¦ fn fn_param_type(param: _source, _source: typeref) -> i32 {
 │    ¦                         ^^^^^^^
 ┴
+error: `_source` item not found
+│  → <root>/main.gpex:20:44
+│    ¦ fn fn_param_requirement(param: i32 require _source == i32, _source: typeref) -> i32 {
+│    ¦                                            ^^^^^^^
+┴

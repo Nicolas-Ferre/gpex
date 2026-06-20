@@ -129,6 +129,9 @@ impl<'item> Indexer<'item> {
     fn index_fn_const_parts(&mut self, node: &'item FnDefinition) {
         for param in &node.params.params {
             self.index_expr(&param.type_);
+            if let Some(requirement) = &param.requirement {
+                self.index_expr(&requirement.condition);
+            }
         }
         if let Some(return_type) = &node.return_type {
             self.index_expr(return_type);
