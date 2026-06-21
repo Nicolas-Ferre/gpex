@@ -8,6 +8,7 @@ pub(crate) const KEYWORDS: &[&str] = &[
     IMPORT_KEYWORD.slice,
     PUB_KEYWORD.slice,
     REPEAT_KEYWORD.slice,
+    REQUIRE_KEYWORD.slice,
     RETURN_KEYWORD.slice,
     STRUCT_KEYWORD.slice,
     TRUE_KEYWORD.slice,
@@ -41,6 +42,10 @@ pub(crate) const PUB_KEYWORD: Symbol = Symbol {
 pub(crate) const REPEAT_KEYWORD: Symbol = Symbol {
     name: "`repeat`",
     slice: "repeat",
+};
+pub(crate) const REQUIRE_KEYWORD: Symbol = Symbol {
+    name: "`require`",
+    slice: "require",
 };
 pub(crate) const RETURN_KEYWORD: Symbol = Symbol {
     name: "`return`",

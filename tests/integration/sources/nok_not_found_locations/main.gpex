@@ -20,6 +20,12 @@ fn _fn_param_type(param: error) -> i32 {
     return 0;
 }
 
+// =========================| Function parameter requirement |=========================
+
+fn _fn_param_requirement(param: i32 require error) -> i32 {
+    return param;
+}
+
 // =========================| Function return type |=========================
 
 fn _fn_return_type() -> error {

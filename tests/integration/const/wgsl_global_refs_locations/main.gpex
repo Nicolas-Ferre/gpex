@@ -3,6 +3,9 @@
 const fn global_item(param: i32) -> i32 {
     return param;
 }
+const fn global_item_bool(param: bool) -> bool {
+    return param;
+}
 const fn GlobalItemTyperef(param: typeref) -> typeref {
     return param;
 }
@@ -18,53 +21,60 @@ const fn fn_with_param_type(param: GlobalItemTyperef(u32)) -> u32 {
     return param;
 }
 
+// =========================| Function parameter requirement |=========================
+
+const _RESULT_FN_PARAM_REQUIREMENT = fn_with_param_requirement(3); // expected: 3
+const fn fn_with_param_requirement(param: i32 require global_item_bool(true)) -> i32 {
+    return param;
+}
+
 // =========================| Function return type |=========================
 
-const _RESULT_FN_RETURN_TYPE = fn_with_return_type(3.0); // expected: 3.0
+const _RESULT_FN_RETURN_TYPE = fn_with_return_type(4.0); // expected: 4.0
 const fn fn_with_return_type(param: f32) -> GlobalItemTyperef(f32) {
     return param;
 }
 
 // =========================| Return statement value |=========================
 
-const _RESULT_RETURN = fn_with_return(); // expected: 4
+const _RESULT_RETURN = fn_with_return(); // expected: 5
 const fn fn_with_return() -> i32 {
-    return global_item(4);
+    return global_item(5);
 }
 
 // =========================| Assignment statement right value |=========================
 
-const _RESULT_ASSIGNMENT_RIGHT = fn_with_assignment_right(0); // expected: 5
+const _RESULT_ASSIGNMENT_RIGHT = fn_with_assignment_right(0); // expected: 6
 const fn fn_with_assignment_right(param: i32) -> i32 {
-    param = global_item(5);
+    param = global_item(6);
     return param;
 }
 
 // =========================| Function call argument |=========================
 
-const _RESULT_FN_CALL_ARG = global_item(global_item(6)); // expected: 6
+const _RESULT_FN_CALL_ARG = global_item(global_item(7)); // expected: 7
 
 // =========================| Function uniform call receiver |=========================
 
-const _RESULT_FN_UNIFORM_CALL_RECEIVER = global_item(7).global_item(); // expected: 7
+const _RESULT_FN_UNIFORM_CALL_RECEIVER = global_item(8).global_item(); // expected: 8
 
 // =========================| Unary operator operand |=========================
 
-const _RESULT_UNARY = -global_item(8); // expected: 8
+const _RESULT_UNARY = -global_item(9); // expected: 9
 const fn __neg__(param: i32) -> i32 {
     return param;
 }
 
 // =========================| Binary operator left operand |=========================
 
-const _RESULT_BINARY_LEFT = global_item(9) + 0; // expected: 9
+const _RESULT_BINARY_LEFT = global_item(10) + 0; // expected: 10
 const fn __add__(param1: i32, _param2: i32) -> i32 {
     return param1;
 }
 
 // =========================| Binary operator right operand |=========================
 
-const _RESULT_BINARY_RIGHT = 0u + global_item(10); // expected: 10
+const _RESULT_BINARY_RIGHT = 0u + global_item(11); // expected: 11
 const fn __add__(_param1: u32, param2: i32) -> i32 {
     return param2;
 }

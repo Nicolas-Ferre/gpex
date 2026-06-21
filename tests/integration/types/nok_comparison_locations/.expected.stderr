@@ -22,8 +22,14 @@ error: expression with invalid type `bool`
 │    ¦                          ^^^^
 ├─ info: expected `typeref` type
 ┴
+error: expression with invalid type `i32`
+│  → <root>/main.gpex:23:45
+│    ¦ fn _fn_param_requirement(param: i32 require 0) -> i32 {
+│    ¦                                             ^
+├─ info: expected `bool` type
+┴
 error: expression with invalid type `bool`
-│  → <root>/main.gpex:23:25
+│  → <root>/main.gpex:29:25
 │    ¦ fn _fn_return_type() -> true {
 │    ¦                         ^^^^
 ├─ info: expected `typeref` type

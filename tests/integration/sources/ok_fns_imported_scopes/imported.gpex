@@ -1,3 +1,7 @@
 pub const fn source() -> typeref {
     return i32;
 }
+
+pub const fn requirement() -> bool {
+    return true;
+}

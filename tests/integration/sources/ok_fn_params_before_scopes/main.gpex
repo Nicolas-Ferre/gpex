@@ -25,3 +25,10 @@ fn fn_call_in_fn_signature(param: const typeref, value: called_fn(param)) -> cal
 const fn called_fn(type_: const typeref) -> typeref {
     return type_;
 }
+
+// =========================| Function parameter requirement |=========================
+
+var _result_param_requirement = fn_param_requirement(true); // expected: true
+fn fn_param_requirement(param: const bool require param) -> bool {
+    return param;
+}

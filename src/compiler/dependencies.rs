@@ -103,9 +103,8 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
         match node {
             ItemRef::Var(child) => self.scan_var(child)?,
             ItemRef::Const(child) => self.scan_const(child)?,
-            ItemRef::Struct(_) => (),
             ItemRef::Fn(child) => self.scan_fn(child)?,
-            ItemRef::Param(child) => self.scan_param(child)?,
+            ItemRef::Struct(_) | ItemRef::Param(_) => (),
         }
         self.dependencies.exit_item();
         Ok(())
@@ -119,6 +118,10 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
     }
 
     fn scan_param(&mut self, node: &Param) -> Result<(), Vec<Span>> {
-        self.scan_expr(&node.type_) // no-fn-check (recursivity)
+        self.scan_expr(&node.type_)?; // no-fn-check (recursivity)
+        if let Some(requirement) = &node.requirement {
+            self.scan_expr(&requirement.condition)?; // no-fn-check (recursivity)
+        }
+        Ok(())
     }
 }

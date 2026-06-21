@@ -18,6 +18,13 @@ fn fn_param_type(param: _SOURCE) -> i32 {
     return param;
 }
 
+// =========================| Function parameter requirement |=========================
+
+var _result_fn_param_requirement = fn_param_requirement(0);
+fn fn_param_requirement(param: i32 require _REQUIREMENT) -> i32 {
+    return param;
+}
+
 // =========================| Function return type |=========================
 
 var _result_fn_return_type = fn_return_type(0);
@@ -26,3 +33,4 @@ fn fn_return_type(param: i32) -> _SOURCE {
 }
 
 const _SOURCE = i32;
+const _REQUIREMENT = true;

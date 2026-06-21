@@ -13,6 +13,12 @@ fn _fn_param_type(param: not_const_value) -> i32 {
     return param;
 }
 
+// =========================| Function parameter requirement |=========================
+
+fn _fn_param_requirement(param: i32 require not_const_value) -> i32 {
+    return param;
+}
+
 // =========================| Function return type |=========================
 
 fn _fn_return_type(param: i32) -> not_const_value {
