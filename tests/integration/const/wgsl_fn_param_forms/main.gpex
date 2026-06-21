@@ -44,3 +44,17 @@ const _RESULT_DEPENDENT_TYPE_2 = dependent_type(9.0, 10.0); // expected: 10.0
 const fn dependent_type(param: ?, value: typeof(param)) -> typeof(param) {
     return value;
 }
+
+// =========================| `typeref` type reference |=========================
+
+const _RESULT_TYPEREF_PARAM_REF = typeref_param_ref(i32, 7); // expected: 7
+const fn typeref_param_ref(type_: const typeref, value: type_) -> type_ {
+    return value;
+}
+
+// =========================| Requirement |=========================
+
+const _RESULT_REQUIREMENT = requirement_param(8); // expected: 8
+const fn requirement_param(param: i32 require true) -> i32 {
+    return param;
+}
