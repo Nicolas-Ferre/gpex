@@ -20,6 +20,13 @@ const fn fn_signature_type(param: const typeref) -> typeref {
     return param;
 }
 
+// =========================| Function parameter requirement |=========================
+
+const _RESULT_PARAM_REQUIREMENT = fn_param_requirement(true); // expected: true
+const fn fn_param_requirement(param: const bool require param) -> bool {
+    return param;
+}
+
 // =========================| Return statement value |=========================
 
 const _RESULT_RETURN = fn_with_return(1); // expected: 1

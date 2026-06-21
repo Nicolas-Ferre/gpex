@@ -22,8 +22,13 @@ error: `_SOURCE` item not found
 │    ¦ fn fn_param_type(param: _SOURCE) -> i32 {
 │    ¦                         ^^^^^^^
 ┴
+error: `_REQUIREMENT` item not found
+│  → <root>/main.gpex:24:44
+│    ¦ fn fn_param_requirement(param: i32 require _REQUIREMENT) -> i32 {
+│    ¦                                            ^^^^^^^^^^^^
+┴
 error: `_SOURCE` item not found
-│  → <root>/main.gpex:24:34
+│  → <root>/main.gpex:31:34
 │    ¦ fn fn_return_type(param: i32) -> _SOURCE {
 │    ¦                                  ^^^^^^^
 ┴
