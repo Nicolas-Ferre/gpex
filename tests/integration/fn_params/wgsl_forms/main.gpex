@@ -1,0 +1,59 @@
+// Test all forms of function parameters (must be correctly transpiled).
+
+// =========================| Copy |=========================
+
+var _result_copy = copy_param(1); // expected: 1
+fn copy_param(param: i32) -> i32 {
+    return param;
+}
+
+// =========================| Constant |=========================
+
+var _result_const_same_value_1 = const_param(2.0, 2u); // expected: 2.0
+var _result_const_same_value_2 = const_param(2.0, 3u); // expected: 2.0
+var _result_const_other_value = const_param(3.0, 4u); // expected: 3.0
+fn const_param(param: const f32, _other_param: u32) -> f32 {
+    return param;
+}
+
+// =========================| Wildcard type |=========================
+
+var _result_wildcard_1 = wildcard_param(5u); // expected: 5u
+var _result_wildcard_2 = wildcard_param(6u); // expected: 6u
+var _result_wildcard_3 = wildcard_param(7.0); // expected: 7.0
+fn wildcard_param(param: ?) -> typeof(param) {
+    return param;
+}
+
+// =========================| Multiple wildcard types |=========================
+
+var _result_wildcards_1 = wildcard_params(8u, 9.0); // expected: 8u
+var _result_wildcards_2 = wildcard_params(10.0, 11u); // expected: 10.0
+fn wildcard_params(param1: ?, _param2: ?) -> typeof(param1) {
+    return param1;
+}
+
+// =========================| Constant wildcard type |=========================
+
+var _result_const_wildcard_1 = const_wildcard_param(12u); // expected: 12u
+var _result_const_wildcard_2 = const_wildcard_param(13u); // expected: 13u
+var _result_const_wildcard_3 = const_wildcard_param(14.0); // expected: 14.0
+fn const_wildcard_param(param: const ?) -> typeof(param) {
+    return param;
+}
+
+// =========================| Mixed constant and runtime wildcard types |=========================
+
+var _result_mixed_wildcards_1 = mixed_wildcard_params(15u, 16.0); // expected: 16.0
+var _result_mixed_wildcards_2 = mixed_wildcard_params(17.0, 18u); // expected: 18u
+fn mixed_wildcard_params(_const_param: const ?, param: ?) -> typeof(param) {
+    return param;
+}
+
+// =========================| Dependent wildcard type |=========================
+
+var _result_dependent_type_1 = dependent_type(19u, 20u); // expected: 20u
+var _result_dependent_type_2 = dependent_type(21.0, 22.0); // expected: 22.0
+fn dependent_type(param: ?, value: typeof(param)) -> typeof(param) {
+    return value;
+}
