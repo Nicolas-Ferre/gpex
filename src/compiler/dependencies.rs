@@ -69,9 +69,7 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
     }
 
     fn scan_ident(&mut self, node: &Ident) -> Result<(), Vec<Span>> {
-        if let Some(&source) = self.indexes.sources.get(&node.id)
-            && !matches!(source, ItemRef::Param(_))
-        {
+        if let Some(&source) = self.indexes.sources.get(&node.id) {
             self.scan_item(source, node.span)
         } else {
             Ok(())
@@ -105,9 +103,8 @@ impl<'item, 'index> DependencyResolver<'item, 'index> {
         match node {
             ItemRef::Var(child) => self.scan_var(child)?,
             ItemRef::Const(child) => self.scan_const(child)?,
-            ItemRef::Struct(_) => (),
             ItemRef::Fn(child) => self.scan_fn(child)?,
-            ItemRef::Param(child) => self.scan_param(child)?,
+            ItemRef::Struct(_) | ItemRef::Param(_) => (),
         }
         self.dependencies.exit_item();
         Ok(())

@@ -79,6 +79,11 @@ error: expected `~` or identifier
 │    ¦        ^
 ┴
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-` or `!`
+│  → <root>/require_invalid.gpex:1:27
+│    ¦ fn fn_(param: i32 require :) {}
+│    ¦                           ^
+┴
+error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-` or `!`
 │  → <root>/statement_invalid.gpex:2:12
 │    ¦     return var;
 │    ¦            ^
