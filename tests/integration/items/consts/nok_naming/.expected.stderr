@@ -1,0 +1,54 @@
+warning: `_snake_case_const` identifier not in SCREAMING_SNAKE_CASE
+│  → <root>/main.gpex:5:7
+│    ¦ const _snake_case_const = 0;
+│    ¦       ^^^^^^^^^^^^^^^^^
+┴
+warning: `_camelCaseConst` identifier not in SCREAMING_SNAKE_CASE
+│  → <root>/main.gpex:6:7
+│    ¦ const _camelCaseConst = 0;
+│    ¦       ^^^^^^^^^^^^^^^
+┴
+warning: `_PascalCaseConst` identifier not in SCREAMING_SNAKE_CASE
+│  → <root>/main.gpex:7:7
+│    ¦ const _PascalCaseConst = 0;
+│    ¦       ^^^^^^^^^^^^^^^^
+┴
+warning: `_snake_case_const_typeref` identifier not in SCREAMING_SNAKE_CASE or PascalCase
+│  → <root>/main.gpex:9:7
+│    ¦ const _snake_case_const_typeref = i32;
+│    ¦       ^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_camelCaseConstTyperef` identifier not in SCREAMING_SNAKE_CASE or PascalCase
+│  → <root>/main.gpex:10:7
+│    ¦ const _camelCaseConstTyperef = i32;
+│    ¦       ^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `C` identifier is single character
+│  → <root>/main.gpex:14:11
+│    ¦ pub const C = 0;
+│    ¦           ^
+┴
+warning: `MISSING_UNDERSCORE` item unused
+│  → <root>/main.gpex:18:7
+│    ¦ const MISSING_UNDERSCORE = 0;
+│    ¦       ^^^^^^^^^^^^^^^^^^
+┴
+warning: `_UNDERSCORE_PUB` item public but name starting with `_`
+│  → <root>/main.gpex:22:11
+│    ¦ pub const _UNDERSCORE_PUB = 0;
+│    ¦           ^^^^^^^^^^^^^^^
+┴
+warning: `_UNDERSCORE_PUB_USED` item public but name starting with `_`
+│  → <root>/main.gpex:24:11
+│    ¦ pub const _UNDERSCORE_PUB_USED = 0;
+│    ¦           ^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `_UNDERSCORE_PRIV_USED` item used but name starting with `_`
+│  → <root>/main.gpex:27:7
+│    ¦ const _UNDERSCORE_PRIV_USED = 0;
+│    ¦       ^^^^^^^^^^^^^^^^^^^^^
+├─ info: item used here
+│  → <root>/main.gpex:28:30
+│    ¦ var _underscore_priv_usage = _UNDERSCORE_PRIV_USED;
+│    ¦                              ^^^^^^^^^^^^^^^^^^^^^
+┴

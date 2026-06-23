@@ -1,0 +1,8 @@
+// Test invalid semantic for function parameter types.
+
+// ===== Not constant =====
+
+var not_const = i32;
+fn _not_const(param: not_const) -> i32 {
+    return param;
+}

@@ -1,0 +1,9 @@
+error: expression not constant
+│  → <root>/main.gpex:7:5
+│    ¦     not_const = 0;
+│    ¦     ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:6:1
+│    ¦ const fn _not_const_in_const_fn() {
+│    ¦ ^^^^^
+┴

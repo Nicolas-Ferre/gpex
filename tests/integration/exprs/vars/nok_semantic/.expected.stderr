@@ -1,0 +1,9 @@
+error: expression not constant
+│  → <root>/main.gpex:6:20
+│    ¦ const _NOT_CONST = not_const;
+│    ¦                    ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:6:1
+│    ¦ const _NOT_CONST = not_const;
+│    ¦ ^^^^^
+┴

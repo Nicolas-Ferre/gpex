@@ -1,0 +1,18 @@
+error: expression not constant
+│  → <root>/main.gpex:5:62
+│    ¦ fn _not_const_param_as_param_type(not_const: typeref, other: not_const) -> i32 {
+│    ¦                                                              ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:5:60
+│    ¦ fn _not_const_param_as_param_type(not_const: typeref, other: not_const) -> i32 {
+│    ¦                                                            ^
+┴
+error: expression not constant
+│  → <root>/main.gpex:8:59
+│    ¦ fn _not_const_param_as_return_type(not_const: typeref) -> not_const {
+│    ¦                                                           ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:8:56
+│    ¦ fn _not_const_param_as_return_type(not_const: typeref) -> not_const {
+│    ¦                                                        ^^
+┴

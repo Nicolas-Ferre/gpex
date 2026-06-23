@@ -3,56 +3,6 @@
 var not_const_value = 0;
 var not_const_type = i32;
 
-// =========================| Global constant value |=========================
-
-const _CONST = not_const_value;
-
-// =========================| Function parameter type |=========================
-
-fn _fn_param_type(param: not_const_value) -> i32 {
-    return param;
-}
-
-// =========================| Function parameter requirement |=========================
-
-fn _fn_param_requirement(param: i32 require not_const_value) -> i32 {
-    return param;
-}
-
-// =========================| Function return type |=========================
-
-fn _fn_return_type(param: i32) -> not_const_value {
-    return param;
-}
-
-// =========================| Return statement value |=========================
-
-const fn _fn_return() -> i32 {
-    return not_const_value;
-}
-
-// =========================| Assignment statement left value |=========================
-
-const fn _fn_assignment_left(){
-    not_const_value = 0;
-}
-
-// =========================| Assignment statement right value |=========================
-
-const fn _fn_assignment_right(param: i32) {
-    param = not_const_value;
-}
-
-// =========================| Signature calling function with assignment statement right value |=========================
-
-fn _fn_signature_assignment_right(type_: const typeref, _value: signature_assignment_right(type_)) -> i32 {
-    return 0;
-}
-const fn signature_assignment_right(type_: typeref) -> typeref {
-    type_ = not_const_type;
-    return type_;
-}
-
 // =========================| Function call argument |=========================
 
 const _FN_CALL_ARG_CONST_CONTEXT = const_fn(not_const_value);

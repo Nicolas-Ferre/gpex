@@ -1,0 +1,18 @@
+error: expression not constant
+│  → <root>/main.gpex:7:13
+│    ¦     param = not_const_value;
+│    ¦             ^^^^^^^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:6:1
+│    ¦ const fn _not_const_value_in_const_fn(param: i32) {
+│    ¦ ^^^^^
+┴
+error: expression not constant
+│  → <root>/main.gpex:14:13
+│    ¦     type_ = not_const_type;
+│    ¦             ^^^^^^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:13:1
+│    ¦ const fn not_const_type_in_const_fn(type_: typeref) -> typeref {
+│    ¦ ^^^^^
+┴

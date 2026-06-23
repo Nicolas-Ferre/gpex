@@ -1,0 +1,19 @@
+// Test invalid semantic for assignment statement left values.
+
+// ===== Not constant value in constant function =====
+
+var not_const_value = 0;
+const fn _not_const_value_in_const_fn(param: i32) {
+    param = not_const_value;
+}
+
+// ===== Not constant type in constant function called in signature =====
+
+var not_const_type = i32;
+const fn not_const_type_in_const_fn(type_: typeref) -> typeref {
+    type_ = not_const_type;
+    return type_;
+}
+fn _not_const_type_usage(type_: const typeref, _value: not_const_type_in_const_fn(type_)) -> i32 {
+    return 0;
+}

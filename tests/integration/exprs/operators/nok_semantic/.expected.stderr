@@ -1,0 +1,18 @@
+error: expression not constant
+│  → <root>/main.gpex:12:26
+│    ¦ const _NOT_CONST_UNARY = -false;
+│    ¦                          ^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:12:1
+│    ¦ const _NOT_CONST_UNARY = -false;
+│    ¦ ^^^^^
+┴
+error: expression not constant
+│  → <root>/main.gpex:13:27
+│    ¦ const _NOT_CONST_BINARY = false + false;
+│    ¦                           ^^^^^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/main.gpex:13:1
+│    ¦ const _NOT_CONST_BINARY = false + false;
+│    ¦ ^^^^^
+┴

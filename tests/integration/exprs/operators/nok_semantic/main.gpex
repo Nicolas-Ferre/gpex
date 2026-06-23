@@ -1,0 +1,13 @@
+// Test invalid semantic for operator expressions.
+
+// ===== Not constant in constant context =====
+
+fn __neg__(param: bool) -> bool {
+    return param;
+}
+fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}
+
+const _NOT_CONST_UNARY = -false;
+const _NOT_CONST_BINARY = false + false;

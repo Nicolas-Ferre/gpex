@@ -14,10 +14,10 @@ Some tests rely on `.gpex` examples:
 
 ## Integration tests (`tests/integration/`)
 
-Tests examples of GPEx programs located in `tests/integration/*/`. The testing behavior depends on
+Tests examples of GPEx programs located in `tests/integration/*/*/`. The testing behavior depends on
 the name prefix of the inner directory.
 
-### `tests/integration/*/ok_*` test directories
+### `tests/integration/*/*/ok_*` test directories
 
 These directories are tested the following way:
 
@@ -33,7 +33,7 @@ These directories are tested the following way:
   const _RESULT = 2_147_483_647; // expected: 2147483647
   ```
 
-### `tests/integration/*/wgsl_*` test directories
+### `tests/integration/*/*/wgsl_*` test directories
 
 These directories are tested the following way:
 
@@ -41,7 +41,7 @@ These directories are tested the following way:
 - Verify that the generated WGSL code matches the expected WGSL code in `.expected.wgsl`.
   If this file doesn't exist, it is auto-generated during the first test run.
 
-### `tests/integration/*/nok_*` test directories
+### `tests/integration/*/*/nok_*` test directories
 
 These directories are tested the following way:
 
@@ -49,16 +49,3 @@ These directories are tested the following way:
 - Verify the compilation returned errors or warnings.
 - Verify that the compilation error messages match the expected messages in `.expected.stderr`.
   If this file doesn't exist, it is auto-generated during the first test run.
-
-### Test dimensions
-
-Some of the test folders inside `tests/integration/*/` can have a suffix that indicates the
-dimension of the test. Here are the common ones:
-
-- `*_exprs`: test all forms of expressions in a particular context.
-- `*_locations`: test all expression locations in a particular context.
-- `*_scopes`: test main semantic scopes in a particular context. For these tests, it is not needed
-  to test all locations, only the main group of locations are enough.
-- `*_forms`: test all forms of a concept or an item.
-
-It is possible to use other dimensions when it makes sense, but they should be clearly extensible.

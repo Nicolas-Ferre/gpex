@@ -1,0 +1,30 @@
+// Test found items from a constant item.
+
+import imported;
+
+// ===== Constant before =====
+
+const CONST_BEFORE = 1;
+const CONST_AFTER_CONST = CONST_BEFORE; // expected: 1
+
+// ===== Constant imported =====
+
+const IMPORTED_CONST = IMPORTED_CONST; // expected: 2
+
+// ===== Function before =====
+
+const fn fn_before(param: i32) -> i32 {
+    return param;
+}
+const CONST_AFTER_FN = fn_before(3); // expected: 3
+
+// ===== Function after =====
+
+const CONST_BEFORE_FN = fn_after(4); // expected: 4
+const fn fn_after(param: i32) -> i32 {
+    return param;
+}
+
+// ===== Function imported =====
+
+const IMPORTED_FN = imported_fn(5); // expected: 5

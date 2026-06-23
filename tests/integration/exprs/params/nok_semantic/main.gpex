@@ -1,0 +1,10 @@
+// Test invalid semantic for variable expressions.
+
+// ===== Not constant in constant context =====
+
+fn _not_const_param_as_param_type(not_const: typeref, other: not_const) -> i32 {
+    return other;
+}
+fn _not_const_param_as_return_type(not_const: typeref) -> not_const {
+    return not_const;
+}

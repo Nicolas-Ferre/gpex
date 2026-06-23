@@ -24,26 +24,35 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let runtime = Arc::new(Runtime::new()?);
     let args = Arguments::from_args();
     let mut trials = vec![];
-    for root_entry in fs::read_dir(Path::new("tests/integration"))? {
+    foreach_file_in_dir(Path::new("tests/integration"), |root_dir| {
+        foreach_file_in_dir(root_dir, |inner_dir| {
+            foreach_file_in_dir(inner_dir, |case_dir| {
+                let trial_name = case_dir.to_string_lossy().to_string();
+                let runtime = runtime.clone();
+                let case_dir = case_dir.to_path_buf();
+                trials.push(Trial::test(trial_name, move || {
+                    run_case(&case_dir, runtime)
+                }));
+                Ok(())
+            })
+        })
+    })?;
+    libtest_mimic::run(&args, trials).exit();
+}
+
+fn foreach_file_in_dir(
+    path: &Path,
+    mut callback: impl FnMut(&Path) -> Result<(), Box<dyn std::error::Error>>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    for root_entry in fs::read_dir(path)? {
         let root_entry = root_entry?;
         let root_path = root_entry.path();
         if !root_path.is_dir() {
             continue;
         }
-        for inner_entry in fs::read_dir(root_path)? {
-            let inner_entry = inner_entry?;
-            let inner_path = inner_entry.path();
-            if !inner_path.is_dir() {
-                continue;
-            }
-            let trial_name = inner_path.to_string_lossy().to_string();
-            let runtime = runtime.clone();
-            trials.push(Trial::test(trial_name, move || {
-                run_case(&inner_path, runtime)
-            }));
-        }
+        callback(&root_path)?;
     }
-    libtest_mimic::run(&args, trials).exit();
+    Ok(())
 }
 
 fn run_case(path: &Path, runtime: Arc<Runtime>) -> Result<(), Failed> {

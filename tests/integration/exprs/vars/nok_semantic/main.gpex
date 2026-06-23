@@ -1,0 +1,6 @@
+// Test invalid semantic for variable expressions.
+
+// ===== Not constant in constant context =====
+
+var not_const = 0;
+const _NOT_CONST = not_const;

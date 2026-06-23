@@ -1,0 +1,7 @@
+const _PRIV_CONST = 2;
+
+const fn _priv_fn(param: i32) -> i32 {
+    return param;
+}
+
+// TODO: try to call them + add tests for public items imported in private import
