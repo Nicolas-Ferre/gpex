@@ -14,3 +14,4 @@ Here are the conventions that are not enforced by CI workflow.
 ## Tests
 
 - When a literal value doesn't matter in a `nok_` test, it is set to zero.
+- Example literals within a test file are generally ordered (first expect value `1`, then `2`, ...)

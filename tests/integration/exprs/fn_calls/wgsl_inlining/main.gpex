@@ -1,13 +1,67 @@
 // Test WGSL inlining for function call expressions.
 
-const fn fn_(param: i32) -> i32 {
+// ===== Uniform call constness =====
+
+const _RESULT_UNIFORM_CONSTNESS = 1.fn_uniform(); // expected: 1
+const fn fn_uniform(param: i32) -> i32 {
     return param;
 }
 
-// ===== Standard form constness =====
+// ===== Function constness with mutable parameter =====
 
-const _RESULT_STANDARD_CONSTNESS = fn_(1); // expected: 1
+const _RESULT_MUT_PARAM_CONSTNESS = fn_with_copy_param(2); // expected: 2
+const fn fn_with_copy_param(param: i32) -> i32 {
+    return param;
+}
 
-// ===== Uniform form constness =====
+// ===== Function constness with constant parameter =====
 
-const _RESULT_UNIFORM_CONSTNESS = 2.fn_(); // expected: 2
+const _RESULT_CONST_PARAM_CONSTNESS = fn_with_const_param(3); // expected: 3
+const fn fn_with_const_param(param: const i32) -> i32 {
+    return param;
+}
+
+// ===== Function constness with wildcard parameter =====
+
+const _RESULT_WILDCARD_PARAM_CONSTNESS_1 = fn_with_wildcard_param(4u); // expected: 4u
+const _RESULT_WILDCARD_PARAM_CONSTNESS_2 = fn_with_wildcard_param(5.0); // expected: 5.0
+const fn fn_with_wildcard_param(param: ?) -> typeof(param) {
+    return param;
+}
+
+// ===== Function constness with constant wildcard parameter =====
+
+const _RESULT_CONST_WILDCARD_PARAM_CONSTNESS_1 = fn_with_const_wildcard_param(6u); // expected: 6u
+const _RESULT_CONST_WILDCARD_PARAM_CONSTNESS_2 = fn_with_const_wildcard_param(7.0); // expected: 7.0
+const fn fn_with_const_wildcard_param(param: const ?) -> typeof(param) {
+    return param;
+}
+
+// ===== Function constness with constant wildcard type reference =====
+
+const _RESULT_CONST_WILDCARD_TYPE_REF_CONSTNESS = sizeof(fn_with_const_wildcard_type_ref(8)); // expected: 4u
+const fn fn_with_const_wildcard_type_ref(value: const ?) -> typeref {
+    return typeof(value);
+}
+
+// ===== Function constness with dependent wildcard type =====
+
+const _RESULT_DEPENDENT_WILDCARD_TYPE_CONSTNESS_1 = fn_with_dependent_wildcard_type(9u, 10u); // expected: 10u
+const _RESULT_DEPENDENT_WILDCARD_TYPE_CONSTNESS_2 = fn_with_dependent_wildcard_type(11.0, 12.0); // expected: 12.0
+const fn fn_with_dependent_wildcard_type(param: ?, value: typeof(param)) -> typeof(param) {
+    return value;
+}
+
+// ===== Function constness with typeref parameter =====
+
+const _RESULT_TYPEREF_PARAM_CONSTNESS = fn_with_typeref_param(i32, 13); // expected: 13
+const fn fn_with_typeref_param(type_: const typeref, value: type_) -> type_ {
+    return value;
+}
+
+// ===== Function constness with parameter requirement =====
+
+const _RESULT_PARAM_REQUIRE_CONSTNESS = fn_with_param_require(14); // expected: 14
+const fn fn_with_param_require(param: i32 require true) -> i32 {
+    return param;
+}
