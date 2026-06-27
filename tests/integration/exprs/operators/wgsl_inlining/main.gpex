@@ -1,0 +1,15 @@
+// Test WGSL inlining for operator expressions.
+
+// ===== Unary constness =====
+
+const _RESULT_UNARY_CONSTNESS = !1; // expected: 1
+const fn __not__(param: i32) -> i32 {
+    return param;
+}
+
+// ===== Binary constness =====
+
+const _RESULT_BINARY_CONSTNESS = 2 && 0; // expected: 2
+const fn __and__(param1: i32, _param2: i32) -> i32 {
+    return param1;
+}

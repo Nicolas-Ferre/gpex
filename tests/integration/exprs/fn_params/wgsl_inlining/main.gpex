@@ -1,0 +1,11 @@
+// Test WGSL inlining for function parameter expressions.
+
+// ===== Constness =====
+
+var _result_const_param = outer_const_param(1); // expected: 1
+fn outer_const_param(param: const i32) -> i32 {
+    return inner_const_param(param);
+}
+fn inner_const_param(param: const i32) -> i32 {
+    return param;
+}
