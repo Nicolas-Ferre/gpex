@@ -1,6 +1,6 @@
 // Test invalid semantic for operator expressions.
 
-// ===== Not constant in constant context =====
+// ===== Not constant operator in constant context =====
 
 fn __neg__(param: bool) -> bool {
     return param;
@@ -9,5 +9,20 @@ fn __add__(param1: bool, _param2: bool) -> bool {
     return param1;
 }
 
-const _NOT_CONST_UNARY = -false;
-const _NOT_CONST_BINARY = false + false;
+const _NOT_CONST_UNARY_OPERATOR = -false;
+const _NOT_CONST_BINARY_OPERATOR = false + false;
+
+// ===== Not constant operand in constant context =====
+
+// TODO: warnings are probably not wanted, to be fixed
+
+const fn __neg__(param: typeref) -> typeref {
+    return param;
+}
+const fn __add__(param1: typeref, _param2: typeref) -> typeref {
+    return param1;
+}
+
+var not_const_operand = i32;
+const _NOT_CONST_UNARY_OPERAND = -not_const_operand;
+const _NOT_CONST_BINARY_OPERAND = not_const_operand + not_const_operand;
