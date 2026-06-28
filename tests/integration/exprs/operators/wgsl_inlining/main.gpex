@@ -13,3 +13,33 @@ const _RESULT_BINARY_CONSTNESS = 2 && 0; // expected: 2
 const fn __and__(param1: i32, _param2: i32) -> i32 {
     return param1;
 }
+
+// ===== Unary function parameter in constant function =====
+
+const _RESULT_UNARY_FN_PARAM = fn_with_returned_unary(3); // expected: 3
+const fn fn_with_returned_unary(param: i32) -> i32 {
+    return -param;
+}
+const fn __neg__(param: i32) -> i32 {
+    return param;
+}
+
+// ===== Binary function parameter left operand in constant function =====
+
+const _RESULT_BINARY_FN_PARAM_LEFT = fn_with_returned_binary_left(4); // expected: 4
+const fn fn_with_returned_binary_left(param: i32) -> i32 {
+    return param + 0;
+}
+const fn __add__(param1: i32, _param2: i32) -> i32 {
+    return param1;
+}
+
+// ===== Binary function parameter right operand in constant function =====
+
+const _RESULT_BINARY_FN_PARAM_RIGHT = fn_with_returned_binary_right(5); // expected: 5
+const fn fn_with_returned_binary_right(param: i32) -> i32 {
+    return 0u + param;
+}
+const fn __add__(_param1: u32, param2: i32) -> i32 {
+    return param2;
+}

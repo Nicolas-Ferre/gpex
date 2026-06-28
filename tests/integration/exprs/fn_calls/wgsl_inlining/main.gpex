@@ -66,3 +66,14 @@ const _RESULT_PARAM_REQUIRE_CONSTNESS = fn_with_param_require(true); // expected
 const fn fn_with_param_require(param: const bool require param) -> bool {
     return param;
 }
+
+// ===== Function constness in function signature =====
+
+const _RESULT_FN_CALL_IN_FN_SIGNATURE_1 = fn_call_in_fn_signature(i32, 15); // expected: 15
+const _RESULT_FN_CALL_IN_FN_SIGNATURE_2 = fn_call_in_fn_signature(u32, 16u); // expected: 16u
+const fn fn_call_in_fn_signature(param: const typeref, value: fn_signature_type(param)) -> fn_signature_type(param) {
+    return value;
+}
+const fn fn_signature_type(param: const typeref) -> typeref {
+    return param;
+}
