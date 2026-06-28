@@ -1,14 +1,5 @@
 // Test parameters in all constant locations (must be transpiled inline).
 
-
-// =========================| Function signature |=========================
-
-const _RESULT1_FN_SIGNATURE = fn_signature(i32, 1); // expected: 1
-const _RESULT2_FN_SIGNATURE = fn_signature(u32, 2u); // expected: 2u
-const fn fn_signature(param: const typeref, value: param) -> param {
-    return value;
-}
-
 // =========================| Function call in function signature |=========================
 
 const _RESULT1_FN_CALL_IN_FN_SIGNATURE = fn_call_in_fn_signature(i32, 3); // expected: 3
@@ -17,20 +8,6 @@ const fn fn_call_in_fn_signature(param: const typeref, value: fn_signature_type(
     return value;
 }
 const fn fn_signature_type(param: const typeref) -> typeref {
-    return param;
-}
-
-// =========================| Function parameter requirement |=========================
-
-const _RESULT_PARAM_REQUIREMENT = fn_param_requirement(true); // expected: true
-const fn fn_param_requirement(param: const bool require param) -> bool {
-    return param;
-}
-
-// =========================| Return statement value |=========================
-
-const _RESULT_RETURN = fn_with_return(1); // expected: 1
-const fn fn_with_return(param: i32) -> i32 {
     return param;
 }
 

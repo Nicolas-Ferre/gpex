@@ -54,14 +54,15 @@ const fn fn_with_dependent_wildcard_type(param: ?, value: typeof(param)) -> type
 
 // ===== Function constness with typeref parameter =====
 
-const _RESULT_TYPEREF_PARAM_CONSTNESS = fn_with_typeref_param(i32, 13); // expected: 13
+const _RESULT_TYPEREF_PARAM_CONSTNESS_1 = fn_with_typeref_param(i32, 13); // expected: 13
+const _RESULT_TYPEREF_PARAM_CONSTNESS_2 = fn_with_typeref_param(u32, 14u); // expected: 14u
 const fn fn_with_typeref_param(type_: const typeref, value: type_) -> type_ {
     return value;
 }
 
 // ===== Function constness with parameter requirement =====
 
-const _RESULT_PARAM_REQUIRE_CONSTNESS = fn_with_param_require(14); // expected: 14
-const fn fn_with_param_require(param: i32 require true) -> i32 {
+const _RESULT_PARAM_REQUIRE_CONSTNESS = fn_with_param_require(true); // expected: true
+const fn fn_with_param_require(param: const bool require param) -> bool {
     return param;
 }

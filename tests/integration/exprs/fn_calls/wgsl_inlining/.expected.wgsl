@@ -12,7 +12,8 @@ struct Buffer {
     ident8: u32,
     ident9: f32,
     ident10: i32,
-    ident11: i32
+    ident11: u32,
+    ident12: u32
 }
 
 @group(0) @binding(0)
@@ -20,7 +21,8 @@ var<storage, read_write> b: Buffer;
 
 @compute @workgroup_size(1, 1, 1)
 fn main() {
-    b.ident11 = i32(14);
+    b.ident12 = u32(1);
+    b.ident11 = u32(14);
     b.ident10 = i32(13);
     b.ident9 = f32(12.0);
     b.ident8 = u32(10);
@@ -49,7 +51,8 @@ struct Buffer {
     ident8: u32,
     ident9: f32,
     ident10: i32,
-    ident11: i32
+    ident11: u32,
+    ident12: u32
 }
 
 @group(0) @binding(0)
