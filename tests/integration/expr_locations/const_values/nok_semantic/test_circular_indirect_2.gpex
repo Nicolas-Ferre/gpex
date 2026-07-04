@@ -1,0 +1,4 @@
+import ~.test_circular_indirect_1;
+
+pub var circular_var_1 = CIRCULAR_ITEM_2;
+pub var circular_var_2 = CIRCULAR_ITEM_1;

@@ -1,3 +1,12 @@
+error: `circular_direct` item has circular dependencies
+│  → <root>/test_circular_direct.gpex:1:4
+│    ¦ fn circular_direct() -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_direct.gpex:2:12
+│    ¦     return circular_direct();
+│    ¦            ^^^^^^^^^^^^^^^^^
+┴
 error: expression not constant
 │  → <root>/test_constness.gpex:1:15
 │    ¦ const _ITEM = not_const(0);

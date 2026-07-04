@@ -1,3 +1,24 @@
+error: `circular_item_1` item has circular dependencies
+│  → <root>/test_circular_indirect_1.gpex:3:8
+│    ¦ pub fn circular_item_1() {
+│    ¦        ^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:4:5
+│    ¦     circular_var_1 = 0;
+│    ¦     ^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_2.gpex:3:26
+│    ¦ pub var circular_var_1 = circular_item_2();
+│    ¦                          ^^^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:8:5
+│    ¦     circular_var_2 = 0;
+│    ¦     ^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_indirect_2.gpex:4:26
+│    ¦ pub var circular_var_2 = circular_item_1();
+│    ¦                          ^^^^^^^^^^^^^^^^^
+┴
 error: expression not constant
 │  → <root>/test_constness.gpex:4:5
 │    ¦     not_const = 0;
