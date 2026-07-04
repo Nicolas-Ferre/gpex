@@ -14,10 +14,12 @@ Some tests rely on `.gpex` examples:
 
 ## Integration tests (`tests/integration/`)
 
-Tests examples of GPEx programs located in `tests/integration/*/*/`. The testing behavior depends on
-the name prefix of the inner directory.
+Tests examples of GPEx programs located in `tests/integration/*/*/*/`.
 
-### `tests/integration/*/*/ok_*` test directories
+The first two directory levels group tests by domain and feature. The third directory level is the
+test case itself and its name prefix defines the testing behavior.
+
+### `tests/integration/*/*/*/ok_*` test directories
 
 These directories are tested the following way:
 
@@ -33,15 +35,16 @@ These directories are tested the following way:
   const _RESULT = 2_147_483_647; // expected: 2147483647
   ```
 
-### `tests/integration/*/*/wgsl_*` test directories
+### `tests/integration/*/*/*/wgsl_*` test directories
 
 These directories are tested the following way:
 
 - Same as `ok_*` tests.
-- Verify that the generated WGSL code matches the expected WGSL code in `.expected.wgsl`.
+- Verify that the formatted generated WGSL code matches the expected WGSL code in
+  `.expected.wgsl`.
   If this file doesn't exist, it is auto-generated during the first test run.
 
-### `tests/integration/*/*/nok_*` test directories
+### `tests/integration/*/*/*/nok_*` test directories
 
 These directories are tested the following way:
 
@@ -49,3 +52,33 @@ These directories are tested the following way:
 - Verify the compilation returned errors or warnings.
 - Verify that the compilation error messages match the expected messages in `.expected.stderr`.
   If this file doesn't exist, it is auto-generated during the first test run.
+
+### Test domains
+
+The following test domains are defined:
+
+- `tests/integration/expr_locations/`: tests are organized per syntactical expression location (
+  returned value, variable default value, binary left operand, ...).
+- `tests/integration/expr_types/`: tests are organized per expression kind (literal, variable
+  reference, function call, ...)
+- `tests/integration/items/`: tests are organized per item (variable, constant, function, ...)
+
+### Test cases
+
+The following test cases at `tests/integration/*/*/*/` are commonly defined:
+
+- `ok_semantic`: test invalid feature semantic
+- `nok_semantic`: test valid feature semantic
+- `ok_search`: test items that are accessible from a given location
+- `nok_search`: test items that are not accessible from a given location
+- `ok_naming`: test valid item names
+- `nok_naming`: test invalid or not recommended item names
+- `wgsl_inlining`: test that items are correctly inlined during transpilation
+- `wgsl_transpiling`: test that items are correctly transpiled
+
+### Test files
+
+Each test case is defined in a file `tests/integration/*/*/*/test_*.gpex`.
+
+The filename starts with `test_`, and the rest of the filename defined the exact tested case using a
+hierarchical naming.

@@ -1,0 +1,2 @@
+const _ITEM_NAME = 0;
+var _usage = _ITEM_NAME;

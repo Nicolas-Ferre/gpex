@@ -1,0 +1,5 @@
+var not_const = 0;
+
+const fn _item(param: i32) {
+    param = not_const;
+}

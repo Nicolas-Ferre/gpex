@@ -10,28 +10,10 @@ const fn GlobalItemTyperef(param: typeref) -> typeref {
     return param;
 }
 
-// =========================| Global constant value |=========================
-
-const _RESULT_GLOBAL_CONST = global_item(1); // expected: 1
-
-// =========================| Function parameter type |=========================
-
-const _RESULT_FN_PARAM_TYPE = fn_with_param_type(2u); // expected: 2u
-const fn fn_with_param_type(param: GlobalItemTyperef(u32)) -> u32 {
-    return param;
-}
-
 // =========================| Function parameter requirement |=========================
 
 const _RESULT_FN_PARAM_REQUIREMENT = fn_with_param_requirement(3); // expected: 3
 const fn fn_with_param_requirement(param: i32 require global_item_bool(true)) -> i32 {
-    return param;
-}
-
-// =========================| Function return type |=========================
-
-const _RESULT_FN_RETURN_TYPE = fn_with_return_type(4.0); // expected: 4.0
-const fn fn_with_return_type(param: f32) -> GlobalItemTyperef(f32) {
     return param;
 }
 

@@ -1,0 +1,25 @@
+error: `_ITEM` item not found
+│  → <root>/test_itself.gpex:1:15
+│    ¦ const _ITEM = _ITEM;
+│    ¦               ^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:1:15
+│    ¦ const _ITEM = unknown();
+│    ¦               ^^^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:1:15
+│    ¦ const _ITEM = unknown;
+│    ¦               ^^^^^^^
+┴
+error: `_USED` item not found
+│  → <root>/test_usage_before_const.gpex:1:15
+│    ¦ const _ITEM = _USED;
+│    ¦               ^^^^^
+┴
+error: `_used` item not found
+│  → <root>/test_usage_before_var.gpex:1:15
+│    ¦ const _ITEM = _used;
+│    ¦               ^^^^^
+┴

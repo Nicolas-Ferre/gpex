@@ -1,9 +1,0 @@
-// Test invalid semantic for function call expressions.
-
-// ===== Not constant in constant context =====
-
-fn not_const_fn(param: i32) -> i32 {
-    return param;
-}
-
-const _NOT_CONST_FN = not_const_fn(0);

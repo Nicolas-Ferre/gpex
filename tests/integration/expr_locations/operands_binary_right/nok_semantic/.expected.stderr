@@ -1,0 +1,14 @@
+error: expression not constant
+│  → <root>/test_constness.gpex:2:19
+│    ¦ const _ITEM = 0 + not_const;
+│    ¦                   ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:2:1
+│    ¦ const _ITEM = 0 + not_const;
+│    ¦ ^^^^^
+┴
+warning: `__add__(bool, bool)` item unused
+│  → <root>/test_constness.gpex:4:10
+│    ¦ const fn __add__(param1: bool, _param2: bool) -> bool {
+│    ¦          ^^^^^^^
+┴

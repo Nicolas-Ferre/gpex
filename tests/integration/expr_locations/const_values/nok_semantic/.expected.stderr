@@ -1,0 +1,15 @@
+error: expression not constant
+│  → <root>/test_constness.gpex:2:15
+│    ¦ const _ITEM = not_const;
+│    ¦               ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:2:1
+│    ¦ const _ITEM = not_const;
+│    ¦ ^^^^^
+┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:15
+│    ¦ const _ITEM = ?;
+│    ¦               ^
+├─ info: wildcards are only allowed as function parameter types
+┴

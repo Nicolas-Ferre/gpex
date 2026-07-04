@@ -1,8 +1,0 @@
-// Test invalid semantic for return statement.
-
-// ===== Not constant value in constant function =====
-
-var not_const = 0;
-const fn _not_const_in_const_fn() -> i32 {
-    return not_const;
-}

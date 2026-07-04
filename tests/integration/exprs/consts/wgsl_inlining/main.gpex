@@ -1,6 +1,0 @@
-// Test WGSL inlining for constant item expressions.
-
-// ===== Constness =====
-
-const ITEM = 1;
-const _RESULT_CONSTNESS = ITEM; // expected: 1

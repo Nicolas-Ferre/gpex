@@ -1,9 +1,0 @@
-// Test WGSL inlining for assignment statement left values.
-
-// ===== Function parameter in constant function =====
-
-const _RESULT_FN_PARAM = fn_with_assignment_left(1); // expected: 2
-const fn fn_with_assignment_left(param: i32) -> i32 {
-    param = 2;
-    return param;
-}

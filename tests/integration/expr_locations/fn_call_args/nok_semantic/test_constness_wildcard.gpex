@@ -1,0 +1,6 @@
+var not_const = 0;
+var _item = fn_(not_const);
+
+fn fn_(param: const ?) -> typeof(param) {
+    return param;
+}

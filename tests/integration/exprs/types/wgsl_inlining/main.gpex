@@ -1,5 +1,0 @@
-// Test WGSL inlining for type expressions.
-
-// ===== `compilerimpl` type reference constness =====
-
-const _COMPILERIMPL_TYPE = i32; // expected: i32

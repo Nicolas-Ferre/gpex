@@ -1,0 +1,18 @@
+error: expression not constant
+│  → <root>/test_constness_typeref.gpex:4:13
+│    ¦     type_ = not_const;
+│    ¦             ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness_typeref.gpex:3:1
+│    ¦ const fn used(type_: typeref) -> typeref {
+│    ¦ ^^^^^
+┴
+error: expression not constant
+│  → <root>/test_constness_value.gpex:4:13
+│    ¦     param = not_const;
+│    ¦             ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness_value.gpex:3:1
+│    ¦ const fn _item(param: i32) {
+│    ¦ ^^^^^
+┴

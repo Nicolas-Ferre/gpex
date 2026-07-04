@@ -1,5 +1,0 @@
-pub const IMPORTED_CONST = 2;
-
-pub const fn imported_fn(param: i32) -> i32 {
-    return param;
-}

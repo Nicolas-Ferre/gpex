@@ -1,0 +1,6 @@
+const _RESULT_1 = fn_(i32, 1); // expected: 1
+const _RESULT_2 = fn_(u32, 2u); // expected: 2u
+
+const fn fn_(type_: const typeref, value: type_) -> type_ {
+    return value;
+}

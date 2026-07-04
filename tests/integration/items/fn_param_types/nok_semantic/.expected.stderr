@@ -1,9 +1,0 @@
-error: expression not constant
-│  → <root>/main.gpex:6:22
-│    ¦ fn _not_const(param: not_const) -> i32 {
-│    ¦                      ^^^^^^^^^
-├─ info: expression must be constant
-│  → <root>/main.gpex:6:20
-│    ¦ fn _not_const(param: not_const) -> i32 {
-│    ¦                    ^
-┴

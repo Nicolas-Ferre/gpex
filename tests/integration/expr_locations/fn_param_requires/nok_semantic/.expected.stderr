@@ -1,0 +1,9 @@
+error: expression not constant
+│  → <root>/test_constness.gpex:3:29
+│    ¦ fn _item(param: i32 require not_const) -> i32 {
+│    ¦                             ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:3:21
+│    ¦ fn _item(param: i32 require not_const) -> i32 {
+│    ¦                     ^^^^^^^
+┴

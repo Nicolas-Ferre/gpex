@@ -1,24 +1,9 @@
-error: `_DUPLICATED` item defined multiple times
-│  → <root>/main.gpex:6:7
-│    ¦ const _DUPLICATED = 0;
-│    ¦       ^^^^^^^^^^^
+error: `_ITEM` item defined multiple times
+│  → <root>/test_duplication.gpex:2:7
+│    ¦ const _ITEM = 0;
+│    ¦       ^^^^^
 ├─ info: item also defined here
-│  → <root>/main.gpex:5:7
-│    ¦ const _DUPLICATED = 0;
-│    ¦       ^^^^^^^^^^^
-┴
-error: invalid wildcard expression
-│  → <root>/main.gpex:10:19
-│    ¦ const _WILDCARD = ?;
-│    ¦                   ^
-├─ info: wildcards are only allowed as function parameter types
-┴
-error: expression not constant
-│  → <root>/main.gpex:15:24
-│    ¦ const _NOT_CONST_VAR = not_const_var;
-│    ¦                        ^^^^^^^^^^^^^
-├─ info: expression must be constant
-│  → <root>/main.gpex:15:1
-│    ¦ const _NOT_CONST_VAR = not_const_var;
-│    ¦ ^^^^^
+│  → <root>/test_duplication.gpex:1:7
+│    ¦ const _ITEM = 0;
+│    ¦       ^^^^^
 ┴

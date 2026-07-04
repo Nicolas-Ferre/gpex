@@ -1,0 +1,5 @@
+const _ITEM = used(1); // expected: 1
+
+const fn used(param: i32) -> i32 {
+    return param;
+}

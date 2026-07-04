@@ -1,0 +1,6 @@
+const _RESULT = used(1); // expected: 2
+
+const fn used(param: i32) -> i32 {
+    param = 2;
+    return param;
+}

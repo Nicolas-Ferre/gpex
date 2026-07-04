@@ -1,0 +1,5 @@
+var not_const = i32;
+
+fn _item(param: i32) -> not_const {
+    return param;
+}

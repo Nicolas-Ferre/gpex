@@ -1,0 +1,9 @@
+error: expression not constant
+│  → <root>/test_constness.gpex:1:15
+│    ¦ const _ITEM = not_const(0);
+│    ¦               ^^^^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:1:1
+│    ¦ const _ITEM = not_const(0);
+│    ¦ ^^^^^
+┴
