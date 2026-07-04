@@ -1,0 +1,11 @@
+import imported;
+
+fn same_wildcard_param_types(_param: ?) -> bool {
+    return false;
+}
+
+fn same_wildcard_param_types(_param: ?) -> bool {
+    return true;
+}
+
+var _result_alias_same_wildcard_param_types = same_wildcard_param_types(0); // expected: true
