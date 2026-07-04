@@ -73,7 +73,8 @@ The following test cases at `tests/integration/*/*/*/` are commonly defined:
 - `nok_search`: test items that are not accessible from a given location
 - `ok_naming`: test valid item names
 - `nok_naming`: test invalid or not recommended item names
-- `wgsl_inlining`: test that items are correctly inlined during transpilation
+- `wgsl_inlining`: test that items are inlined during transpilation
+- `wgsl_no_inlining`: test that items are not inlined during transpilation
 - `wgsl_transpiling`: test that items are correctly transpiled
 
 ### Test files
