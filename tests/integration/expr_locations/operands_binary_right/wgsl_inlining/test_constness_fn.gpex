@@ -1,6 +1,6 @@
-const _RESULT = 0u + used(1); // expected: 1
+const _RESULT = 0u + fn_(1); // expected: 1
 
-const fn used(param: i32) -> i32 {
+const fn fn_(param: i32) -> i32 {
     return param;
 }
 

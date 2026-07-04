@@ -1,10 +1,10 @@
 var not_const = i32;
 
-const fn used(type_: typeref) -> typeref {
+const fn fn_(type_: typeref) -> typeref {
     type_ = not_const;
     return type_;
 }
 
-fn _item(type_: const typeref, _value: used(type_)) -> i32 {
+fn _item(type_: const typeref, _value: fn_(type_)) -> i32 {
     return 0;
 }

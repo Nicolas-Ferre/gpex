@@ -1,5 +1,5 @@
-const _RESULT = 1.used().used(); // expected: 1
+const _RESULT = 1.fn_().fn_(); // expected: 1
 
-const fn used(param: i32) -> i32 {
+const fn fn_(param: i32) -> i32 {
     return param;
 }

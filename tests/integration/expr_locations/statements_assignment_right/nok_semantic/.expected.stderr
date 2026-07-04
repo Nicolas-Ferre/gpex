@@ -4,7 +4,7 @@ error: expression not constant
 │    ¦             ^^^^^^^^^
 ├─ info: expression must be constant
 │  → <root>/test_constness_typeref.gpex:3:1
-│    ¦ const fn used(type_: typeref) -> typeref {
+│    ¦ const fn fn_(type_: typeref) -> typeref {
 │    ¦ ^^^^^
 ┴
 error: expression not constant

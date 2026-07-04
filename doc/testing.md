@@ -87,3 +87,7 @@ hierarchical naming.
 
 - When a literal value doesn't matter in a `nok_` test, it is set to zero.
 - Example literals within a test file are generally ordered (first expect value `1`, then `2`, ...)
+- Generic functions primarily tested by the file are named `fn_`.
+- Secondary helper functions called by the primary function are named `called`.
+- Functions named `used` are reserved for tests where item usage or search visibility is part of the
+  tested behavior.
