@@ -1,0 +1,9 @@
+const _RESULT = -used(1); // expected: 1
+
+const fn used(param: i32) -> i32 {
+    return param;
+}
+
+const fn __neg__(param: i32) -> i32 {
+    return param;
+}

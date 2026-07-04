@@ -10,8 +10,3 @@ Here are the conventions that are not enforced by CI workflow.
       `is_connected_user`).
     - Avoid including a negation in the name (e.g. avoid `is_not_active`,
       `is_disconnected`, ...).
-
-## Tests
-
-- When a literal value doesn't matter in a `nok_` test, it is set to zero.
-- Example literals within a test file are generally ordered (first expect value `1`, then `2`, ...)

@@ -82,3 +82,8 @@ Each test case is defined in a file `tests/integration/*/*/*/test_*.gpex`.
 
 The filename starts with `test_`, and the rest of the filename defined the exact tested case using a
 hierarchical naming.
+
+### GPEx conventions
+
+- When a literal value doesn't matter in a `nok_` test, it is set to zero.
+- Example literals within a test file are generally ordered (first expect value `1`, then `2`, ...)

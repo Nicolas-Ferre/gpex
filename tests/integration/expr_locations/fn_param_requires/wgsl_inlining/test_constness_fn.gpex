@@ -1,0 +1,9 @@
+const _RESULT = fn_(1); // expected: 1
+
+const fn fn_(param: i32 require is_valid(true)) -> i32 {
+    return param;
+}
+
+const fn is_valid(param: bool) -> bool {
+    return param;
+}
