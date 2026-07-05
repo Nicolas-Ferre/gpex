@@ -1,0 +1,20 @@
+error: expected `~` or identifier
+│  → <root>/test_missing_path.gpex:1:8
+│    ¦ import ;
+│    ¦        ^
+┴
+error: expected `.` or `;`
+│  → <root>/test_missing_separator.gpex:1:12
+│    ¦ import foo invalid;
+│    ¦            ^
+┴
+error: expected identifier
+│  → <root>/test_trailing_separator.gpex:1:30
+│    ¦ import ~.choice_not_matching.;
+│    ¦                              ^
+┴
+error: expected identifier
+│  → <root>/test_unexpected_segment.gpex:1:18
+│    ¦ import ~.segment.var;
+│    ¦                  ^
+┴
