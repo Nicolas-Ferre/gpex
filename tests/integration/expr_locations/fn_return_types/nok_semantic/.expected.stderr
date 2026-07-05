@@ -37,3 +37,9 @@ error: expression not constant
 │    ¦ fn _item(param: i32) -> not_const {
 │    ¦                      ^^
 ┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:15
+│    ¦ fn _item() -> ? {
+│    ¦               ^
+├─ info: wildcards are only allowed as function parameter types
+┴

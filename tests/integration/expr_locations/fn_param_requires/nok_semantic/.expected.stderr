@@ -28,3 +28,9 @@ error: expression not constant
 │    ¦ fn _item(param: i32 require not_const) -> i32 {
 │    ¦                     ^^^^^^^
 ┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:29
+│    ¦ fn _item(param: i32 require ?) -> i32 {
+│    ¦                             ^
+├─ info: wildcards are only allowed as function parameter types
+┴

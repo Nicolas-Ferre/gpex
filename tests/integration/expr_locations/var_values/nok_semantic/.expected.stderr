@@ -19,3 +19,9 @@ error: `circular_item_1` item has circular dependencies
 │    ¦ pub var circular_var_2 = circular_item_1;
 │    ¦                          ^^^^^^^^^^^^^^^
 ┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:13
+│    ¦ var _item = ?;
+│    ¦             ^
+├─ info: wildcards are only allowed as function parameter types
+┴

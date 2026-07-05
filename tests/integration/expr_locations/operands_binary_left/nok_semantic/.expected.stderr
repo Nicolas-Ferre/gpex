@@ -28,6 +28,12 @@ error: expression not constant
 │    ¦ const _ITEM = not_const + 0;
 │    ¦ ^^^^^
 ┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:15
+│    ¦ const _ITEM = ? + 0;
+│    ¦               ^
+├─ info: wildcards are only allowed as function parameter types
+┴
 warning: `__add__(bool, bool)` item unused
 │  → <root>/test_constness.gpex:4:10
 │    ¦ const fn __add__(param1: bool, _param2: bool) -> bool {

@@ -28,3 +28,9 @@ error: expression not constant
 │    ¦ const fn _item() -> i32 {
 │    ¦ ^^^^^
 ┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:2:12
+│    ¦     return ?;
+│    ¦            ^
+├─ info: wildcards are only allowed as function parameter types
+┴

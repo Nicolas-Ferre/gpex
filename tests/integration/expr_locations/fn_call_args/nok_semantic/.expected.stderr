@@ -55,3 +55,9 @@ error: expression not constant
 │    ¦ fn fn_(param: const ?) -> typeof(param) {
 │    ¦               ^^^^^
 ┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:17
+│    ¦ var _item = fn_(?);
+│    ¦                 ^
+├─ info: wildcards are only allowed as function parameter types
+┴
