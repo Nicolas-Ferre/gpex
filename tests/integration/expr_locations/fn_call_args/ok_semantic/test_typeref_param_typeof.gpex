@@ -1,0 +1,6 @@
+var _result1 = fn_(i32, 1); // expected: 1
+var _result2 = fn_(u32, 2u); // expected: 2u
+
+fn fn_(type_: const typeref, value: type_) -> typeof(value) {
+    return value;
+}
