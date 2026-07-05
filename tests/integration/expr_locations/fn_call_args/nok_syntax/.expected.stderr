@@ -1,15 +1,15 @@
 error: expected identifier, `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, `-` or `!`
-│  → <root>/test_invalid_arg.gpex:1:20
+│  → <root>/test_reserved.gpex:1:20
 │    ¦ var value = fn_(1, var);
 │    ¦                    ^
 ┴
-error: expected `.`, `+`, `-`, `*`, `/`, `%`, `==`, `!=`, `<=`, `<`, `>=`, `>`, `&&`, `||`, `,` or `)`
-│  → <root>/test_missing_separator.gpex:1:19
-│    ¦ var value = fn_(1 var);
-│    ¦                   ^
-┴
 error: expected identifier, `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, `-`, `!` or `)`
-│  → <root>/test_trailing_separator_alone.gpex:1:17
+│  → <root>/test_separator_alone.gpex:1:17
 │    ¦ var value = fn_(,);
 │    ¦                 ^
+┴
+error: expected `.`, `+`, `-`, `*`, `/`, `%`, `==`, `!=`, `<=`, `<`, `>=`, `>`, `&&`, `||`, `,` or `)`
+│  → <root>/test_separator_missing.gpex:1:19
+│    ¦ var value = fn_(1 var);
+│    ¦                   ^
 ┴

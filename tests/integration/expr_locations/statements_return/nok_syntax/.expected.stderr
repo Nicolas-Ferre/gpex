@@ -1,5 +1,5 @@
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-` or `!`
-│  → <root>/test_invalid_expr_keyword.gpex:2:12
+│  → <root>/test_reserved.gpex:2:12
 │    ¦     return var;
 │    ¦            ^
 ┴

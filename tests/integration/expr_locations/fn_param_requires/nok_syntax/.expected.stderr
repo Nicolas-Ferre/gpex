@@ -1,5 +1,5 @@
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-` or `!`
-│  → <root>/test_invalid_expr.gpex:1:27
+│  → <root>/test_invalid_symbol.gpex:1:27
 │    ¦ fn fn_(param: i32 require :) {}
 │    ¦                           ^
 ┴

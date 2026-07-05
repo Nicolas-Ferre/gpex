@@ -24,7 +24,7 @@ warning: `_item_name` identifier not in SCREAMING_SNAKE_CASE
 │    ¦       ^^^^^^^^^^
 ┴
 warning: `I` identifier is single character
-│  → <root>/test_length_single_letter.gpex:1:11
+│  → <root>/test_len_single_letter.gpex:1:11
 │    ¦ pub const I = 0;
 │    ¦           ^
 ┴

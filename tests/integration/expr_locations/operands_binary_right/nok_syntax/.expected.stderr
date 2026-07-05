@@ -1,5 +1,5 @@
 error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-` or `!`
-│  → <root>/test_missing_operand.gpex:1:16
+│  → <root>/test_missing.gpex:1:16
 │    ¦ var value = 2 +;
 │    ¦                ^
 ┴

@@ -3,12 +3,12 @@ error: `fn_(i32)` item not found
 │    ¦ repeat fn_(0);
 │    ¦        ^^^^^^
 ├─ info: similar candidate
-│  → <root>/test_f32_param_type.gpex:3:4
+│  → <root>/test_f32_param_type.gpex:4:4
 │    ¦ fn fn_(_param: 400000000000000000000000000000000000000.0) -> i32 {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `f32` literal out of bounds
-│  → <root>/test_f32_param_type.gpex:3:16
+│  → <root>/test_f32_param_type.gpex:4:16
 │    ¦ fn fn_(_param: 400000000000000000000000000000000000000.0) -> i32 {
 │    ¦                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
@@ -32,12 +32,12 @@ error: `fn_(i32)` item not found
 │    ¦ repeat fn_(0);
 │    ¦        ^^^^^^
 ├─ info: similar candidate
-│  → <root>/test_i32_param_type.gpex:3:4
+│  → <root>/test_i32_param_type.gpex:4:4
 │    ¦ fn fn_(_param: 2_147_483_648) -> i32 {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `i32` literal out of bounds
-│  → <root>/test_i32_param_type.gpex:3:16
+│  → <root>/test_i32_param_type.gpex:4:16
 │    ¦ fn fn_(_param: 2_147_483_648) -> i32 {
 │    ¦                ^^^^^^^^^^^^^
 ┴
@@ -61,12 +61,12 @@ error: `fn_(i32)` item not found
 │    ¦ repeat fn_(0);
 │    ¦        ^^^^^^
 ├─ info: similar candidate
-│  → <root>/test_u32_param_type.gpex:3:4
+│  → <root>/test_u32_param_type.gpex:4:4
 │    ¦ fn fn_(_param: 4_294_967_296u) -> i32 {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `u32` literal out of bounds
-│  → <root>/test_u32_param_type.gpex:3:16
+│  → <root>/test_u32_param_type.gpex:4:16
 │    ¦ fn fn_(_param: 4_294_967_296u) -> i32 {
 │    ¦                ^^^^^^^^^^^^^^
 ┴
