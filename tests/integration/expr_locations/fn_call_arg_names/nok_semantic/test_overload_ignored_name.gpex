@@ -1,0 +1,9 @@
+var _result = fn_(_left_u32: 0, _right_u32: 0);
+
+pub fn fn_(left: i32, right: i32) -> i32 {
+    return left + right;
+}
+
+pub fn fn_(_left_u32: u32, _right_u32: u32) -> i32 {
+    return 0;
+}

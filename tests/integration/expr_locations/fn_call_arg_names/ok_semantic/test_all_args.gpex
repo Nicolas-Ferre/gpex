@@ -1,0 +1,5 @@
+fn fn_(left: i32, right: i32) -> i32 {
+    return left + right;
+}
+
+var _result = fn_(left: 1, right: 2); // expected: 3
