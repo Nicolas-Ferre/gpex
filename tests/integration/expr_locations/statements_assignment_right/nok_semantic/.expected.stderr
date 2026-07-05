@@ -37,6 +37,15 @@ error: expression not constant
 │    ¦ const fn _item(param: i32) {
 │    ¦ ^^^^^
 ┴
+error: expression with invalid type `bool`
+│  → <root>/test_type.gpex:2:13
+│    ¦     param = true;
+│    ¦             ^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type.gpex:2:5
+│    ¦     param = true;
+│    ¦     ^^^^^
+┴
 error: invalid wildcard expression
 │  → <root>/test_wildcard.gpex:2:13
 │    ¦     param = ?;

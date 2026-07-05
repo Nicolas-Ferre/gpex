@@ -37,6 +37,12 @@ error: expression not constant
 │    ¦ fn _item(param: not_const) -> i32 {
 │    ¦               ^
 ┴
+error: expression with invalid type `bool`
+│  → <root>/test_type.gpex:1:17
+│    ¦ fn _item(param: true) -> i32 {
+│    ¦                 ^^^^
+├─ info: expected `typeref` type
+┴
 error: invalid wildcard expression
 │  → <root>/test_wildcard_nested.gpex:1:25
 │    ¦ fn _item(_param: sizeof(?)) -> i32 {

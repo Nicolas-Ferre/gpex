@@ -28,6 +28,12 @@ error: expression not constant
 │    ¦ fn _item(param: i32 require not_const) -> i32 {
 │    ¦                     ^^^^^^^
 ┴
+error: expression with invalid type `i32`
+│  → <root>/test_type.gpex:1:29
+│    ¦ fn _item(param: i32 require 0) -> i32 {
+│    ¦                             ^
+├─ info: expected `bool` type
+┴
 error: invalid wildcard expression
 │  → <root>/test_wildcard.gpex:1:29
 │    ¦ fn _item(param: i32 require ?) -> i32 {
