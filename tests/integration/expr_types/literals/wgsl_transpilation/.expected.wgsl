@@ -19,15 +19,15 @@ var<storage, read_write> b: Buffer;
 
 @compute @workgroup_size(1, 1, 1)
 fn main() {
-    b.ident10 = u32(4294967295);
-    b.ident9 = u32(0);
-    b.ident8 = i32(2147483647);
-    b.ident7 = i32(0);
-    b.ident6 = i32(-2147483648);
-    b.ident5 = f32(3.4028235e38);
+    b.ident10 = u32(0);
+    b.ident9 = u32(4294967295);
+    b.ident8 = i32(0);
+    b.ident7 = i32(-2147483648);
+    b.ident6 = i32(2147483647);
+    b.ident5 = f32(0.0);
     b.ident4 = f32(1e-23);
-    b.ident3 = f32(0.0);
-    b.ident2 = f32(-3.4028235e38);
+    b.ident3 = f32(-3.4028235e38);
+    b.ident2 = f32(3.4028235e38);
     b.ident1 = u32(1);
     b.ident0 = u32(0);
 }
