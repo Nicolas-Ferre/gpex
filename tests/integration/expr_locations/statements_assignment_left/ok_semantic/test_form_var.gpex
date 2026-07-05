@@ -1,0 +1,7 @@
+var result = 0; // expected: 1
+
+repeat set_result();
+
+fn set_result() {
+    result = 1;
+}
