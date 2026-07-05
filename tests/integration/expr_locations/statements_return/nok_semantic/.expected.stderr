@@ -1,23 +1,23 @@
-error: `circular_item_1` item has circular dependencies
+error: `circular_item1` item has circular dependencies
 │  → <root>/test_circular_indirect_1.gpex:3:8
-│    ¦ pub fn circular_item_1() -> i32 {
-│    ¦        ^^^^^^^^^^^^^^^
+│    ¦ pub fn circular_item1() -> i32 {
+│    ¦        ^^^^^^^^^^^^^^
 ├─ info: depends on this item
 │  → <root>/test_circular_indirect_1.gpex:4:12
-│    ¦     return circular_var_1;
-│    ¦            ^^^^^^^^^^^^^^
+│    ¦     return circular_var1;
+│    ¦            ^^^^^^^^^^^^^
 ├─ info: depends on this item
-│  → <root>/test_circular_indirect_2.gpex:3:26
-│    ¦ pub var circular_var_1 = circular_item_2();
-│    ¦                          ^^^^^^^^^^^^^^^^^
+│  → <root>/test_circular_indirect_2.gpex:3:25
+│    ¦ pub var circular_var1 = circular_item2();
+│    ¦                         ^^^^^^^^^^^^^^^^
 ├─ info: depends on this item
 │  → <root>/test_circular_indirect_1.gpex:8:12
-│    ¦     return circular_var_2;
-│    ¦            ^^^^^^^^^^^^^^
+│    ¦     return circular_var2;
+│    ¦            ^^^^^^^^^^^^^
 ├─ info: depends on itself
-│  → <root>/test_circular_indirect_2.gpex:4:26
-│    ¦ pub var circular_var_2 = circular_item_1();
-│    ¦                          ^^^^^^^^^^^^^^^^^
+│  → <root>/test_circular_indirect_2.gpex:4:25
+│    ¦ pub var circular_var2 = circular_item1();
+│    ¦                         ^^^^^^^^^^^^^^^^
 ┴
 error: expression not constant
 │  → <root>/test_constness.gpex:4:12
@@ -29,13 +29,94 @@ error: expression not constant
 │    ¦ ^^^^^
 ┴
 error: expression with invalid type `bool`
-│  → <root>/test_type.gpex:2:12
+│  → <root>/test_type_literal_as_typeref.gpex:2:12
 │    ¦     return true;
 │    ¦            ^^^^
 ├─ info: expected `i32` type
-│  → <root>/test_type.gpex:1:15
+│  → <root>/test_type_literal_as_typeref.gpex:1:15
 │    ¦ fn _item() -> i32 {
 │    ¦               ^^^
+┴
+error: expression with invalid type `typeref`
+│  → <root>/test_type_typeref_as_typeref_param.gpex:2:12
+│    ¦     return i32;
+│    ¦            ^^^
+├─ info: expected `type_` type
+│  → <root>/test_type_typeref_as_typeref_param.gpex:1:35
+│    ¦ fn _item(type_: const typeref) -> type_ {
+│    ¦                                   ^^^^^
+┴
+error: expression with invalid type `i32`
+│  → <root>/test_type_typeref_as_wildcard.gpex:2:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `typeof(param)` type
+│  → <root>/test_type_typeref_as_wildcard.gpex:1:35
+│    ¦ fn _item(param: ?, value: i32) -> typeof(param) {
+│    ¦                                   ^^^^^^^^^^^^^
+┴
+error: expression with invalid type `type1`
+│  → <root>/test_type_typeref_param_as_other_typeref_param.gpex:2:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `type2` type
+│  → <root>/test_type_typeref_param_as_other_typeref_param.gpex:1:71
+│    ¦ fn _item(type1: const typeref, type2: const typeref, value: type1) -> type2 {
+│    ¦                                                                       ^^^^^
+┴
+error: expression with invalid type `type_`
+│  → <root>/test_type_typeref_param_as_typeref.gpex:2:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type_typeref_param_as_typeref.gpex:1:49
+│    ¦ fn _item(type_: const typeref, value: type_) -> i32 {
+│    ¦                                                 ^^^
+┴
+error: expression with invalid type `type_`
+│  → <root>/test_type_typeref_param_as_wildcard.gpex:2:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `typeof(param)` type
+│  → <root>/test_type_typeref_param_as_wildcard.gpex:1:59
+│    ¦ fn _item(type_: const typeref, param: ?, value: type_) -> typeof(param) {
+│    ¦                                                           ^^^^^^^^^^^^^
+┴
+error: expression with invalid type `type_`
+│  → <root>/test_type_typeref_param_through_fn_as_typeref.gpex:2:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type_typeref_param_through_fn_as_typeref.gpex:1:60
+│    ¦ fn _item(type_: const typeref, value: same_type(type_)) -> i32 {
+│    ¦                                                            ^^^
+┴
+error: expression with invalid type `typeof(param1)`
+│  → <root>/test_type_wildcard_as_other_wildcard.gpex:2:12
+│    ¦     return param1;
+│    ¦            ^^^^^^
+├─ info: expected `typeof(param2)` type
+│  → <root>/test_type_wildcard_as_other_wildcard.gpex:1:35
+│    ¦ fn _item(param1: ?, param2: ?) -> typeof(param2) {
+│    ¦                                   ^^^^^^^^^^^^^^
+┴
+error: expression with invalid type `typeof(param)`
+│  → <root>/test_type_wildcard_as_typeref.gpex:2:12
+│    ¦     return param;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type_wildcard_as_typeref.gpex:1:23
+│    ¦ fn _item(param: ?) -> i32 {
+│    ¦                       ^^^
+┴
+error: expression with invalid type `typeof(param)`
+│  → <root>/test_type_wildcard_as_typeref_param.gpex:2:12
+│    ¦     return param;
+│    ¦            ^^^^^
+├─ info: expected `type_` type
+│  → <root>/test_type_wildcard_as_typeref_param.gpex:1:45
+│    ¦ fn _item(type_: const typeref, param: ?) -> type_ {
+│    ¦                                             ^^^^^
 ┴
 error: invalid wildcard expression
 │  → <root>/test_wildcard.gpex:2:12
