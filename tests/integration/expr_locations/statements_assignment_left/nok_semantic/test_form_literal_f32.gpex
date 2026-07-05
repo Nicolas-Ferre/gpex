@@ -1,0 +1,9 @@
+const fn fn_() -> typeref {
+    0.0 = 0.0;
+    return i32;
+}
+
+// Test constant calculation behavior in case of reference check error.
+fn _usage() -> fn_() {
+    return 0;
+}

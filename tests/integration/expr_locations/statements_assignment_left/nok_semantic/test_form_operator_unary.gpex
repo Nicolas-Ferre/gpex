@@ -1,0 +1,13 @@
+const fn fn_() -> typeref {
+    !0 = 0;
+    return i32;
+}
+
+const fn __not__(param: i32) -> i32 {
+    return param;
+}
+
+// Test constant calculation behavior in case of reference check error.
+fn _usage() -> fn_() {
+    return 0;
+}
