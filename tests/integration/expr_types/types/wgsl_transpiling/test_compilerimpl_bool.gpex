@@ -1,0 +1,1 @@
+const _RESULT = bool; // expected: bool

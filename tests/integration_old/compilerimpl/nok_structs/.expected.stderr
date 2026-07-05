@@ -1,5 +1,0 @@
-error: forbidden `compilerimpl` item outside prelude
-│  → <root>/main.gpex:3:17
-│    ¦ struct MyType = compilerimpl {}
-│    ¦                 ^^^^^^^^^^^^
-┴

@@ -1,0 +1,4 @@
+var one = 1;
+
+var _result = 2 + one; // expected: 3
+var _result_overflow = 2_147_483_647 + one; // expected: -2147483648

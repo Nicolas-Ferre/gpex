@@ -1,3 +1,0 @@
-// Test disallowed definition of `compilerimpl` structs (must generate errors).
-
-struct MyType = compilerimpl {}

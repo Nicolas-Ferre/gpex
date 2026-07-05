@@ -1,0 +1,2 @@
+const _RESULT = 2 + 1; // expected: 3
+const _RESULT_OVERFLOW = 2_147_483_647 + 1; // expected: -2147483648
