@@ -62,6 +62,7 @@ The following test domains are defined:
 - `tests/integration/expr_types/`: tests are organized per expression kind (literal, variable
   reference, function call, ...)
 - `tests/integration/items/`: tests are organized per item (variable, constant, function, ...)
+- `tests/integration/logs/`: tests are organized per compiler log rendering behavior.
 
 ### Test cases
 

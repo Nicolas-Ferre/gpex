@@ -1,5 +1,5 @@
 warning: empty statement block
-│  → <root>/main.gpex:4:2
+│  → <root>/test_tabs.gpex:2:2
 │    ¦     { // tabulated opening line
 │    ¦     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦     //  tabulated
