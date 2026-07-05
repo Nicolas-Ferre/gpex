@@ -1,0 +1,9 @@
+error: expression with invalid type `f32`
+│  → <root>/test_type.gpex:4:12
+│    ¦     return item;
+│    ¦            ^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type.gpex:3:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴

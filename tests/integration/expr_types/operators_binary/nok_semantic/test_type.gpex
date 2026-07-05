@@ -1,0 +1,7 @@
+fn _fn() -> i32 {
+    return true - false;
+}
+
+fn __sub__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}

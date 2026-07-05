@@ -1,0 +1,7 @@
+fn _fn() -> i32 {
+    return called();
+}
+
+fn called() -> f32 {
+    return 0.0;
+}
