@@ -67,6 +67,7 @@ The following test domains are defined:
 
 The following test cases at `tests/integration/*/*/*/` are commonly defined:
 
+- `ok_syntax`: test valid syntax forms
 - `ok_semantic`: test invalid feature semantic
 - `nok_semantic`: test valid feature semantic
 - `ok_search`: test items that are accessible from a given location
