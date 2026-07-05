@@ -228,3 +228,93 @@ error: `__not__(i32)` unary operator function without return type
 │    ¦ fn __not__(param: i32) {
 │    ¦    ^^^^^^^^^^^^^^^^^^^
 ┴
+warning: empty statement block
+│  → <root>/test_body_empty.gpex:1:10
+│    ¦ fn _fn() {
+│    ¦          ^
+│    ¦     // empty
+│    ¦ ^^^^^^^^^^^^
+│    ¦ }
+│    ¦ ^
+┴
+warning: `fn_(i32)` function defined multiple times
+│  → <root>/test_duplication_concrete.gpex:5:8
+│    ¦ pub fn fn_(_other: i32) -> i32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_concrete.gpex:1:8
+│    ¦ pub fn fn_(_value: i32) -> i32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(u32)` function defined multiple times
+│  → <root>/test_duplication_concrete_typeof.gpex:5:8
+│    ¦ pub fn fn_(_value: u32) -> u32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_concrete_typeof.gpex:1:8
+│    ¦ pub fn fn_(_value: typeof(0u)) -> u32 {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(f32)` function defined multiple times
+│  → <root>/test_duplication_ignored_qualifiers.gpex:5:8
+│    ¦ pub fn fn_(_other: f32) -> u32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_ignored_qualifiers.gpex:1:14
+│    ¦ pub const fn fn_(_value: const f32) -> f32 {
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(bool)` function defined multiple times
+│  → <root>/test_duplication_multiple.gpex:5:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_multiple.gpex:1:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(bool)` function defined multiple times
+│  → <root>/test_duplication_multiple.gpex:9:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_multiple.gpex:5:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(typeref, other_type)` function defined multiple times
+│  → <root>/test_duplication_typeref_param.gpex:5:8
+│    ¦ pub fn fn_(other_type: const typeref, other_value: other_type) -> other_type {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_typeref_param.gpex:1:8
+│    ¦ pub fn fn_(type_: const typeref, value: type_) -> type_ {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(typeref, other_type, other_type)` function defined multiple times
+│  → <root>/test_duplication_typeref_param_typeof.gpex:5:8
+│    ¦ pub fn fn_(other_type: const typeref, other_value: other_type, other_copy: typeof(other_value)) -> other_type {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_typeref_param_typeof.gpex:1:8
+│    ¦ pub fn fn_(type_: const typeref, value: type_, copy: typeof(value)) -> type_ {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(?)` function defined multiple times
+│  → <root>/test_duplication_wildcard.gpex:5:8
+│    ¦ pub fn fn_(other: ?) -> typeof(other) {
+│    ¦        ^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_wildcard.gpex:1:8
+│    ¦ pub fn fn_(value: ?) -> typeof(value) {
+│    ¦        ^^^^^^^^^^^^^
+┴
+warning: `fn_(?, typeof(other))` function defined multiple times
+│  → <root>/test_duplication_wildcard_typeof.gpex:5:8
+│    ¦ pub fn fn_(other: ?, other_copy: typeof(other)) -> typeof(other) {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_wildcard_typeof.gpex:1:8
+│    ¦ pub fn fn_(value: ?, copy: typeof(value)) -> typeof(value) {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴

@@ -1,0 +1,7 @@
+pub fn fn_(_value: typeof(0u)) -> u32 {
+    return 0u;
+}
+
+pub fn fn_(_value: u32) -> u32 {
+    return 0u;
+}

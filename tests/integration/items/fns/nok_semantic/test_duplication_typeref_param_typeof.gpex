@@ -1,0 +1,7 @@
+pub fn fn_(type_: const typeref, value: type_, copy: typeof(value)) -> type_ {
+    return copy;
+}
+
+pub fn fn_(other_type: const typeref, other_value: other_type, other_copy: typeof(other_value)) -> other_type {
+    return other_copy;
+}

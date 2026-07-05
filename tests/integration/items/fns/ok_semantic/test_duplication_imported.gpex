@@ -1,0 +1,7 @@
+pub import imported;
+
+fn fn_(value: i32) -> i32 {
+    return value;
+}
+
+var _imported_usage = fn_(0);
