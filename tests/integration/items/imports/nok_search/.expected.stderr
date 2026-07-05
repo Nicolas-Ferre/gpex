@@ -1,0 +1,36 @@
+error: `segment1.segment2` module not found
+│  → <root>/test_not_found_absolute_nested.gpex:1:8
+│    ¦ import segment1.segment2;
+│    ¦        ^^^^^^^^^^^^^^^^^
+├─ info: cannot read "<root>/segment1/segment2.gpex"
+┴
+error: `segment` module not found
+│  → <root>/test_not_found_absolute_root.gpex:1:8
+│    ¦ import segment;
+│    ¦        ^^^^^^^
+├─ info: cannot read "<root>/segment.gpex"
+┴
+error: `~.~.segment` module not found
+│  → <root>/test_not_found_relative_indirect_parent.gpex:1:8
+│    ¦ import ~.~.segment;
+│    ¦        ^^^^^^^^^^^
+├─ info: cannot read "tests/integration/items/imports/segment.gpex"
+┴
+error: `~.segment1.segment2` module not found
+│  → <root>/test_not_found_relative_nested.gpex:1:8
+│    ¦ import ~.segment1.segment2;
+│    ¦        ^^^^^^^^^^^^^^^^^^^
+├─ info: cannot read "<root>/segment1/segment2.gpex"
+┴
+error: `~.~.~.~.~.~.~.segment` module not found
+│  → <root>/test_not_found_relative_outside_root.gpex:1:8
+│    ¦ import ~.~.~.~.~.~.~.segment;
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^
+├─ info: cannot read "../segment.gpex"
+┴
+error: `~.segment` module not found
+│  → <root>/test_not_found_relative_root.gpex:1:8
+│    ¦ import ~.segment;
+│    ¦        ^^^^^^^^^
+├─ info: cannot read "<root>/segment.gpex"
+┴

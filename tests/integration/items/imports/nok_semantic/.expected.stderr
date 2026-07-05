@@ -1,5 +1,5 @@
 error: `import` statement not at the top of the module
-│  → <root>/main.gpex:4:1
+│  → <root>/test_after_item.gpex:3:1
 │    ¦ import ~.imported;
 │    ¦ ^^^^^^^^^^^^^^^^^^
 ├─ info: `import` statements should appear before anything else

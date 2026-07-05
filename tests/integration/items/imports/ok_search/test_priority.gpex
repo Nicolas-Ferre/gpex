@@ -1,7 +1,5 @@
-// Test imported item priorities.
-
-import ~.imported1;
-import ~.imported2;
+import ~.imported_priority1;
+import ~.imported_priority2;
 
 const UNIQUE_MAIN = 41;
 const CONFLICTING_MAIN = 42;
