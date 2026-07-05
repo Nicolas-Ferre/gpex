@@ -3,3 +3,228 @@ error: forbidden `compilerimpl` item outside prelude
 │    ¦ fn fn_() -> i32 = compilerimpl;
 │    ¦                   ^^^^^^^^^^^^
 ┴
+error: `__add__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:1:4
+│    ¦ fn __add__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__sub__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:5:4
+│    ¦ fn __sub__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mul__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:9:4
+│    ¦ fn __mul__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__div__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:13:4
+│    ¦ fn __div__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mod__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:17:4
+│    ¦ fn __mod__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__eq__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:21:4
+│    ¦ fn __eq__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ne__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:25:4
+│    ¦ fn __ne__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__lt__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:29:4
+│    ¦ fn __lt__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__le__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:33:4
+│    ¦ fn __le__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__gt__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:37:4
+│    ¦ fn __gt__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ge__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:41:4
+│    ¦ fn __ge__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__and__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:45:4
+│    ¦ fn __and__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__or__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:49:4
+│    ¦ fn __or__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__add__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:1:4
+│    ¦ fn __add__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__sub__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:5:4
+│    ¦ fn __sub__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mul__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:9:4
+│    ¦ fn __mul__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__div__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:13:4
+│    ¦ fn __div__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mod__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:17:4
+│    ¦ fn __mod__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__eq__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:21:4
+│    ¦ fn __eq__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ne__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:25:4
+│    ¦ fn __ne__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__lt__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:29:4
+│    ¦ fn __lt__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__le__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:33:4
+│    ¦ fn __le__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__gt__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:37:4
+│    ¦ fn __gt__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ge__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:41:4
+│    ¦ fn __ge__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__and__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:45:4
+│    ¦ fn __and__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__or__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:49:4
+│    ¦ fn __or__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__add__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:1:4
+│    ¦ fn __add__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__sub__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:5:4
+│    ¦ fn __sub__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mul__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:9:4
+│    ¦ fn __mul__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__div__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:13:4
+│    ¦ fn __div__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mod__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:17:4
+│    ¦ fn __mod__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__eq__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:21:4
+│    ¦ fn __eq__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ne__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:25:4
+│    ¦ fn __ne__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__lt__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:29:4
+│    ¦ fn __lt__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__le__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:33:4
+│    ¦ fn __le__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__gt__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:37:4
+│    ¦ fn __gt__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ge__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:41:4
+│    ¦ fn __ge__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__and__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:45:4
+│    ¦ fn __and__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__or__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:49:4
+│    ¦ fn __or__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__neg__(i32, i32)` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_extra.gpex:1:4
+│    ¦ fn __neg__(_param1: i32, _param2: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__not__(i32, i32)` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_extra.gpex:5:4
+│    ¦ fn __not__(_param1: i32, _param2: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__neg__()` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_missing.gpex:1:4
+│    ¦ fn __neg__() -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^
+┴
+error: `__not__()` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_missing.gpex:5:4
+│    ¦ fn __not__() -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^
+┴
+error: `__neg__(i32)` unary operator function without return type
+│  → <root>/test_operator_unary_return_type_missing.gpex:1:4
+│    ¦ fn __neg__(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^
+┴
+error: `__not__(i32)` unary operator function without return type
+│  → <root>/test_operator_unary_return_type_missing.gpex:5:4
+│    ¦ fn __not__(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^
+┴
