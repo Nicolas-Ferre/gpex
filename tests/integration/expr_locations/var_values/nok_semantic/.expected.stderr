@@ -19,6 +19,15 @@ error: `circular_item_1` item has circular dependencies
 │    ¦ pub var circular_var_2 = circular_item_1;
 │    ¦                          ^^^^^^^^^^^^^^^
 ┴
+error: called function `called(i32)` with no return type
+│  → <root>/test_fn_call_return_type_missing.gpex:1:13
+│    ¦ var _item = called(0);
+│    ¦             ^^^^^^^^^
+├─ info: function has no return type
+│  → <root>/test_fn_call_return_type_missing.gpex:3:4
+│    ¦ fn called(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^
+┴
 error: invalid wildcard expression
 │  → <root>/test_wildcard.gpex:1:13
 │    ¦ var _item = ?;

@@ -7,6 +7,15 @@ error: `circular_direct` item has circular dependencies
 │    ¦     return circular_direct();
 │    ¦            ^^^^^^^^^^^^^^^^^
 ┴
+error: called function `called(i32)` with no return type
+│  → <root>/test_compilerimpl_typeof_return_type_missing.gpex:1:22
+│    ¦ const _ITEM = typeof(called(0));
+│    ¦                      ^^^^^^^^^
+├─ info: function has no return type
+│  → <root>/test_compilerimpl_typeof_return_type_missing.gpex:3:4
+│    ¦ fn called(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^
+┴
 error: expression not constant
 │  → <root>/test_constness.gpex:1:15
 │    ¦ const _ITEM = not_const(0);

@@ -1,0 +1,9 @@
+repeat fn_(called(0));
+
+pub fn fn_(param: i32) {
+    param = 0;
+}
+
+fn called(param: i32) {
+    param = 0;
+}

@@ -55,6 +55,15 @@ error: expression not constant
 │    ¦ fn fn_(param: const ?) -> typeof(param) {
 │    ¦               ^^^^^
 ┴
+error: called function `called(i32)` with no return type
+│  → <root>/test_fn_call_return_type_missing.gpex:1:12
+│    ¦ repeat fn_(called(0));
+│    ¦            ^^^^^^^^^
+├─ info: function has no return type
+│  → <root>/test_fn_call_return_type_missing.gpex:7:4
+│    ¦ fn called(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^
+┴
 error: invalid wildcard expression
 │  → <root>/test_wildcard.gpex:1:17
 │    ¦ var _item = fn_(?);
