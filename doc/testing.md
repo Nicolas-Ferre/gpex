@@ -14,12 +14,13 @@ Some tests rely on `.gpex` examples:
 
 ## Integration tests (`tests/integration/`)
 
-Tests examples of GPEx programs located in `tests/integration/*/*/*/`.
+Tests examples of GPEx programs located in `tests/integration/`.
 
-The first two directory levels group tests by domain and feature. The third directory level is the
-test case itself and its name prefix defines the testing behavior.
+Directories group tests by domain, feature, and optionally more specific subfeatures. A test case is
+any directory whose name starts with `ok_`, `wgsl_` or `nok_`, and this prefix defines the testing
+behavior.
 
-### `tests/integration/*/*/*/ok_*` test directories
+### `ok_*` test directories
 
 These directories are tested the following way:
 
@@ -35,7 +36,7 @@ These directories are tested the following way:
   const _RESULT = 2_147_483_647; // expected: 2147483647
   ```
 
-### `tests/integration/*/*/*/wgsl_*` test directories
+### `wgsl_*` test directories
 
 These directories are tested the following way:
 
@@ -44,7 +45,7 @@ These directories are tested the following way:
   `.expected.wgsl`.
   If this file doesn't exist, it is auto-generated during the first test run.
 
-### `tests/integration/*/*/*/nok_*` test directories
+### `nok_*` test directories
 
 These directories are tested the following way:
 
@@ -63,10 +64,11 @@ The following test domains are defined:
   reference, function call, ...)
 - `tests/integration/items/`: tests are organized per item (variable, constant, function, ...)
 - `tests/integration/logs/`: tests are organized per compiler log rendering behavior.
+- `tests/integration/prelude/`: tests are organized per built-in prelude item.
 
 ### Test cases
 
-The following test cases at `tests/integration/*/*/*/` are commonly defined:
+The following test cases are commonly defined:
 
 - `ok_syntax`: test valid syntax forms
 - `ok_semantic`: test invalid feature semantic
@@ -81,7 +83,7 @@ The following test cases at `tests/integration/*/*/*/` are commonly defined:
 
 ### Test files
 
-Each test case is defined in a file `tests/integration/*/*/*/test_*.gpex`.
+Each test case is defined in a `test_*.gpex` file inside a test case directory.
 
 The filename starts with `test_`, and the rest of the filename defined the exact tested case using a
 hierarchical naming.
