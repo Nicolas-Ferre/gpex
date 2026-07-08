@@ -1,0 +1,7 @@
+const fn called(param: i32) -> i32 {
+    param = 0;
+}
+
+const fn _fn() -> i32 {
+    return called(0);
+}
