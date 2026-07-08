@@ -1,0 +1,30 @@
+warning: `_itemName` identifier not in snake_case
+│  → <root>/test_case_camel_typeref.gpex:1:5
+│    ¦ var _itemName = i32;
+│    ¦     ^^^^^^^^^
+┴
+warning: `_itemName` identifier not in snake_case
+│  → <root>/test_case_camel_value.gpex:1:5
+│    ¦ var _itemName = 0;
+│    ¦     ^^^^^^^^^
+┴
+warning: `_ItemName` identifier not in snake_case
+│  → <root>/test_case_pascal_typeref.gpex:1:5
+│    ¦ var _ItemName = i32;
+│    ¦     ^^^^^^^^^
+┴
+warning: `_ItemName` identifier not in snake_case
+│  → <root>/test_case_pascal_value.gpex:1:5
+│    ¦ var _ItemName = 0;
+│    ¦     ^^^^^^^^^
+┴
+warning: `_ITEM_NAME` identifier not in snake_case
+│  → <root>/test_case_screaming_snake_typeref.gpex:1:5
+│    ¦ var _ITEM_NAME = i32;
+│    ¦     ^^^^^^^^^^
+┴
+warning: `_ITEM_NAME` identifier not in snake_case
+│  → <root>/test_case_screaming_snake_value.gpex:1:5
+│    ¦ var _ITEM_NAME = 0;
+│    ¦     ^^^^^^^^^^
+┴

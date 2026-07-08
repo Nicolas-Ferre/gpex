@@ -1,0 +1,3 @@
+fn _fn(ITEM_NAME: const typeref) -> typeref {
+    return ITEM_NAME;
+}

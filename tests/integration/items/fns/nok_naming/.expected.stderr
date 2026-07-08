@@ -1,0 +1,70 @@
+warning: `_itemName` identifier not in snake_case or PascalCase
+│  → <root>/test_case_camel_const_return_typeref.gpex:1:10
+│    ¦ const fn _itemName() -> typeref {
+│    ¦          ^^^^^^^^^
+┴
+warning: `_itemName` identifier not in snake_case
+│  → <root>/test_case_camel_no_return.gpex:1:4
+│    ¦ fn _itemName(param: i32) {
+│    ¦    ^^^^^^^^^
+┴
+warning: `_itemName` identifier not in snake_case
+│  → <root>/test_case_camel_return_const_param.gpex:1:10
+│    ¦ const fn _itemName(type_: const typeref, value: type_) -> type_ {
+│    ¦          ^^^^^^^^^
+┴
+warning: `_itemName` identifier not in snake_case
+│  → <root>/test_case_camel_return_typeref.gpex:1:4
+│    ¦ fn _itemName() -> typeref {
+│    ¦    ^^^^^^^^^
+┴
+warning: `_itemName` identifier not in snake_case
+│  → <root>/test_case_camel_return_value.gpex:1:4
+│    ¦ fn _itemName() -> i32 {
+│    ¦    ^^^^^^^^^
+┴
+warning: `_ItemName` identifier not in snake_case
+│  → <root>/test_case_pascal_no_return.gpex:1:4
+│    ¦ fn _ItemName(param: i32) {
+│    ¦    ^^^^^^^^^
+┴
+warning: `_ItemName` identifier not in snake_case
+│  → <root>/test_case_pascal_return_const_param.gpex:1:10
+│    ¦ const fn _ItemName(type_: const typeref, value: type_) -> type_ {
+│    ¦          ^^^^^^^^^
+┴
+warning: `_ItemName` identifier not in snake_case
+│  → <root>/test_case_pascal_return_typeref.gpex:1:4
+│    ¦ fn _ItemName() -> typeref {
+│    ¦    ^^^^^^^^^
+┴
+warning: `_ItemName` identifier not in snake_case
+│  → <root>/test_case_pascal_return_value.gpex:1:4
+│    ¦ fn _ItemName() -> i32 {
+│    ¦    ^^^^^^^^^
+┴
+warning: `_ITEM_NAME` identifier not in snake_case or PascalCase
+│  → <root>/test_case_screaming_snake_const_return_typeref.gpex:1:10
+│    ¦ const fn _ITEM_NAME() -> typeref {
+│    ¦          ^^^^^^^^^^
+┴
+warning: `_ITEM_NAME` identifier not in snake_case
+│  → <root>/test_case_screaming_snake_no_return.gpex:1:4
+│    ¦ fn _ITEM_NAME(param: i32) {
+│    ¦    ^^^^^^^^^^
+┴
+warning: `_ITEM_NAME` identifier not in snake_case
+│  → <root>/test_case_screaming_snake_return_const_param.gpex:1:10
+│    ¦ const fn _ITEM_NAME(type_: const typeref, value: type_) -> type_ {
+│    ¦          ^^^^^^^^^^
+┴
+warning: `_ITEM_NAME` identifier not in snake_case
+│  → <root>/test_case_screaming_snake_return_typeref.gpex:1:4
+│    ¦ fn _ITEM_NAME() -> typeref {
+│    ¦    ^^^^^^^^^^
+┴
+warning: `_ITEM_NAME` identifier not in snake_case
+│  → <root>/test_case_screaming_snake_return_value.gpex:1:4
+│    ¦ fn _ITEM_NAME() -> i32 {
+│    ¦    ^^^^^^^^^^
+┴
