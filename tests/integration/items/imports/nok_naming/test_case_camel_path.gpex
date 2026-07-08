@@ -1,1 +1,1 @@
-pub import _camel_case._itemName;
+pub import camelCase.itemName;

@@ -1,1 +1,1 @@
-pub import _screaming_snake_case._ITEM_NAME;
+pub import SCREAMING_SNAKE_CASE.ITEM_NAME;

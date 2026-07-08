@@ -1,1 +1,1 @@
-pub import _pascal_case._ItemName;
+pub import PascalCase.ItemName;
