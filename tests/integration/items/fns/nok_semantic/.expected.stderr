@@ -272,6 +272,24 @@ error: missing `return` statement
 │    ¦ const fn type_(param: i32) -> typeref {
 │    ¦                               ^^^^^^^
 ┴
+error: `return` statement not at the end of the block
+│  → <root>/test_return_not_at_end.gpex:2:5
+│    ¦     return 0;
+│    ¦     ^^^^^^^^^
+├─ info: this statement is after
+│  → <root>/test_return_not_at_end.gpex:3:5
+│    ¦     return 1;
+│    ¦     ^^^^^^^^^
+┴
+error: `return` statement in function with no return type
+│  → <root>/test_return_without_return_type.gpex:2:5
+│    ¦     return 0;
+│    ¦     ^^^^^^^^^
+├─ info: function has no return type
+│  → <root>/test_return_without_return_type.gpex:1:4
+│    ¦ fn _fn() {
+│    ¦    ^^^^^
+┴
 warning: empty statement block
 │  → <root>/test_body_empty.gpex:1:10
 │    ¦ fn _fn() {
