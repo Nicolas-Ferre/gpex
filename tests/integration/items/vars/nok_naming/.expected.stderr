@@ -33,3 +33,13 @@ warning: `i` identifier is single character
 │    ¦ pub var i = 0;
 │    ¦         ^
 ┴
+warning: `_item_name` item public but name starting with `_`
+│  → <root>/test_prefix_pub_unused.gpex:1:9
+│    ¦ pub var _item_name = 0;
+│    ¦         ^^^^^^^^^^
+┴
+warning: `_item_name` item public but name starting with `_`
+│  → <root>/test_prefix_pub_used.gpex:1:9
+│    ¦ pub var _item_name = 0;
+│    ¦         ^^^^^^^^^^
+┴

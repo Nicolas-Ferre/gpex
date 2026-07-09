@@ -73,3 +73,13 @@ warning: `i` identifier is single character
 │    ¦ pub fn i() -> i32 { return 0; }
 │    ¦        ^
 ┴
+warning: `_item_name()` item public but name starting with `_`
+│  → <root>/test_prefix_pub_unused.gpex:1:8
+│    ¦ pub fn _item_name() -> i32 { return 0; }
+│    ¦        ^^^^^^^^^^
+┴
+warning: `_item_name()` item public but name starting with `_`
+│  → <root>/test_prefix_pub_used.gpex:1:8
+│    ¦ pub fn _item_name() -> i32 { return 0; }
+│    ¦        ^^^^^^^^^^
+┴
