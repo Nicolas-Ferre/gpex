@@ -1,0 +1,3 @@
+fn _fn(_param: i32) {
+    _param = 0;
+}

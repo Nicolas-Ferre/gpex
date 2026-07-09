@@ -103,3 +103,12 @@ warning: `i` identifier is single character
 │    ¦ fn _fn(i: i32) {
 │    ¦        ^
 ┴
+warning: `_param` item used but name starting with `_`
+│  → <root>/test_prefix_used.gpex:1:8
+│    ¦ fn _fn(_param: i32) {
+│    ¦        ^^^^^^
+├─ info: item used here
+│  → <root>/test_prefix_used.gpex:2:5
+│    ¦     _param = 0;
+│    ¦     ^^^^^^
+┴
