@@ -28,3 +28,13 @@ warning: `ITEM_NAME` identifier not in snake_case
 │    ¦ pub import SCREAMING_SNAKE_CASE.ITEM_NAME;
 │    ¦                                 ^^^^^^^^^
 ┴
+warning: `unused` import unused
+│  → <root>/test_unused.gpex:1:1
+│    ¦ import unused;
+│    ¦ ^^^^^^^^^^^^^^
+┴
+warning: `duplicated` import unused
+│  → <root>/test_unused_duplicated.gpex:1:1
+│    ¦ import duplicated;
+│    ¦ ^^^^^^^^^^^^^^^^^^
+┴

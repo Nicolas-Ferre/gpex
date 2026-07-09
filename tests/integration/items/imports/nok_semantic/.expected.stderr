@@ -4,3 +4,8 @@ error: `import` statement not at the top of the module
 │    ¦ ^^^^^^^^^^^^^^^^^^
 ├─ info: `import` statements should appear before anything else
 ┴
+warning: module importing itself
+│  → <root>/test_self.gpex:1:1
+│    ¦ import test_self;
+│    ¦ ^^^^^^^^^^^^^^^^^
+┴

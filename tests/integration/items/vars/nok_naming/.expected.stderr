@@ -33,6 +33,11 @@ warning: `i` identifier is single character
 │    ¦ pub var i = 0;
 │    ¦         ^
 ┴
+warning: `item_name` item unused
+│  → <root>/test_prefix_priv_unused.gpex:1:5
+│    ¦ var item_name = 0;
+│    ¦     ^^^^^^^^^
+┴
 warning: `_item_name` item used but name starting with `_`
 │  → <root>/test_prefix_priv_used.gpex:1:5
 │    ¦ var _item_name = 0;
