@@ -73,15 +73,15 @@ warning: `i` identifier is single character
 │    ¦ pub fn i() -> i32 { return 0; }
 │    ¦        ^
 ┴
-warning: `__item_name()` item unused
-│  → <root>/test_prefix_double_priv_unused.gpex:1:4
-│    ¦ fn __item_name() -> i32 { return 0; }
-│    ¦    ^^^^^^^^^^^
-┴
 warning: `item_name()` item unused
 │  → <root>/test_prefix_priv_unused.gpex:1:4
 │    ¦ fn item_name() -> i32 { return 0; }
 │    ¦    ^^^^^^^^^
+┴
+warning: `__item_name()` item unused
+│  → <root>/test_prefix_priv_unused_double_underscore.gpex:1:4
+│    ¦ fn __item_name() -> i32 { return 0; }
+│    ¦    ^^^^^^^^^^^
 ┴
 warning: `item_name(?)` item unused
 │  → <root>/test_prefix_priv_unused_wildcard_param.gpex:1:4
