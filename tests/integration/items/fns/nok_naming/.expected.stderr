@@ -68,3 +68,8 @@ warning: `_ITEM_NAME` identifier not in snake_case
 │    ¦ fn _ITEM_NAME() -> i32 {
 │    ¦    ^^^^^^^^^^
 ┴
+warning: `i` identifier is single character
+│  → <root>/test_len_single_letter.gpex:1:8
+│    ¦ pub fn i() -> i32 { return 0; }
+│    ¦        ^
+┴

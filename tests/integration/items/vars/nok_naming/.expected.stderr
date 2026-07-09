@@ -28,3 +28,8 @@ warning: `_ITEM_NAME` identifier not in snake_case
 │    ¦ var _ITEM_NAME = 0;
 │    ¦     ^^^^^^^^^^
 ┴
+warning: `i` identifier is single character
+│  → <root>/test_len_single_letter.gpex:1:9
+│    ¦ pub var i = 0;
+│    ¦         ^
+┴
