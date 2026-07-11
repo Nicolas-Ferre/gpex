@@ -1,0 +1,5 @@
+var _item = _called(0u, 0.0);
+
+fn _called(param: ?, value: typeof(param)) -> typeof(param) {
+    return value;
+}

@@ -1,5 +1,32 @@
+error: `_called(u32, f32)` item not found
+│  → <root>/test_mismatching_dependent_type.gpex:1:13
+│    ¦ var _item = _called(0u, 0.0);
+│    ¦             ^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/test_mismatching_dependent_type.gpex:3:4
+│    ¦ fn _called(param: ?, value: typeof(param)) -> typeof(param) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `_called()` item not found
+│  → <root>/test_mismatching_param_count.gpex:1:13
+│    ¦ var _item = _called();
+│    ¦             ^^^^^^^^^
+┴
+error: `_called(u32)` item not found
+│  → <root>/test_mismatching_param_type.gpex:1:13
+│    ¦ var _item = _called(0u);
+│    ¦             ^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/test_mismatching_param_type.gpex:7:4
+│    ¦ fn _called(param: f32) -> f32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/test_mismatching_param_type.gpex:3:4
+│    ¦ fn _called(param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
 error: `unknown` item not found
-│  → <root>/test_no_return_type_in_fn_return_type.gpex:1:35
+│  → <root>/test_no_return_type_as_fn_call_arg.gpex:1:35
 │    ¦ const fn unknown_return_type() -> unknown {
 │    ¦                                   ^^^^^^^
 ┴
