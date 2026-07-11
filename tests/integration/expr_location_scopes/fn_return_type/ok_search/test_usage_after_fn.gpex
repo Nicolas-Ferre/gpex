@@ -1,0 +1,9 @@
+const fn used() -> typeref {
+    return i32;
+}
+
+var _item = fn_(1); // expected: 1
+
+fn fn_(param: i32) -> used() {
+    return param;
+}

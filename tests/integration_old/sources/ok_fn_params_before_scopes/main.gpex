@@ -1,16 +1,5 @@
 // Test function parameter source before all possible scopes (must be found).
 
-// =========================| Function call in function signature |=========================
-
-var _result1_fn_call_in_fn_signature = fn_call_in_fn_signature(i32, 4); // expected: 4
-var _result2_fn_call_in_fn_signature = fn_call_in_fn_signature(u32, 5u); // expected: 5u
-fn fn_call_in_fn_signature(param: const typeref, value: called_fn(param)) -> called_fn(param) {
-    return value;
-}
-const fn called_fn(type_: const typeref) -> typeref {
-    return type_;
-}
-
 // =========================| Function parameter requirement |=========================
 
 var _result_param_requirement = fn_param_requirement(true); // expected: true

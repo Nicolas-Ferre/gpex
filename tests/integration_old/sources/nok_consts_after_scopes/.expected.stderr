@@ -8,8 +8,3 @@ error: `_REQUIREMENT` item not found
 │    ¦ fn fn_param_requirement(param: i32 require _REQUIREMENT) -> i32 {
 │    ¦                                            ^^^^^^^^^^^^
 ┴
-error: `_SOURCE` item not found
-│  → <root>/main.gpex:17:34
-│    ¦ fn fn_return_type(param: i32) -> _SOURCE {
-│    ¦                                  ^^^^^^^
-┴
