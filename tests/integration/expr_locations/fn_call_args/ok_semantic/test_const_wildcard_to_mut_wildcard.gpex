@@ -1,0 +1,10 @@
+var _result1 = fn_(1u); // expected: 1u
+var _result2 = fn_(2.0); // expected: 2.0
+
+fn fn_(param: const ?) -> typeof(param) {
+    return called(param);
+}
+
+fn called(param: ?) -> typeof(param) {
+    return param;
+}

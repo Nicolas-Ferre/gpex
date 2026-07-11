@@ -1,0 +1,5 @@
+const _ITEM = not_const(0);
+
+fn not_const(param: i32) -> i32 {
+    return param;
+}

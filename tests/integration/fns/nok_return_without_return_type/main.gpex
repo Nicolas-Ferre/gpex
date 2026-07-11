@@ -1,5 +1,0 @@
-// Test return statement in functions that don't have a return type (must generate errors).
-
-fn _fn() {
-    return 0;
-}

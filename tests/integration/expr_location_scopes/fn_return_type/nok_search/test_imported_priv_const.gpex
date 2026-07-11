@@ -1,0 +1,5 @@
+import imported_priv;
+
+fn _fn(param: i32) -> _PRIV_CONST {
+    return param;
+}

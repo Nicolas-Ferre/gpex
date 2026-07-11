@@ -1,0 +1,5 @@
+var _item = used(1); // expected: 1
+
+fn used(param: i32) -> i32 {
+    return param;
+}

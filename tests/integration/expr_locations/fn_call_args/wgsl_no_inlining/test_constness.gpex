@@ -1,0 +1,6 @@
+var var_ = 0;
+var _result = fn_(var_, 0); // expected: 1
+
+const fn fn_(_param1: i32, _param2: i32) -> i32 {
+    return 1;
+}

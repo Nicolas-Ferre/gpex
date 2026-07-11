@@ -1,0 +1,2 @@
+pub fn _item_name() -> i32 { return 0; }
+var _usage = _item_name();

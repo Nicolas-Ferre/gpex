@@ -1,0 +1,25 @@
+error: expected identifier
+│  → <root>/test_keyword_eof.gpex:1:4
+│    ¦ var
+│    ¦    ^
+┴
+error: expected `import`, `var`, `const`, `struct`, `fn`, `repeat` or end of file
+│  → <root>/test_keyword_prefix.gpex:1:1
+│    ¦ varvalue = 0;
+│    ¦ ^
+┴
+error: expected identifier
+│  → <root>/test_name_invalid.gpex:1:5
+│    ¦ var 123value = 0;
+│    ¦     ^
+┴
+error: expected identifier
+│  → <root>/test_name_reserved.gpex:1:5
+│    ¦ var var = 0;
+│    ¦     ^
+┴
+error: expected `=`
+│  → <root>/test_symbol_unexpected.gpex:1:11
+│    ¦ var value # 0;
+│    ¦           ^
+┴

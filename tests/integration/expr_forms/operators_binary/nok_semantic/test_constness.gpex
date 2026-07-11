@@ -1,0 +1,5 @@
+const _ITEM = false + false;
+
+fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}

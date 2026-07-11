@@ -1,0 +1,5 @@
+const _ITEM = -false;
+
+fn __neg__(param: bool) -> bool {
+    return param;
+}

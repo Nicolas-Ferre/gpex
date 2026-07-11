@@ -1,0 +1,7 @@
+pub const fn fn_(_value: const f32) -> f32 {
+    return 0.0;
+}
+
+pub fn fn_(_other: f32) -> u32 {
+    return 0u;
+}

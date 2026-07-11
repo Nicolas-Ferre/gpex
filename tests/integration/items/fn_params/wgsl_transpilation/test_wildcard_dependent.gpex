@@ -1,0 +1,6 @@
+var _result_1 = fn_(1u, 2u); // expected: 2u
+var _result_2 = fn_(3.0, 4.0); // expected: 4.0
+
+fn fn_(param: ?, value: typeof(param)) -> typeof(param) {
+    return value;
+}

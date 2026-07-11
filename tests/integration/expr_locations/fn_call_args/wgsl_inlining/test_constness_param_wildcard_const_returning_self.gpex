@@ -1,0 +1,6 @@
+const _RESULT_1 = fn_(1u); // expected: 1u
+const _RESULT_2 = fn_(2.0); // expected: 2.0
+
+const fn fn_(param: const ?) -> typeof(param) {
+    return param;
+}

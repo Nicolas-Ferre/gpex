@@ -1,0 +1,7 @@
+fn __neg__() -> i32 {
+    return 0;
+}
+
+fn __not__() -> i32 {
+    return 0;
+}

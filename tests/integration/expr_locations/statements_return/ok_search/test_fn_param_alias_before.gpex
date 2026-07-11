@@ -1,0 +1,7 @@
+var param = 0;
+
+fn fn_(param: i32) -> i32 {
+    return param;
+}
+
+var _result = fn_(1); // expected: 1

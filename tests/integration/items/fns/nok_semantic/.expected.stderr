@@ -1,0 +1,382 @@
+error: forbidden `compilerimpl` item outside prelude
+│  → <root>/test_compilerimpl.gpex:3:19
+│    ¦ fn fn_() -> i32 = compilerimpl;
+│    ¦                   ^^^^^^^^^^^^
+┴
+error: `__add__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:1:4
+│    ¦ fn __add__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__sub__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:5:4
+│    ¦ fn __sub__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mul__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:9:4
+│    ¦ fn __mul__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__div__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:13:4
+│    ¦ fn __div__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mod__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:17:4
+│    ¦ fn __mod__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__eq__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:21:4
+│    ¦ fn __eq__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ne__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:25:4
+│    ¦ fn __ne__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__lt__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:29:4
+│    ¦ fn __lt__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__le__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:33:4
+│    ¦ fn __le__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__gt__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:37:4
+│    ¦ fn __gt__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ge__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:41:4
+│    ¦ fn __ge__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__and__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:45:4
+│    ¦ fn __and__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__or__(i32, i32, i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_extra.gpex:49:4
+│    ¦ fn __or__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__add__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:1:4
+│    ¦ fn __add__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__sub__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:5:4
+│    ¦ fn __sub__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mul__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:9:4
+│    ¦ fn __mul__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__div__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:13:4
+│    ¦ fn __div__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mod__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:17:4
+│    ¦ fn __mod__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__eq__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:21:4
+│    ¦ fn __eq__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ne__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:25:4
+│    ¦ fn __ne__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__lt__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:29:4
+│    ¦ fn __lt__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__le__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:33:4
+│    ¦ fn __le__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__gt__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:37:4
+│    ¦ fn __gt__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ge__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:41:4
+│    ¦ fn __ge__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__and__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:45:4
+│    ¦ fn __and__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__or__(i32)` binary operator function must have exactly two parameters
+│  → <root>/test_operator_binary_param_count_missing.gpex:49:4
+│    ¦ fn __or__(_param: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__add__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:1:4
+│    ¦ fn __add__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__sub__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:5:4
+│    ¦ fn __sub__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mul__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:9:4
+│    ¦ fn __mul__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__div__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:13:4
+│    ¦ fn __div__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__mod__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:17:4
+│    ¦ fn __mod__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__eq__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:21:4
+│    ¦ fn __eq__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ne__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:25:4
+│    ¦ fn __ne__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__lt__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:29:4
+│    ¦ fn __lt__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__le__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:33:4
+│    ¦ fn __le__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__gt__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:37:4
+│    ¦ fn __gt__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__ge__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:41:4
+│    ¦ fn __ge__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__and__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:45:4
+│    ¦ fn __and__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__or__(i32, i32)` binary operator function without return type
+│  → <root>/test_operator_binary_return_type_missing.gpex:49:4
+│    ¦ fn __or__(_param1: i32, _param2: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__neg__(i32, i32)` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_extra.gpex:1:4
+│    ¦ fn __neg__(_param1: i32, _param2: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__not__(i32, i32)` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_extra.gpex:5:4
+│    ¦ fn __not__(_param1: i32, _param2: i32) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__neg__()` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_missing.gpex:1:4
+│    ¦ fn __neg__() -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^
+┴
+error: `__not__()` unary operator function must have exactly one parameter
+│  → <root>/test_operator_unary_param_count_missing.gpex:5:4
+│    ¦ fn __not__() -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^
+┴
+error: `__neg__(i32)` unary operator function without return type
+│  → <root>/test_operator_unary_return_type_missing.gpex:1:4
+│    ¦ fn __neg__(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^
+┴
+error: `__not__(i32)` unary operator function without return type
+│  → <root>/test_operator_unary_return_type_missing.gpex:5:4
+│    ¦ fn __not__(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^^
+┴
+error: missing `return` statement
+│  → <root>/test_return_missing_body_empty.gpex:1:17
+│    ¦ fn _fn() -> i32 {
+│    ¦                 ^
+│    ¦ }
+│    ¦ ^
+├─ info: function has a return type
+│  → <root>/test_return_missing_body_empty.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴
+error: missing `return` statement
+│  → <root>/test_return_missing_body_not_empty.gpex:2:5
+│    ¦     param = 0;
+│    ¦     ^^^^^^^^^^
+│    ¦ }
+│    ¦ ^
+├─ info: function has a return type
+│  → <root>/test_return_missing_body_not_empty.gpex:1:23
+│    ¦ fn _fn(param: i32) -> u32 {
+│    ¦                       ^^^
+┴
+error: missing `return` statement
+│  → <root>/test_return_missing_used_in_const_context.gpex:2:5
+│    ¦     param = 0;
+│    ¦     ^^^^^^^^^^
+│    ¦ }
+│    ¦ ^
+├─ info: function has a return type
+│  → <root>/test_return_missing_used_in_const_context.gpex:1:32
+│    ¦ const fn called(param: i32) -> i32 {
+│    ¦                                ^^^
+┴
+error: missing `return` statement
+│  → <root>/test_return_missing_used_in_fn_return_type.gpex:2:5
+│    ¦     param = 0;
+│    ¦     ^^^^^^^^^^
+│    ¦ }
+│    ¦ ^
+├─ info: function has a return type
+│  → <root>/test_return_missing_used_in_fn_return_type.gpex:1:31
+│    ¦ const fn type_(param: i32) -> typeref {
+│    ¦                               ^^^^^^^
+┴
+error: `return` statement not at the end of the block
+│  → <root>/test_return_not_at_end.gpex:2:5
+│    ¦     return 0;
+│    ¦     ^^^^^^^^^
+├─ info: this statement is after
+│  → <root>/test_return_not_at_end.gpex:3:5
+│    ¦     return 1;
+│    ¦     ^^^^^^^^^
+┴
+error: `return` statement in function with no return type
+│  → <root>/test_return_without_return_type.gpex:2:5
+│    ¦     return 0;
+│    ¦     ^^^^^^^^^
+├─ info: function has no return type
+│  → <root>/test_return_without_return_type.gpex:1:4
+│    ¦ fn _fn() {
+│    ¦    ^^^^^
+┴
+warning: empty statement block
+│  → <root>/test_body_empty.gpex:1:10
+│    ¦ fn _fn() {
+│    ¦          ^
+│    ¦     // empty
+│    ¦ ^^^^^^^^^^^^
+│    ¦ }
+│    ¦ ^
+┴
+warning: `fn_(i32)` function defined multiple times
+│  → <root>/test_duplication_concrete.gpex:5:8
+│    ¦ pub fn fn_(_other: i32) -> i32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_concrete.gpex:1:8
+│    ¦ pub fn fn_(_value: i32) -> i32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(u32)` function defined multiple times
+│  → <root>/test_duplication_concrete_typeof.gpex:5:8
+│    ¦ pub fn fn_(_value: u32) -> u32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_concrete_typeof.gpex:1:8
+│    ¦ pub fn fn_(_value: typeof(0u)) -> u32 {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(f32)` function defined multiple times
+│  → <root>/test_duplication_ignored_qualifiers.gpex:5:8
+│    ¦ pub fn fn_(_other: f32) -> u32 {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_ignored_qualifiers.gpex:1:14
+│    ¦ pub const fn fn_(_value: const f32) -> f32 {
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(bool)` function defined multiple times
+│  → <root>/test_duplication_multiple.gpex:5:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_multiple.gpex:1:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(bool)` function defined multiple times
+│  → <root>/test_duplication_multiple.gpex:9:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_multiple.gpex:5:8
+│    ¦ pub fn fn_(value: bool) -> bool {
+│    ¦        ^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(typeref, other_type)` function defined multiple times
+│  → <root>/test_duplication_typeref_param.gpex:5:8
+│    ¦ pub fn fn_(other_type: const typeref, other_value: other_type) -> other_type {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_typeref_param.gpex:1:8
+│    ¦ pub fn fn_(type_: const typeref, value: type_) -> type_ {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(typeref, other_type, other_type)` function defined multiple times
+│  → <root>/test_duplication_typeref_param_typeof.gpex:5:8
+│    ¦ pub fn fn_(other_type: const typeref, other_value: other_type, other_copy: typeof(other_value)) -> other_type {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_typeref_param_typeof.gpex:1:8
+│    ¦ pub fn fn_(type_: const typeref, value: type_, copy: typeof(value)) -> type_ {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `fn_(?)` function defined multiple times
+│  → <root>/test_duplication_wildcard.gpex:5:8
+│    ¦ pub fn fn_(other: ?) -> typeof(other) {
+│    ¦        ^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_wildcard.gpex:1:8
+│    ¦ pub fn fn_(value: ?) -> typeof(value) {
+│    ¦        ^^^^^^^^^^^^^
+┴
+warning: `fn_(?, typeof(other))` function defined multiple times
+│  → <root>/test_duplication_wildcard_typeof.gpex:5:8
+│    ¦ pub fn fn_(other: ?, other_copy: typeof(other)) -> typeof(other) {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: function also defined here
+│  → <root>/test_duplication_wildcard_typeof.gpex:1:8
+│    ¦ pub fn fn_(value: ?, copy: typeof(value)) -> typeof(value) {
+│    ¦        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴

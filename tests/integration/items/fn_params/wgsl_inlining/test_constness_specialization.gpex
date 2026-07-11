@@ -1,0 +1,7 @@
+var _result_same_value_1 = fn_(1.0, 2u); // expected: 1.0
+var _result_same_value_2 = fn_(1.0, 3u); // expected: 1.0
+var _result_other_value = fn_(4.0, 5u); // expected: 4.0
+
+fn fn_(param: const f32, _other_param: u32) -> f32 {
+    return param;
+}

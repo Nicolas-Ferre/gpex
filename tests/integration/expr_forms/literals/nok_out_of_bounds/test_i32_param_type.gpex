@@ -1,0 +1,6 @@
+repeat fn_(0);
+
+// To reach case where compiler tries to calculate compile-time value of an invalid literal:
+fn fn_(_param: 2_147_483_648) -> i32 {
+    return 0;
+}

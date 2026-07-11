@@ -1,0 +1,5 @@
+var not_const = 0;
+
+const fn _item() -> i32 {
+    return not_const;
+}

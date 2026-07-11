@@ -1,0 +1,5 @@
+const ITEM = 0.0;
+
+fn _fn() -> i32 {
+    return ITEM;
+}

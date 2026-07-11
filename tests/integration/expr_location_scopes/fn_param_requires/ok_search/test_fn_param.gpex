@@ -1,0 +1,5 @@
+var _item = fn_(true); // expected: true
+
+fn fn_(param: const bool require param) -> bool {
+    return param;
+}

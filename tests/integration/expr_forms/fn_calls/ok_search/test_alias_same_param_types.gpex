@@ -1,0 +1,11 @@
+import imported;
+
+fn same_param_types(_param: i32) -> bool {
+    return false;
+}
+
+fn same_param_types(_param: i32) -> bool {
+    return true;
+}
+
+var _result_alias_same_param_types = same_param_types(0); // expected: true

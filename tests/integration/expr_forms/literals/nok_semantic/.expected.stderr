@@ -1,0 +1,45 @@
+error: expression with invalid type `bool`
+│  → <root>/test_type_bool_false.gpex:2:12
+│    ¦     return false;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type_bool_false.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴
+error: expression with invalid type `bool`
+│  → <root>/test_type_bool_true.gpex:2:12
+│    ¦     return true;
+│    ¦            ^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type_bool_true.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴
+error: expression with invalid type `f32`
+│  → <root>/test_type_f32.gpex:2:12
+│    ¦     return 0.0;
+│    ¦            ^^^
+├─ info: expected `i32` type
+│  → <root>/test_type_f32.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴
+error: expression with invalid type `i32`
+│  → <root>/test_type_i32.gpex:2:12
+│    ¦     return 0;
+│    ¦            ^
+├─ info: expected `u32` type
+│  → <root>/test_type_i32.gpex:1:13
+│    ¦ fn _fn() -> u32 {
+│    ¦             ^^^
+┴
+error: expression with invalid type `u32`
+│  → <root>/test_type_u32.gpex:2:12
+│    ¦     return 0u;
+│    ¦            ^^
+├─ info: expected `i32` type
+│  → <root>/test_type_u32.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴

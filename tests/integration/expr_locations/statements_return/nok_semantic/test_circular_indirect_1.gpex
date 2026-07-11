@@ -1,0 +1,9 @@
+import ~.test_circular_indirect_2;
+
+pub fn circular_item1() -> i32 {
+    return circular_var1;
+}
+
+pub fn circular_item2() -> i32 {
+    return circular_var2;
+}

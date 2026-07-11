@@ -1,0 +1,11 @@
+import imported;
+
+fn different_param_count(_param: i32) -> bool {
+    return true;
+}
+
+fn different_param_count() -> bool {
+    return false;
+}
+
+var _result_alias_different_param_count = different_param_count(0); // expected: true

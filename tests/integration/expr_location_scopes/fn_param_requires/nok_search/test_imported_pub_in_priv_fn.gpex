@@ -1,0 +1,5 @@
+import imported_pub_in_priv;
+
+fn _fn(param: i32 require pub_fn()) -> i32 {
+    return param;
+}

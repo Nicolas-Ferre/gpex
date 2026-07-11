@@ -1,0 +1,7 @@
+import imported;
+
+var _item = fn_(); // expected: 1
+
+fn fn_() -> i32 {
+    return imported_var;
+}

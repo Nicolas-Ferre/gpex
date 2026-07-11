@@ -1,0 +1,5 @@
+pub const IMPORTED_CONST = true;
+
+pub const fn imported_fn() -> bool {
+    return true;
+}

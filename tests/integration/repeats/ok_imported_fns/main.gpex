@@ -1,5 +1,0 @@
-// Test imported functions called in repeat (must behave correctly).
-
-import ~.imported;
-
-repeat set_value();

@@ -1,0 +1,9 @@
+error: repeated function `fn_()` with a return type
+│  → <root>/test_return_type.gpex:1:8
+│    ¦ repeat fn_();
+│    ¦        ^^^^^
+├─ info: function has a return type
+│  → <root>/test_return_type.gpex:3:4
+│    ¦ fn fn_() -> i32 {
+│    ¦    ^^^^^^^^^^^^
+┴

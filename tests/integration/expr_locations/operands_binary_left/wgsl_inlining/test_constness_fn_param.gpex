@@ -1,0 +1,9 @@
+const _RESULT = fn_(true); // expected: true
+
+const fn fn_(param: bool) -> bool {
+    return param + false;
+}
+
+const fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}

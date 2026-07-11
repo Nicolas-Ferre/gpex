@@ -1,0 +1,3 @@
+const fn _item_name(type_: const typeref, value: type_) -> type_ {
+    return value;
+}

@@ -1,0 +1,18 @@
+error: `_ITEM` item defined multiple times
+│  → <root>/test_duplication.gpex:2:7
+│    ¦ const _ITEM = 0;
+│    ¦       ^^^^^
+├─ info: item also defined here
+│  → <root>/test_duplication.gpex:1:7
+│    ¦ const _ITEM = 0;
+│    ¦       ^^^^^
+┴
+error: `_ITEM` item defined multiple times
+│  → <root>/test_duplication.gpex:3:5
+│    ¦ var _ITEM = 0;
+│    ¦     ^^^^^
+├─ info: item also defined here
+│  → <root>/test_duplication.gpex:2:7
+│    ¦ const _ITEM = 0;
+│    ¦       ^^^^^
+┴

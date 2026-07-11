@@ -1,0 +1,51 @@
+error: `circular_item_1` item has circular dependencies
+│  → <root>/test_circular_indirect_1.gpex:3:8
+│    ¦ pub fn circular_item_1() -> circular_var_1 {
+│    ¦        ^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:3:29
+│    ¦ pub fn circular_item_1() -> circular_var_1 {
+│    ¦                             ^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_2.gpex:3:26
+│    ¦ pub var circular_var_1 = circular_item_2();
+│    ¦                          ^^^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:7:29
+│    ¦ pub fn circular_item_2() -> circular_var_2 {
+│    ¦                             ^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_indirect_2.gpex:4:26
+│    ¦ pub var circular_var_2 = circular_item_1();
+│    ¦                          ^^^^^^^^^^^^^^^^^
+┴
+error: expression not constant
+│  → <root>/test_constness_param.gpex:1:33
+│    ¦ fn _item(not_const: typeref) -> not_const {
+│    ¦                                 ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness_param.gpex:1:30
+│    ¦ fn _item(not_const: typeref) -> not_const {
+│    ¦                              ^^
+┴
+error: expression not constant
+│  → <root>/test_constness_var.gpex:3:25
+│    ¦ fn _item(param: i32) -> not_const {
+│    ¦                         ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness_var.gpex:3:22
+│    ¦ fn _item(param: i32) -> not_const {
+│    ¦                      ^^
+┴
+error: expression with invalid type `bool`
+│  → <root>/test_type.gpex:1:15
+│    ¦ fn _item() -> true {
+│    ¦               ^^^^
+├─ info: expected `typeref` type
+┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:15
+│    ¦ fn _item() -> ? {
+│    ¦               ^
+├─ info: wildcards are only allowed as function parameter types
+┴

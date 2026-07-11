@@ -1,0 +1,9 @@
+warning: empty statement block
+│  → <root>/test_tabs.gpex:2:2
+│    ¦     { // tabulated opening line
+│    ¦     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     //  tabulated
+│    ¦ ^^^^^^^^^^^^^^^^^
+│    ¦     }
+│    ¦ ^^^^^
+┴

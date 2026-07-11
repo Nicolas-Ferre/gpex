@@ -1,0 +1,3 @@
+fn _item(type_: const typeref, param: ?, value: type_) -> typeof(param) {
+    return value;
+}

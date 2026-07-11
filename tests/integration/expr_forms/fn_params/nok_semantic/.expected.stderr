@@ -1,0 +1,9 @@
+error: expression with invalid type `f32`
+│  → <root>/test_type.gpex:2:12
+│    ¦     return param;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type.gpex:1:23
+│    ¦ fn _fn(param: f32) -> i32 {
+│    ¦                       ^^^
+┴

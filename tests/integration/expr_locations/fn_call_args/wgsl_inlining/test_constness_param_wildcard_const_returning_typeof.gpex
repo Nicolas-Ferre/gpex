@@ -1,0 +1,5 @@
+const _RESULT = sizeof(fn_(1)); // expected: 4u
+
+const fn fn_(param: const ?) -> typeref {
+    return typeof(param);
+}

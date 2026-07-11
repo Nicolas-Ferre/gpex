@@ -1,0 +1,7 @@
+fn _item(type_: const typeref, value: same_type(type_)) -> i32 {
+    return value;
+}
+
+const fn same_type(type_: const typeref) -> typeref {
+    return type_;
+}

@@ -1,0 +1,91 @@
+error: `circular_item_1` item has circular dependencies
+│  → <root>/test_circular_indirect_1.gpex:3:8
+│    ¦ pub fn circular_item_1() {
+│    ¦        ^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:4:5
+│    ¦     circular_var_1 = 0;
+│    ¦     ^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_2.gpex:3:26
+│    ¦ pub var circular_var_1 = circular_item_2();
+│    ¦                          ^^^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:8:5
+│    ¦     circular_var_2 = 0;
+│    ¦     ^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_indirect_2.gpex:4:26
+│    ¦ pub var circular_var_2 = circular_item_1();
+│    ¦                          ^^^^^^^^^^^^^^^^^
+┴
+error: expression not constant
+│  → <root>/test_constness.gpex:4:5
+│    ¦     not_const = 0;
+│    ¦     ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:3:1
+│    ¦ const fn _item() {
+│    ¦ ^^^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_const.gpex:4:5
+│    ¦     CONST = 0;
+│    ¦     ^^^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_fn_call.gpex:2:5
+│    ¦     called() = 0;
+│    ¦     ^^^^^^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_fn_const_param.gpex:2:5
+│    ¦     param = 0;
+│    ¦     ^^^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_literal_bool_false.gpex:2:5
+│    ¦     false = true;
+│    ¦     ^^^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_literal_bool_true.gpex:2:5
+│    ¦     true = false;
+│    ¦     ^^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_literal_f32.gpex:2:5
+│    ¦     0.0 = 0.0;
+│    ¦     ^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_literal_i32.gpex:2:5
+│    ¦     0 = 0;
+│    ¦     ^
+┴
+error: expression is not a reference
+│  → <root>/test_form_literal_u32.gpex:2:5
+│    ¦     0u = 0u;
+│    ¦     ^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_operator_binary.gpex:2:5
+│    ¦     true + false = false;
+│    ¦     ^^^^^^^^^^^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_operator_unary.gpex:2:5
+│    ¦     !0 = 0;
+│    ¦     ^^
+┴
+error: expression is not a reference
+│  → <root>/test_form_typeref.gpex:2:5
+│    ¦     i32 = u32;
+│    ¦     ^^^
+┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:2:5
+│    ¦     ? = 0;
+│    ¦     ^
+├─ info: wildcards are only allowed as function parameter types
+┴

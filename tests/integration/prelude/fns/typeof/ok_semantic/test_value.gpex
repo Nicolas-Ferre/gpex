@@ -1,0 +1,10 @@
+var runtime_value = 2u;
+
+fn runtime_fn() -> u32 {
+    return 3u;
+}
+
+const _RESULT_I32_LITERAL = typeof(1); // expected: i32
+const _RESULT_TYPEREF = typeof(i32); // expected: typeref
+const _RESULT_RUNTIME_VALUE = typeof(runtime_value); // expected: u32
+const _RESULT_RUNTIME_FN_CALL = typeof(runtime_fn()); // expected: u32

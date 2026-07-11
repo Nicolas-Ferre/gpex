@@ -1,0 +1,7 @@
+pub fn fn_(input: ?) -> typeof(input) {
+    return input;
+}
+
+pub fn fn_(input: u32) -> u32 {
+    return input;
+}

@@ -1,0 +1,36 @@
+error: `right` argument name not matching parameter
+│  → <root>/test_mismatching_name.gpex:5:19
+│    ¦ var _result = fn_(right: 0, 0);
+│    ¦                   ^^^^^
+├─ info: expected `left` parameter name
+│  → <root>/test_mismatching_name.gpex:1:8
+│    ¦ fn fn_(left: i32, right: i32) -> i32 {
+│    ¦        ^^^^
+┴
+error: `left` argument name not matching parameter
+│  → <root>/test_mismatching_name_uniform_call.gpex:5:21
+│    ¦ var _result = 0.fn_(left: 0);
+│    ¦                     ^^^^
+├─ info: expected `right` parameter name
+│  → <root>/test_mismatching_name_uniform_call.gpex:1:19
+│    ¦ fn fn_(left: i32, right: i32) -> i32 {
+│    ¦                   ^^^^^
+┴
+error: `_left_u32` argument name not matching parameter
+│  → <root>/test_overload_ignored_name.gpex:1:19
+│    ¦ var _result = fn_(_left_u32: 0, _right_u32: 0);
+│    ¦                   ^^^^^^^^^
+├─ info: expected `left` parameter name
+│  → <root>/test_overload_ignored_name.gpex:3:12
+│    ¦ pub fn fn_(left: i32, right: i32) -> i32 {
+│    ¦            ^^^^
+┴
+error: `_right_u32` argument name not matching parameter
+│  → <root>/test_overload_ignored_name.gpex:1:33
+│    ¦ var _result = fn_(_left_u32: 0, _right_u32: 0);
+│    ¦                                 ^^^^^^^^^^
+├─ info: expected `right` parameter name
+│  → <root>/test_overload_ignored_name.gpex:3:23
+│    ¦ pub fn fn_(left: i32, right: i32) -> i32 {
+│    ¦                       ^^^^^
+┴

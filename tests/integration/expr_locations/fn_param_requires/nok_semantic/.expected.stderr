@@ -1,0 +1,42 @@
+error: `circular_item_1` item has circular dependencies
+│  → <root>/test_circular_indirect_1.gpex:3:8
+│    ¦ pub fn circular_item_1(param: i32 require circular_var_1) -> i32 {
+│    ¦        ^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:3:43
+│    ¦ pub fn circular_item_1(param: i32 require circular_var_1) -> i32 {
+│    ¦                                           ^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_2.gpex:3:26
+│    ¦ pub var circular_var_1 = circular_item_2(0);
+│    ¦                          ^^^^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:7:43
+│    ¦ pub fn circular_item_2(param: i32 require circular_var_2) -> i32 {
+│    ¦                                           ^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_indirect_2.gpex:4:26
+│    ¦ pub var circular_var_2 = circular_item_1(0);
+│    ¦                          ^^^^^^^^^^^^^^^^^^
+┴
+error: expression not constant
+│  → <root>/test_constness.gpex:3:29
+│    ¦ fn _item(param: i32 require not_const) -> i32 {
+│    ¦                             ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:3:21
+│    ¦ fn _item(param: i32 require not_const) -> i32 {
+│    ¦                     ^^^^^^^
+┴
+error: expression with invalid type `i32`
+│  → <root>/test_type.gpex:1:29
+│    ¦ fn _item(param: i32 require 0) -> i32 {
+│    ¦                             ^
+├─ info: expected `bool` type
+┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:29
+│    ¦ fn _item(param: i32 require ?) -> i32 {
+│    ¦                             ^
+├─ info: wildcards are only allowed as function parameter types
+┴

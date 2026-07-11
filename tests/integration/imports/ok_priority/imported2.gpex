@@ -1,5 +1,0 @@
-pub import ~.imported3;
-
-pub const UNIQUE_IMPORTED2 = 21;
-pub const CONFLICTING_MAIN = 22;
-pub const CONFLICTING_IMPORTED2 = 23;

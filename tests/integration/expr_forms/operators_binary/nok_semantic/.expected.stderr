@@ -1,0 +1,18 @@
+error: expression not constant
+│  → <root>/test_constness.gpex:1:15
+│    ¦ const _ITEM = false + false;
+│    ¦               ^^^^^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:1:1
+│    ¦ const _ITEM = false + false;
+│    ¦ ^^^^^
+┴
+error: expression with invalid type `bool`
+│  → <root>/test_type.gpex:2:12
+│    ¦     return true - false;
+│    ¦            ^^^^^^^^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴

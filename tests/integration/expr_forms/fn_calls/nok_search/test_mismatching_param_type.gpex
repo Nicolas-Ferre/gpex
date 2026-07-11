@@ -1,0 +1,9 @@
+var _item = _called(0u);
+
+fn _called(param: i32) -> i32 {
+    return param;
+}
+
+fn _called(param: f32) -> f32 {
+    return param;
+}

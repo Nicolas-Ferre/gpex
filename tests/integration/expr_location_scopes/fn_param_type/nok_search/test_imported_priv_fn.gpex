@@ -1,0 +1,5 @@
+import imported_priv;
+
+fn _fn(param: _priv_fn()) -> i32 {
+    return param;
+}

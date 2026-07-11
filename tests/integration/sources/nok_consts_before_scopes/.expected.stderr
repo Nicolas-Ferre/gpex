@@ -1,5 +1,0 @@
-error: `_SOURCE` item not found
-│  → <root>/main.gpex:5:17
-│    ¦ const _SOURCE = _SOURCE;
-│    ¦                 ^^^^^^^
-┴

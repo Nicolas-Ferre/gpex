@@ -1,0 +1,9 @@
+fn wildcard_after_concrete(_param: i32) -> bool {
+    return false;
+}
+
+fn wildcard_after_concrete(_param: ?) -> bool {
+    return true;
+}
+
+var _result_alias_wildcard_after_concrete = wildcard_after_concrete(0); // expected: true

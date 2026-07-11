@@ -1,0 +1,51 @@
+fn __add__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __sub__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __mul__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __div__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __mod__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __eq__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __ne__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __lt__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __le__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __gt__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __ge__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __and__(_param: i32) -> i32 {
+    return 0;
+}
+
+fn __or__(_param: i32) -> i32 {
+    return 0;
+}

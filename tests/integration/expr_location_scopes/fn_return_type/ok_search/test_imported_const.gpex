@@ -1,0 +1,7 @@
+import imported;
+
+var _item = fn_(1); // expected: 1
+
+fn fn_(param: i32) -> IMPORTED_CONST {
+    return param;
+}

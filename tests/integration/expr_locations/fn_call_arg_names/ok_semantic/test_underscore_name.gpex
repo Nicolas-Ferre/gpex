@@ -1,0 +1,5 @@
+fn fn_(_unused: i32, result: i32) -> i32 {
+    return result;
+}
+
+var _result = fn_(_unused: 1, result: 2); // expected: 2

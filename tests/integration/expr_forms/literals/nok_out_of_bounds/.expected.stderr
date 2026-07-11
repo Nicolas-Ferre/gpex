@@ -1,0 +1,82 @@
+error: `fn_(i32)` item not found
+│  → <root>/test_f32_param_type.gpex:1:8
+│    ¦ repeat fn_(0);
+│    ¦        ^^^^^^
+├─ info: similar candidate
+│  → <root>/test_f32_param_type.gpex:4:4
+│    ¦ fn fn_(_param: 400000000000000000000000000000000000000.0) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `f32` literal out of bounds
+│  → <root>/test_f32_param_type.gpex:4:16
+│    ¦ fn fn_(_param: 400000000000000000000000000000000000000.0) -> i32 {
+│    ¦                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `f32` literal out of bounds
+│  → <root>/test_f32_too_large.gpex:1:13
+│    ¦ var _item = 400000000000000000000000000000000000000.0;
+│    ¦             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `f32` literal out of bounds
+│  → <root>/test_f32_too_small.gpex:1:13
+│    ¦ var _item = -400000000000000000000000000000000000000.0;
+│    ¦             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `f32` literal out of bounds
+│  → <root>/test_f32_very_large.gpex:1:13
+│    ¦ var _item = 99999999999999999999999999999999999999999999999999.99999999999999999999999999999999999999999999999999;
+│    ¦             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `fn_(i32)` item not found
+│  → <root>/test_i32_param_type.gpex:1:8
+│    ¦ repeat fn_(0);
+│    ¦        ^^^^^^
+├─ info: similar candidate
+│  → <root>/test_i32_param_type.gpex:4:4
+│    ¦ fn fn_(_param: 2_147_483_648) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `i32` literal out of bounds
+│  → <root>/test_i32_param_type.gpex:4:16
+│    ¦ fn fn_(_param: 2_147_483_648) -> i32 {
+│    ¦                ^^^^^^^^^^^^^
+┴
+error: `i32` literal out of bounds
+│  → <root>/test_i32_too_large.gpex:1:13
+│    ¦ var _item = 2_147_483_648;
+│    ¦             ^^^^^^^^^^^^^
+┴
+error: `i32` literal out of bounds
+│  → <root>/test_i32_too_small.gpex:1:13
+│    ¦ var _item = -2_147_483_649;
+│    ¦             ^^^^^^^^^^^^^^
+┴
+error: `i32` literal out of bounds
+│  → <root>/test_i32_very_large.gpex:1:13
+│    ¦ var _item = 99999999999999999999999999999999999999999999999999;
+│    ¦             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `fn_(i32)` item not found
+│  → <root>/test_u32_param_type.gpex:1:8
+│    ¦ repeat fn_(0);
+│    ¦        ^^^^^^
+├─ info: similar candidate
+│  → <root>/test_u32_param_type.gpex:4:4
+│    ¦ fn fn_(_param: 4_294_967_296u) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `u32` literal out of bounds
+│  → <root>/test_u32_param_type.gpex:4:16
+│    ¦ fn fn_(_param: 4_294_967_296u) -> i32 {
+│    ¦                ^^^^^^^^^^^^^^
+┴
+error: `u32` literal out of bounds
+│  → <root>/test_u32_too_large.gpex:1:13
+│    ¦ var _item = 4_294_967_296u;
+│    ¦             ^^^^^^^^^^^^^^
+┴
+error: `u32` literal out of bounds
+│  → <root>/test_u32_very_large.gpex:1:13
+│    ¦ var _item = 99999999999999999999999999999999999999999999999999u;
+│    ¦             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴

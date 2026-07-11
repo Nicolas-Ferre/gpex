@@ -1,0 +1,2 @@
+pub var _item_name = 0;
+var _usage = _item_name;

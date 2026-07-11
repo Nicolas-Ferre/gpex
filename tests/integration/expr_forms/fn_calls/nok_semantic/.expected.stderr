@@ -1,0 +1,27 @@
+error: `circular_direct` item has circular dependencies
+│  → <root>/test_circular_direct.gpex:1:4
+│    ¦ fn circular_direct() -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_direct.gpex:2:12
+│    ¦     return circular_direct();
+│    ¦            ^^^^^^^^^^^^^^^^^
+┴
+error: expression not constant
+│  → <root>/test_constness.gpex:1:15
+│    ¦ const _ITEM = not_const(0);
+│    ¦               ^^^^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:1:1
+│    ¦ const _ITEM = not_const(0);
+│    ¦ ^^^^^
+┴
+error: expression with invalid type `f32`
+│  → <root>/test_type.gpex:2:12
+│    ¦     return called();
+│    ¦            ^^^^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_type.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴

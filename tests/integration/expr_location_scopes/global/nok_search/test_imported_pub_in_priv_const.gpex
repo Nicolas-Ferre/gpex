@@ -1,0 +1,3 @@
+import imported_pub_in_priv;
+
+var _item = PUB_CONST;

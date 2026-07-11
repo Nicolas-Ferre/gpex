@@ -1,0 +1,7 @@
+pub const IMPORTED_CONST = 1;
+
+pub var imported_var = 1;
+
+pub fn imported_fn(param: i32) -> i32 {
+    return param;
+}

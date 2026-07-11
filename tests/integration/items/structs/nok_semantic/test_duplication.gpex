@@ -1,0 +1,2 @@
+struct item = compilerimpl {}
+var item = 0;

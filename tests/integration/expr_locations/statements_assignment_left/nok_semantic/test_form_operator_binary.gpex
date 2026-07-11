@@ -1,0 +1,13 @@
+const fn fn_() -> typeref {
+    true + false = false;
+    return i32;
+}
+
+const fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}
+
+// Test constant calculation behavior in case of reference check error.
+fn _usage() -> fn_() {
+    return 0;
+}

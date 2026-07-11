@@ -1,0 +1,130 @@
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:1:12
+│    ¦ var _add = unknown() + 0;
+│    ¦            ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:2:12
+│    ¦ var _sub = unknown() - 0;
+│    ¦            ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:3:12
+│    ¦ var _mul = unknown() * 0;
+│    ¦            ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:4:12
+│    ¦ var _div = unknown() / 0;
+│    ¦            ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:5:12
+│    ¦ var _mod = unknown() % 0;
+│    ¦            ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:6:11
+│    ¦ var _eq = unknown() == 0;
+│    ¦           ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:7:11
+│    ¦ var _ne = unknown() != 0;
+│    ¦           ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:8:11
+│    ¦ var _lt = unknown() < 0;
+│    ¦           ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:9:11
+│    ¦ var _le = unknown() <= 0;
+│    ¦           ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:10:11
+│    ¦ var _gt = unknown() > 0;
+│    ¦           ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:11:11
+│    ¦ var _ge = unknown() >= 0;
+│    ¦           ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:12:12
+│    ¦ var _and = unknown() && false;
+│    ¦            ^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:13:11
+│    ¦ var _or = unknown() || false;
+│    ¦           ^^^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:1:12
+│    ¦ var _add = unknown + 0;
+│    ¦            ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:2:12
+│    ¦ var _sub = unknown - 0;
+│    ¦            ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:3:12
+│    ¦ var _mul = unknown * 0;
+│    ¦            ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:4:12
+│    ¦ var _div = unknown / 0;
+│    ¦            ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:5:12
+│    ¦ var _mod = unknown % 0;
+│    ¦            ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:6:11
+│    ¦ var _eq = unknown == 0;
+│    ¦           ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:7:11
+│    ¦ var _ne = unknown != 0;
+│    ¦           ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:8:11
+│    ¦ var _lt = unknown < 0;
+│    ¦           ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:9:11
+│    ¦ var _le = unknown <= 0;
+│    ¦           ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:10:11
+│    ¦ var _gt = unknown > 0;
+│    ¦           ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:11:11
+│    ¦ var _ge = unknown >= 0;
+│    ¦           ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:12:12
+│    ¦ var _and = unknown && false;
+│    ¦            ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:13:11
+│    ¦ var _or = unknown || false;
+│    ¦           ^^^^^^^
+┴

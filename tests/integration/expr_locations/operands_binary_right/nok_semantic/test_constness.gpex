@@ -1,0 +1,6 @@
+var not_const = false;
+const _ITEM = 0 + not_const;
+
+const fn __add__(param1: bool, _param2: bool) -> bool {
+    return param1;
+}

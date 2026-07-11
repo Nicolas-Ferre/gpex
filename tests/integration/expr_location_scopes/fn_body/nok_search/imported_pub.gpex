@@ -1,0 +1,7 @@
+pub const PUB_CONST = 0;
+
+pub var pub_var = 0;
+
+pub fn pub_fn(param: i32) -> i32 {
+    return param;
+}

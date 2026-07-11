@@ -1,4 +1,0 @@
-// Test disallowed definition of `compilerimpl` functions (must generate errors).
-
-fn my_fn() -> i32 = compilerimpl;
-var _value = my_fn();

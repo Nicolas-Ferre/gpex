@@ -1,0 +1,7 @@
+const USED = i32;
+
+var _item = fn_(1); // expected: 1
+
+fn fn_(param: i32) -> USED {
+    return param;
+}

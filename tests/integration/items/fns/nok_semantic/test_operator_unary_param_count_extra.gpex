@@ -1,0 +1,7 @@
+fn __neg__(_param1: i32, _param2: i32) -> i32 {
+    return 0;
+}
+
+fn __not__(_param1: i32, _param2: i32) -> i32 {
+    return 0;
+}

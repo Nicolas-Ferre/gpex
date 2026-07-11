@@ -1,0 +1,11 @@
+pub fn fn_(value: bool) -> bool {
+    return value;
+}
+
+pub fn fn_(value: bool) -> bool {
+    return value;
+}
+
+pub fn fn_(value: bool) -> bool {
+    return value;
+}

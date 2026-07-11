@@ -1,0 +1,5 @@
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:1:8
+│    ¦ repeat unknown();
+│    ¦        ^^^^^^^^^
+┴

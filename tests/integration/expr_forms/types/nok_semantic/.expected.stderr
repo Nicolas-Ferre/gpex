@@ -1,0 +1,9 @@
+error: expression with invalid type `typeref`
+│  → <root>/test_type.gpex:2:12
+│    ¦     return i32;
+│    ¦            ^^^
+├─ info: expected `i32` type
+│  → <root>/test_type.gpex:1:13
+│    ¦ fn _fn() -> i32 {
+│    ¦             ^^^
+┴

@@ -1,0 +1,36 @@
+error: `circular_item_1` item has circular dependencies
+│  → <root>/test_circular_indirect_1.gpex:3:9
+│    ¦ pub var circular_item_1 = -circular_var_1;
+│    ¦         ^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:3:28
+│    ¦ pub var circular_item_1 = -circular_var_1;
+│    ¦                            ^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_2.gpex:3:26
+│    ¦ pub var circular_var_1 = circular_item_2;
+│    ¦                          ^^^^^^^^^^^^^^^
+├─ info: depends on this item
+│  → <root>/test_circular_indirect_1.gpex:4:28
+│    ¦ pub var circular_item_2 = -circular_var_2;
+│    ¦                            ^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_indirect_2.gpex:4:26
+│    ¦ pub var circular_var_2 = circular_item_1;
+│    ¦                          ^^^^^^^^^^^^^^^
+┴
+error: expression not constant
+│  → <root>/test_constness.gpex:2:16
+│    ¦ const _ITEM = -not_const;
+│    ¦                ^^^^^^^^^
+├─ info: expression must be constant
+│  → <root>/test_constness.gpex:2:1
+│    ¦ const _ITEM = -not_const;
+│    ¦ ^^^^^
+┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard.gpex:1:16
+│    ¦ const _ITEM = -?;
+│    ¦                ^
+├─ info: wildcards are only allowed as function parameter types
+┴

@@ -1,0 +1,3 @@
+const fn _itemName() -> typeref {
+    return i32;
+}

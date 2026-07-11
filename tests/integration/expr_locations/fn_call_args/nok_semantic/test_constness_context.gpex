@@ -1,0 +1,6 @@
+var not_const = 0;
+const _ITEM = fn_(not_const);
+
+const fn fn_(param: i32) -> i32 {
+    return param;
+}

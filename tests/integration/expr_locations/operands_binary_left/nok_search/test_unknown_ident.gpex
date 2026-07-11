@@ -1,0 +1,13 @@
+var _add = unknown + 0;
+var _sub = unknown - 0;
+var _mul = unknown * 0;
+var _div = unknown / 0;
+var _mod = unknown % 0;
+var _eq = unknown == 0;
+var _ne = unknown != 0;
+var _lt = unknown < 0;
+var _le = unknown <= 0;
+var _gt = unknown > 0;
+var _ge = unknown >= 0;
+var _and = unknown && false;
+var _or = unknown || false;

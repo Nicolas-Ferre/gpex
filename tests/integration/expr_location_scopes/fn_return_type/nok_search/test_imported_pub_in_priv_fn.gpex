@@ -1,0 +1,5 @@
+import imported_pub_in_priv;
+
+fn _fn(param: i32) -> pub_fn() {
+    return param;
+}

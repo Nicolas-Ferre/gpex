@@ -1,5 +1,0 @@
-error: forbidden `compilerimpl` item outside prelude
-│  → <root>/main.gpex:3:21
-│    ¦ fn my_fn() -> i32 = compilerimpl;
-│    ¦                     ^^^^^^^^^^^^
-┴

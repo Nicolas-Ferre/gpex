@@ -1,0 +1,5 @@
+const _ITEM = typeof(called(0));
+
+fn called(param: i32) {
+    param = 0;
+}

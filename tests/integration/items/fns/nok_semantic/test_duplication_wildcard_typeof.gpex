@@ -1,0 +1,7 @@
+pub fn fn_(value: ?, copy: typeof(value)) -> typeof(value) {
+    return copy;
+}
+
+pub fn fn_(other: ?, other_copy: typeof(other)) -> typeof(other) {
+    return other_copy;
+}

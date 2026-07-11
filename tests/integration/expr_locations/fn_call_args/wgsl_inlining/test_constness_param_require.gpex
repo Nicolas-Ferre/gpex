@@ -1,0 +1,5 @@
+const _RESULT = fn_(true); // expected: true
+
+const fn fn_(param: const bool require param) -> bool {
+    return param;
+}

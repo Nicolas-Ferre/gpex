@@ -1,0 +1,7 @@
+const fn type_(param: i32) -> typeref {
+    param = 0;
+}
+
+fn _fn() -> type_(0) {
+    return 0;
+}

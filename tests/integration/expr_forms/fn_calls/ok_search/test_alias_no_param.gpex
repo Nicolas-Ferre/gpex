@@ -1,0 +1,11 @@
+import imported;
+
+fn no_param() -> bool {
+    return false;
+}
+
+fn no_param() -> bool {
+    return true;
+}
+
+var _result_alias_no_param = no_param(); // expected: true

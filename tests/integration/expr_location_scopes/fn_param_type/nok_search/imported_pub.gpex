@@ -1,0 +1,5 @@
+pub const PUB_CONST = i32;
+
+pub const fn pub_fn() -> typeref {
+    return i32;
+}

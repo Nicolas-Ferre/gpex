@@ -1,0 +1,19 @@
+error: forbidden `compilerimpl` item outside prelude
+│  → <root>/test_compilerimpl.gpex:1:15
+│    ¦ struct Type = compilerimpl {}
+│    ¦               ^^^^^^^^^^^^
+┴
+error: forbidden `compilerimpl` item outside prelude
+│  → <root>/test_duplication.gpex:1:15
+│    ¦ struct item = compilerimpl {}
+│    ¦               ^^^^^^^^^^^^
+┴
+error: `item` item defined multiple times
+│  → <root>/test_duplication.gpex:2:5
+│    ¦ var item = 0;
+│    ¦     ^^^^
+├─ info: item also defined here
+│  → <root>/test_duplication.gpex:1:8
+│    ¦ struct item = compilerimpl {}
+│    ¦        ^^^^
+┴

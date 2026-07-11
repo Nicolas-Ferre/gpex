@@ -1,0 +1,5 @@
+const _RESULT_I32 = sizeof(i32); // expected: 4u
+const _RESULT_U32 = sizeof(u32); // expected: 4u
+const _RESULT_F32 = sizeof(f32); // expected: 4u
+const _RESULT_BOOL = sizeof(bool); // expected: 4u
+const _RESULT_TYPEREF = sizeof(typeref); // expected: 8u

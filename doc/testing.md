@@ -14,10 +14,13 @@ Some tests rely on `.gpex` examples:
 
 ## Integration tests (`tests/integration/`)
 
-Tests examples of GPEx programs located in `tests/integration/*/`. The testing behavior depends on
-the name prefix of the inner directory.
+Tests examples of GPEx programs located in `tests/integration/`.
 
-### `tests/integration/*/ok_*` test directories
+Directories group tests by domain, feature, and optionally more specific subfeatures. A test
+directory is any directory whose name starts with `ok_`, `wgsl_` or `nok_`, and this prefix defines
+the testing behavior.
+
+### `ok_*` test directories
 
 These directories are tested the following way:
 
@@ -33,15 +36,16 @@ These directories are tested the following way:
   const _RESULT = 2_147_483_647; // expected: 2147483647
   ```
 
-### `tests/integration/*/wgsl_*` test directories
+### `wgsl_*` test directories
 
 These directories are tested the following way:
 
 - Same as `ok_*` tests.
-- Verify that the generated WGSL code matches the expected WGSL code in `.expected.wgsl`.
+- Verify that the formatted generated WGSL code matches the expected WGSL code in
+  `.expected.wgsl`.
   If this file doesn't exist, it is auto-generated during the first test run.
 
-### `tests/integration/*/nok_*` test directories
+### `nok_*` test directories
 
 These directories are tested the following way:
 
@@ -50,15 +54,46 @@ These directories are tested the following way:
 - Verify that the compilation error messages match the expected messages in `.expected.stderr`.
   If this file doesn't exist, it is auto-generated during the first test run.
 
-### Test dimensions
+### Test domains
 
-Some of the test folders inside `tests/integration/*/` can have a suffix that indicates the
-dimension of the test. Here are the common ones:
+The following test domains are defined:
 
-- `*_exprs`: test all forms of expressions in a particular context.
-- `*_locations`: test all expression locations in a particular context.
-- `*_scopes`: test main semantic scopes in a particular context. For these tests, it is not needed
-  to test all locations, only the main group of locations are enough.
-- `*_forms`: test all forms of a concept or an item.
+- `tests/integration/expr_locations/`: tests are organized per syntactical expression location (
+  returned value, variable default value, binary left operand, ...).
+- `tests/integration/expr_location_scopes/`: tests are organized per scope containing an expression
+  (global scope, function body, ...).
+- `tests/integration/expr_forms/`: tests are organized per expression form (literal, variable
+  reference, function call, ...)
+- `tests/integration/items/`: tests are organized per item (variable, constant, function, ...)
+- `tests/integration/logs/`: tests are organized per compiler log rendering behavior.
+- `tests/integration/prelude/`: tests are organized per built-in prelude item.
 
-It is possible to use other dimensions when it makes sense, but they should be clearly extensible.
+### Test cases
+
+The following test cases are commonly defined:
+
+- `ok_syntax`: test valid syntax forms
+- `ok_semantic`: test valid feature semantic
+- `nok_semantic`: test invalid feature semantic
+- `ok_search`: test items that are accessible from a given location
+- `nok_search`: test items that are not accessible from a given location
+- `ok_naming`: test valid item names
+- `nok_naming`: test invalid or not recommended item names
+- `wgsl_inlining`: test that items are inlined during transpilation
+- `wgsl_no_inlining`: test that items are not inlined during transpilation
+- `wgsl_transpilation`: test that items are correctly transpiled
+
+### Test files
+
+Each test case is defined by an entrypoint file named `test_*.gpex` inside a test directory. A test
+directory may also contain supporting `.gpex` files, such as imported modules.
+
+After the `test_` prefix, the remainder of the filename identifies the exact tested scenario using
+hierarchical naming.
+
+### GPEx conventions
+
+- When a literal value doesn't matter in a `nok_` test, it is set to zero.
+- Example literals within a test file are generally ordered (first expect value `1`, then `2`, ...)
+- Function, variable, type, ... names should be as short as possible and aligned across tests (e.g.
+  `fn_`, `used`, `called`, ...). Most generally, they should be aligned with other similar tests.

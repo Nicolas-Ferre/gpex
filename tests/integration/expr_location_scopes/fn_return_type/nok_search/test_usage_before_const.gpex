@@ -1,0 +1,5 @@
+fn _fn(param: i32) -> _USED {
+    return param;
+}
+
+const _USED = i32;
