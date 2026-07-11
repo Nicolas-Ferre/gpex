@@ -313,9 +313,6 @@ fn find_previous_same_fn_signature<'index>(
     fn_: &FnDefinition,
     indexes: &'index Indexes<'_>,
 ) -> Option<&'index FnDefinition> {
-    if fn_.has_requirement() {
-        return None;
-    }
     let search_params = SearchParams {
         key: &fn_.key(),
         location: ItemRef::Fn(fn_),
@@ -334,7 +331,6 @@ fn find_previous_same_fn_signature<'index>(
                 unreachable!("only functions are searched with parameter types")
             }
         })
-        .filter(|previous_fn| !previous_fn.has_requirement())
         .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
 }
 
@@ -345,6 +341,9 @@ fn are_same_fn_signatures(
 ) -> bool {
     debug_assert!(fn_.name == other_fn.name);
     debug_assert!(fn_.params.params.len() == other_fn.params.params.len());
+    if fn_.has_requirement() || other_fn.has_requirement() {
+        return false;
+    }
     let mut value_resolver = ValueResolver::new(indexes);
     let mut other_value_resolver = ValueResolver::new(indexes);
     fn_.params

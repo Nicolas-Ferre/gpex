@@ -20,8 +20,8 @@ Key directories and files:
       structs, ...), expressions, statements. This layer also defines utility methods run on AST
       nodes.
     - `indexing/`: Symbol table construction (imports, item references, ...).
-    - `validation/`: Semantic validation passes (type comparison, circular dependency.
-      detection, ...)
+    - `validation/`: Semantic validation passes (type comparison, circular dependency
+      detection, ...).
     - `transpilation/`: AST-to-WGSL conversion.
     - `consts.rs`: Constness checking.
     - `dependencies.rs`: Item dependencies resolution.
