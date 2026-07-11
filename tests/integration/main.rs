@@ -5,8 +5,10 @@ use itertools::Itertools;
 use libtest_mimic::{Arguments, Failed, Trial};
 use pretty_assertions::assert_eq;
 use regex::{Captures, Regex};
+use std::borrow::Cow;
 use std::ffi::OsStr;
 use std::fmt::Write;
+use std::io::Error as IoError;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::sync::Arc;
@@ -18,6 +20,7 @@ const NUMBERED_IDENT_REGEX: &str = r"[v_]+([0-9]+)";
 const EXPECTED_VAR_REGEX: &str = r"var +(\w+) *= *[^;]*; *// expected: *(.+)";
 const EXPECTED_CONST_REGEX: &str = r"const +(\w+) *= *([^;]*); *// expected: *(.+)";
 const EXPECTED_PATTERN: &str = "// expected";
+const GPEX_EXTENSION: &str = "gpex";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     owo_colors::set_override(false);
@@ -45,6 +48,12 @@ fn collect_case_dirs(
             trials.push(Trial::test(trial_name, move || {
                 run_case(&root_path, runtime)
             }));
+        } else if has_gpex_file(&root_path)? {
+            let dir_name = path_file_name(&root_path);
+            return Err(format!(
+                "Test directory should have 'ok_', 'wgsl_' or 'nok_' prefix: {dir_name}"
+            )
+            .into());
         } else {
             collect_case_dirs(&root_path, runtime, trials)?;
         }
@@ -53,12 +62,21 @@ fn collect_case_dirs(
 }
 
 fn is_case_dir(path: &Path) -> bool {
-    let dir_name = path.file_name().unwrap_or_default().to_string_lossy();
+    let dir_name = path_file_name(path);
     dir_name.starts_with("ok_") || dir_name.starts_with("wgsl_") || dir_name.starts_with("nok_")
 }
 
+fn has_gpex_file(path: &Path) -> Result<bool, IoError> {
+    for entry in fs::read_dir(path)? {
+        if entry?.path().extension() == Some(OsStr::new(GPEX_EXTENSION)) {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
 fn run_case(path: &Path, runtime: Arc<Runtime>) -> Result<(), Failed> {
-    let dir_name = path.file_name().unwrap_or_default().to_string_lossy();
+    let dir_name = path_file_name(path);
     runtime.block_on(async move {
         if dir_name.starts_with("ok_") {
             run_ok_cases(path, false).await
@@ -141,7 +159,7 @@ fn generate_case_dir(dir_path: &Path) -> Result<(), Failed> {
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
             generate_case_dir(&path)?;
-        } else if path.extension() == Some(OsStr::new("gpex")) {
+        } else if path.extension() == Some(OsStr::new(GPEX_EXTENSION)) {
             let code = fs::read_to_string(&path)?;
             let code = expected_const_regex.replace_all(&code, |caps: &Captures<'_>| {
                 let const_name = caps[1].strip_prefix("_").unwrap_or(&caps[1]);
@@ -178,7 +196,7 @@ fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Resu
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
             check_global_vars(&path, root_path, runner)?;
-        } else if path.extension() == Some(OsStr::new("gpex")) {
+        } else if path.extension() == Some(OsStr::new(GPEX_EXTENSION)) {
             let code = fs::read_to_string(&path)?;
             let dot_path = to_dot_path(&path, root_path);
             for capture in expected_regex.captures_iter(&code) {
@@ -200,6 +218,10 @@ fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Resu
 fn path_parent(path: &Path) -> &Path {
     path.parent()
         .unwrap_or_else(|| unreachable!("parent should be at least temporary folder"))
+}
+
+fn path_file_name(path: &Path) -> Cow<'_, str> {
+    path.file_name().unwrap_or_default().to_string_lossy()
 }
 
 fn check_wgsl_output(path: &Path, program: &Program) -> Result<(), Failed> {

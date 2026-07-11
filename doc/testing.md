@@ -62,7 +62,7 @@ The following test domains are defined:
   returned value, variable default value, binary left operand, ...).
 - `tests/integration/expr_location_scopes/`: tests are organized per scope containing an expression
   (global scope, function body, ...).
-- `tests/integration/expr_types/`: tests are organized per expression kind (literal, variable
+- `tests/integration/expr_forms/`: tests are organized per expression form (literal, variable
   reference, function call, ...)
 - `tests/integration/items/`: tests are organized per item (variable, constant, function, ...)
 - `tests/integration/logs/`: tests are organized per compiler log rendering behavior.
@@ -73,8 +73,8 @@ The following test domains are defined:
 The following test cases are commonly defined:
 
 - `ok_syntax`: test valid syntax forms
-- `ok_semantic`: test invalid feature semantic
-- `nok_semantic`: test valid feature semantic
+- `ok_semantic`: test valid feature semantic
+- `nok_semantic`: test invalid feature semantic
 - `ok_search`: test items that are accessible from a given location
 - `nok_search`: test items that are not accessible from a given location
 - `ok_naming`: test valid item names
@@ -85,7 +85,7 @@ The following test cases are commonly defined:
 
 ### Test files
 
-Each test case is defined in a `test_*.gpex` file inside a test case directory.
+All test cases are defined in `test_*.gpex` files inside test case directories.
 
 The filename starts with `test_`, and the rest of the filename defined the exact tested case using a
 hierarchical naming.
