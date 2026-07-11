@@ -1,3 +1,0 @@
-import imported;
-
-const _ITEM = imported_fn(1); // expected: 1

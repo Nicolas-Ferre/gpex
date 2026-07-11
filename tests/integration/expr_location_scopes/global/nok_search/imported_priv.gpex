@@ -1,5 +1,5 @@
 const _PRIV_CONST = 2;
 
-const fn _priv_fn(param: i32) -> i32 {
+fn _priv_fn(param: i32) -> i32 {
     return param;
 }

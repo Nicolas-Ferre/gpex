@@ -1,0 +1,2 @@
+const USED = 1;
+var _item = USED; // expected: 1

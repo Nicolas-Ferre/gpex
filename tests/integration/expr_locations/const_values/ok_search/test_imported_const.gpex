@@ -1,3 +1,0 @@
-import imported;
-
-const _ITEM = IMPORTED_CONST; // expected: 1

@@ -60,6 +60,8 @@ The following test domains are defined:
 
 - `tests/integration/expr_locations/`: tests are organized per syntactical expression location (
   returned value, variable default value, binary left operand, ...).
+- `tests/integration/expr_location_scopes/`: tests are organized per scope containing an expression
+  (global scope, function body, ...).
 - `tests/integration/expr_types/`: tests are organized per expression kind (literal, variable
   reference, function call, ...)
 - `tests/integration/items/`: tests are organized per item (variable, constant, function, ...)

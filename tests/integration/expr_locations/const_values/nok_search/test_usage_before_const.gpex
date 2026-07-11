@@ -1,2 +1,0 @@
-const _ITEM = _USED;
-const _USED = 0;
