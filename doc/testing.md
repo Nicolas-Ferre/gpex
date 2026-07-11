@@ -81,7 +81,7 @@ The following test cases are commonly defined:
 - `nok_naming`: test invalid or not recommended item names
 - `wgsl_inlining`: test that items are inlined during transpilation
 - `wgsl_no_inlining`: test that items are not inlined during transpilation
-- `wgsl_transpiling`: test that items are correctly transpiled
+- `wgsl_transpilation`: test that items are correctly transpiled
 
 ### Test files
 
