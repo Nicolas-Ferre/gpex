@@ -117,7 +117,7 @@ pub(crate) fn check_unique_fn_signature(
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
-    if let Some(previous_fn) = find_previous_similar_fn_signature(fn_, indexes) {
+    if let Some(previous_fn) = find_previous_same_fn_signature(fn_, indexes) {
         let fn_key = KeyRenderer::new(indexes)
             .fn_key(fn_)
             .unwrap_or_else(|_| unreachable!("function should be validated before"));
@@ -309,10 +309,13 @@ pub(crate) fn check_binary_operator_fn(
     }
 }
 
-fn find_previous_similar_fn_signature<'index>(
+fn find_previous_same_fn_signature<'index>(
     fn_: &FnDefinition,
     indexes: &'index Indexes<'_>,
 ) -> Option<&'index FnDefinition> {
+    if fn_.has_requirement() {
+        return None;
+    }
     let search_params = SearchParams {
         key: &fn_.key(),
         location: ItemRef::Fn(fn_),
@@ -331,6 +334,7 @@ fn find_previous_similar_fn_signature<'index>(
                 unreachable!("only functions are searched with parameter types")
             }
         })
+        .filter(|previous_fn| !previous_fn.has_requirement())
         .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
 }
 
