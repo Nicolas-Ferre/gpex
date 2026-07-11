@@ -7,3 +7,12 @@ error: called function `called(i32)` with no return type
 │    ¦ fn called(param: i32) {
 │    ¦    ^^^^^^^^^^^^^^^^^^
 ┴
+error: called function `called(i32)` with no return type
+│  → <root>/test_return_type_missing_nested.gpex:1:29
+│    ¦ const _ITEM = sizeof(typeof(called(0)));
+│    ¦                             ^^^^^^^^^
+├─ info: function has no return type
+│  → <root>/test_return_type_missing_nested.gpex:3:4
+│    ¦ fn called(param: i32) {
+│    ¦    ^^^^^^^^^^^^^^^^^^
+┴
