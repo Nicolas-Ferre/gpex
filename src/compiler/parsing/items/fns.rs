@@ -93,6 +93,13 @@ impl FnDefinition {
         }
     }
 
+    pub(crate) fn has_requirement(&self) -> bool {
+        self.params
+            .params
+            .iter()
+            .any(|param| param.requirement.is_some())
+    }
+
     fn parse_return_type_stop<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<(), ParseError<'context>> {

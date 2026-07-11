@@ -1,0 +1,7 @@
+pub fn fn_(_value: i32 require true) -> i32 {
+    return 0;
+}
+
+pub fn fn_(_value: i32 require false) -> i32 {
+    return 0;
+}
