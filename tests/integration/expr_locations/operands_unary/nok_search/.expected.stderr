@@ -1,0 +1,10 @@
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:1:13
+│    ¦ var _neg = -unknown;
+│    ¦             ^^^^^^^
+┴
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:2:13
+│    ¦ var _not = !unknown;
+│    ¦             ^^^^^^^
+┴

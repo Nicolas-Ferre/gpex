@@ -1,0 +1,5 @@
+error: `unknown` item not found
+│  → <root>/test_unknown_ident.gpex:1:27
+│    ¦ fn fn_(param: i32 require unknown) -> i32 {
+│    ¦                           ^^^^^^^
+┴
