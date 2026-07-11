@@ -1,19 +1,9 @@
-// Test function sources after all possible scopes (must be found).
+// Test function sources after global scope (must be found).
 
 // =========================| Global |=========================
 
 var _result_global = source(); // expected: i32
 
-// =========================| Function parameter requirement |=========================
-
-var _result_fn_param_requirement = fn_param_requirement(2); // expected: 2
-fn fn_param_requirement(param: i32 require requirement()) -> i32 {
-    return param;
-}
-
 const fn source() -> typeref {
     return i32;
-}
-const fn requirement() -> bool {
-    return true;
 }

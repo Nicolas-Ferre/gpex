@@ -1,15 +1,7 @@
-// Test constant sources before all possible scopes (must be found).
+// Test constant sources before global scope (must be found).
 
 const SOURCE = i32;
-const REQUIREMENT = true;
 
 // =========================| Global |=========================
 
 var _result_global = SOURCE; // expected: i32
-
-// =========================| Function parameter requirement |=========================
-
-var _result_fn_param_requirement = fn_param_requirement(2); // expected: 2
-fn fn_param_requirement(param: i32 require REQUIREMENT) -> i32 {
-    return param;
-}

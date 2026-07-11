@@ -1,14 +1,7 @@
-// Test constant sources imported before all possible scopes (must be found).
+// Test constant sources imported before global scope (must be found).
 
 import ~.imported;
 
 // =========================| Global |=========================
 
 var _result_global = SOURCE; // expected: i32
-
-// =========================| Function parameter requirement |=========================
-
-var _result_fn_param_requirement = fn_param_requirement(2); // expected: 2
-fn fn_param_requirement(param: i32 require REQUIREMENT) -> i32 {
-    return param;
-}

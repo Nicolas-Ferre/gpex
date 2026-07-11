@@ -1,0 +1,5 @@
+const _PRIV_CONST = true;
+
+const fn _priv_fn() -> bool {
+    return true;
+}

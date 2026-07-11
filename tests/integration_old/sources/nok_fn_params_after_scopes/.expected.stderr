@@ -1,5 +1,0 @@
-error: `_source` item not found
-│  → <root>/main.gpex:6:44
-│    ¦ fn fn_param_requirement(param: i32 require _source == i32, _source: typeref) -> i32 {
-│    ¦                                            ^^^^^^^
-┴

@@ -1,0 +1,9 @@
+const fn used() -> bool {
+    return true;
+}
+
+var _item = fn_(1); // expected: 1
+
+fn fn_(param: i32 require used()) -> i32 {
+    return param;
+}

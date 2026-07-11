@@ -1,0 +1,5 @@
+import imported_priv;
+
+fn _fn(param: i32 require _PRIV_CONST) -> i32 {
+    return param;
+}

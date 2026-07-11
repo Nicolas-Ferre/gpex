@@ -1,0 +1,51 @@
+error: `_PRIV_CONST` item not found
+│  → <root>/test_imported_priv_const.gpex:3:27
+│    ¦ fn _fn(param: i32 require _PRIV_CONST) -> i32 {
+│    ¦                           ^^^^^^^^^^^
+├─ info: item not qualified with `pub`
+│  → <root>/imported_priv.gpex:1:7
+│    ¦ const _PRIV_CONST = true;
+│    ¦       ^^^^^^^^^^^
+┴
+error: `_priv_fn()` item not found
+│  → <root>/test_imported_priv_fn.gpex:3:27
+│    ¦ fn _fn(param: i32 require _priv_fn()) -> i32 {
+│    ¦                           ^^^^^^^^^^
+├─ info: item not qualified with `pub`
+│  → <root>/imported_priv.gpex:3:10
+│    ¦ const fn _priv_fn() -> bool {
+│    ¦          ^^^^^^^^
+┴
+error: `PUB_CONST` item not found
+│  → <root>/test_imported_pub_in_priv_const.gpex:3:27
+│    ¦ fn _fn(param: i32 require PUB_CONST) -> i32 {
+│    ¦                           ^^^^^^^^^
+├─ info: item can be imported from `imported_pub`
+│  → <root>/imported_pub.gpex:1:11
+│    ¦ pub const PUB_CONST = true;
+│    ¦           ^^^^^^^^^
+┴
+error: `pub_fn()` item not found
+│  → <root>/test_imported_pub_in_priv_fn.gpex:3:27
+│    ¦ fn _fn(param: i32 require pub_fn()) -> i32 {
+│    ¦                           ^^^^^^^^
+├─ info: item can be imported from `imported_pub`
+│  → <root>/imported_pub.gpex:3:14
+│    ¦ pub const fn pub_fn() -> bool {
+│    ¦              ^^^^^^
+┴
+error: `_USED` item not found
+│  → <root>/test_usage_before_const.gpex:1:27
+│    ¦ fn _fn(param: i32 require _USED) -> i32 {
+│    ¦                           ^^^^^
+┴
+error: `used` item not found
+│  → <root>/test_usage_before_fn_param.gpex:1:27
+│    ¦ fn _fn(param: i32 require used == i32, used: typeref) -> i32 {
+│    ¦                           ^^^^
+┴
+warning: `used` item unused
+│  → <root>/test_usage_before_fn_param.gpex:1:40
+│    ¦ fn _fn(param: i32 require used == i32, used: typeref) -> i32 {
+│    ¦                                        ^^^^
+┴

@@ -1,8 +1,0 @@
-// Test function parameter source before all possible scopes (must be found).
-
-// =========================| Function parameter requirement |=========================
-
-var _result_param_requirement = fn_param_requirement(true); // expected: true
-fn fn_param_requirement(param: const bool require param) -> bool {
-    return param;
-}

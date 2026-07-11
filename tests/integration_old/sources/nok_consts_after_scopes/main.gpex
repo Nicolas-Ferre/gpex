@@ -1,15 +1,7 @@
-// Test constant sources after all possible scopes (must generate errors).
+// Test constant sources after global scope (must generate errors).
 
 // =========================| Global |=========================
 
 var _result_global = _SOURCE;
 
-// =========================| Function parameter requirement |=========================
-
-var _result_fn_param_requirement = fn_param_requirement(0);
-fn fn_param_requirement(param: i32 require _REQUIREMENT) -> i32 {
-    return param;
-}
-
 const _SOURCE = i32;
-const _REQUIREMENT = true;
