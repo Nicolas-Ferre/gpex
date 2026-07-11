@@ -16,9 +16,9 @@ Some tests rely on `.gpex` examples:
 
 Tests examples of GPEx programs located in `tests/integration/`.
 
-Directories group tests by domain, feature, and optionally more specific subfeatures. A test case is
-any directory whose name starts with `ok_`, `wgsl_` or `nok_`, and this prefix defines the testing
-behavior.
+Directories group tests by domain, feature, and optionally more specific subfeatures. A test
+directory is any directory whose name starts with `ok_`, `wgsl_` or `nok_`, and this prefix defines
+the testing behavior.
 
 ### `ok_*` test directories
 
@@ -85,9 +85,10 @@ The following test cases are commonly defined:
 
 ### Test files
 
-All test cases are defined in `test_*.gpex` files inside test case directories.
+Each test case is defined by an entrypoint file named `test_*.gpex` inside a test directory. A test
+directory may also contain supporting `.gpex` files, such as imported modules.
 
-The filename starts with `test_`, and the rest of the filename defined the exact tested case using a
+After the `test_` prefix, the remainder of the filename identifies the exact tested scenario using
 hierarchical naming.
 
 ### GPEx conventions
