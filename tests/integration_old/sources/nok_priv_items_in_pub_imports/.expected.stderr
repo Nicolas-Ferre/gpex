@@ -1,32 +1,14 @@
-error: `_CONST` item not found
-│  → <root>/main.gpex:5:23
-│    ¦ const _RESULT_CONST = _CONST;
-│    ¦                       ^^^^^^
-├─ info: item not qualified with `pub`
-│  → <root>/imported.gpex:1:7
-│    ¦ const _CONST = 0;
-│    ¦       ^^^^^^
-┴
 error: `_var` item not found
-│  → <root>/main.gpex:6:19
+│  → <root>/main.gpex:5:19
 │    ¦ var _result_var = _var;
 │    ¦                   ^^^^
 ├─ info: item not qualified with `pub`
-│  → <root>/imported.gpex:3:5
+│  → <root>/imported.gpex:1:5
 │    ¦ var _var = 0;
 │    ¦     ^^^^
 ┴
-error: `_fn(i32)` item not found
-│  → <root>/main.gpex:7:18
-│    ¦ var _result_fn = _fn(0);
-│    ¦                  ^^^^^^
-├─ info: item not qualified with `pub`
-│  → <root>/imported.gpex:5:4
-│    ¦ fn _fn(param: i32) -> i32 {
-│    ¦    ^^^
-┴
 error: `param` item not found
-│  → <root>/main.gpex:8:21
+│  → <root>/main.gpex:6:21
 │    ¦ var _result_param = param;
 │    ¦                     ^^^^^
 ┴

@@ -1,0 +1,9 @@
+const fn unknown_return_type() -> unknown {
+    return i32;
+}
+
+const fn used(param: i32) -> called(unknown_return_type()) {
+    return param;
+}
+
+const _ITEM = used(0);

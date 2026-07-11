@@ -1,3 +1,8 @@
+error: `unknown` item not found
+│  → <root>/test_call_without_return_type_as_arg.gpex:1:35
+│    ¦ const fn unknown_return_type() -> unknown {
+│    ¦                                   ^^^^^^^
+┴
 error: `CIRCULAR_ITEM_1` item has circular dependencies
 │  → <root>/test_circular_indirect_1.gpex:3:11
 │    ¦ pub const CIRCULAR_ITEM_1 = circular_var_1;

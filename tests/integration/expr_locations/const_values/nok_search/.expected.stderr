@@ -1,3 +1,39 @@
+error: `_PRIV_CONST` item not found
+│  → <root>/test_imported_priv_const.gpex:3:15
+│    ¦ const _ITEM = _PRIV_CONST;
+│    ¦               ^^^^^^^^^^^
+├─ info: item not qualified with `pub`
+│  → <root>/imported_priv.gpex:1:7
+│    ¦ const _PRIV_CONST = 2;
+│    ¦       ^^^^^^^^^^^
+┴
+error: `_priv_fn(i32)` item not found
+│  → <root>/test_imported_priv_fn.gpex:3:15
+│    ¦ const _ITEM = _priv_fn(0);
+│    ¦               ^^^^^^^^^^^
+├─ info: item not qualified with `pub`
+│  → <root>/imported_priv.gpex:3:10
+│    ¦ const fn _priv_fn(param: i32) -> i32 {
+│    ¦          ^^^^^^^^
+┴
+error: `PUB_CONST` item not found
+│  → <root>/test_imported_pub_in_priv_const.gpex:3:15
+│    ¦ const _ITEM = PUB_CONST;
+│    ¦               ^^^^^^^^^
+├─ info: item can be imported from `imported_pub`
+│  → <root>/imported_pub.gpex:1:11
+│    ¦ pub const PUB_CONST = 2;
+│    ¦           ^^^^^^^^^
+┴
+error: `pub_fn(i32)` item not found
+│  → <root>/test_imported_pub_in_priv_fn.gpex:3:15
+│    ¦ const _ITEM = pub_fn(0);
+│    ¦               ^^^^^^^^^
+├─ info: item can be imported from `imported_pub`
+│  → <root>/imported_pub.gpex:3:14
+│    ¦ pub const fn pub_fn(param: i32) -> i32 {
+│    ¦              ^^^^^^
+┴
 error: `_ITEM` item not found
 │  → <root>/test_itself.gpex:1:15
 │    ¦ const _ITEM = _ITEM;

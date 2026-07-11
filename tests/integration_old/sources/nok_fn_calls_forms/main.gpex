@@ -23,13 +23,3 @@ var _result_mismatching_dependent_type = _dependent_type(19u, 20.0);
 fn _dependent_type(param: ?, value: typeof(param)) -> typeof(param) {
     return value;
 }
-
-// ==========================| Invalid return type as call argument |==========================
-
-const fn unknown_return_type() -> unknown {
-    return i32;
-}
-const fn fn_(param: i32) -> called(unknown_return_type()) {
-    return param;
-}
-const _USAGE = fn_(0);

@@ -1,0 +1,3 @@
+import imported_priv;
+
+const _ITEM = _PRIV_CONST;
