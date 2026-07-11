@@ -1,0 +1,5 @@
+fn _used(param: i32) -> i32 {
+    return param;
+}
+
+var _item = param;

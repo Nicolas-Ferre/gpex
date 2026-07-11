@@ -1,10 +1,15 @@
+error: `param` item not found
+│  → <root>/test_fn_param.gpex:5:13
+│    ¦ var _item = param;
+│    ¦             ^^^^^
+┴
 error: `_PRIV_CONST` item not found
 │  → <root>/test_imported_priv_const.gpex:3:13
 │    ¦ var _item = _PRIV_CONST;
 │    ¦             ^^^^^^^^^^^
 ├─ info: item not qualified with `pub`
 │  → <root>/imported_priv.gpex:1:7
-│    ¦ const _PRIV_CONST = 2;
+│    ¦ const _PRIV_CONST = 0;
 │    ¦       ^^^^^^^^^^^
 ┴
 error: `_priv_fn(i32)` item not found
@@ -12,9 +17,18 @@ error: `_priv_fn(i32)` item not found
 │    ¦ var _item = _priv_fn(0);
 │    ¦             ^^^^^^^^^^^
 ├─ info: item not qualified with `pub`
-│  → <root>/imported_priv.gpex:3:4
+│  → <root>/imported_priv.gpex:5:4
 │    ¦ fn _priv_fn(param: i32) -> i32 {
 │    ¦    ^^^^^^^^
+┴
+error: `_priv_var` item not found
+│  → <root>/test_imported_priv_var.gpex:3:13
+│    ¦ var _item = _priv_var;
+│    ¦             ^^^^^^^^^
+├─ info: item not qualified with `pub`
+│  → <root>/imported_priv.gpex:3:5
+│    ¦ var _priv_var = 0;
+│    ¦     ^^^^^^^^^
 ┴
 error: `PUB_CONST` item not found
 │  → <root>/test_imported_pub_in_priv_const.gpex:3:13
@@ -22,7 +36,7 @@ error: `PUB_CONST` item not found
 │    ¦             ^^^^^^^^^
 ├─ info: item can be imported from `imported_pub`
 │  → <root>/imported_pub.gpex:1:11
-│    ¦ pub const PUB_CONST = 2;
+│    ¦ pub const PUB_CONST = 0;
 │    ¦           ^^^^^^^^^
 ┴
 error: `pub_fn(i32)` item not found
@@ -30,9 +44,18 @@ error: `pub_fn(i32)` item not found
 │    ¦ var _item = pub_fn(0);
 │    ¦             ^^^^^^^^^
 ├─ info: item can be imported from `imported_pub`
-│  → <root>/imported_pub.gpex:3:8
+│  → <root>/imported_pub.gpex:5:8
 │    ¦ pub fn pub_fn(param: i32) -> i32 {
 │    ¦        ^^^^^^
+┴
+error: `pub_var` item not found
+│  → <root>/test_imported_pub_in_priv_var.gpex:3:13
+│    ¦ var _item = pub_var;
+│    ¦             ^^^^^^^
+├─ info: item can be imported from `imported_pub`
+│  → <root>/imported_pub.gpex:3:9
+│    ¦ pub var pub_var = 0;
+│    ¦         ^^^^^^^
 ┴
 error: `_item` item not found
 │  → <root>/test_itself.gpex:1:13

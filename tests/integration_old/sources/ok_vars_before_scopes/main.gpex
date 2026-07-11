@@ -2,10 +2,6 @@
 
 var source = 1;
 
-// =========================| Global |=========================
-
-var _result_global = source; // expected: 1
-
 // =========================| Function body |=========================
 
 var _result_fn_body = fn_body(); // expected: 1

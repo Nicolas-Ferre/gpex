@@ -1,4 +1,6 @@
-const _PRIV_CONST = 2;
+const _PRIV_CONST = 0;
+
+var _priv_var = 0;
 
 fn _priv_fn(param: i32) -> i32 {
     return param;

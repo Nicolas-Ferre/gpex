@@ -1,0 +1,3 @@
+import imported;
+
+var _item = imported_var; // expected: 1

@@ -1,12 +1,5 @@
 // Test function parameter source after all possible scopes (must generate errors).
 
-// =========================| Global |=========================
-
-var _result_global = source;
-fn _global(source: i32) -> i32 {
-    return source;
-}
-
 // =========================| Function parameter type |=========================
 
 var _result_fn_param_type = fn_param_type(0, i32);

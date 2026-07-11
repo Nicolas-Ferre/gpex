@@ -1,6 +1,0 @@
-// Test public items used from imported private imports (must generate errors).
-
-import ~.imported;
-
-var _result_var = var_;
-var _result_param = param;

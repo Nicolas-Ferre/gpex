@@ -1,0 +1,3 @@
+import imported_priv;
+
+var _item = _priv_var;
