@@ -1,0 +1,5 @@
+error: `unknown` item not found
+│  → <root>/test_no_return_type_in_fn_return_type.gpex:1:35
+│    ¦ const fn unknown_return_type() -> unknown {
+│    ¦                                   ^^^^^^^
+┴
