@@ -1,0 +1,5 @@
+fn _fn() -> i32 {
+    return _used;
+}
+
+var _used = 0;

@@ -1,0 +1,5 @@
+fn _fn() -> i32 {
+    return _USED;
+}
+
+const _USED = 0;

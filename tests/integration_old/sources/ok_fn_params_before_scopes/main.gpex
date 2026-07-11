@@ -1,12 +1,5 @@
 // Test function parameter source before all possible scopes (must be found).
 
-// =========================| Function body |=========================
-
-var _result_fn_body = fn_body(1); // expected: 1
-fn fn_body(param: i32) -> i32 {
-    return param;
-}
-
 // =========================| Function signature |=========================
 
 var _result1_fn_signature = fn_signature(i32, 2); // expected: 2

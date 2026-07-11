@@ -6,13 +6,6 @@ import ~.imported;
 
 var _result_global = SOURCE; // expected: i32
 
-// =========================| Function body |=========================
-
-var _result_fn_body = fn_body(); // expected: i32
-fn fn_body() -> typeref {
-    return SOURCE;
-}
-
 // =========================| Function parameter type |=========================
 
 var _result_fn_param_type = fn_param_type(1); // expected: 1

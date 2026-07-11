@@ -4,11 +4,4 @@
 
 var _result_global = _source;
 
-// =========================| Function body |=========================
-
-var _result_fn_body = fn_body();
-fn fn_body() -> i32 {
-    return _source;
-}
-
 var _source = 0;
