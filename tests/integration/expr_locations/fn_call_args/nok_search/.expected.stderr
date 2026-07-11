@@ -1,7 +1,17 @@
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:1:17
+│    ¦ var _item = fn_(unknown());
+│    ¦                 ^^^^^^^^^
+┴
 error: `unknown` item not found
 │  → <root>/test_unknown_ident.gpex:1:17
 │    ¦ var _item = fn_(unknown);
 │    ¦                 ^^^^^^^
+┴
+warning: `fn_(i32)` item unused
+│  → <root>/test_unknown_call.gpex:3:4
+│    ¦ fn fn_(param: i32) -> i32 {
+│    ¦    ^^^
 ┴
 warning: `fn_(i32)` item unused
 │  → <root>/test_unknown_ident.gpex:3:4

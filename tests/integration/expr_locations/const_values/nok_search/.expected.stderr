@@ -1,3 +1,8 @@
+error: `unknown()` item not found
+│  → <root>/test_unknown_call.gpex:1:15
+│    ¦ const _ITEM = unknown();
+│    ¦               ^^^^^^^^^
+┴
 error: `unknown` item not found
 │  → <root>/test_unknown_ident.gpex:1:15
 │    ¦ const _ITEM = unknown;

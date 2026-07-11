@@ -39,16 +39,6 @@ error: `_item` item not found
 │    ¦ var _item = _item;
 │    ¦             ^^^^^
 ┴
-error: `unknown()` item not found
-│  → <root>/test_unknown_call.gpex:1:13
-│    ¦ var _item = unknown();
-│    ¦             ^^^^^^^^^
-┴
-error: `unknown` item not found
-│  → <root>/test_unknown_ident.gpex:1:13
-│    ¦ var _item = unknown;
-│    ¦             ^^^^^^^
-┴
 error: `_USED` item not found
 │  → <root>/test_usage_before_const.gpex:1:13
 │    ¦ var _item = _USED;

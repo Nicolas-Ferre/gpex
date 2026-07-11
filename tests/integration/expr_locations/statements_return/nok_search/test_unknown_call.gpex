@@ -1,0 +1,3 @@
+fn fn_() -> i32 {
+    return unknown();
+}

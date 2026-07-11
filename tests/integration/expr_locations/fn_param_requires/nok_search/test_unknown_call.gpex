@@ -1,0 +1,3 @@
+fn fn_(param: i32 require unknown()) -> i32 {
+    return param;
+}
