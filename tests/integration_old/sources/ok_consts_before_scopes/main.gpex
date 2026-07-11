@@ -1,7 +1,0 @@
-// Test constant sources before global scope (must be found).
-
-const SOURCE = i32;
-
-// =========================| Global |=========================
-
-var _result_global = SOURCE; // expected: i32

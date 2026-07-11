@@ -1,7 +1,7 @@
 error: expected identifier
-│  → <root>/test_keyword_eof.gpex:2:1
-│    ¦ 
-│    ¦ ^
+│  → <root>/test_keyword_eof.gpex:1:4
+│    ¦ var
+│    ¦    ^
 ┴
 error: expected `import`, `var`, `const`, `struct`, `fn`, `repeat` or end of file
 │  → <root>/test_keyword_prefix.gpex:1:1
@@ -12,11 +12,6 @@ error: expected identifier
 │  → <root>/test_name_invalid.gpex:1:5
 │    ¦ var 123value = 0;
 │    ¦     ^
-┴
-error: expected identifier
-│  → <root>/test_name_missing.gpex:2:1
-│    ¦ 
-│    ¦ ^
 ┴
 error: expected identifier
 │  → <root>/test_name_reserved.gpex:1:5

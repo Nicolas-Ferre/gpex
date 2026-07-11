@@ -1,7 +1,0 @@
-// Test constant sources after global scope (must generate errors).
-
-// =========================| Global |=========================
-
-var _result_global = _SOURCE;
-
-const _SOURCE = i32;

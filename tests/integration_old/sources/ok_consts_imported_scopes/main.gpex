@@ -1,7 +1,0 @@
-// Test constant sources imported before global scope (must be found).
-
-import ~.imported;
-
-// =========================| Global |=========================
-
-var _result_global = SOURCE; // expected: i32

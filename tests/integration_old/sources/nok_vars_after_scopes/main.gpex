@@ -1,7 +1,0 @@
-// Test variable sources after all possible scopes (must generate errors).
-
-// =========================| Global |=========================
-
-var _result_global = _source;
-
-var _source = 0;

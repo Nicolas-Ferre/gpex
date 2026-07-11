@@ -1,9 +1,0 @@
-// Test function sources after global scope (must be found).
-
-// =========================| Global |=========================
-
-var _result_global = source(); // expected: i32
-
-const fn source() -> typeref {
-    return i32;
-}

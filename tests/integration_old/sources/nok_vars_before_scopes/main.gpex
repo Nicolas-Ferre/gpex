@@ -1,5 +1,0 @@
-// Test variable sources before all possible scopes (must generate errors).
-
-// =========================| Child scope |=========================
-
-var _source = _source;

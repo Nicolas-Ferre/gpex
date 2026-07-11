@@ -1,7 +1,0 @@
-// Test function parameter source before all possible scopes (must generate errors).
-
-// =========================| Own type |=========================
-
-fn _own_type(source: source) -> i32 {
-    return 0;
-}
