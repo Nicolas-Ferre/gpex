@@ -1,0 +1,5 @@
+const _PRIV_CONST = i32;
+
+const fn _priv_fn() -> typeref {
+    return i32;
+}

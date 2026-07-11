@@ -12,13 +12,6 @@ const fn requirement() -> bool {
 
 var _result_global = source(); // expected: i32
 
-// =========================| Function parameter type |=========================
-
-var _result_fn_param_type = fn_param_type(1); // expected: 1
-fn fn_param_type(param: source()) -> i32 {
-    return param;
-}
-
 // =========================| Function parameter requirement |=========================
 
 var _result_fn_param_requirement = fn_param_requirement(2); // expected: 2

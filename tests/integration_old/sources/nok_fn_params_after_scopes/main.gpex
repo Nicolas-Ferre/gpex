@@ -1,12 +1,5 @@
 // Test function parameter source after all possible scopes (must generate errors).
 
-// =========================| Function parameter type |=========================
-
-var _result_fn_param_type = fn_param_type(0, i32);
-fn fn_param_type(param: _source, _source: typeref) -> i32 {
-    return param;
-}
-
 // =========================| Function parameter requirement |=========================
 
 var _result_fn_param_requirement = fn_param_requirement(0, i32);
