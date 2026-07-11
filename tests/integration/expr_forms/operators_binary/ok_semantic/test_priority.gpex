@@ -40,6 +40,16 @@ fn __or__(_param1: i32, _param2: i32) -> i32 {
     return 13;
 }
 
+fn __add__(_param1: bool, _param2: bool) -> bool {
+    return true;
+}
+
+fn __mul__(_param1: bool, _param2: bool) -> bool {
+    return false;
+}
+
+var _chain = true + false * true; // expected: true
+
 // =========================| `+` first |=========================
 
 var _add_add = 1 + 2 + 3; // expected: 1

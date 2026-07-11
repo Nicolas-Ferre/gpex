@@ -1,0 +1,5 @@
+var _result = called(1, 0u); // expected: 1
+
+fn called(param1: i32, _param2: u32) -> i32 {
+    return param1;
+}

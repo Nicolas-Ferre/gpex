@@ -1,0 +1,5 @@
+var _result = called(); // expected: 1
+
+fn called() -> i32 {
+    return 1;
+}

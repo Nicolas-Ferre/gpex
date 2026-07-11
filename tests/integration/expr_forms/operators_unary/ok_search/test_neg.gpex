@@ -1,0 +1,5 @@
+var _result = -true; // expected: true
+
+fn __neg__(param: bool) -> bool {
+    return param;
+}

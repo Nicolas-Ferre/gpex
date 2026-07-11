@@ -1,0 +1,5 @@
+var _result = !1; // expected: 1
+
+fn __not__(param: i32) -> i32 {
+    return param;
+}
