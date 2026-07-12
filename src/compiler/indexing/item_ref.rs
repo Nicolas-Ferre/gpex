@@ -101,11 +101,8 @@ impl<'item> ItemRef<'item> {
         value_resolver.enter_scope();
         params.params.iter().zip(args).all(|(param, arg)| {
             let (param_type, arg_type) = value_resolver.bind_param_to_arg(param, arg);
-            (matches!(param_type, Type::Wildcard(_)) || param_type == arg_type)
-                && param.requirement.as_ref().is_none_or(|requirement| {
-                    value_resolver.expr_const_value(&requirement.condition)
-                        == ConstValue::Bool(true)
-                })
+            Self::are_types_matching(param_type, arg_type)
+                && Self::is_requirement_true(param, &mut value_resolver)
         })
     }
 
@@ -132,5 +129,17 @@ impl<'item> ItemRef<'item> {
 
     pub(crate) fn is_param_constness_ignored(self) -> bool {
         matches!(self, ItemRef::Fn(fn_) if fn_.compilerimpl() == Some(CompilerImpl::Typeof))
+    }
+
+    fn are_types_matching(param_type: Type<'_>, arg_type: Type<'_>) -> bool {
+        matches!(param_type, Type::Wildcard(_)) || param_type == arg_type
+    }
+
+    fn is_requirement_true(param: &Param, value_resolver: &mut ValueResolver<'_, '_>) -> bool {
+        if let Some(requirement) = &param.requirement {
+            value_resolver.expr_const_value(&requirement.condition) == ConstValue::Bool(true)
+        } else {
+            true
+        }
     }
 }
