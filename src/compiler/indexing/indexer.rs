@@ -1,5 +1,5 @@
 use crate::compiler::indexing::indexes::Indexes;
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::indexing::item_ref::{ArgsMatch, ItemRef};
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -190,14 +190,20 @@ impl<'item> Indexer<'item> {
             imports: &self.indexes.imports,
             config: FN_CALL_SEARCH_CONFIG,
         };
-        if let Some(source) = self.search_accessible_call_source(node, search_params) {
-            self.index_accessible_source(&node, node.span, source);
-        } else if let Some(source) = self.search_not_accessible_call_source(node, search_params) {
-            self.index_not_accessible_source(node.id, source);
-        } else if let candidates = self.search_candidate_call_sources(search_params)
-            && !candidates.is_empty()
-        {
-            self.index_candidate_sources(node.id, candidates);
+        match self.search_accessible_call_source(node, search_params) {
+            CallSource::Found(source) => self.index_accessible_source(&node, node.span, source),
+            CallSource::NotFound => {
+                if let Some(source) = self.search_not_accessible_call_source(node, search_params) {
+                    self.index_not_accessible_source(node.id, source);
+                } else {
+                    let candidates = self.search_candidate_call_sources(search_params);
+                    self.index_call_candidates(node.id, candidates);
+                }
+            }
+            CallSource::Unknown => {
+                let candidates = self.search_candidate_call_sources(search_params);
+                self.index_call_candidates(node.id, candidates);
+            }
         }
     }
 
@@ -223,11 +229,19 @@ impl<'item> Indexer<'item> {
         &self,
         call: &Call,
         search_params: SearchParams<'_, &Call>,
-    ) -> Option<ItemRef<'item>> {
-        self.indexes
+    ) -> CallSource<'item> {
+        for item in self
+            .indexes
             .items
             .search(search_params, Visibility::Enforced)
-            .find(|item| item.has_matching_args(&call.args, &self.indexes))
+        {
+            match item.args_match(&call.args, &self.indexes) {
+                ArgsMatch::Matching => return CallSource::Found(item),
+                ArgsMatch::NotMatching => {}
+                ArgsMatch::Unknown => return CallSource::Unknown,
+            }
+        }
+        CallSource::NotFound
     }
 
     fn search_candidate_call_sources(
@@ -249,7 +263,7 @@ impl<'item> Indexer<'item> {
         self.indexes
             .items
             .search(search_params, Visibility::Ignored)
-            .find(|item| item.has_matching_args(&call.args, &self.indexes))
+            .find(|item| item.args_match(&call.args, &self.indexes) == ArgsMatch::Matching)
     }
 
     fn search_accessible_ident_source(
@@ -273,6 +287,15 @@ impl<'item> Indexer<'item> {
                 ItemRef::Param(_) => false,
                 ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_) => true,
             })
+    }
+
+    fn index_call_candidates(&mut self, node_id: u64, candidates: Vec<ItemRef<'item>>) {
+        if self.is_indexing_source_only {
+            return;
+        }
+        if !candidates.is_empty() {
+            self.index_candidate_sources(node_id, candidates);
+        }
     }
 
     fn index_accessible_source(
@@ -304,4 +327,10 @@ impl<'item> Indexer<'item> {
         }
         self.indexes.priv_sources.insert(node_id, source);
     }
+}
+
+enum CallSource<'item> {
+    Found(ItemRef<'item>),
+    NotFound,
+    Unknown,
 }

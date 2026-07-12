@@ -1,0 +1,18 @@
+const _MATCHING = select(0); // expected: 2
+const _FALLBACK = select(0u); // expected: 1
+
+const fn select(_value: ?) -> i32 {
+    return 1;
+}
+
+const fn select(_value: type_()) -> i32 {
+    return 2;
+}
+
+const fn type_() -> typeref {
+    return identity(i32);
+}
+
+const fn identity(type_: const typeref) -> typeref {
+    return type_;
+}

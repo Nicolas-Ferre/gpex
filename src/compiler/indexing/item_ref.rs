@@ -95,15 +95,25 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn has_matching_args(self, args: &[Arg], indexes: &Indexes<'_>) -> bool {
+    pub(crate) fn args_match(self, args: &[Arg], indexes: &Indexes<'_>) -> ArgsMatch {
         let params = self.params();
         let mut value_resolver = ValueResolver::new(indexes);
         value_resolver.enter_scope();
-        params.params.iter().zip(args).all(|(param, arg)| {
+        let mut result = ArgsMatch::Matching;
+        for (param, arg) in params.params.iter().zip(args) {
             let (param_type, arg_type) = value_resolver.bind_param_to_arg(param, arg);
-            Self::are_types_matching(param_type, arg_type)
-                && Self::is_requirement_true(param, &mut value_resolver)
-        })
+            for param_match in [
+                Self::arg_match(param_type, arg_type),
+                Self::requirement_match(param, &mut value_resolver),
+            ] {
+                match param_match {
+                    ArgsMatch::Matching => {}
+                    ArgsMatch::NotMatching => return ArgsMatch::NotMatching,
+                    ArgsMatch::Unknown => result = ArgsMatch::Unknown,
+                }
+            }
+        }
+        result
     }
 
     pub(crate) fn params(self) -> &'item ParamGroup {
@@ -131,15 +141,39 @@ impl<'item> ItemRef<'item> {
         matches!(self, ItemRef::Fn(fn_) if fn_.compilerimpl() == Some(CompilerImpl::Typeof))
     }
 
-    fn are_types_matching(param_type: Type<'_>, arg_type: Type<'_>) -> bool {
-        matches!(param_type, Type::Wildcard(_)) || param_type == arg_type
-    }
-
-    fn is_requirement_true(param: &Param, value_resolver: &mut ValueResolver<'_, '_>) -> bool {
-        if let Some(requirement) = &param.requirement {
-            value_resolver.expr_const_value(&requirement.condition) == ConstValue::Bool(true)
+    fn arg_match(param_type: Type<'_>, arg_type: Type<'_>) -> ArgsMatch {
+        if matches!(param_type, Type::Wildcard(_)) || param_type == arg_type {
+            ArgsMatch::Matching
+        } else if matches!(param_type, Type::Unknown) || matches!(arg_type, Type::Unknown) {
+            ArgsMatch::Unknown
         } else {
-            true
+            ArgsMatch::NotMatching
         }
     }
+
+    fn requirement_match(param: &Param, value_resolver: &mut ValueResolver<'_, '_>) -> ArgsMatch {
+        if let Some(requirement) = &param.requirement {
+            match value_resolver.expr_const_value(&requirement.condition) {
+                ConstValue::Bool(true) => ArgsMatch::Matching,
+                ConstValue::Unknown => ArgsMatch::Unknown,
+                ConstValue::TypeRef(_)
+                | ConstValue::Param(_)
+                | ConstValue::WildcardType(_)
+                | ConstValue::I32(_)
+                | ConstValue::U32(_)
+                | ConstValue::F32(_)
+                | ConstValue::Bool(false)
+                | ConstValue::RuntimeValue => ArgsMatch::NotMatching,
+            }
+        } else {
+            ArgsMatch::Matching
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ArgsMatch {
+    Matching,
+    NotMatching,
+    Unknown,
 }
