@@ -25,15 +25,6 @@ error: `_called(u32)` item not found
 │    ¦ fn _called(param: i32) -> i32 {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-error: `_called(i32)` item not found
-│  → <root>/test_mismatching_require.gpex:1:13
-│    ¦ var _item = _called(0);
-│    ¦             ^^^^^^^^^^
-├─ info: similar candidate
-│  → <root>/test_mismatching_require.gpex:3:4
-│    ¦ fn _called(param: i32 require false) -> i32 {
-│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-┴
 error: `unknown` item not found
 │  → <root>/test_no_return_type_as_fn_call_arg.gpex:1:35
 │    ¦ const fn unknown_return_type() -> unknown {

@@ -34,6 +34,15 @@ error: expression with invalid type `i32`
 │    ¦                             ^
 ├─ info: expected `bool` type
 ┴
+error: `_called(i32)` item not found
+│  → <root>/test_unsatisfied.gpex:1:13
+│    ¦ var _item = _called(0);
+│    ¦             ^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/test_unsatisfied.gpex:3:4
+│    ¦ fn _called(param: i32 require false) -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
 error: invalid wildcard expression
 │  → <root>/test_wildcard.gpex:1:29
 │    ¦ fn _item(param: i32 require ?) -> i32 {
