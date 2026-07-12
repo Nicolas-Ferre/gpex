@@ -7,7 +7,7 @@ pub(crate) mod types;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Arg;
-use crate::compiler::parsing::items::params::ParamGroup;
+use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types::Type;
 use std::collections::HashMap;
@@ -40,18 +40,28 @@ impl<'item, 'index> ValueResolver<'item, 'index> {
         args: &[Arg],
     ) -> impl Iterator<Item = (Type<'item>, Type<'item>)> {
         debug_assert_eq!(params.params.len(), args.len());
-        params.params.iter().zip(args).map(|(param, arg)| {
-            let param_type = self.param_type(param);
-            let arg_type = self.expr_type(&arg.value);
-            if matches!(param.type_, Expr::Wildcard(_)) {
-                self.add_type(param.id, arg_type);
-            }
-            if param.const_mark_span().is_some() {
-                let value = self.expr_const_value(&arg.value);
-                self.add_value(param.id, value);
-            }
-            (param_type, arg_type)
-        })
+        params
+            .params
+            .iter()
+            .zip(args)
+            .map(|(param, arg)| self.bind_param_to_arg(param, arg))
+    }
+
+    pub(crate) fn bind_param_to_arg(
+        &mut self,
+        param: &'item Param,
+        arg: &Arg,
+    ) -> (Type<'item>, Type<'item>) {
+        let param_type = self.param_type(param);
+        let arg_type = self.expr_type(&arg.value);
+        if matches!(param.type_, Expr::Wildcard(_)) {
+            self.add_type(param.id, arg_type);
+        }
+        if param.const_mark_span().is_some() {
+            let value = self.expr_const_value(&arg.value);
+            self.add_value(param.id, value);
+        }
+        (param_type, arg_type)
     }
 
     fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {

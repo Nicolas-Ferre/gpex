@@ -1,0 +1,10 @@
+fn fn_(enabled: const bool require enabled, _disabled: const bool) -> i32 {
+    return 1;
+}
+
+fn fn_(_disabled: const bool, enabled: const bool require enabled) -> i32 {
+    return 2;
+}
+
+var _first = fn_(true, false); // expected: 1
+var _second = fn_(false, true); // expected: 2

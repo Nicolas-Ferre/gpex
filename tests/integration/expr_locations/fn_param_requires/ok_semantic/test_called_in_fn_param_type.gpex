@@ -1,0 +1,11 @@
+const fn type_(_enabled: const bool) -> typeref {
+    return u32;
+}
+
+const fn type_(enabled: const bool require enabled) -> typeref {
+    return i32;
+}
+
+fn _item(param: type_(true)) -> i32 {
+    return param;
+}

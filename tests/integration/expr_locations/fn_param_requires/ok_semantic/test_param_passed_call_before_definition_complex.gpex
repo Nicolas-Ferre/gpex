@@ -1,0 +1,25 @@
+const _RESULT = outer(inner()); // expected: 1
+
+const fn outer(enabled: const bool require enabled) -> i32 {
+    return 1;
+}
+
+const fn inner() -> bool {
+    return select(truth());
+}
+
+const fn select(_enabled: const bool) -> bool {
+    return false;
+}
+
+const fn select(enabled: const bool require enabled) -> bool {
+    return true;
+}
+
+const fn truth() -> bool {
+    return identity(true);
+}
+
+const fn identity(value: const bool) -> bool {
+    return value;
+}
