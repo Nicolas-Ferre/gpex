@@ -1,0 +1,5 @@
+var _item = _called(0);
+
+fn _called(param: i32 require false) -> i32 {
+    return param;
+}

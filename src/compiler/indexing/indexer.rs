@@ -227,7 +227,7 @@ impl<'item> Indexer<'item> {
         self.indexes
             .items
             .search(search_params, Visibility::Enforced)
-            .find(|item| item.has_same_param_types_as_args(&call.args, &self.indexes))
+            .find(|item| item.has_matching_args(&call.args, &self.indexes))
     }
 
     fn search_candidate_call_sources(
@@ -249,7 +249,7 @@ impl<'item> Indexer<'item> {
         self.indexes
             .items
             .search(search_params, Visibility::Ignored)
-            .find(|item| item.has_same_param_types_as_args(&call.args, &self.indexes))
+            .find(|item| item.has_matching_args(&call.args, &self.indexes))
     }
 
     fn search_accessible_ident_source(

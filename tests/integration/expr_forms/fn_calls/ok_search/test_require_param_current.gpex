@@ -1,0 +1,11 @@
+fn fn_(_param1: bool, _param2: bool) -> i32 {
+    return 1;
+}
+
+fn fn_(param1: const bool require param1, param2: const bool require param2) -> i32 {
+    return 2;
+}
+
+var _all_true = fn_(true, true); // expected: 2
+var _first_false = fn_(false, true); // expected: 1
+var _second_false = fn_(true, false); // expected: 1

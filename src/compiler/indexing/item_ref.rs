@@ -6,6 +6,7 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::values::ValueResolver;
+use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
@@ -94,15 +95,18 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn has_same_param_types_as_args(self, args: &[Arg], indexes: &Indexes<'_>) -> bool {
+    pub(crate) fn has_matching_args(self, args: &[Arg], indexes: &Indexes<'_>) -> bool {
         let params = self.params();
         let mut value_resolver = ValueResolver::new(indexes);
         value_resolver.enter_scope();
-        value_resolver
-            .bind_params_to_args(params, args)
-            .all(|(param_type, arg_type)| {
-                matches!(param_type, Type::Wildcard(_)) || param_type == arg_type
-            })
+        params.params.iter().zip(args).all(|(param, arg)| {
+            let (param_type, arg_type) = value_resolver.bind_param_to_arg(param, arg);
+            (matches!(param_type, Type::Wildcard(_)) || param_type == arg_type)
+                && param.requirement.as_ref().is_none_or(|requirement| {
+                    value_resolver.expr_const_value(&requirement.condition)
+                        == ConstValue::Bool(true)
+                })
+        })
     }
 
     pub(crate) fn params(self) -> &'item ParamGroup {

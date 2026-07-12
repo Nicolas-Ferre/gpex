@@ -1,0 +1,13 @@
+fn fn_(_param: ?) -> i32 {
+    return 1;
+}
+
+fn fn_(param: ? require is_valid(typeof(param))) -> i32 {
+    return 2;
+}
+
+const fn is_valid(_type: const typeref) -> bool {
+    return true;
+}
+
+var _item = fn_(0); // expected: 2
