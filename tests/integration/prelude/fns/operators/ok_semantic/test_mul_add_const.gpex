@@ -1,2 +1,3 @@
-const _MUL_ADD = mul_add(2.0, 3.0, 4.0); // expected: 10.0
-const _MUL_ADD_FUSED = mul_add(1.00000011920928955078125, 1.00000011920928955078125, -1.0000002384185791015625); // expected: 0.000000000000014210855
+const _VALUE = mul_add(2.0, 3.0, 4.0); // expected: 10.0
+// TODO: exceptionally, you can compare here the result with the classic * and + operators
+const _FUSED = mul_add(1.00000011920928955078125, 1.00000011920928955078125, -1.0000002384185791015625); // expected: 0.000000000000014210855

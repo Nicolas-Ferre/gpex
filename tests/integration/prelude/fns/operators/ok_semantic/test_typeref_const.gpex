@@ -1,2 +1,4 @@
-const _TYPEREF_EQ = i32 == i32; // expected: true
-const _TYPEREF_NE = i32 != u32; // expected: true
+const _EQ_TRUE = i32 == i32; // expected: true
+const _EQ_FALSE = i32 == u32; // expected: false
+const _NE_TRUE = i32 != u32; // expected: true
+const _NE_FALSE = i32 != i32; // expected: false

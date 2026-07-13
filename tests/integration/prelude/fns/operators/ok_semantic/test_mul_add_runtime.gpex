@@ -1,5 +1,6 @@
-var mul_add_two = 2.0;
-var mul_add_almost_one = 1.00000011920928955078125;
+var two = 2.0;
+var almost_one = 1.00000011920928955078125;
 
-var _mul_add = mul_add(mul_add_two, 3.0, 4.0); // expected: 10.0
-var _mul_add_fused = mul_add(mul_add_almost_one, mul_add_almost_one, -1.0000002384185791015625); // expected: 0.000000000000014210855
+var _value = mul_add(two, 3.0, 4.0); // expected: 10.0
+// TODO: same as const tests
+var _fused = mul_add(almost_one, almost_one, -1.0000002384185791015625); // expected: 0.000000000000014210855

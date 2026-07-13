@@ -1,20 +1,28 @@
-const _I32_ADD = 2 + 3; // expected: 5
-const _I32_SUB = 2 - 3; // expected: -1
-const _I32_MUL = -3 * 2; // expected: -6
-const _I32_DIV = -7 / 2; // expected: -3
-const _I32_MOD = -7 % 2; // expected: -1
-const _I32_EQ = 2 == 2; // expected: true
-const _I32_NE = 2 != 3; // expected: true
-const _I32_LT = 2 < 3; // expected: true
-const _I32_LE = 2 <= 2; // expected: true
-const _I32_GT = 3 > 2; // expected: true
-const _I32_GE = 2 >= 2; // expected: true
-const _I32_NEG = -2; // expected: -2
-const _I32_ADD_WRAP = 2_147_483_647 + 1; // expected: -2147483648
-const _I32_SUB_WRAP = -2_147_483_647 - 2; // expected: 2147483647
-const _I32_MUL_WRAP = 1_073_741_824 * 2; // expected: -2147483648
-const I32_MIN = -2_147_483_647 - 1; // TODO: name doesn't seem aligned with the rest, is this normal?
-const _I32_DIV_WRAP = I32_MIN / -1; // expected: -2147483648
-const _I32_MOD_WRAP = I32_MIN % -1; // expected: 0
-const _I32_DIV_ZERO = 7 / 0; // expected: 7
-const _I32_MOD_ZERO = 7 % 0; // expected: 7
+const MIN = -2_147_483_647 - 1;
+
+// TODO: for all operation tests, regroup operators together (e.g. _ADD and _ADD_WRAP)
+const _ADD = 2 + 3; // expected: 5
+const _SUB = 2 - 3; // expected: -1
+const _MUL = -3 * 2; // expected: -6
+const _DIV = -7 / 2; // expected: -3
+const _MOD = -7 % 2; // expected: -1
+const _EQ_TRUE = 2 == 2; // expected: true
+const _EQ_FALSE = 2 == 3; // expected: false
+const _NE_TRUE = 2 != 3; // expected: true
+const _NE_FALSE = 2 != 2; // expected: false
+const _LT_TRUE = 2 < 3; // expected: true
+const _LT_FALSE = 3 < 2; // expected: false
+const _LE_TRUE = 2 <= 2; // expected: true
+const _LE_FALSE = 3 <= 2; // expected: false
+const _GT_TRUE = 3 > 2; // expected: true
+const _GT_FALSE = 2 > 3; // expected: false
+const _GE_TRUE = 2 >= 2; // expected: true
+const _GE_FALSE = 2 >= 3; // expected: false
+const _NEG = -2; // expected: -2 // TODO: not good, this is the syntactical `-` operator of i32 literals
+const _ADD_WRAP = 2_147_483_647 + 1; // expected: -2147483648
+const _SUB_WRAP = MIN - 1; // expected: 2147483647
+const _MUL_WRAP = 1_073_741_824 * 2; // expected: -2147483648
+const _DIV_WRAP = MIN / -1; // expected: -2147483648
+const _MOD_WRAP = MIN % -1; // expected: 0
+const _DIV_ZERO = 7 / 0; // expected: 7
+const _MOD_ZERO = 7 % 0; // expected: 7

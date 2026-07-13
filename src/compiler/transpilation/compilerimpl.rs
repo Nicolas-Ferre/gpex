@@ -1,5 +1,8 @@
+use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::items::fns::{CompilerImpl, FnDefinition};
+use crate::compiler::parsing::items::fns::{
+    BinaryCompilerImpl, CompilerImpl, FnDefinition, UnaryCompilerImpl,
+};
 use crate::compiler::transpilation::Transpiler;
 use crate::compiler::values::types::Type;
 use std::fmt::Write;
@@ -7,22 +10,10 @@ use std::fmt::Write;
 impl Transpiler<'_, '_> {
     pub(super) fn transpile_compilerimpl_fn_call(&mut self, node: &Call, source: &FnDefinition) {
         match source.compilerimpl() {
-            Some(
-                compilerimpl @ (CompilerImpl::Add
-                | CompilerImpl::Sub
-                | CompilerImpl::Mul
-                | CompilerImpl::Div
-                | CompilerImpl::Mod
-                | CompilerImpl::Eq
-                | CompilerImpl::Ne
-                | CompilerImpl::Lt
-                | CompilerImpl::Le
-                | CompilerImpl::Gt
-                | CompilerImpl::Ge
-                | CompilerImpl::And
-                | CompilerImpl::Or),
-            ) => self.transpile_compilerimpl_fn_call_binary(node, compilerimpl),
-            Some(compilerimpl @ (CompilerImpl::Neg | CompilerImpl::Not)) => {
+            Some(CompilerImpl::Binary(compilerimpl)) => {
+                self.transpile_compilerimpl_fn_call_binary(node, compilerimpl);
+            }
+            Some(CompilerImpl::Unary(compilerimpl)) => {
                 self.transpile_compilerimpl_fn_call_unary(node, compilerimpl);
             }
             Some(CompilerImpl::MulAdd) => self.transpile_compilerimpl_fn_call_mul_add(node),
@@ -32,86 +23,86 @@ impl Transpiler<'_, '_> {
         }
     }
 
-    // TODO: this function is way to big
-    #[allow(clippy::wildcard_enum_match_arm)]
-    fn transpile_compilerimpl_fn_call_binary(&mut self, node: &Call, compilerimpl: CompilerImpl) {
+    fn transpile_compilerimpl_fn_call_binary(
+        &mut self,
+        node: &Call,
+        compilerimpl: BinaryCompilerImpl,
+    ) {
         let is_typeref_comparison = matches!(
             self.value_resolver.expr_type(&node.args[0].value),
             Type::Struct(type_) if type_.name == "typeref"
         );
         if is_typeref_comparison {
-            if compilerimpl == CompilerImpl::Ne {
-                self.shader += "u32(!all(";
-            } else {
-                self.shader += "u32(all(";
-            }
-            self.transpile_expr(&node.args[0].value);
-            self.shader += " == ";
-            self.transpile_expr(&node.args[1].value);
-            self.shader += "))";
-            return;
+            self.transpile_compilerimpl_fn_call_typeref_binary(node, compilerimpl);
+        } else {
+            self.transpile_compilerimpl_fn_call_scalar_binary(node, compilerimpl);
         }
-        let operator = match compilerimpl {
-            CompilerImpl::Add => "+",
-            CompilerImpl::Sub => "-",
-            CompilerImpl::Mul => "*",
-            CompilerImpl::Div => "/",
-            CompilerImpl::Mod => "%",
-            CompilerImpl::Eq => "==",
-            CompilerImpl::Ne => "!=",
-            CompilerImpl::Lt => "<",
-            CompilerImpl::Le => "<=",
-            CompilerImpl::Gt => ">",
-            CompilerImpl::Ge => ">=",
-            CompilerImpl::And => "&&",
-            CompilerImpl::Or => "||",
-            _ => unreachable!("invalid binary compiler implementation"),
+    }
+
+    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+    fn transpile_compilerimpl_fn_call_typeref_binary(
+        &mut self,
+        node: &Call,
+        compilerimpl: BinaryCompilerImpl,
+    ) {
+        let negation = match compilerimpl {
+            BinaryCompilerImpl::Eq => "",
+            BinaryCompilerImpl::Ne => "!",
+            _ => unreachable!("invalid typeref compiler implementation"),
         };
-        let is_comparison = matches!(
-            compilerimpl,
-            CompilerImpl::Eq
-                | CompilerImpl::Ne
-                | CompilerImpl::Lt
-                | CompilerImpl::Le
-                | CompilerImpl::Gt
-                | CompilerImpl::Ge
-        );
-        let is_boolean = matches!(compilerimpl, CompilerImpl::And | CompilerImpl::Or);
-        if is_comparison || is_boolean {
+        _ = write!(self.shader, "u32({negation}all(");
+        self.transpile_expr(&node.args[0].value);
+        self.shader += " == ";
+        self.transpile_expr(&node.args[1].value);
+        self.shader += "))";
+    }
+
+    fn transpile_compilerimpl_fn_call_scalar_binary(
+        &mut self,
+        node: &Call,
+        compilerimpl: BinaryCompilerImpl,
+    ) {
+        if compilerimpl.returns_bool() {
             self.shader += "u32(";
         }
         self.shader += "(";
-        if is_boolean {
-            self.shader += "(";
-        }
-        self.transpile_expr(&node.args[0].value);
-        if is_boolean {
-            self.shader += " != u32(0))";
-        }
-        _ = write!(self.shader, " {operator} ");
-        if is_boolean {
-            self.shader += "(";
-        }
-        self.transpile_expr(&node.args[1].value);
-        if is_boolean {
-            self.shader += " != u32(0))";
-        }
+        self.transpile_compilerimpl_fn_call_binary_operand(
+            &node.args[0].value,
+            compilerimpl.is_bool(),
+        );
+        _ = write!(self.shader, " {} ", compilerimpl.wgsl_operator());
+        self.transpile_compilerimpl_fn_call_binary_operand(
+            &node.args[1].value,
+            compilerimpl.is_bool(),
+        );
         self.shader += ")";
-        if is_comparison || is_boolean {
+        if compilerimpl.returns_bool() {
             self.shader += ")";
         }
     }
 
-    fn transpile_compilerimpl_fn_call_unary(&mut self, node: &Call, compilerimpl: CompilerImpl) {
-        if compilerimpl == CompilerImpl::Not {
-            self.shader += "u32(";
-            self.transpile_expr(&node.args[0].value);
-            self.shader += " == u32(0))";
-        } else {
-            self.shader += "(-";
-            self.transpile_expr(&node.args[0].value);
-            self.shader += ")";
+    fn transpile_compilerimpl_fn_call_binary_operand(&mut self, expr: &Expr, is_bool: bool) {
+        if is_bool {
+            self.shader += "(";
         }
+        self.transpile_expr(expr);
+        if is_bool {
+            self.shader += " == u32(true))";
+        }
+    }
+
+    fn transpile_compilerimpl_fn_call_unary(
+        &mut self,
+        node: &Call,
+        compilerimpl: UnaryCompilerImpl,
+    ) {
+        let (prefix, suffix) = match compilerimpl {
+            UnaryCompilerImpl::Neg => ("(-", ")"),
+            UnaryCompilerImpl::Not => ("u32(", " == u32(false))"),
+        };
+        self.shader += prefix;
+        self.transpile_expr(&node.args[0].value);
+        self.shader += suffix;
     }
 
     fn transpile_compilerimpl_fn_call_mul_add(&mut self, node: &Call) {
@@ -121,5 +112,37 @@ impl Transpiler<'_, '_> {
             self.shader += ", ";
         }
         self.shader += ")";
+    }
+}
+
+// Avoid create external impl block (i.e. in other file than item def) for helper functions
+impl BinaryCompilerImpl {
+    fn wgsl_operator(self) -> &'static str {
+        match self {
+            Self::Add => "+",
+            Self::Sub => "-",
+            Self::Mul => "*",
+            Self::Div => "/",
+            Self::Mod => "%",
+            Self::Eq => "==",
+            Self::Ne => "!=",
+            Self::Lt => "<",
+            Self::Le => "<=",
+            Self::Gt => ">",
+            Self::Ge => ">=",
+            Self::And => "&&",
+            Self::Or => "||",
+        }
+    }
+
+    fn is_bool(self) -> bool {
+        matches!(self, Self::And | Self::Or)
+    }
+
+    fn returns_bool(self) -> bool {
+        matches!(
+            self,
+            Self::Eq | Self::Ne | Self::Lt | Self::Le | Self::Gt | Self::Ge | Self::And | Self::Or
+        )
     }
 }

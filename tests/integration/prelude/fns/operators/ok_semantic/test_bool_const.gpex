@@ -1,10 +1,15 @@
-// TODO: don't repeat the type names in variables/constants in tests
-const _BOOL_EQ = false == false; // expected: true
-const _BOOL_NE = false != true; // expected: true
-const _BOOL_LT = false < true; // expected: true
-const _BOOL_LE = true <= true; // expected: true
-const _BOOL_GT = true > false; // expected: true
-const _BOOL_GE = false >= false; // expected: true
-const _BOOL_AND = true && false; // expected: false
-const _BOOL_OR = true || false; // expected: true
-const _BOOL_NOT = !false; // expected: true
+const _EQ_TRUE = false == false; // expected: true
+const _EQ_FALSE = false == true; // expected: false
+const _NE_TRUE = false != true; // expected: true
+const _NE_FALSE = false != false; // expected: false
+const _LT_TRUE = false < true; // expected: true
+const _LT_FALSE = true < false; // expected: false
+const _LE_TRUE = true <= true; // expected: true
+const _LE_FALSE = true <= false; // expected: false
+const _GT_TRUE = true > false; // expected: true
+const _GT_FALSE = false > true; // expected: false
+const _GE_TRUE = false >= false; // expected: true
+const _GE_FALSE = false >= true; // expected: false
+const _AND = true && false; // expected: false
+const _OR = true || false; // expected: true
+const _NOT = !false; // expected: true

@@ -1,12 +1,18 @@
-var bool_false = false;
-var bool_true = true;
+var false_ = false;
+var true_ = true;
 
-var _bool_eq = bool_false == false; // expected: true
-var _bool_ne = bool_false != true; // expected: true
-var _bool_lt = bool_false < bool_true; // expected: true
-var _bool_le = bool_true <= true; // expected: true
-var _bool_gt = bool_true > bool_false; // expected: true
-var _bool_ge = bool_false >= false; // expected: true
-var _bool_and = bool_true && bool_false; // expected: false
-var _bool_or = bool_true || bool_false; // expected: true
-var _bool_not = !bool_false; // expected: true
+var _eq_true = false_ == false; // expected: true
+var _eq_false = false_ == true; // expected: false
+var _ne_true = false_ != true; // expected: true
+var _ne_false = false_ != false; // expected: false
+var _lt_true = false_ < true_; // expected: true
+var _lt_false = true_ < false_; // expected: false
+var _le_true = true_ <= true; // expected: true
+var _le_false = true_ <= false; // expected: false
+var _gt_true = true_ > false_; // expected: true
+var _gt_false = false_ > true_; // expected: false
+var _ge_true = false_ >= false; // expected: true
+var _ge_false = false_ >= true; // expected: false
+var _and = true_ && false_; // expected: false
+var _or = true_ || false_; // expected: true
+var _not = !false_; // expected: true

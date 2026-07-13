@@ -86,21 +86,21 @@ impl FnDefinition {
             return None;
         }
         match self.name.as_str() {
-            "__add__" => Some(CompilerImpl::Add),
-            "__sub__" => Some(CompilerImpl::Sub),
-            "__mul__" => Some(CompilerImpl::Mul),
-            "__div__" => Some(CompilerImpl::Div),
-            "__mod__" => Some(CompilerImpl::Mod),
-            "__eq__" => Some(CompilerImpl::Eq),
-            "__ne__" => Some(CompilerImpl::Ne),
-            "__lt__" => Some(CompilerImpl::Lt),
-            "__le__" => Some(CompilerImpl::Le),
-            "__gt__" => Some(CompilerImpl::Gt),
-            "__ge__" => Some(CompilerImpl::Ge),
-            "__and__" => Some(CompilerImpl::And),
-            "__or__" => Some(CompilerImpl::Or),
-            "__neg__" => Some(CompilerImpl::Neg),
-            "__not__" => Some(CompilerImpl::Not),
+            "__add__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Add)),
+            "__sub__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Sub)),
+            "__mul__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Mul)),
+            "__div__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Div)),
+            "__mod__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Mod)),
+            "__eq__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Eq)),
+            "__ne__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Ne)),
+            "__lt__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Lt)),
+            "__le__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Le)),
+            "__gt__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Gt)),
+            "__ge__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Ge)),
+            "__and__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::And)),
+            "__or__" => Some(CompilerImpl::Binary(BinaryCompilerImpl::Or)),
+            "__neg__" => Some(CompilerImpl::Unary(UnaryCompilerImpl::Neg)),
+            "__not__" => Some(CompilerImpl::Unary(UnaryCompilerImpl::Not)),
             "mul_add" => Some(CompilerImpl::MulAdd),
             "typeof" => Some(CompilerImpl::Typeof),
             "sizeof" => Some(CompilerImpl::Sizeof),
@@ -151,10 +151,17 @@ impl FnDefinition {
     }
 }
 
-// TODO: replace Add, Sub, ... by Binary() variant (same for unary) and create BinaryCompilerImpl child enum (same for unary)
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum CompilerImpl {
+    Binary(BinaryCompilerImpl),
+    Unary(UnaryCompilerImpl),
+    MulAdd,
+    Typeof,
+    Sizeof,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum BinaryCompilerImpl {
     Add,
     Sub,
     Mul,
@@ -168,11 +175,12 @@ pub(crate) enum CompilerImpl {
     Ge,
     And,
     Or,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum UnaryCompilerImpl {
     Neg,
     Not,
-    MulAdd,
-    Typeof,
-    Sizeof,
 }
 
 #[derive(Debug)]
