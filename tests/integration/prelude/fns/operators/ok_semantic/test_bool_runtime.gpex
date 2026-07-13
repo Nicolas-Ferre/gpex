@@ -1,0 +1,12 @@
+var bool_false = false;
+var bool_true = true;
+
+var _bool_eq = bool_false == false; // expected: true
+var _bool_ne = bool_false != true; // expected: true
+var _bool_lt = bool_false < bool_true; // expected: true
+var _bool_le = bool_true <= true; // expected: true
+var _bool_gt = bool_true > bool_false; // expected: true
+var _bool_ge = bool_false >= false; // expected: true
+var _bool_and = bool_true && bool_false; // expected: false
+var _bool_or = bool_true || bool_false; // expected: true
+var _bool_not = !bool_false; // expected: true

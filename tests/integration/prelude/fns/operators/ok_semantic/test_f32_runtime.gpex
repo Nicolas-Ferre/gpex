@@ -1,0 +1,15 @@
+var f32_two = 2.0;
+var f32_negative_seven = -7.0;
+
+var _f32_add = f32_two + 3.0; // expected: 5.0
+var _f32_sub = f32_two - 3.0; // expected: -1.0
+var _f32_mul = f32_two * -3.0; // expected: -6.0
+var _f32_div = f32_negative_seven / 2.0; // expected: -3.5
+var _f32_mod = f32_negative_seven % 2.0; // expected: -1.0
+var _f32_eq = f32_two == 2.0; // expected: true
+var _f32_ne = f32_two != 3.0; // expected: true
+var _f32_lt = f32_two < 3.0; // expected: true
+var _f32_le = f32_two <= 2.0; // expected: true
+var _f32_gt = f32_two > 1.0; // expected: true
+var _f32_ge = f32_two >= 2.0; // expected: true
+var _f32_neg = -f32_two; // expected: -2.0

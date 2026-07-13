@@ -87,6 +87,21 @@ impl FnDefinition {
         }
         match self.name.as_str() {
             "__add__" => Some(CompilerImpl::Add),
+            "__sub__" => Some(CompilerImpl::Sub),
+            "__mul__" => Some(CompilerImpl::Mul),
+            "__div__" => Some(CompilerImpl::Div),
+            "__mod__" => Some(CompilerImpl::Mod),
+            "__eq__" => Some(CompilerImpl::Eq),
+            "__ne__" => Some(CompilerImpl::Ne),
+            "__lt__" => Some(CompilerImpl::Lt),
+            "__le__" => Some(CompilerImpl::Le),
+            "__gt__" => Some(CompilerImpl::Gt),
+            "__ge__" => Some(CompilerImpl::Ge),
+            "__and__" => Some(CompilerImpl::And),
+            "__or__" => Some(CompilerImpl::Or),
+            "__neg__" => Some(CompilerImpl::Neg),
+            "__not__" => Some(CompilerImpl::Not),
+            "mul_add" => Some(CompilerImpl::MulAdd),
             "typeof" => Some(CompilerImpl::Typeof),
             "sizeof" => Some(CompilerImpl::Sizeof),
             _ => None,
@@ -136,9 +151,26 @@ impl FnDefinition {
     }
 }
 
+// TODO: replace Add, Sub, ... by Binary() variant (same for unary) and create BinaryCompilerImpl child enum (same for unary)
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum CompilerImpl {
     Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+    And,
+    Or,
+    Neg,
+    Not,
+    MulAdd,
     Typeof,
     Sizeof,
 }

@@ -1,3 +1,5 @@
+// NATIVE TYPES
+
 /// A reference to a type.
 ///
 /// # Examples
@@ -49,14 +51,7 @@ pub struct f32 = compilerimpl {}
 /// ```
 pub struct bool = compilerimpl {}
 
-/// Adds two `i32` values.
-///
-/// # Examples
-///
-/// ```gpex
-/// var value = 1 + 2;
-/// ```
-pub const fn __add__(left: i32, right: i32) -> i32 = compilerimpl;
+// TYPE OPERATIONS
 
 /// Returns the type of a value.
 ///
@@ -76,3 +71,95 @@ pub const fn typeof(value: ?) -> typeref = compilerimpl;
 /// const I32_SIZE = sizeof(i32); // 4u
 /// ```
 pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
+
+// OPERATORS
+
+// TODO: typeof can be kept in normal form, but we can use uniform notation for is_numeric, ...
+// TODO: formatting to review: return type on same lign as signature, but `= compilerimpl;` indented on next line.
+// TODO: add examples section in all doc strings
+// TODO: in doc strings, add example for each supported type (in same code block)
+// TODO: Prefers "Returns whether ..." in doc strings of functions returning bool, instead of "Tests whether", ...
+/// Adds two numeric values of the same type.
+///
+/// # Examples
+///
+/// ```gpex
+/// var value = 1 + 2;
+/// ```
+pub const fn __add__(left: ? require is_numeric(typeof(left)), right: typeof(left))
+    -> typeof(left) = compilerimpl;
+
+/// Subtracts two numeric values of the same type.
+pub const fn __sub__(left: ? require is_numeric(typeof(left)), right: typeof(left))
+    -> typeof(left) = compilerimpl;
+
+/// Multiplies two numeric values of the same type.
+pub const fn __mul__(left: ? require is_numeric(typeof(left)), right: typeof(left))
+    -> typeof(left) = compilerimpl;
+
+/// Divides two numeric values of the same type.
+pub const fn __div__(left: ? require is_numeric(typeof(left)), right: typeof(left))
+    -> typeof(left) = compilerimpl;
+
+/// Returns the remainder after dividing two numeric values of the same type.
+pub const fn __mod__(left: ? require is_numeric(typeof(left)), right: typeof(left))
+    -> typeof(left) = compilerimpl;
+
+/// Tests whether two scalar values of the same type are equal.
+pub const fn __eq__(left: ? require is_ordered(typeof(left)), right: typeof(left))
+    -> bool = compilerimpl;
+
+/// Tests whether two scalar values of the same type are different.
+pub const fn __ne__(left: ? require is_ordered(typeof(left)), right: typeof(left))
+    -> bool = compilerimpl;
+
+/// Tests whether the left scalar value is less than the right one.
+pub const fn __lt__(left: ? require is_ordered(typeof(left)), right: typeof(left))
+    -> bool = compilerimpl;
+
+// TODO: All doc strings should be as short as possible, and referring at least once all parameter names directly, for example for the next function: "Tests whether `left`and `right` values are equal."
+/// Tests whether the left scalar value is less than or equal to the right one.
+pub const fn __le__(left: ? require is_ordered(typeof(left)), right: typeof(left))
+    -> bool = compilerimpl;
+
+/// Tests whether the left scalar value is greater than the right one.
+pub const fn __gt__(left: ? require is_ordered(typeof(left)), right: typeof(left))
+    -> bool = compilerimpl;
+
+/// Tests whether the left scalar value is greater than or equal to the right one.
+pub const fn __ge__(left: ? require is_ordered(typeof(left)), right: typeof(left))
+    -> bool = compilerimpl;
+
+/// Returns whether both boolean values are true.
+pub const fn __and__(left: bool, right: bool) -> bool = compilerimpl;
+
+/// Returns whether either boolean value is true.
+pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
+
+/// Negates a signed numeric value.
+pub const fn __neg__(value: ? require is_signed(typeof(value)))
+    -> typeof(value) = compilerimpl;
+
+/// Negates a boolean value.
+pub const fn __not__(value: bool) -> bool = compilerimpl;
+
+/// Tests whether two type references are equal.
+pub const fn __eq__(left: typeref, right: typeref) -> bool = compilerimpl;
+
+/// Tests whether two type references are different.
+pub const fn __ne__(left: typeref, right: typeref) -> bool = compilerimpl;
+
+/// Multiplies two `f32` values and adds a third with a single rounding.
+pub const fn mul_add(value: f32, multiplier: f32, addend: f32) -> f32 = compilerimpl;
+
+const fn is_numeric(type_: typeref) -> bool {
+    return type_ == i32 || type_ == u32 || type_ == f32;
+}
+
+const fn is_ordered(type_: typeref) -> bool {
+    return is_numeric(type_) || type_ == bool;
+}
+
+const fn is_signed(type_: typeref) -> bool {
+    return type_ == i32 || type_ == f32;
+}

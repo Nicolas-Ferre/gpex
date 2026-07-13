@@ -1,0 +1,5 @@
+var typeref_i32 = i32;
+
+// TODO: when testing equality or comparison, also return cases returning false
+var _typeref_eq = typeref_i32 == i32; // expected: true
+var _typeref_ne = typeref_i32 != u32; // expected: true

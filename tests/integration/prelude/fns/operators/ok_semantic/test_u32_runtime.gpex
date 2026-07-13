@@ -1,0 +1,15 @@
+var u32_two = 2u;
+var u32_max = 4_294_967_295u;
+
+var _u32_add = u32_two + 3u; // expected: 5u
+var _u32_sub = u32_two - 1u; // expected: 1u
+var _u32_mul = u32_two * 3u; // expected: 6u
+var _u32_div = u32_two / 2u; // expected: 1u
+var _u32_mod = u32_two % 2u; // expected: 0u
+var _u32_eq = u32_two == 2u; // expected: true
+var _u32_ne = u32_two != 3u; // expected: true
+var _u32_lt = u32_two < 3u; // expected: true
+var _u32_le = u32_two <= 2u; // expected: true
+var _u32_gt = u32_two > 1u; // expected: true
+var _u32_ge = u32_two >= 2u; // expected: true
+var _u32_add_wrap = u32_max + 1u; // expected: 0u

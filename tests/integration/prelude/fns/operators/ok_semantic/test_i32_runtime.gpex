@@ -1,0 +1,20 @@
+var i32_two = 2;
+var i32_negative_seven = -7;
+var i32_min = -2_147_483_647 - 1;
+
+var _i32_add = i32_two + 3; // expected: 5
+var _i32_sub = i32_two - 3; // expected: -1
+var _i32_mul = i32_two * -3; // expected: -6
+var _i32_div = i32_negative_seven / 2; // expected: -3
+var _i32_mod = i32_negative_seven % 2; // expected: -1
+var _i32_eq = i32_two == 2; // expected: true
+var _i32_ne = i32_two != 3; // expected: true
+var _i32_lt = i32_two < 3; // expected: true
+var _i32_le = i32_two <= 2; // expected: true
+var _i32_gt = i32_two > 1; // expected: true
+var _i32_ge = i32_two >= 2; // expected: true
+var _i32_neg = -i32_two; // expected: -2
+var _i32_add_wrap = i32_min + -1; // expected: 2147483647
+var _i32_div_wrap = i32_min / -1; // expected: -2147483648
+var _i32_mod_wrap = i32_min % -1; // expected: 0
+// TODO: do exactly the same tests for runtime and const time for all prelude tests (e.g. here division by zero is missing)
