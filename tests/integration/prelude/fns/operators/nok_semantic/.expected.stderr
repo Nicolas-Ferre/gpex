@@ -1,0 +1,15 @@
+error: `__mod__(f32, f32)` item not found
+│  → <root>/test_f32_mod.gpex:1:15
+│    ¦ var _result = 0.0 % 0.0;
+│    ¦               ^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/res/prelude.gpex:141:14
+│    ¦ pub const fn __mod__(
+│    ¦              ^^^^^^^^
+│    ¦     left: ? require typeof(left).is_integer(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> typeof(left) = compilerimpl;
+│    ¦ ^^^^^^^^^^^^^^^^^
+┴

@@ -58,15 +58,21 @@ impl Transpiler<'_, '_> {
         node: &Call,
         fn_: BinaryCompilerImplFn,
     ) {
-        if fn_.returns_bool() {
+        if is_binary_operator_returning_bool(fn_) {
             self.shader += "u32(";
         }
         self.shader += "(";
-        self.transpile_compilerimpl_fn_call_binary_operand(&node.args[0].value, fn_.is_bool());
-        _ = write!(self.shader, " {} ", fn_.wgsl_operator());
-        self.transpile_compilerimpl_fn_call_binary_operand(&node.args[1].value, fn_.is_bool());
+        self.transpile_compilerimpl_fn_call_binary_operand(
+            &node.args[0].value,
+            is_binary_operator_accepting_bool(fn_),
+        );
+        _ = write!(self.shader, " {} ", binary_operator_wgsl(fn_));
+        self.transpile_compilerimpl_fn_call_binary_operand(
+            &node.args[1].value,
+            is_binary_operator_accepting_bool(fn_),
+        );
         self.shader += ")";
-        if fn_.returns_bool() {
+        if is_binary_operator_returning_bool(fn_) {
             self.shader += ")";
         }
     }
@@ -101,34 +107,38 @@ impl Transpiler<'_, '_> {
     }
 }
 
-// TODO: avoid create external impl block (i.e. in other file than item def) for helper functions
-impl BinaryCompilerImplFn {
-    fn wgsl_operator(self) -> &'static str {
-        match self {
-            Self::Add => "+",
-            Self::Sub => "-",
-            Self::Mul => "*",
-            Self::Div => "/",
-            Self::Mod => "%",
-            Self::Eq => "==",
-            Self::Ne => "!=",
-            Self::Lt => "<",
-            Self::Le => "<=",
-            Self::Gt => ">",
-            Self::Ge => ">=",
-            Self::And => "&&",
-            Self::Or => "||",
-        }
+fn binary_operator_wgsl(fn_: BinaryCompilerImplFn) -> &'static str {
+    match fn_ {
+        BinaryCompilerImplFn::Add => "+",
+        BinaryCompilerImplFn::Sub => "-",
+        BinaryCompilerImplFn::Mul => "*",
+        BinaryCompilerImplFn::Div => "/",
+        BinaryCompilerImplFn::Mod => "%",
+        BinaryCompilerImplFn::Eq => "==",
+        BinaryCompilerImplFn::Ne => "!=",
+        BinaryCompilerImplFn::Lt => "<",
+        BinaryCompilerImplFn::Le => "<=",
+        BinaryCompilerImplFn::Gt => ">",
+        BinaryCompilerImplFn::Ge => ">=",
+        BinaryCompilerImplFn::And => "&&",
+        BinaryCompilerImplFn::Or => "||",
     }
+}
 
-    fn is_bool(self) -> bool {
-        matches!(self, Self::And | Self::Or)
-    }
+fn is_binary_operator_accepting_bool(fn_: BinaryCompilerImplFn) -> bool {
+    matches!(fn_, BinaryCompilerImplFn::And | BinaryCompilerImplFn::Or)
+}
 
-    fn returns_bool(self) -> bool {
-        matches!(
-            self,
-            Self::Eq | Self::Ne | Self::Lt | Self::Le | Self::Gt | Self::Ge | Self::And | Self::Or
-        )
-    }
+fn is_binary_operator_returning_bool(fn_: BinaryCompilerImplFn) -> bool {
+    matches!(
+        fn_,
+        BinaryCompilerImplFn::Eq
+            | BinaryCompilerImplFn::Ne
+            | BinaryCompilerImplFn::Lt
+            | BinaryCompilerImplFn::Le
+            | BinaryCompilerImplFn::Gt
+            | BinaryCompilerImplFn::Ge
+            | BinaryCompilerImplFn::And
+            | BinaryCompilerImplFn::Or
+    )
 }

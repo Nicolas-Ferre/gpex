@@ -5,9 +5,9 @@ const _SUB_WRAP = 0u - 1u; // expected: 4294967295u
 const _MUL = 3u * 2u; // expected: 6u
 const _MUL_WRAP = 2_147_483_648u * 2u; // expected: 0u
 const _DIV = 7u / 2u; // expected: 3u
-const _DIV_ZERO = 7u / 0u; // expected: 7u
+const _DIV_ZERO = 7u / 0u; // expected: 7u // TODO: missing wrap tests like in i32
 const _MOD = 7u % 2u; // expected: 1u
-const _MOD_ZERO = 7u % 0u; // expected: 7u
+const _MOD_ZERO = 7u % 0u; // expected: 7u // TODO: missing wrap tests like in u32
 const _EQ_TRUE = 2u == 2u; // expected: true
 const _EQ_FALSE = 2u == 3u; // expected: false
 const _NE_TRUE = 2u != 3u; // expected: true

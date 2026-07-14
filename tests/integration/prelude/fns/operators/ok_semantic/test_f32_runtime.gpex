@@ -6,7 +6,6 @@ var _add = two + 3.0; // expected: 5.0
 var _sub = two - 3.0; // expected: -1.0
 var _mul = -three * two; // expected: -6.0
 var _div = negative_seven / two; // expected: -3.5
-var _mod = negative_seven % two; // expected: -1.0
 var _eq_true = two == 2.0; // expected: true
 var _eq_false = two == three; // expected: false
 var _ne_true = two != three; // expected: true

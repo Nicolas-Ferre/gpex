@@ -97,11 +97,13 @@ impl<'item> ValueResolver<'item, '_> {
             BinaryCompilerImplFn::Div => ConstValue::U32(if right == 0 {
                 left
             } else {
-                left.div_euclid(right) // TODO: wrapping_div ? + ensure tests are aligned
+                left.wrapping_div(right)
             }),
-            BinaryCompilerImplFn::Mod => {
-                ConstValue::U32(if right == 0 { left } else { left % right })
-            }
+            BinaryCompilerImplFn::Mod => ConstValue::U32(if right == 0 {
+                left
+            } else {
+                left.wrapping_rem(right)
+            }),
             BinaryCompilerImplFn::Eq => ConstValue::Bool(left == right),
             BinaryCompilerImplFn::Ne => ConstValue::Bool(left != right),
             BinaryCompilerImplFn::Lt => ConstValue::Bool(left < right),

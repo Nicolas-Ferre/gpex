@@ -130,7 +130,6 @@ pub const fn __div__(
     right: typeof(left)
 ) -> typeof(left) = compilerimpl;
 
-// TODO: modulo shouldn't be implemented for f32
 /// Returns the remainder of `left` divided by `right`.
 ///
 /// # Examples
@@ -138,10 +137,9 @@ pub const fn __div__(
 /// ```gpex
 /// var i32_value = 5 % 2; // 1
 /// var u32_value = 5u % 2u; // 1u
-/// var f32_value = 5.0 % 2.0; // 1.0
 /// ```
 pub const fn __mod__(
-    left: ? require typeof(left).is_numeric(),
+    left: ? require typeof(left).is_integer(),
     right: typeof(left)
 ) -> typeof(left) = compilerimpl;
 
@@ -303,6 +301,10 @@ pub const fn mul_add(value: f32, multiplier: f32, addend: f32) -> f32 = compiler
 
 const fn is_numeric(type_: typeref) -> bool {
     return type_ == i32 || type_ == u32 || type_ == f32;
+}
+
+const fn is_integer(type_: typeref) -> bool {
+    return type_ == i32 || type_ == u32;
 }
 
 const fn is_ordered(type_: typeref) -> bool {
