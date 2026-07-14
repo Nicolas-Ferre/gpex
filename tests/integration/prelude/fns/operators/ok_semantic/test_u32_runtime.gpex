@@ -13,7 +13,7 @@ var _mul_wrap = large * two; // expected: 0u
 var _div = 7u / two; // expected: 3u
 var _div_zero = 7u / zero; // expected: 7u
 var _mod = 7u % two; // expected: 1u
-var _mod_zero = 7u % zero; // expected: 7u
+var _mod_zero = 7u % zero; // expected: 0u
 var _eq_true = two == 2u; // expected: true
 var _eq_false = two == three; // expected: false
 var _ne_true = two != three; // expected: true

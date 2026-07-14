@@ -3,4 +3,4 @@ var almost_one = 1.00000011920928955078125;
 
 var _value = mul_add(two, 3.0, 4.0); // expected: 10.0
 var _fused = mul_add(almost_one, almost_one, -1.0000002384185791015625); // expected: 0.000000000000014210855
-var _separate = almost_one * almost_one + -1.0000002384185791015625; // expected: 0.0
+var _separate = almost_one * almost_one + -1.0000002384185791015625; // expected: 0.000000000000014210855

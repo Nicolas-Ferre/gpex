@@ -70,7 +70,7 @@ impl<'item> ValueResolver<'item, '_> {
                 left.wrapping_div(right)
             }),
             BinaryCompilerImplFn::Mod => ConstValue::I32(if right == 0 {
-                left
+                0
             } else {
                 left.wrapping_rem(right)
             }),
@@ -100,7 +100,7 @@ impl<'item> ValueResolver<'item, '_> {
                 left.wrapping_div(right)
             }),
             BinaryCompilerImplFn::Mod => ConstValue::U32(if right == 0 {
-                left
+                0
             } else {
                 left.wrapping_rem(right)
             }),
