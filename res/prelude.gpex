@@ -76,6 +76,8 @@ pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
 
 /// Adds `left` to `right`.
 ///
+/// Integer results wrap on overflow.
+///
 /// # Examples
 ///
 /// ```gpex
@@ -89,6 +91,8 @@ pub const fn __add__(
 ) -> typeof(left) = compilerimpl;
 
 /// Subtracts `right` from `left`.
+///
+/// Integer results wrap on overflow.
 ///
 /// # Examples
 ///
@@ -104,6 +108,8 @@ pub const fn __sub__(
 
 /// Multiplies `left` by `right`.
 ///
+/// Integer results wrap on overflow.
+///
 /// # Examples
 ///
 /// ```gpex
@@ -118,6 +124,9 @@ pub const fn __mul__(
 
 /// Divides `left` by `right`.
 ///
+/// Integer division truncates toward zero and wraps on overflow. When `right` is zero, integer
+/// division returns `left`.
+///
 /// # Examples
 ///
 /// ```gpex
@@ -131,6 +140,8 @@ pub const fn __div__(
 ) -> typeof(left) = compilerimpl;
 
 /// Returns the remainder of `left` divided by `right`.
+///
+/// The result has the sign of `left`. When `right` is zero, returns zero.
 ///
 /// # Examples
 ///
@@ -270,6 +281,8 @@ pub const fn __and__(left: bool, right: bool) -> bool = compilerimpl;
 pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
 
 /// Negates `value`.
+///
+/// Integer results wrap on overflow.
 ///
 /// # Examples
 ///
