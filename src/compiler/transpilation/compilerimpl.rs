@@ -1,7 +1,7 @@
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::{
-    BinaryCompilerImpl, CompilerImpl, FnDefinition, UnaryCompilerImpl,
+    BinaryCompilerImplFn, CompilerImplFn, FnDefinition, UnaryCompilerImplFn,
 };
 use crate::compiler::transpilation::Transpiler;
 use crate::compiler::values::types::Type;
@@ -10,32 +10,28 @@ use std::fmt::Write;
 impl Transpiler<'_, '_> {
     pub(super) fn transpile_compilerimpl_fn_call(&mut self, node: &Call, source: &FnDefinition) {
         match source.compilerimpl() {
-            Some(CompilerImpl::Binary(compilerimpl)) => {
+            Some(CompilerImplFn::Binary(compilerimpl)) => {
                 self.transpile_compilerimpl_fn_call_binary(node, compilerimpl);
             }
-            Some(CompilerImpl::Unary(compilerimpl)) => {
+            Some(CompilerImplFn::Unary(compilerimpl)) => {
                 self.transpile_compilerimpl_fn_call_unary(node, compilerimpl);
             }
-            Some(CompilerImpl::MulAdd) => self.transpile_compilerimpl_fn_call_mul_add(node),
-            Some(CompilerImpl::Typeof | CompilerImpl::Sizeof) | None => {
+            Some(CompilerImplFn::MulAdd) => self.transpile_compilerimpl_fn_call_mul_add(node),
+            Some(CompilerImplFn::Typeof | CompilerImplFn::Sizeof) | None => {
                 unreachable!("not implemented `{}` GPU function", source.name)
             }
         }
     }
 
-    fn transpile_compilerimpl_fn_call_binary(
-        &mut self,
-        node: &Call,
-        compilerimpl: BinaryCompilerImpl,
-    ) {
+    fn transpile_compilerimpl_fn_call_binary(&mut self, node: &Call, fn_: BinaryCompilerImplFn) {
         let is_typeref_comparison = matches!(
             self.value_resolver.expr_type(&node.args[0].value),
             Type::Struct(type_) if type_.name == "typeref"
         );
         if is_typeref_comparison {
-            self.transpile_compilerimpl_fn_call_typeref_binary(node, compilerimpl);
+            self.transpile_compilerimpl_fn_call_typeref_binary(node, fn_);
         } else {
-            self.transpile_compilerimpl_fn_call_scalar_binary(node, compilerimpl);
+            self.transpile_compilerimpl_fn_call_scalar_binary(node, fn_);
         }
     }
 
@@ -43,11 +39,11 @@ impl Transpiler<'_, '_> {
     fn transpile_compilerimpl_fn_call_typeref_binary(
         &mut self,
         node: &Call,
-        compilerimpl: BinaryCompilerImpl,
+        fn_: BinaryCompilerImplFn,
     ) {
-        let negation = match compilerimpl {
-            BinaryCompilerImpl::Eq => "",
-            BinaryCompilerImpl::Ne => "!",
+        let negation = match fn_ {
+            BinaryCompilerImplFn::Eq => "",
+            BinaryCompilerImplFn::Ne => "!",
             _ => unreachable!("invalid typeref compiler implementation"),
         };
         _ = write!(self.shader, "u32({negation}all(");
@@ -60,23 +56,17 @@ impl Transpiler<'_, '_> {
     fn transpile_compilerimpl_fn_call_scalar_binary(
         &mut self,
         node: &Call,
-        compilerimpl: BinaryCompilerImpl,
+        fn_: BinaryCompilerImplFn,
     ) {
-        if compilerimpl.returns_bool() {
+        if fn_.returns_bool() {
             self.shader += "u32(";
         }
         self.shader += "(";
-        self.transpile_compilerimpl_fn_call_binary_operand(
-            &node.args[0].value,
-            compilerimpl.is_bool(),
-        );
-        _ = write!(self.shader, " {} ", compilerimpl.wgsl_operator());
-        self.transpile_compilerimpl_fn_call_binary_operand(
-            &node.args[1].value,
-            compilerimpl.is_bool(),
-        );
+        self.transpile_compilerimpl_fn_call_binary_operand(&node.args[0].value, fn_.is_bool());
+        _ = write!(self.shader, " {} ", fn_.wgsl_operator());
+        self.transpile_compilerimpl_fn_call_binary_operand(&node.args[1].value, fn_.is_bool());
         self.shader += ")";
-        if compilerimpl.returns_bool() {
+        if fn_.returns_bool() {
             self.shader += ")";
         }
     }
@@ -91,14 +81,10 @@ impl Transpiler<'_, '_> {
         }
     }
 
-    fn transpile_compilerimpl_fn_call_unary(
-        &mut self,
-        node: &Call,
-        compilerimpl: UnaryCompilerImpl,
-    ) {
-        let (prefix, suffix) = match compilerimpl {
-            UnaryCompilerImpl::Neg => ("(-", ")"),
-            UnaryCompilerImpl::Not => ("u32(", " == u32(false))"),
+    fn transpile_compilerimpl_fn_call_unary(&mut self, node: &Call, fn_: UnaryCompilerImplFn) {
+        let (prefix, suffix) = match fn_ {
+            UnaryCompilerImplFn::Neg => ("(-", ")"),
+            UnaryCompilerImplFn::Not => ("u32(", " == u32(false))"),
         };
         self.shader += prefix;
         self.transpile_expr(&node.args[0].value);
@@ -116,7 +102,7 @@ impl Transpiler<'_, '_> {
 }
 
 // TODO: avoid create external impl block (i.e. in other file than item def) for helper functions
-impl BinaryCompilerImpl {
+impl BinaryCompilerImplFn {
     fn wgsl_operator(self) -> &'static str {
         match self {
             Self::Add => "+",

@@ -1,7 +1,7 @@
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::calls::Arg;
-use crate::compiler::parsing::items::fns::{CompilerImpl, FnDefinition};
+use crate::compiler::parsing::items::fns::{CompilerImplFn, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
@@ -138,7 +138,7 @@ impl<'item> ItemRef<'item> {
     }
 
     pub(crate) fn is_param_constness_ignored(self) -> bool {
-        matches!(self, ItemRef::Fn(fn_) if fn_.compilerimpl() == Some(CompilerImpl::Typeof))
+        matches!(self, ItemRef::Fn(fn_) if fn_.compilerimpl() == Some(CompilerImplFn::Typeof))
     }
 
     fn arg_match(param_type: Type<'_>, arg_type: Type<'_>) -> ArgsMatch {
