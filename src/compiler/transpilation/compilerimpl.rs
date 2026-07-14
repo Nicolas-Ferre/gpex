@@ -115,7 +115,7 @@ impl Transpiler<'_, '_> {
     }
 }
 
-// Avoid create external impl block (i.e. in other file than item def) for helper functions
+// TODO: avoid create external impl block (i.e. in other file than item def) for helper functions
 impl BinaryCompilerImpl {
     fn wgsl_operator(self) -> &'static str {
         match self {

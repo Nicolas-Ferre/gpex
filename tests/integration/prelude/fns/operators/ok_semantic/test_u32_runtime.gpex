@@ -5,10 +5,15 @@ var zero = 0u;
 var large = 2_147_483_648u;
 
 var _add = two + three; // expected: 5u
+var _add_wrap = max + 1u; // expected: 0u
 var _sub = three - two; // expected: 1u
+var _sub_wrap = zero - 1u; // expected: 4294967295u
 var _mul = three * two; // expected: 6u
+var _mul_wrap = large * two; // expected: 0u
 var _div = 7u / two; // expected: 3u
+var _div_zero = 7u / zero; // expected: 7u
 var _mod = 7u % two; // expected: 1u
+var _mod_zero = 7u % zero; // expected: 7u
 var _eq_true = two == 2u; // expected: true
 var _eq_false = two == three; // expected: false
 var _ne_true = two != three; // expected: true
@@ -21,8 +26,3 @@ var _gt_true = three > two; // expected: true
 var _gt_false = two > three; // expected: false
 var _ge_true = two >= 2u; // expected: true
 var _ge_false = two >= three; // expected: false
-var _add_wrap = max + 1u; // expected: 0u
-var _sub_wrap = zero - 1u; // expected: 4294967295u
-var _mul_wrap = large * two; // expected: 0u
-var _div_zero = 7u / zero; // expected: 7u
-var _mod_zero = 7u % zero; // expected: 7u

@@ -7,10 +7,17 @@ var large = 1_073_741_824;
 var zero = 0;
 
 var _add = two + 3; // expected: 5
+var _add_wrap = max + 1; // expected: -2147483648
 var _sub = two - 3; // expected: -1
+var _sub_wrap = min - 1; // expected: 2147483647
 var _mul = -three * two; // expected: -6
+var _mul_wrap = large * two; // expected: -2147483648
 var _div = negative_seven / two; // expected: -3
+var _div_wrap = min / -1; // expected: -2147483648
+var _div_zero = 7 / zero; // expected: 7
 var _mod = negative_seven % two; // expected: -1
+var _mod_wrap = min % -1; // expected: 0
+var _mod_zero = 7 % zero; // expected: 7
 var _eq_true = two == 2; // expected: true
 var _eq_false = two == three; // expected: false
 var _ne_true = two != three; // expected: true
@@ -24,10 +31,3 @@ var _gt_false = two > three; // expected: false
 var _ge_true = two >= 2; // expected: true
 var _ge_false = two >= three; // expected: false
 var _neg = -two; // expected: -2
-var _add_wrap = max + 1; // expected: -2147483648
-var _sub_wrap = min - 1; // expected: 2147483647
-var _mul_wrap = large * two; // expected: -2147483648
-var _div_wrap = min / -1; // expected: -2147483648
-var _mod_wrap = min % -1; // expected: 0
-var _div_zero = 7 / zero; // expected: 7
-var _mod_zero = 7 % zero; // expected: 7

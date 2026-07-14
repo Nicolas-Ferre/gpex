@@ -2,6 +2,7 @@ use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::{
     BinaryCompilerImpl, CompilerImpl, FnDefinition, UnaryCompilerImpl,
 };
+use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::values::ValueResolver;
 use crate::compiler::values::consts::{ConstValue, HashableF32};
 use crate::compiler::values::types::Type;
@@ -26,12 +27,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    // TODO: refactor this function as it is too big
-    #[allow(
-        clippy::bool_comparison, // needed
-        clippy::float_cmp, // needed
-        clippy::wildcard_enum_match_arm, // opt-in is preferred
-    )]
     fn fn_compilerimpl_binary_const_value(
         &self,
         source: &FnDefinition,
@@ -40,79 +35,142 @@ impl<'item> ValueResolver<'item, '_> {
         let left = self.const_value(source.params.params[0].id);
         let right = self.const_value(source.params.params[1].id);
         match (left, right) {
-            (ConstValue::I32(left), ConstValue::I32(right)) => match compilerimpl {
-                BinaryCompilerImpl::Add => ConstValue::I32(left.wrapping_add(right)),
-                BinaryCompilerImpl::Sub => ConstValue::I32(left.wrapping_sub(right)),
-                BinaryCompilerImpl::Mul => ConstValue::I32(left.wrapping_mul(right)),
-                BinaryCompilerImpl::Div => ConstValue::I32(if right == 0 {
-                    left
-                } else {
-                    left.wrapping_div(right)
-                }),
-                BinaryCompilerImpl::Mod => ConstValue::I32(if right == 0 {
-                    left
-                } else {
-                    left.wrapping_rem(right)
-                }),
-                BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
-                BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
-                BinaryCompilerImpl::Lt => ConstValue::Bool(left < right),
-                BinaryCompilerImpl::Le => ConstValue::Bool(left <= right),
-                BinaryCompilerImpl::Gt => ConstValue::Bool(left > right),
-                BinaryCompilerImpl::Ge => ConstValue::Bool(left >= right),
-                _ => unreachable!("invalid i32 compiler implementation"),
-            },
-            (ConstValue::U32(left), ConstValue::U32(right)) => match compilerimpl {
-                BinaryCompilerImpl::Add => ConstValue::U32(left.wrapping_add(right)),
-                BinaryCompilerImpl::Sub => ConstValue::U32(left.wrapping_sub(right)),
-                BinaryCompilerImpl::Mul => ConstValue::U32(left.wrapping_mul(right)),
-                BinaryCompilerImpl::Div => ConstValue::U32(if right == 0 {
-                    left
-                } else {
-                    left.div_euclid(right)
-                }),
-                BinaryCompilerImpl::Mod => {
-                    ConstValue::U32(if right == 0 { left } else { left % right })
-                }
-                BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
-                BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
-                BinaryCompilerImpl::Lt => ConstValue::Bool(left < right),
-                BinaryCompilerImpl::Le => ConstValue::Bool(left <= right),
-                BinaryCompilerImpl::Gt => ConstValue::Bool(left > right),
-                BinaryCompilerImpl::Ge => ConstValue::Bool(left >= right),
-                _ => unreachable!("invalid u32 compiler implementation"),
-            },
-            (ConstValue::F32(left), ConstValue::F32(right)) => match compilerimpl {
-                BinaryCompilerImpl::Add => ConstValue::F32(HashableF32(left.0 + right.0)),
-                BinaryCompilerImpl::Sub => ConstValue::F32(HashableF32(left.0 - right.0)),
-                BinaryCompilerImpl::Mul => ConstValue::F32(HashableF32(left.0 * right.0)),
-                BinaryCompilerImpl::Div => ConstValue::F32(HashableF32(left.0 / right.0)),
-                BinaryCompilerImpl::Mod => ConstValue::F32(HashableF32(left.0 % right.0)),
-                BinaryCompilerImpl::Eq => ConstValue::Bool(left.0 == right.0),
-                BinaryCompilerImpl::Ne => ConstValue::Bool(left.0 != right.0),
-                BinaryCompilerImpl::Lt => ConstValue::Bool(left.0 < right.0),
-                BinaryCompilerImpl::Le => ConstValue::Bool(left.0 <= right.0),
-                BinaryCompilerImpl::Gt => ConstValue::Bool(left.0 > right.0),
-                BinaryCompilerImpl::Ge => ConstValue::Bool(left.0 >= right.0),
-                _ => unreachable!("invalid f32 compiler implementation"),
-            },
-            (ConstValue::Bool(left), ConstValue::Bool(right)) => match compilerimpl {
-                BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
-                BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
-                BinaryCompilerImpl::Lt => ConstValue::Bool(left < right),
-                BinaryCompilerImpl::Le => ConstValue::Bool(left <= right),
-                BinaryCompilerImpl::Gt => ConstValue::Bool(left > right),
-                BinaryCompilerImpl::Ge => ConstValue::Bool(left >= right),
-                BinaryCompilerImpl::And => ConstValue::Bool(left && right),
-                BinaryCompilerImpl::Or => ConstValue::Bool(left || right),
-                _ => unreachable!("invalid bool compiler implementation"),
-            },
-            (ConstValue::TypeRef(left), ConstValue::TypeRef(right)) => match compilerimpl {
-                BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
-                BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
-                _ => unreachable!("invalid typeref compiler implementation"),
-            },
+            (ConstValue::I32(left), ConstValue::I32(right)) => {
+                Self::fn_compilerimpl_binary_i32_const_value(left, right, compilerimpl)
+            }
+            (ConstValue::U32(left), ConstValue::U32(right)) => {
+                Self::fn_compilerimpl_binary_u32_const_value(left, right, compilerimpl)
+            }
+            (ConstValue::F32(left), ConstValue::F32(right)) => {
+                Self::fn_compilerimpl_binary_f32_const_value(left, right, compilerimpl)
+            }
+            (ConstValue::Bool(left), ConstValue::Bool(right)) => {
+                Self::fn_compilerimpl_binary_bool_const_value(left, right, compilerimpl)
+            }
+            (ConstValue::TypeRef(left), ConstValue::TypeRef(right)) => {
+                Self::fn_compilerimpl_binary_typeref_const_value(left, right, compilerimpl)
+            }
             _ => unreachable!("not implemented `{}` constant GPU function", source.name),
+        }
+    }
+
+    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+    fn fn_compilerimpl_binary_i32_const_value(
+        left: i32,
+        right: i32,
+        compilerimpl: BinaryCompilerImpl,
+    ) -> ConstValue<'item> {
+        match compilerimpl {
+            BinaryCompilerImpl::Add => ConstValue::I32(left.wrapping_add(right)),
+            BinaryCompilerImpl::Sub => ConstValue::I32(left.wrapping_sub(right)),
+            BinaryCompilerImpl::Mul => ConstValue::I32(left.wrapping_mul(right)),
+            BinaryCompilerImpl::Div => ConstValue::I32(if right == 0 {
+                left
+            } else {
+                left.wrapping_div(right)
+            }),
+            BinaryCompilerImpl::Mod => ConstValue::I32(if right == 0 {
+                left
+            } else {
+                left.wrapping_rem(right)
+            }),
+            BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
+            BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
+            BinaryCompilerImpl::Lt => ConstValue::Bool(left < right),
+            BinaryCompilerImpl::Le => ConstValue::Bool(left <= right),
+            BinaryCompilerImpl::Gt => ConstValue::Bool(left > right),
+            BinaryCompilerImpl::Ge => ConstValue::Bool(left >= right),
+            _ => unreachable!("not implemented `{compilerimpl:?}` constant GPU function for i32"),
+        }
+    }
+
+    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+    fn fn_compilerimpl_binary_u32_const_value(
+        left: u32,
+        right: u32,
+        compilerimpl: BinaryCompilerImpl,
+    ) -> ConstValue<'item> {
+        match compilerimpl {
+            BinaryCompilerImpl::Add => ConstValue::U32(left.wrapping_add(right)),
+            BinaryCompilerImpl::Sub => ConstValue::U32(left.wrapping_sub(right)),
+            BinaryCompilerImpl::Mul => ConstValue::U32(left.wrapping_mul(right)),
+            BinaryCompilerImpl::Div => ConstValue::U32(if right == 0 {
+                left
+            } else {
+                left.div_euclid(right) // TODO: wrapping_div ? + ensure tests are aligned
+            }),
+            BinaryCompilerImpl::Mod => {
+                ConstValue::U32(if right == 0 { left } else { left % right })
+            }
+            BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
+            BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
+            BinaryCompilerImpl::Lt => ConstValue::Bool(left < right),
+            BinaryCompilerImpl::Le => ConstValue::Bool(left <= right),
+            BinaryCompilerImpl::Gt => ConstValue::Bool(left > right),
+            BinaryCompilerImpl::Ge => ConstValue::Bool(left >= right),
+            _ => unreachable!("not implemented `{compilerimpl:?}` constant GPU function for u32"),
+        }
+    }
+
+    #[expect(
+        clippy::float_cmp, // needed
+        clippy::wildcard_enum_match_arm, // opt-in is preferred
+    )]
+    fn fn_compilerimpl_binary_f32_const_value(
+        left: HashableF32,
+        right: HashableF32,
+        compilerimpl: BinaryCompilerImpl,
+    ) -> ConstValue<'item> {
+        match compilerimpl {
+            BinaryCompilerImpl::Add => ConstValue::F32(HashableF32(left.0 + right.0)),
+            BinaryCompilerImpl::Sub => ConstValue::F32(HashableF32(left.0 - right.0)),
+            BinaryCompilerImpl::Mul => ConstValue::F32(HashableF32(left.0 * right.0)),
+            BinaryCompilerImpl::Div => ConstValue::F32(HashableF32(left.0 / right.0)),
+            BinaryCompilerImpl::Mod => ConstValue::F32(HashableF32(left.0 % right.0)),
+            BinaryCompilerImpl::Eq => ConstValue::Bool(left.0 == right.0),
+            BinaryCompilerImpl::Ne => ConstValue::Bool(left.0 != right.0),
+            BinaryCompilerImpl::Lt => ConstValue::Bool(left.0 < right.0),
+            BinaryCompilerImpl::Le => ConstValue::Bool(left.0 <= right.0),
+            BinaryCompilerImpl::Gt => ConstValue::Bool(left.0 > right.0),
+            BinaryCompilerImpl::Ge => ConstValue::Bool(left.0 >= right.0),
+            _ => unreachable!("not implemented `{compilerimpl:?}` constant GPU function for f32"),
+        }
+    }
+
+    #[expect(
+        clippy::bool_comparison, // needed
+        clippy::wildcard_enum_match_arm, // opt-in is preferred
+    )]
+    fn fn_compilerimpl_binary_bool_const_value(
+        left: bool,
+        right: bool,
+        compilerimpl: BinaryCompilerImpl,
+    ) -> ConstValue<'item> {
+        match compilerimpl {
+            BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
+            BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
+            BinaryCompilerImpl::Lt => ConstValue::Bool(left < right),
+            BinaryCompilerImpl::Le => ConstValue::Bool(left <= right),
+            BinaryCompilerImpl::Gt => ConstValue::Bool(left > right),
+            BinaryCompilerImpl::Ge => ConstValue::Bool(left >= right),
+            BinaryCompilerImpl::And => ConstValue::Bool(left && right),
+            BinaryCompilerImpl::Or => ConstValue::Bool(left || right),
+            _ => unreachable!("not implemented `{compilerimpl:?}` constant GPU function for bool"),
+        }
+    }
+
+    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+    fn fn_compilerimpl_binary_typeref_const_value(
+        left: &'item StructDefinition,
+        right: &'item StructDefinition,
+        compilerimpl: BinaryCompilerImpl,
+    ) -> ConstValue<'item> {
+        match compilerimpl {
+            BinaryCompilerImpl::Eq => ConstValue::Bool(left == right),
+            BinaryCompilerImpl::Ne => ConstValue::Bool(left != right),
+            _ => {
+                unreachable!("not implemented `{compilerimpl:?}` constant GPU function for typeref")
+            }
         }
     }
 
@@ -126,7 +184,7 @@ impl<'item> ValueResolver<'item, '_> {
             ConstValue::I32(value) => ConstValue::I32(value.wrapping_neg()),
             ConstValue::F32(value) => ConstValue::F32(HashableF32(-value.0)),
             ConstValue::Bool(value) => ConstValue::Bool(!value),
-            _ => unreachable!("not implemented `{:?}` constant GPU function", compilerimpl),
+            _ => unreachable!("not implemented `{compilerimpl:?}` constant GPU function"),
         }
     }
 

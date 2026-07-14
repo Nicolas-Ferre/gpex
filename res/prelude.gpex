@@ -63,7 +63,6 @@ pub struct bool = compilerimpl {}
 /// ```
 pub const fn typeof(value: ?) -> typeref = compilerimpl;
 
-// TODO: add result in comment on the right of each example (like previously)
 /// Returns the size of a given `type_` in bytes.
 ///
 /// # Examples
@@ -80,9 +79,9 @@ pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
 /// # Examples
 ///
 /// ```gpex
-/// var i32_value = 1 + 2;
-/// var u32_value = 1u + 2u;
-/// var f32_value = 1.0 + 2.0;
+/// var i32_value = 1 + 2; // 3
+/// var u32_value = 1u + 2u; // 3u
+/// var f32_value = 1.0 + 2.0; // 3.0
 /// ```
 pub const fn __add__(
     left: ? require typeof(left).is_numeric(),
@@ -94,9 +93,9 @@ pub const fn __add__(
 /// # Examples
 ///
 /// ```gpex
-/// var i32_value = 2 - 1;
-/// var u32_value = 2u - 1u;
-/// var f32_value = 2.0 - 1.0;
+/// var i32_value = 2 - 1; // 1
+/// var u32_value = 2u - 1u; // 1u
+/// var f32_value = 2.0 - 1.0; // 1.0
 /// ```
 pub const fn __sub__(
     left: ? require typeof(left).is_numeric(),
@@ -108,9 +107,9 @@ pub const fn __sub__(
 /// # Examples
 ///
 /// ```gpex
-/// var i32_value = 2 * 3;
-/// var u32_value = 2u * 3u;
-/// var f32_value = 2.0 * 3.0;
+/// var i32_value = 2 * 3; // 6
+/// var u32_value = 2u * 3u; // 6u
+/// var f32_value = 2.0 * 3.0; // 6.0
 /// ```
 pub const fn __mul__(
     left: ? require typeof(left).is_numeric(),
@@ -122,23 +121,24 @@ pub const fn __mul__(
 /// # Examples
 ///
 /// ```gpex
-/// var i32_value = 6 / 2;
-/// var u32_value = 6u / 2u;
-/// var f32_value = 6.0 / 2.0;
+/// var i32_value = 6 / 2; // 3
+/// var u32_value = 6u / 2u; // 3u
+/// var f32_value = 6.0 / 2.0; // 3.0
 /// ```
 pub const fn __div__(
     left: ? require typeof(left).is_numeric(),
     right: typeof(left)
 ) -> typeof(left) = compilerimpl;
 
+// TODO: modulo shouldn't be implemented for f32
 /// Returns the remainder of `left` divided by `right`.
 ///
 /// # Examples
 ///
 /// ```gpex
-/// var i32_value = 5 % 2;
-/// var u32_value = 5u % 2u;
-/// var f32_value = 5.0 % 2.0;
+/// var i32_value = 5 % 2; // 1
+/// var u32_value = 5u % 2u; // 1u
+/// var f32_value = 5.0 % 2.0; // 1.0
 /// ```
 pub const fn __mod__(
     left: ? require typeof(left).is_numeric(),
@@ -150,10 +150,10 @@ pub const fn __mod__(
 /// # Examples
 ///
 /// ```gpex
-/// var i32_result = 1 == 1;
-/// var u32_result = 1u == 1u;
-/// var f32_result = 1.0 == 1.0;
-/// var bool_result = true == true;
+/// var i32_result = 1 == 1; // true
+/// var u32_result = 1u == 1u; // true
+/// var f32_result = 1.0 == 1.0; // true
+/// var bool_result = true == true; // true
 /// ```
 pub const fn __eq__(
     left: ? require typeof(left).is_ordered(),
@@ -165,7 +165,7 @@ pub const fn __eq__(
 /// # Examples
 ///
 /// ```gpex
-/// const ARE_EQUAL = i32 == i32;
+/// const ARE_EQUAL = i32 == i32; // true
 /// ```
 pub const fn __eq__(left: typeref, right: typeref) -> bool = compilerimpl;
 
@@ -174,10 +174,10 @@ pub const fn __eq__(left: typeref, right: typeref) -> bool = compilerimpl;
 /// # Examples
 ///
 /// ```gpex
-/// var i32_result = 1 != 2;
-/// var u32_result = 1u != 2u;
-/// var f32_result = 1.0 != 2.0;
-/// var bool_result = true != false;
+/// var i32_result = 1 != 2; // true
+/// var u32_result = 1u != 2u; // true
+/// var f32_result = 1.0 != 2.0; // true
+/// var bool_result = true != false; // true
 /// ```
 pub const fn __ne__(
     left: ? require typeof(left).is_ordered(),
@@ -189,7 +189,7 @@ pub const fn __ne__(
 /// # Examples
 ///
 /// ```gpex
-/// const ARE_DIFFERENT = i32 != u32;
+/// const ARE_DIFFERENT = i32 != u32; // true
 /// ```
 pub const fn __ne__(left: typeref, right: typeref) -> bool = compilerimpl;
 
@@ -198,10 +198,10 @@ pub const fn __ne__(left: typeref, right: typeref) -> bool = compilerimpl;
 /// # Examples
 ///
 /// ```gpex
-/// var i32_result = 1 < 2;
-/// var u32_result = 1u < 2u;
-/// var f32_result = 1.0 < 2.0;
-/// var bool_result = false < true;
+/// var i32_result = 1 < 2; // true
+/// var u32_result = 1u < 2u; // true
+/// var f32_result = 1.0 < 2.0; // true
+/// var bool_result = false < true; // true
 /// ```
 pub const fn __lt__(
     left: ? require typeof(left).is_ordered(),
@@ -213,10 +213,10 @@ pub const fn __lt__(
 /// # Examples
 ///
 /// ```gpex
-/// var i32_result = 1 <= 2;
-/// var u32_result = 1u <= 2u;
-/// var f32_result = 1.0 <= 2.0;
-/// var bool_result = false <= true;
+/// var i32_result = 1 <= 2; // true
+/// var u32_result = 1u <= 2u; // true
+/// var f32_result = 1.0 <= 2.0; // true
+/// var bool_result = false <= true; // true
 /// ```
 pub const fn __le__(
     left: ? require typeof(left).is_ordered(),
@@ -228,10 +228,10 @@ pub const fn __le__(
 /// # Examples
 ///
 /// ```gpex
-/// var i32_result = 2 > 1;
-/// var u32_result = 2u > 1u;
-/// var f32_result = 2.0 > 1.0;
-/// var bool_result = true > false;
+/// var i32_result = 2 > 1; // true
+/// var u32_result = 2u > 1u; // true
+/// var f32_result = 2.0 > 1.0; // true
+/// var bool_result = true > false; // true
 /// ```
 pub const fn __gt__(
     left: ? require typeof(left).is_ordered(),
@@ -243,10 +243,10 @@ pub const fn __gt__(
 /// # Examples
 ///
 /// ```gpex
-/// var i32_result = 2 >= 1;
-/// var u32_result = 2u >= 1u;
-/// var f32_result = 2.0 >= 1.0;
-/// var bool_result = true >= false;
+/// var i32_result = 2 >= 1; // true
+/// var u32_result = 2u >= 1u; // true
+/// var f32_result = 2.0 >= 1.0; // true
+/// var bool_result = true >= false; // true
 /// ```
 pub const fn __ge__(
     left: ? require typeof(left).is_ordered(),
@@ -258,7 +258,7 @@ pub const fn __ge__(
 /// # Examples
 ///
 /// ```gpex
-/// var result = true && false;
+/// var result = true && false; // false
 /// ```
 pub const fn __and__(left: bool, right: bool) -> bool = compilerimpl;
 
@@ -267,18 +267,19 @@ pub const fn __and__(left: bool, right: bool) -> bool = compilerimpl;
 /// # Examples
 ///
 /// ```gpex
-/// var result = true || false;
+/// var result = true || false; // true
 /// ```
 pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
 
-// TODO: example is not ok because it is using the syntactical `-` of literals, not the operator function
 /// Negates `value`.
 ///
 /// # Examples
 ///
 /// ```gpex
-/// var i32_value = -1;
-/// var f32_value = -1.0;
+/// var i32_one = 1; // 1
+/// var negated_i32_value = -i32_one; // -1
+/// var f32_one = 1.0; // 1.0
+/// var negated_f32_value = -f32_one; // -1.0
 /// ```
 pub const fn __neg__(value: ? require typeof(value).is_signed()) -> typeof(value) = compilerimpl;
 
@@ -287,7 +288,7 @@ pub const fn __neg__(value: ? require typeof(value).is_signed()) -> typeof(value
 /// # Examples
 ///
 /// ```gpex
-/// var result = !false;
+/// var result = !false; // true
 /// ```
 pub const fn __not__(value: bool) -> bool = compilerimpl;
 
@@ -296,7 +297,7 @@ pub const fn __not__(value: bool) -> bool = compilerimpl;
 /// # Examples
 ///
 /// ```gpex
-/// var result = mul_add(2.0, 3.0, 4.0);
+/// var result = mul_add(2.0, 3.0, 4.0); // 10.0
 /// ```
 pub const fn mul_add(value: f32, multiplier: f32, addend: f32) -> f32 = compilerimpl;
 

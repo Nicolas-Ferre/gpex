@@ -151,6 +151,7 @@ impl FnDefinition {
     }
 }
 
+// TODO: rename to CompilerImplFn + rename param names of this type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum CompilerImpl {
     Binary(BinaryCompilerImpl),
@@ -160,6 +161,7 @@ pub(crate) enum CompilerImpl {
     Sizeof,
 }
 
+// TODO: rename to BinaryCompilerImplFn + rename param names of this type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum BinaryCompilerImpl {
     Add,
@@ -177,6 +179,7 @@ pub(crate) enum BinaryCompilerImpl {
     Or,
 }
 
+// TODO: rename to UnaryCompilerImplFn + rename param names of this type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum UnaryCompilerImpl {
     Neg,
