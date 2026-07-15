@@ -4,6 +4,7 @@ use crate::compiler::parsing::items::fns::{
     BinaryCompilerImplFn, CompilerImplFn, FnDefinition, UnaryCompilerImplFn,
 };
 use crate::compiler::transpilation::Transpiler;
+use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types::Type;
 use std::fmt::Write;
 
@@ -53,11 +54,35 @@ impl Transpiler<'_, '_> {
         self.shader += "))";
     }
 
+    // TODO: function too large
     fn transpile_compilerimpl_fn_call_scalar_binary(
         &mut self,
         node: &Call,
         fn_: BinaryCompilerImplFn,
     ) {
+        let right_const_value = self.value_resolver.expr_const_value(&node.args[1].value);
+        let integer_zero_divisor_result = match (fn_, right_const_value) {
+            (BinaryCompilerImplFn::Div, ConstValue::I32(0) | ConstValue::U32(0)) => {
+                Some(&node.args[0].value)
+            }
+            (BinaryCompilerImplFn::Mod, ConstValue::I32(0) | ConstValue::U32(0)) => {
+                Some(&node.args[1].value)
+            }
+            _ => None,
+        };
+        if let Some(result) = integer_zero_divisor_result {
+            self.transpile_expr(result);
+            return;
+        }
+        let is_f32_division = fn_ == BinaryCompilerImplFn::Div
+            && matches!(
+                self.value_resolver.expr_type(&node.args[0].value),
+                Type::Struct(type_) if type_.name == "f32"
+            );
+        if is_f32_division {
+            self.transpile_compilerimpl_fn_call_f32_div(node);
+            return;
+        }
         if is_binary_operator_returning_bool(fn_) {
             self.shader += "u32(";
         }
@@ -75,6 +100,16 @@ impl Transpiler<'_, '_> {
         if is_binary_operator_returning_bool(fn_) {
             self.shader += ")";
         }
+    }
+
+    fn transpile_compilerimpl_fn_call_f32_div(&mut self, node: &Call) {
+        self.shader += "(";
+        self.transpile_expr(&node.args[0].value);
+        self.shader += " / select(";
+        self.transpile_expr(&node.args[1].value);
+        self.shader += ", f32(1), ";
+        self.transpile_expr(&node.args[1].value);
+        self.shader += " == f32(0)))";
     }
 
     fn transpile_compilerimpl_fn_call_binary_operand(&mut self, expr: &Expr, is_bool: bool) {

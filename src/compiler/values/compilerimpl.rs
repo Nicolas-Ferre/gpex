@@ -127,7 +127,11 @@ impl<'item> ValueResolver<'item, '_> {
             BinaryCompilerImplFn::Add => ConstValue::F32(HashableF32(left.0 + right.0)),
             BinaryCompilerImplFn::Sub => ConstValue::F32(HashableF32(left.0 - right.0)),
             BinaryCompilerImplFn::Mul => ConstValue::F32(HashableF32(left.0 * right.0)),
-            BinaryCompilerImplFn::Div => ConstValue::F32(HashableF32(left.0 / right.0)),
+            BinaryCompilerImplFn::Div => ConstValue::F32(HashableF32(if right.0 == 0.0 {
+                left.0
+            } else {
+                left.0 / right.0
+            })),
             BinaryCompilerImplFn::Eq => ConstValue::Bool(left.0 == right.0),
             BinaryCompilerImplFn::Ne => ConstValue::Bool(left.0 != right.0),
             BinaryCompilerImplFn::Lt => ConstValue::Bool(left.0 < right.0),

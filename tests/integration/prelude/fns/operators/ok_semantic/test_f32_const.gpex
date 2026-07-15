@@ -4,6 +4,7 @@ const _ADD = 2.0 + 3.0; // expected: 5.0
 const _SUB = 2.0 - 3.0; // expected: -1.0
 const _MUL = -3.0 * 2.0; // expected: -6.0
 const _DIV = -7.0 / 2.0; // expected: -3.5
+const _DIV_ZERO = -7.0 / 0.0; // expected: -7.0
 const _EQ_TRUE = 2.0 == 2.0; // expected: true
 const _EQ_FALSE = 2.0 == 3.0; // expected: false
 const _NE_TRUE = 2.0 != 3.0; // expected: true

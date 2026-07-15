@@ -1,11 +1,14 @@
 var two = 2.0;
 var three = 3.0;
 var negative_seven = -7.0;
+var zero = 0.0;
 
 var _add = two + 3.0; // expected: 5.0
 var _sub = two - 3.0; // expected: -1.0
 var _mul = -three * two; // expected: -6.0
 var _div = negative_seven / two; // expected: -3.5
+var _div_runtime_zero = negative_seven / zero; // expected: -7.0
+var _div_const_zero = negative_seven / 0.0; // expected: -7.0
 var _eq_true = two == 2.0; // expected: true
 var _eq_false = two == three; // expected: false
 var _ne_true = two != three; // expected: true

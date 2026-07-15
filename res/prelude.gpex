@@ -124,8 +124,8 @@ pub const fn __mul__(
 
 /// Divides `left` by `right`.
 ///
-/// Integer division truncates toward zero and wraps on overflow. When `right` is zero, integer
-/// division returns `left`.
+/// Returns `left` when `right` is zero.
+/// Integer division truncates toward zero and wraps on overflow.
 ///
 /// # Examples
 ///
@@ -139,9 +139,11 @@ pub const fn __div__(
     right: typeof(left)
 ) -> typeof(left) = compilerimpl;
 
+// TODO: add tests to confirm the result has the sign of `left`
 /// Returns the remainder of `left` divided by `right`.
 ///
-/// The result has the sign of `left`. When `right` is zero, returns zero.
+/// The result has the sign of `left`.
+/// When `right` is zero, returns zero.
 ///
 /// # Examples
 ///
