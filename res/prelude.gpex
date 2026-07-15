@@ -139,7 +139,6 @@ pub const fn __div__(
     right: typeof(left)
 ) -> typeof(left) = compilerimpl;
 
-// TODO: add tests to confirm the result has the sign of `left`
 /// Returns the remainder of `left` divided by `right`.
 ///
 /// The result has the sign of `left`.

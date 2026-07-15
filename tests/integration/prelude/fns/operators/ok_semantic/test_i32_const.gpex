@@ -10,7 +10,8 @@ const _MUL_WRAP = 1_073_741_824 * 2; // expected: -2147483648
 const _DIV = -7 / 2; // expected: -3
 const _DIV_WRAP = MIN / -1; // expected: -2147483648
 const _DIV_ZERO = 7 / 0; // expected: 7
-const _MOD = -7 % 2; // expected: -1
+const _MOD_NEGATIVE_LEFT = -7 % 2; // expected: -1
+const _MOD_NEGATIVE_RIGHT = 7 % -2; // expected: 1
 const _MOD_WRAP = MIN % -1; // expected: 0
 const _MOD_ZERO = 7 % 0; // expected: 0
 const _EQ_TRUE = 2 == 2; // expected: true

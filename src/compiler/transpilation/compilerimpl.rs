@@ -27,7 +27,7 @@ impl Transpiler<'_, '_> {
     fn transpile_compilerimpl_fn_call_binary(&mut self, node: &Call, fn_: BinaryCompilerImplFn) {
         let is_typeref_comparison = matches!(
             self.value_resolver.expr_type(&node.args[0].value),
-            Type::Struct(type_) if type_.name == "typeref"
+            Type::Struct(type_) if type_.name == "typeref" // TODO: please make safer comparison as the type can be used for custom names (same everywhere else)
         );
         if is_typeref_comparison {
             self.transpile_compilerimpl_fn_call_typeref_binary(node, fn_);
@@ -54,23 +54,12 @@ impl Transpiler<'_, '_> {
         self.shader += "))";
     }
 
-    // TODO: function too large
     fn transpile_compilerimpl_fn_call_scalar_binary(
         &mut self,
         node: &Call,
         fn_: BinaryCompilerImplFn,
     ) {
-        let right_const_value = self.value_resolver.expr_const_value(&node.args[1].value);
-        let integer_zero_divisor_result = match (fn_, right_const_value) {
-            (BinaryCompilerImplFn::Div, ConstValue::I32(0) | ConstValue::U32(0)) => {
-                Some(&node.args[0].value)
-            }
-            (BinaryCompilerImplFn::Mod, ConstValue::I32(0) | ConstValue::U32(0)) => {
-                Some(&node.args[1].value)
-            }
-            _ => None,
-        };
-        if let Some(result) = integer_zero_divisor_result {
+        if let Some(result) = self.compilerimpl_integer_fn_call_zero_divisor_result(node, fn_) {
             self.transpile_expr(result);
             return;
         }
@@ -83,6 +72,14 @@ impl Transpiler<'_, '_> {
             self.transpile_compilerimpl_fn_call_f32_div(node);
             return;
         }
+        self.transpile_compilerimpl_fn_call_scalar_binary_operator(node, fn_);
+    }
+
+    fn transpile_compilerimpl_fn_call_scalar_binary_operator(
+        &mut self,
+        node: &Call,
+        fn_: BinaryCompilerImplFn,
+    ) {
         if is_binary_operator_returning_bool(fn_) {
             self.shader += "u32(";
         }
@@ -139,6 +136,23 @@ impl Transpiler<'_, '_> {
             self.shader += ", ";
         }
         self.shader += ")";
+    }
+
+    fn compilerimpl_integer_fn_call_zero_divisor_result<'node>(
+        &mut self,
+        node: &'node Call,
+        fn_: BinaryCompilerImplFn,
+    ) -> Option<&'node Expr> {
+        let right_const_value = self.value_resolver.expr_const_value(&node.args[1].value);
+        match (fn_, right_const_value) {
+            (BinaryCompilerImplFn::Div, ConstValue::I32(0) | ConstValue::U32(0)) => {
+                Some(&node.args[0].value)
+            }
+            (BinaryCompilerImplFn::Mod, ConstValue::I32(0) | ConstValue::U32(0)) => {
+                Some(&node.args[1].value)
+            }
+            _ => None,
+        }
     }
 }
 

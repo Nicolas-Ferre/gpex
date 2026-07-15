@@ -1,5 +1,6 @@
 var two = 2;
 var three = 3;
+var negative_two = -2;
 var negative_seven = -7;
 var min = -2_147_483_647 - 1;
 var max = 2_147_483_647;
@@ -16,7 +17,8 @@ var _div = negative_seven / two; // expected: -3
 var _div_wrap = min / -1; // expected: -2147483648
 var _div_runtime_zero = 7 / zero; // expected: 7
 var _div_const_zero = negative_seven / 0; // expected: -7
-var _mod = negative_seven % two; // expected: -1
+var _mod_negative_left = negative_seven % two; // expected: -1
+var _mod_negative_right = 7 % negative_two; // expected: 1
 var _mod_wrap = min % -1; // expected: 0
 var _mod_runtime_zero = 7 % zero; // expected: 0
 var _mod_const_zero = negative_seven % 0; // expected: 0
