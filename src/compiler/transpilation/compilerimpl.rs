@@ -25,9 +25,10 @@ impl Transpiler<'_, '_> {
     }
 
     fn transpile_compilerimpl_fn_call_binary(&mut self, node: &Call, fn_: BinaryCompilerImplFn) {
+        let typeref_type = self.indexes.search_prelude_type("typeref");
         let is_typeref_comparison = matches!(
             self.value_resolver.expr_type(&node.args[0].value),
-            Type::Struct(type_) if type_.name == "typeref" // TODO: please make safer comparison as the type can be used for custom names (same everywhere else)
+            Type::Struct(type_) if type_ == typeref_type
         );
         if is_typeref_comparison {
             self.transpile_compilerimpl_fn_call_typeref_binary(node, fn_);
@@ -63,10 +64,11 @@ impl Transpiler<'_, '_> {
             self.transpile_expr(result);
             return;
         }
+        let f32_type = self.indexes.search_prelude_type("f32");
         let is_f32_division = fn_ == BinaryCompilerImplFn::Div
             && matches!(
                 self.value_resolver.expr_type(&node.args[0].value),
-                Type::Struct(type_) if type_.name == "f32"
+                Type::Struct(type_) if type_ == f32_type
             );
         if is_f32_division {
             self.transpile_compilerimpl_fn_call_f32_div(node);
