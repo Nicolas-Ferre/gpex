@@ -177,6 +177,19 @@ pub(crate) enum BinaryCompilerImplFn {
     Or,
 }
 
+impl BinaryCompilerImplFn {
+    pub(crate) fn is_logical_operator(self) -> bool {
+        matches!(self, Self::And | Self::Or)
+    }
+
+    pub(crate) fn is_comparison_operator(self) -> bool {
+        matches!(
+            self,
+            Self::Eq | Self::Ne | Self::Lt | Self::Le | Self::Gt | Self::Ge
+        )
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum UnaryCompilerImplFn {
     Neg,

@@ -63,7 +63,7 @@ pub struct bool = compilerimpl {}
 /// ```
 pub const fn typeof(value: ?) -> typeref = compilerimpl;
 
-/// Returns the size of a given `type_` in bytes.
+/// Returns the size of a `type_` in bytes.
 ///
 /// # Examples
 ///
@@ -76,7 +76,7 @@ pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
 
 /// Adds `left` to `right`.
 ///
-/// Integer results wrap on overflow.
+/// `i32` and `u32` results wrap on overflow.
 ///
 /// # Examples
 ///
@@ -92,7 +92,7 @@ pub const fn __add__(
 
 /// Subtracts `right` from `left`.
 ///
-/// Integer results wrap on overflow.
+/// `i32` and `u32` results wrap on overflow.
 ///
 /// # Examples
 ///
@@ -108,7 +108,7 @@ pub const fn __sub__(
 
 /// Multiplies `left` by `right`.
 ///
-/// Integer results wrap on overflow.
+/// `i32` and `u32` results wrap on overflow.
 ///
 /// # Examples
 ///
@@ -125,7 +125,7 @@ pub const fn __mul__(
 /// Divides `left` by `right`.
 ///
 /// Returns `left` when `right` is zero.
-/// Integer division truncates toward zero and wraps on overflow.
+/// `i32` and `u32` division truncates toward zero and wraps on overflow.
 ///
 /// # Examples
 ///
@@ -194,7 +194,7 @@ pub const fn __ne__(
     right: typeof(left)
 ) -> bool = compilerimpl;
 
-/// Returns whether `left` and `right` type references are different.
+/// Returns whether `left` and `right` types are different.
 ///
 /// # Examples
 ///
@@ -283,7 +283,7 @@ pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
 
 /// Negates `value`.
 ///
-/// Integer results wrap on overflow.
+/// `i32` and `u32` results wrap on overflow.
 ///
 /// # Examples
 ///
