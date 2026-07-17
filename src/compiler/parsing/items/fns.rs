@@ -1,4 +1,9 @@
-use crate::compiler::parsing::exprs::Expr;
+use crate::compiler::parsing::exprs::calls::{UNARY_NEG_FN_NAME, UNARY_NOT_FN_NAME};
+use crate::compiler::parsing::exprs::{
+    BINARY_ADD_FN_NAME, BINARY_AND_FN_NAME, BINARY_DIV_FN_NAME, BINARY_EQ_FN_NAME,
+    BINARY_GE_FN_NAME, BINARY_GT_FN_NAME, BINARY_LE_FN_NAME, BINARY_LT_FN_NAME, BINARY_MOD_FN_NAME,
+    BINARY_MUL_FN_NAME, BINARY_NE_FN_NAME, BINARY_OR_FN_NAME, BINARY_SUB_FN_NAME, Expr,
+};
 use crate::compiler::parsing::items::params::ParamGroup;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::statements::Statement;
@@ -86,21 +91,21 @@ impl FnDefinition {
             return None;
         }
         match self.name.as_str() {
-            "__add__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add)),
-            "__sub__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Sub)),
-            "__mul__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul)),
-            "__div__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Div)),
-            "__mod__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mod)),
-            "__eq__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Eq)),
-            "__ne__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ne)),
-            "__lt__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Lt)),
-            "__le__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Le)),
-            "__gt__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Gt)),
-            "__ge__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ge)),
-            "__and__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::And)),
-            "__or__" => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Or)),
-            "__neg__" => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Neg)),
-            "__not__" => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Not)),
+            BINARY_ADD_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add)),
+            BINARY_SUB_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Sub)),
+            BINARY_MUL_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul)),
+            BINARY_DIV_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Div)),
+            BINARY_MOD_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mod)),
+            BINARY_EQ_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Eq)),
+            BINARY_NE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ne)),
+            BINARY_LT_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Lt)),
+            BINARY_LE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Le)),
+            BINARY_GT_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Gt)),
+            BINARY_GE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ge)),
+            BINARY_AND_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::And)),
+            BINARY_OR_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Or)),
+            UNARY_NEG_FN_NAME => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Neg)),
+            UNARY_NOT_FN_NAME => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Not)),
             "mul_add" => Some(CompilerImplFn::MulAdd),
             "typeof" => Some(CompilerImplFn::Typeof),
             "sizeof" => Some(CompilerImplFn::Sizeof),
