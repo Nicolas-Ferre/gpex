@@ -7,6 +7,7 @@ use crate::compiler::values::ValueResolver;
 use crate::compiler::values::consts::{ConstValue, HashableF32};
 use crate::compiler::values::types::Type;
 
+#[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
 impl<'item> ValueResolver<'item, '_> {
     pub(super) fn fn_compilerimpl_const_value(
         &mut self,
@@ -50,7 +51,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
     fn fn_binary_i32_const_value(
         left: i32,
         right: i32,
@@ -80,7 +80,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
     fn fn_binary_u32_const_value(
         left: u32,
         right: u32,
@@ -110,10 +109,7 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[expect(
-        clippy::float_cmp, // needed
-        clippy::wildcard_enum_match_arm, // opt-in is preferred
-    )]
+    #[expect(clippy::float_cmp)] // needed
     fn fn_binary_f32_const_value(
         left: HashableF32,
         right: HashableF32,
@@ -138,7 +134,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
     fn fn_binary_bool_const_value(
         left: bool,
         right: bool,
@@ -157,7 +152,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
     fn fn_binary_typeref_const_value(
         left: &'item StructDefinition,
         right: &'item StructDefinition,
@@ -170,7 +164,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
     fn fn_unary_const_value(
         &self,
         source: &FnDefinition,
@@ -204,7 +197,6 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
     fn fn_sizeof_const_value(&self, source: &FnDefinition) -> ConstValue<'item> {
         match self.const_value(source.params.params[0].id) {
             ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
