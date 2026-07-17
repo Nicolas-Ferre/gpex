@@ -88,6 +88,11 @@ impl Validator<'_, '_> {
                 self.param_constness,
             )?;
         }
+        validators::expr::check_f32_const_bounds(
+            self.value_resolver.is_const_infinite_f32(node),
+            node.span,
+            &mut self.context,
+        )?;
         Ok(())
     }
 

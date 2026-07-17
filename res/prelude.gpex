@@ -32,6 +32,8 @@ pub struct u32 = compilerimpl {}
 
 /// A 32-bit floating-point number.
 ///
+/// Compile-time operations producing non-finite results are rejected.
+///
 /// # Examples
 ///
 /// ```gpex
