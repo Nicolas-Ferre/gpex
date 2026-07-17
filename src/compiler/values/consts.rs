@@ -39,6 +39,13 @@ impl<'item> ValueResolver<'item, '_> {
             .unwrap_or(ConstValue::RuntimeValue)
     }
 
+    pub(crate) fn is_const_infinite_f32(&mut self, node: &Call) -> bool {
+        matches!(
+            self.call_const_value(node),
+            ConstValue::F32(value) if !value.0.is_finite()
+        )
+    }
+
     pub(crate) fn call_const_value(&mut self, node: &Call) -> ConstValue<'item> {
         match self.indexes.sources.get(&node.id) {
             Some(ItemRef::Fn(source)) => self.fn_call_const_value(node, source),
@@ -47,13 +54,6 @@ impl<'item> ValueResolver<'item, '_> {
             }
             None => ConstValue::Unknown,
         }
-    }
-
-    pub(crate) fn is_const_infinite_f32(&mut self, node: &Call) -> bool {
-        matches!(
-            self.call_const_value(node),
-            ConstValue::F32(value) if !value.0.is_finite()
-        )
     }
 
     fn i32_literal_value(node: &I32Literal) -> ConstValue<'static> {
