@@ -14,12 +14,20 @@ impl<'item> ValueResolver<'item, '_> {
         call: &Call,
         source: &FnDefinition,
     ) -> ConstValue<'item> {
+        for param in &source.params.params {
+            if matches!(
+                self.const_value(param.id),
+                ConstValue::Param(_) | ConstValue::WildcardType(_)
+            ) {
+                return ConstValue::Unknown;
+            }
+        }
         match source.compilerimpl() {
             Some(CompilerImplFn::Binary(fn_)) => self.fn_binary_const_value(source, fn_),
             Some(CompilerImplFn::Unary(fn_)) => self.fn_unary_const_value(source, fn_),
             Some(CompilerImplFn::MulAdd) => self.fn_mul_add_const_value(source),
-            Some(CompilerImplFn::Typeof) => self.fn_typeof_const_value(call),
             Some(CompilerImplFn::Sizeof) => self.fn_sizeof_const_value(source),
+            Some(CompilerImplFn::Typeof) => self.fn_typeof_const_value(call),
             None => unreachable!("not implemented `{}` constant GPU function", source.name),
         }
     }

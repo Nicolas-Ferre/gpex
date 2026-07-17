@@ -6,8 +6,9 @@ fn fn_(param: ? require is_valid(typeof(param))) -> i32 {
     return 2;
 }
 
-const fn is_valid(_type: const typeref) -> bool {
-    return true;
+const fn is_valid(type_: const typeref) -> bool {
+    return type_ == i32;
 }
 
-var _item = fn_(0); // expected: 2
+var _matching = fn_(0); // expected: 2
+var _not_matching = fn_(0u); // expected: 1
