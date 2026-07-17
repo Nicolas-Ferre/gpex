@@ -1,0 +1,18 @@
+const _EQ_TRUE = false == false; // expected: true
+const _EQ_FALSE = false == true; // expected: false
+const _NE_TRUE = false != true; // expected: true
+const _NE_FALSE = false != false; // expected: false
+const _LT_TRUE = false < true; // expected: true
+const _LT_FALSE = true < false; // expected: false
+const _LE_TRUE = true <= true; // expected: true
+const _LE_FALSE = true <= false; // expected: false
+const _GT_TRUE = true > false; // expected: true
+const _GT_FALSE = false > true; // expected: false
+const _GE_TRUE = false >= false; // expected: true
+const _GE_FALSE = false >= true; // expected: false
+const _AND_TRUE = true && true; // expected: true
+const _AND_FALSE = true && false; // expected: false
+const _OR_TRUE = true || false; // expected: true
+const _OR_FALSE = false || false; // expected: false
+const _NOT_TRUE = !false; // expected: true
+const _NOT_FALSE = !true; // expected: false

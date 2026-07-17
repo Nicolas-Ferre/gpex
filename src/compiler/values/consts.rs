@@ -39,6 +39,23 @@ impl<'item> ValueResolver<'item, '_> {
             .unwrap_or(ConstValue::RuntimeValue)
     }
 
+    pub(crate) fn is_const_infinite_f32(&mut self, node: &Call) -> bool {
+        matches!(
+            self.call_const_value(node),
+            ConstValue::F32(value) if !value.0.is_finite()
+        )
+    }
+
+    pub(crate) fn call_const_value(&mut self, node: &Call) -> ConstValue<'item> {
+        match self.indexes.sources.get(&node.id) {
+            Some(ItemRef::Fn(source)) => self.fn_call_const_value(node, source),
+            Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_)) => {
+                unreachable!("identifier should not refer to a value")
+            }
+            None => ConstValue::Unknown,
+        }
+    }
+
     fn i32_literal_value(node: &I32Literal) -> ConstValue<'static> {
         if let Some(value) = node.value {
             ConstValue::I32(value)
@@ -77,16 +94,6 @@ impl<'item> ValueResolver<'item, '_> {
                 }
             }
             Some(ItemRef::Fn(_)) => unreachable!("identifier should not refer to a function"),
-            None => ConstValue::Unknown,
-        }
-    }
-
-    fn call_const_value(&mut self, node: &Call) -> ConstValue<'item> {
-        match self.indexes.sources.get(&node.id) {
-            Some(ItemRef::Fn(source)) => self.fn_call_const_value(node, source),
-            Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_)) => {
-                unreachable!("identifier should not refer to a value")
-            }
             None => ConstValue::Unknown,
         }
     }

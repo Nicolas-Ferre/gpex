@@ -4,6 +4,7 @@ mod compilerimpl;
 mod exprs;
 mod items;
 
+use self::compilerimpl::CompilerImplType;
 use crate::compiler::dependencies::DependencyResolver;
 use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
@@ -63,6 +64,7 @@ pub(crate) struct Transpiler<'item, 'index> {
     indexes: &'index Indexes<'item>,
     shader: String,
     value_resolver: ValueResolver<'item, 'index>,
+    compilerimpl_types: HashMap<u64, CompilerImplType>,
     specialized_fns: HashMap<SpecializedFn<'item>, usize>,
     transpiled_specialized_fn_indexes: HashSet<usize>,
 }
@@ -73,6 +75,7 @@ impl<'item, 'index> Transpiler<'item, 'index> {
             indexes,
             shader: String::new(),
             value_resolver: ValueResolver::new(indexes),
+            compilerimpl_types: CompilerImplType::all_by_id(indexes),
             specialized_fns: HashMap::default(),
             transpiled_specialized_fn_indexes: HashSet::default(),
         }

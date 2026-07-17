@@ -15,19 +15,19 @@ use calls::Call;
 use idents::Ident;
 use literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
 
-const BINARY_ADD_FN_NAME: &str = "__add__";
-const BINARY_SUB_FN_NAME: &str = "__sub__";
-const BINARY_MUL_FN_NAME: &str = "__mul__";
-const BINARY_DIV_FN_NAME: &str = "__div__";
-const BINARY_MOD_FN_NAME: &str = "__mod__";
-const BINARY_EQ_FN_NAME: &str = "__eq__";
-const BINARY_NE_FN_NAME: &str = "__ne__";
-const BINARY_LT_FN_NAME: &str = "__lt__";
-const BINARY_LE_FN_NAME: &str = "__le__";
-const BINARY_GT_FN_NAME: &str = "__gt__";
-const BINARY_GE_FN_NAME: &str = "__ge__";
-const BINARY_AND_FN_NAME: &str = "__and__";
-const BINARY_OR_FN_NAME: &str = "__or__";
+pub(crate) const BINARY_ADD_FN_NAME: &str = "__add__";
+pub(crate) const BINARY_SUB_FN_NAME: &str = "__sub__";
+pub(crate) const BINARY_MUL_FN_NAME: &str = "__mul__";
+pub(crate) const BINARY_DIV_FN_NAME: &str = "__div__";
+pub(crate) const BINARY_MOD_FN_NAME: &str = "__mod__";
+pub(crate) const BINARY_EQ_FN_NAME: &str = "__eq__";
+pub(crate) const BINARY_NE_FN_NAME: &str = "__ne__";
+pub(crate) const BINARY_LT_FN_NAME: &str = "__lt__";
+pub(crate) const BINARY_LE_FN_NAME: &str = "__le__";
+pub(crate) const BINARY_GT_FN_NAME: &str = "__gt__";
+pub(crate) const BINARY_GE_FN_NAME: &str = "__ge__";
+pub(crate) const BINARY_AND_FN_NAME: &str = "__and__";
+pub(crate) const BINARY_OR_FN_NAME: &str = "__or__";
 pub(crate) const BINARY_FN_NAMES: &[&str] = &[
     BINARY_ADD_FN_NAME,
     BINARY_SUB_FN_NAME,

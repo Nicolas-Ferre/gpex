@@ -62,6 +62,24 @@ pub(crate) fn check_const_value(
     }
 }
 
+pub(crate) fn check_f32_const_bounds(
+    is_out_of_bounds: bool,
+    span: Span,
+    context: &mut ValidateContext<'_>,
+) -> Result<(), ValidateError> {
+    if is_out_of_bounds {
+        context.logs.push(Log {
+            level: LogLevel::Error,
+            msg: "`f32` constant expression out of bounds".into(),
+            location: Some(context.location(span)),
+            inner: vec![],
+        });
+        Err(ValidateError)
+    } else {
+        Ok(())
+    }
+}
+
 pub(crate) fn check_arg_name(
     arg: &Arg,
     param: &Param,

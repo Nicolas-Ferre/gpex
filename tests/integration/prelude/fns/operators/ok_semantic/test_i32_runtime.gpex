@@ -1,0 +1,38 @@
+var two = 2;
+var three = 3;
+var negative_two = -2;
+var negative_seven = -7;
+var min = -2_147_483_648;
+var max = 2_147_483_647;
+var large = 1_073_741_824;
+var zero = 0;
+
+var _add = two + 3; // expected: 5
+var _add_wrap = max + 1; // expected: -2147483648
+var _sub = two - 3; // expected: -1
+var _sub_wrap = min - 1; // expected: 2147483647
+var _mul = -three * two; // expected: -6
+var _mul_wrap = large * two; // expected: -2147483648
+var _div = negative_seven / two; // expected: -3
+var _div_wrap = min / -1; // expected: -2147483648
+var _div_runtime_zero = 7 / zero; // expected: 7
+var _div_const_zero = negative_seven / 0; // expected: -7
+var _mod_negative_left = negative_seven % two; // expected: -1
+var _mod_negative_right = 7 % negative_two; // expected: 1
+var _mod_wrap = min % -1; // expected: 0
+var _mod_runtime_zero = 7 % zero; // expected: 0
+var _mod_const_zero = negative_seven % 0; // expected: 0
+var _eq_true = two == 2; // expected: true
+var _eq_false = two == three; // expected: false
+var _ne_true = two != three; // expected: true
+var _ne_false = two != 2; // expected: false
+var _lt_true = two < three; // expected: true
+var _lt_false = three < two; // expected: false
+var _le_true = two <= 2; // expected: true
+var _le_false = three <= two; // expected: false
+var _gt_true = three > two; // expected: true
+var _gt_false = two > three; // expected: false
+var _ge_true = two >= 2; // expected: true
+var _ge_false = two >= three; // expected: false
+var _neg = -two; // expected: -2
+var _neg_wrap = -min; // expected: -2147483648

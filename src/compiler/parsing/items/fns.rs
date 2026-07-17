@@ -1,4 +1,9 @@
-use crate::compiler::parsing::exprs::Expr;
+use crate::compiler::parsing::exprs::calls::{UNARY_NEG_FN_NAME, UNARY_NOT_FN_NAME};
+use crate::compiler::parsing::exprs::{
+    BINARY_ADD_FN_NAME, BINARY_AND_FN_NAME, BINARY_DIV_FN_NAME, BINARY_EQ_FN_NAME,
+    BINARY_GE_FN_NAME, BINARY_GT_FN_NAME, BINARY_LE_FN_NAME, BINARY_LT_FN_NAME, BINARY_MOD_FN_NAME,
+    BINARY_MUL_FN_NAME, BINARY_NE_FN_NAME, BINARY_OR_FN_NAME, BINARY_SUB_FN_NAME, Expr,
+};
 use crate::compiler::parsing::items::params::ParamGroup;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::statements::Statement;
@@ -81,14 +86,29 @@ impl FnDefinition {
         format!("{}({})", self.name, self.params.params.len())
     }
 
-    pub(crate) fn compilerimpl(&self) -> Option<CompilerImpl> {
+    pub(crate) fn compilerimpl(&self) -> Option<CompilerImplFn> {
         if !matches!(self.body, FnBody::Compilerimpl(_)) {
             return None;
         }
         match self.name.as_str() {
-            "__add__" => Some(CompilerImpl::Add),
-            "typeof" => Some(CompilerImpl::Typeof),
-            "sizeof" => Some(CompilerImpl::Sizeof),
+            BINARY_ADD_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add)),
+            BINARY_SUB_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Sub)),
+            BINARY_MUL_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul)),
+            BINARY_DIV_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Div)),
+            BINARY_MOD_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mod)),
+            BINARY_EQ_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Eq)),
+            BINARY_NE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ne)),
+            BINARY_LT_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Lt)),
+            BINARY_LE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Le)),
+            BINARY_GT_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Gt)),
+            BINARY_GE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ge)),
+            BINARY_AND_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::And)),
+            BINARY_OR_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Or)),
+            UNARY_NEG_FN_NAME => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Neg)),
+            UNARY_NOT_FN_NAME => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Not)),
+            "mul_add" => Some(CompilerImplFn::MulAdd),
+            "typeof" => Some(CompilerImplFn::Typeof),
+            "sizeof" => Some(CompilerImplFn::Sizeof),
             _ => None,
         }
     }
@@ -137,10 +157,48 @@ impl FnDefinition {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum CompilerImpl {
-    Add,
+pub(crate) enum CompilerImplFn {
+    Binary(BinaryCompilerImplFn),
+    Unary(UnaryCompilerImplFn),
+    MulAdd,
     Typeof,
     Sizeof,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum BinaryCompilerImplFn {
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+    And,
+    Or,
+}
+
+impl BinaryCompilerImplFn {
+    pub(crate) fn is_logical_operator(self) -> bool {
+        matches!(self, Self::And | Self::Or)
+    }
+
+    pub(crate) fn is_comparison_operator(self) -> bool {
+        matches!(
+            self,
+            Self::Eq | Self::Ne | Self::Lt | Self::Le | Self::Gt | Self::Ge
+        )
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum UnaryCompilerImplFn {
+    Neg,
+    Not,
 }
 
 #[derive(Debug)]

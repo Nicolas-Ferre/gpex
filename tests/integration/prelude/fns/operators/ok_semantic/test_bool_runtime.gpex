@@ -1,0 +1,21 @@
+var false_ = false;
+var true_ = true;
+
+var _eq_true = false_ == false; // expected: true
+var _eq_false = false_ == true; // expected: false
+var _ne_true = false_ != true; // expected: true
+var _ne_false = false_ != false; // expected: false
+var _lt_true = false_ < true_; // expected: true
+var _lt_false = true_ < false_; // expected: false
+var _le_true = true_ <= true; // expected: true
+var _le_false = true_ <= false; // expected: false
+var _gt_true = true_ > false_; // expected: true
+var _gt_false = false_ > true_; // expected: false
+var _ge_true = false_ >= false; // expected: true
+var _ge_false = false_ >= true; // expected: false
+var _and_true = true_ && true_; // expected: true
+var _and_false = true_ && false_; // expected: false
+var _or_true = true_ || false_; // expected: true
+var _or_false = false_ || false_; // expected: false
+var _not_true = !false_; // expected: true
+var _not_false = !true_; // expected: false

@@ -1,0 +1,30 @@
+const MIN = -2_147_483_648;
+const TWO = 2;
+
+const _ADD = 2 + 3; // expected: 5
+const _ADD_WRAP = 2_147_483_647 + 1; // expected: -2147483648
+const _SUB = 2 - 3; // expected: -1
+const _SUB_WRAP = MIN - 1; // expected: 2147483647
+const _MUL = -3 * 2; // expected: -6
+const _MUL_WRAP = 1_073_741_824 * 2; // expected: -2147483648
+const _DIV = -7 / 2; // expected: -3
+const _DIV_WRAP = MIN / -1; // expected: -2147483648
+const _DIV_ZERO = 7 / 0; // expected: 7
+const _MOD_NEGATIVE_LEFT = -7 % 2; // expected: -1
+const _MOD_NEGATIVE_RIGHT = 7 % -2; // expected: 1
+const _MOD_WRAP = MIN % -1; // expected: 0
+const _MOD_ZERO = 7 % 0; // expected: 0
+const _EQ_TRUE = 2 == 2; // expected: true
+const _EQ_FALSE = 2 == 3; // expected: false
+const _NE_TRUE = 2 != 3; // expected: true
+const _NE_FALSE = 2 != 2; // expected: false
+const _LT_TRUE = 2 < 3; // expected: true
+const _LT_FALSE = 3 < 2; // expected: false
+const _LE_TRUE = 2 <= 2; // expected: true
+const _LE_FALSE = 3 <= 2; // expected: false
+const _GT_TRUE = 3 > 2; // expected: true
+const _GT_FALSE = 2 > 3; // expected: false
+const _GE_TRUE = 2 >= 2; // expected: true
+const _GE_FALSE = 2 >= 3; // expected: false
+const _NEG = -TWO; // expected: -2
+const _NEG_WRAP = -MIN; // expected: -2147483648

@@ -17,8 +17,8 @@ use crate::utils::parsing::context::{ParseContext, Parser, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
 
-const UNARY_NEG_FN_NAME: &str = "__neg__";
-const UNARY_NOT_FN_NAME: &str = "__not__";
+pub(crate) const UNARY_NEG_FN_NAME: &str = "__neg__";
+pub(crate) const UNARY_NOT_FN_NAME: &str = "__not__";
 pub(crate) const UNARY_FN_NAMES: &[&str] = &[UNARY_NEG_FN_NAME, UNARY_NOT_FN_NAME];
 
 #[derive(Debug)]

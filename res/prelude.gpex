@@ -1,3 +1,5 @@
+// NATIVE TYPES
+
 /// A reference to a type.
 ///
 /// # Examples
@@ -30,6 +32,8 @@ pub struct u32 = compilerimpl {}
 
 /// A 32-bit floating-point number.
 ///
+/// Compile-time operations producing non-finite results are rejected.
+///
 /// # Examples
 ///
 /// ```gpex
@@ -49,16 +53,9 @@ pub struct f32 = compilerimpl {}
 /// ```
 pub struct bool = compilerimpl {}
 
-/// Adds two `i32` values.
-///
-/// # Examples
-///
-/// ```gpex
-/// var value = 1 + 2;
-/// ```
-pub const fn __add__(left: i32, right: i32) -> i32 = compilerimpl;
+// TYPE OPERATIONS
 
-/// Returns the type of a value.
+/// Returns the type of a `value`.
 ///
 /// # Examples
 ///
@@ -68,7 +65,7 @@ pub const fn __add__(left: i32, right: i32) -> i32 = compilerimpl;
 /// ```
 pub const fn typeof(value: ?) -> typeref = compilerimpl;
 
-/// Returns the size in bytes of a type.
+/// Returns the size of a `type_` in bytes.
 ///
 /// # Examples
 ///
@@ -76,3 +73,262 @@ pub const fn typeof(value: ?) -> typeref = compilerimpl;
 /// const I32_SIZE = sizeof(i32); // 4u
 /// ```
 pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
+
+// OPERATORS
+
+/// Adds `left` to `right`.
+///
+/// `i32` and `u32` results wrap on overflow.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_value = 1 + 2; // 3
+/// var u32_value = 1u + 2u; // 3u
+/// var f32_value = 1.0 + 2.0; // 3.0
+/// ```
+pub const fn __add__(
+    left: ? require typeof(left).is_numeric(),
+    right: typeof(left)
+) -> typeof(left) = compilerimpl;
+
+/// Subtracts `right` from `left`.
+///
+/// `i32` and `u32` results wrap on overflow.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_value = 2 - 1; // 1
+/// var u32_value = 2u - 1u; // 1u
+/// var f32_value = 2.0 - 1.0; // 1.0
+/// ```
+pub const fn __sub__(
+    left: ? require typeof(left).is_numeric(),
+    right: typeof(left)
+) -> typeof(left) = compilerimpl;
+
+/// Multiplies `left` by `right`.
+///
+/// `i32` and `u32` results wrap on overflow.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_value = 2 * 3; // 6
+/// var u32_value = 2u * 3u; // 6u
+/// var f32_value = 2.0 * 3.0; // 6.0
+/// ```
+pub const fn __mul__(
+    left: ? require typeof(left).is_numeric(),
+    right: typeof(left)
+) -> typeof(left) = compilerimpl;
+
+/// Divides `left` by `right`.
+///
+/// Returns `left` when `right` is zero.
+/// `i32` and `u32` division truncates toward zero and wraps on overflow.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_value = 6 / 2; // 3
+/// var u32_value = 6u / 2u; // 3u
+/// var f32_value = 6.0 / 2.0; // 3.0
+/// ```
+pub const fn __div__(
+    left: ? require typeof(left).is_numeric(),
+    right: typeof(left)
+) -> typeof(left) = compilerimpl;
+
+/// Returns the remainder of `left` divided by `right`.
+///
+/// The result has the sign of `left`.
+/// When `right` is zero, returns zero.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_value = 5 % 2; // 1
+/// var u32_value = 5u % 2u; // 1u
+/// ```
+pub const fn __mod__(
+    left: ? require typeof(left).is_integer(),
+    right: typeof(left)
+) -> typeof(left) = compilerimpl;
+
+/// Returns whether `left` and `right` are equal.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_result = 1 == 1; // true
+/// var u32_result = 1u == 1u; // true
+/// var f32_result = 1.0 == 1.0; // true
+/// var bool_result = true == true; // true
+/// ```
+pub const fn __eq__(
+    left: ? require typeof(left).is_ordered(),
+    right: typeof(left)
+) -> bool = compilerimpl;
+
+/// Returns whether `left` and `right` type references are equal.
+///
+/// # Examples
+///
+/// ```gpex
+/// const ARE_EQUAL = i32 == i32; // true
+/// ```
+pub const fn __eq__(left: typeref, right: typeref) -> bool = compilerimpl;
+
+/// Returns whether `left` and `right` are different.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_result = 1 != 2; // true
+/// var u32_result = 1u != 2u; // true
+/// var f32_result = 1.0 != 2.0; // true
+/// var bool_result = true != false; // true
+/// ```
+pub const fn __ne__(
+    left: ? require typeof(left).is_ordered(),
+    right: typeof(left)
+) -> bool = compilerimpl;
+
+/// Returns whether `left` and `right` types are different.
+///
+/// # Examples
+///
+/// ```gpex
+/// const ARE_DIFFERENT = i32 != u32; // true
+/// ```
+pub const fn __ne__(left: typeref, right: typeref) -> bool = compilerimpl;
+
+/// Returns whether `left` is less than `right`.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_result = 1 < 2; // true
+/// var u32_result = 1u < 2u; // true
+/// var f32_result = 1.0 < 2.0; // true
+/// var bool_result = false < true; // true
+/// ```
+pub const fn __lt__(
+    left: ? require typeof(left).is_ordered(),
+    right: typeof(left)
+) -> bool = compilerimpl;
+
+/// Returns whether `left` is less than or equal to `right`.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_result = 1 <= 2; // true
+/// var u32_result = 1u <= 2u; // true
+/// var f32_result = 1.0 <= 2.0; // true
+/// var bool_result = false <= true; // true
+/// ```
+pub const fn __le__(
+    left: ? require typeof(left).is_ordered(),
+    right: typeof(left)
+) -> bool = compilerimpl;
+
+/// Returns whether `left` is greater than `right`.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_result = 2 > 1; // true
+/// var u32_result = 2u > 1u; // true
+/// var f32_result = 2.0 > 1.0; // true
+/// var bool_result = true > false; // true
+/// ```
+pub const fn __gt__(
+    left: ? require typeof(left).is_ordered(),
+    right: typeof(left)
+) -> bool = compilerimpl;
+
+/// Returns whether `left` is greater than or equal to `right`.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_result = 2 >= 1; // true
+/// var u32_result = 2u >= 1u; // true
+/// var f32_result = 2.0 >= 1.0; // true
+/// var bool_result = true >= false; // true
+/// ```
+pub const fn __ge__(
+    left: ? require typeof(left).is_ordered(),
+    right: typeof(left)
+) -> bool = compilerimpl;
+
+/// Returns whether `left` and `right` are both true.
+///
+/// # Examples
+///
+/// ```gpex
+/// var result = true && false; // false
+/// ```
+pub const fn __and__(left: bool, right: bool) -> bool = compilerimpl;
+
+/// Returns whether `left` or `right` is true.
+///
+/// # Examples
+///
+/// ```gpex
+/// var result = true || false; // true
+/// ```
+pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
+
+/// Negates `value`.
+///
+/// `i32` results wrap on overflow.
+///
+/// # Examples
+///
+/// ```gpex
+/// var i32_one = 1; // 1
+/// var negated_i32_value = -i32_one; // -1
+/// var f32_one = 1.0; // 1.0
+/// var negated_f32_value = -f32_one; // -1.0
+/// ```
+pub const fn __neg__(value: ? require typeof(value).is_signed()) -> typeof(value) = compilerimpl;
+
+/// Returns whether `value` is false.
+///
+/// # Examples
+///
+/// ```gpex
+/// var result = !false; // true
+/// ```
+pub const fn __not__(value: bool) -> bool = compilerimpl;
+
+/// Multiplies `value` by `multiplier`, then adds `addend` with a single rounding.
+///
+/// To be noted that single rounding is not always guaranteed, depending on the platform.
+///
+/// # Examples
+///
+/// ```gpex
+/// var result = mul_add(2.0, 3.0, 4.0); // 10.0
+/// ```
+pub const fn mul_add(value: f32, multiplier: f32, addend: f32) -> f32 = compilerimpl;
+
+const fn is_numeric(type_: typeref) -> bool {
+    return type_ == i32 || type_ == u32 || type_ == f32;
+}
+
+const fn is_integer(type_: typeref) -> bool {
+    return type_ == i32 || type_ == u32;
+}
+
+const fn is_ordered(type_: typeref) -> bool {
+    return type_.is_numeric() || type_ == bool;
+}
+
+const fn is_signed(type_: typeref) -> bool {
+    return type_ == i32 || type_ == f32;
+}

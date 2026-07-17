@@ -1,0 +1,6 @@
+var integer = i32;
+
+var _eq_true = integer == i32; // expected: true
+var _eq_false = integer == u32; // expected: false
+var _ne_true = integer != u32; // expected: true
+var _ne_false = integer != i32; // expected: false

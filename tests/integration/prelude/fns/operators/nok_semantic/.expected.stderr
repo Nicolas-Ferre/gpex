@@ -1,0 +1,20 @@
+error: `__mod__(f32, f32)` item not found
+│  → <root>/test_f32_mod.gpex:1:15
+│    ¦ var _result = 0.0 % 0.0;
+│    ¦               ^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/res/prelude.gpex:155:14
+│    ¦ pub const fn __mod__(
+│    ¦              ^^^^^^^^
+│    ¦     left: ? require typeof(left).is_integer(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> typeof(left) = compilerimpl;
+│    ¦ ^^^^^^^^^^^^^^^^^
+┴
+error: `f32` constant expression out of bounds
+│  → <root>/test_f32_overflow.gpex:1:15
+│    ¦ var _result = 340_282_347_000_000_000_000_000_000_000_000_000_000.0 * 2.0;
+│    ¦               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴

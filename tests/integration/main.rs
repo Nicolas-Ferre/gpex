@@ -125,7 +125,8 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
             .iter()
             .map(Log::to_string)
             .join("")
-            .replace(&path.display().to_string(), "<root>");
+            .replace(&path.display().to_string(), "<root>")
+            .replace(env!("CARGO_MANIFEST_DIR"), "<project>");
         let expected_path = path.join(".expected.stderr");
         if expected_path.exists() {
             let expected = fs::read_to_string(&expected_path)?;
