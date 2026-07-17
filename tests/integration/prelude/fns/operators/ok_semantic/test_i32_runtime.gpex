@@ -2,7 +2,7 @@ var two = 2;
 var three = 3;
 var negative_two = -2;
 var negative_seven = -7;
-var min = -2_147_483_647 - 1;
+var min = -2_147_483_648;
 var max = 2_147_483_647;
 var large = 1_073_741_824;
 var zero = 0;
@@ -35,3 +35,4 @@ var _gt_false = two > three; // expected: false
 var _ge_true = two >= 2; // expected: true
 var _ge_false = two >= three; // expected: false
 var _neg = -two; // expected: -2
+var _neg_wrap = -min; // expected: -2147483648

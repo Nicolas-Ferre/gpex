@@ -306,6 +306,8 @@ pub const fn __not__(value: bool) -> bool = compilerimpl;
 
 /// Multiplies `value` by `multiplier`, then adds `addend` with a single rounding.
 ///
+/// To be noted that single rounding is not always guaranteed, depending on the platform.
+///
 /// # Examples
 ///
 /// ```gpex

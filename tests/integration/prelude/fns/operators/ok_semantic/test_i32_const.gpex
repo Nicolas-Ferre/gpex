@@ -1,4 +1,4 @@
-const MIN = -2_147_483_647 - 1;
+const MIN = -2_147_483_648;
 const TWO = 2;
 
 const _ADD = 2 + 3; // expected: 5
@@ -27,3 +27,4 @@ const _GT_FALSE = 2 > 3; // expected: false
 const _GE_TRUE = 2 >= 2; // expected: true
 const _GE_FALSE = 2 >= 3; // expected: false
 const _NEG = -TWO; // expected: -2
+const _NEG_WRAP = -MIN; // expected: -2147483648
