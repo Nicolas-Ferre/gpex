@@ -283,7 +283,7 @@ pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
 
 /// Negates `value`.
 ///
-/// `i32` and `u32` results wrap on overflow.
+/// `i32` results wrap on overflow.
 ///
 /// # Examples
 ///
