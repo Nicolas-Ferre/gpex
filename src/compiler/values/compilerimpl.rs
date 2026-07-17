@@ -14,48 +14,44 @@ impl<'item> ValueResolver<'item, '_> {
         source: &FnDefinition,
     ) -> ConstValue<'item> {
         match source.compilerimpl() {
-            Some(CompilerImplFn::Binary(compilerimpl)) => {
-                self.fn_compilerimpl_binary_const_value(source, compilerimpl)
-            }
-            Some(CompilerImplFn::Unary(compilerimpl)) => {
-                self.fn_compilerimpl_unary_const_value(source, compilerimpl)
-            }
-            Some(CompilerImplFn::MulAdd) => self.fn_compilerimpl_mul_add_const_value(source),
-            Some(CompilerImplFn::Typeof) => self.fn_compilerimpl_typeof_const_value(call),
-            Some(CompilerImplFn::Sizeof) => self.fn_compilerimpl_sizeof_const_value(source),
+            Some(CompilerImplFn::Binary(fn_)) => self.fn_binary_const_value(source, fn_),
+            Some(CompilerImplFn::Unary(fn_)) => self.fn_unary_const_value(source, fn_),
+            Some(CompilerImplFn::MulAdd) => self.fn_mul_add_const_value(source),
+            Some(CompilerImplFn::Typeof) => self.fn_typeof_const_value(call),
+            Some(CompilerImplFn::Sizeof) => self.fn_sizeof_const_value(source),
             None => unreachable!("not implemented `{}` constant GPU function", source.name),
         }
     }
 
-    fn fn_compilerimpl_binary_const_value(
+    fn fn_binary_const_value(
         &self,
-        source: &FnDefinition,
+        node: &FnDefinition,
         fn_: BinaryCompilerImplFn,
     ) -> ConstValue<'item> {
-        let left = self.const_value(source.params.params[0].id);
-        let right = self.const_value(source.params.params[1].id);
+        let left = self.const_value(node.params.params[0].id);
+        let right = self.const_value(node.params.params[1].id);
         match (left, right) {
             (ConstValue::I32(left), ConstValue::I32(right)) => {
-                Self::fn_compilerimpl_binary_i32_const_value(left, right, fn_)
+                Self::fn_binary_i32_const_value(left, right, fn_)
             }
             (ConstValue::U32(left), ConstValue::U32(right)) => {
-                Self::fn_compilerimpl_binary_u32_const_value(left, right, fn_)
+                Self::fn_binary_u32_const_value(left, right, fn_)
             }
             (ConstValue::F32(left), ConstValue::F32(right)) => {
-                Self::fn_compilerimpl_binary_f32_const_value(left, right, fn_)
+                Self::fn_binary_f32_const_value(left, right, fn_)
             }
             (ConstValue::Bool(left), ConstValue::Bool(right)) => {
-                Self::fn_compilerimpl_binary_bool_const_value(left, right, fn_)
+                Self::fn_binary_bool_const_value(left, right, fn_)
             }
             (ConstValue::TypeRef(left), ConstValue::TypeRef(right)) => {
-                Self::fn_compilerimpl_binary_typeref_const_value(left, right, fn_)
+                Self::fn_binary_typeref_const_value(left, right, fn_)
             }
-            _ => unreachable!("not implemented `{}` constant GPU function", source.name),
+            _ => unreachable!("not implemented `{}` constant GPU function", node.name),
         }
     }
 
     #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
-    fn fn_compilerimpl_binary_i32_const_value(
+    fn fn_binary_i32_const_value(
         left: i32,
         right: i32,
         fn_: BinaryCompilerImplFn,
@@ -80,12 +76,12 @@ impl<'item> ValueResolver<'item, '_> {
             BinaryCompilerImplFn::Le => ConstValue::Bool(left <= right),
             BinaryCompilerImplFn::Gt => ConstValue::Bool(left > right),
             BinaryCompilerImplFn::Ge => ConstValue::Bool(left >= right),
-            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for i32"),
+            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `i32`"),
         }
     }
 
     #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
-    fn fn_compilerimpl_binary_u32_const_value(
+    fn fn_binary_u32_const_value(
         left: u32,
         right: u32,
         fn_: BinaryCompilerImplFn,
@@ -110,7 +106,7 @@ impl<'item> ValueResolver<'item, '_> {
             BinaryCompilerImplFn::Le => ConstValue::Bool(left <= right),
             BinaryCompilerImplFn::Gt => ConstValue::Bool(left > right),
             BinaryCompilerImplFn::Ge => ConstValue::Bool(left >= right),
-            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for u32"),
+            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `u32`"),
         }
     }
 
@@ -118,7 +114,7 @@ impl<'item> ValueResolver<'item, '_> {
         clippy::float_cmp, // needed
         clippy::wildcard_enum_match_arm, // opt-in is preferred
     )]
-    fn fn_compilerimpl_binary_f32_const_value(
+    fn fn_binary_f32_const_value(
         left: HashableF32,
         right: HashableF32,
         fn_: BinaryCompilerImplFn,
@@ -138,15 +134,12 @@ impl<'item> ValueResolver<'item, '_> {
             BinaryCompilerImplFn::Le => ConstValue::Bool(left.0 <= right.0),
             BinaryCompilerImplFn::Gt => ConstValue::Bool(left.0 > right.0),
             BinaryCompilerImplFn::Ge => ConstValue::Bool(left.0 >= right.0),
-            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for f32"),
+            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `f32`"),
         }
     }
 
-    #[expect(
-        clippy::bool_comparison, // needed
-        clippy::wildcard_enum_match_arm, // opt-in is preferred
-    )]
-    fn fn_compilerimpl_binary_bool_const_value(
+    #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+    fn fn_binary_bool_const_value(
         left: bool,
         right: bool,
         fn_: BinaryCompilerImplFn,
@@ -154,18 +147,18 @@ impl<'item> ValueResolver<'item, '_> {
         match fn_ {
             BinaryCompilerImplFn::Eq => ConstValue::Bool(left == right),
             BinaryCompilerImplFn::Ne => ConstValue::Bool(left != right),
-            BinaryCompilerImplFn::Lt => ConstValue::Bool(left < right),
+            BinaryCompilerImplFn::Lt => ConstValue::Bool(!left && right),
             BinaryCompilerImplFn::Le => ConstValue::Bool(left <= right),
-            BinaryCompilerImplFn::Gt => ConstValue::Bool(left > right),
+            BinaryCompilerImplFn::Gt => ConstValue::Bool(left && !right),
             BinaryCompilerImplFn::Ge => ConstValue::Bool(left >= right),
             BinaryCompilerImplFn::And => ConstValue::Bool(left && right),
             BinaryCompilerImplFn::Or => ConstValue::Bool(left || right),
-            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for bool"),
+            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `bool`"),
         }
     }
 
     #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
-    fn fn_compilerimpl_binary_typeref_const_value(
+    fn fn_binary_typeref_const_value(
         left: &'item StructDefinition,
         right: &'item StructDefinition,
         fn_: BinaryCompilerImplFn,
@@ -173,12 +166,12 @@ impl<'item> ValueResolver<'item, '_> {
         match fn_ {
             BinaryCompilerImplFn::Eq => ConstValue::Bool(left == right),
             BinaryCompilerImplFn::Ne => ConstValue::Bool(left != right),
-            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for typeref"),
+            _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `typeref`"),
         }
     }
 
     #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
-    fn fn_compilerimpl_unary_const_value(
+    fn fn_unary_const_value(
         &self,
         source: &FnDefinition,
         fn_: UnaryCompilerImplFn,
@@ -191,20 +184,18 @@ impl<'item> ValueResolver<'item, '_> {
         }
     }
 
-    fn fn_compilerimpl_mul_add_const_value(&self, source: &FnDefinition) -> ConstValue<'item> {
-        match (
+    fn fn_mul_add_const_value(&self, source: &FnDefinition) -> ConstValue<'item> {
+        let (ConstValue::F32(value), ConstValue::F32(multiplier), ConstValue::F32(addend)) = (
             self.const_value(source.params.params[0].id),
             self.const_value(source.params.params[1].id),
             self.const_value(source.params.params[2].id),
-        ) {
-            (ConstValue::F32(value), ConstValue::F32(multiplier), ConstValue::F32(addend)) => {
-                ConstValue::F32(HashableF32(value.0.mul_add(multiplier.0, addend.0)))
-            }
-            _ => unreachable!("not implemented `{}` constant GPU function", source.name),
-        }
+        ) else {
+            unreachable!("not implemented `{}` constant GPU function", source.name)
+        };
+        ConstValue::F32(HashableF32(value.0.mul_add(multiplier.0, addend.0)))
     }
 
-    fn fn_compilerimpl_typeof_const_value(&mut self, call: &Call) -> ConstValue<'item> {
+    fn fn_typeof_const_value(&mut self, call: &Call) -> ConstValue<'item> {
         match self.expr_type(&call.args[0].value) {
             Type::Struct(type_) => ConstValue::TypeRef(type_),
             Type::Param(param) => ConstValue::Param(param),
@@ -214,7 +205,7 @@ impl<'item> ValueResolver<'item, '_> {
     }
 
     #[expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
-    fn fn_compilerimpl_sizeof_const_value(&self, source: &FnDefinition) -> ConstValue<'item> {
+    fn fn_sizeof_const_value(&self, source: &FnDefinition) -> ConstValue<'item> {
         match self.const_value(source.params.params[0].id) {
             ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
             _ => unreachable!("not implemented `{}` constant GPU function", source.name),
