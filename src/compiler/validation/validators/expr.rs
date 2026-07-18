@@ -83,8 +83,8 @@ pub(crate) fn check_f32_const_bounds(
 
 pub(crate) fn check_mul_add_candidate(
     source: ItemRef<'_>,
-    first_arg_type: Type<'_>,
     node: &Call,
+    are_all_args_f32: bool,
     context: &mut ValidateContext<'_>,
     indexes: &Indexes<'_>,
 ) {
@@ -92,7 +92,7 @@ pub(crate) fn check_mul_add_candidate(
         return;
     };
     if source.compilerimpl() != Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add))
-        || first_arg_type != Type::Struct(indexes.search_prelude_type("f32"))
+        || !are_all_args_f32
         || !node
             .args
             .iter()
