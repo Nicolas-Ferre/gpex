@@ -89,7 +89,7 @@ pub(crate) fn check_mul_add_candidate(
     indexes: &Indexes<'_>,
 ) {
     let ItemRef::Fn(source) = source else {
-        return;
+        unreachable!("calls can only be functions")
     };
     if source.compilerimpl() != Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add))
         || !are_all_args_f32
