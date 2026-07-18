@@ -39,7 +39,6 @@ See `doc/testing.md`.
 - Plans must follow `.agents/PLANS.md`
 - Follow explicit and implicit conventions already existing in the codebase
 - New item names should be aligned with other existing items.
-- Always add tests.
 
 ## General coding guidelines
 

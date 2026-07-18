@@ -1,8 +1,7 @@
 # Source guidelines
 
 - Implemented solutions must be simple, pragmatic and straightforward to understand.
-- Avoid large functions, keep them as small and readable as possible (< 20 lines, except when
-  justified).
+- Keep functions as small and readable as possible, avoid large functions.
 - Minimize function cognitive complexity
 - Define helper-method `impl` blocks in the same file as their type instead of creating external
   implementations elsewhere.
