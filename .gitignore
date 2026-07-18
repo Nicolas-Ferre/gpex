@@ -9,3 +9,6 @@ Cargo.lock
 *.iml
 *.profraw
 .DS_Store
+.codex
+.claude
+.agents/skills
