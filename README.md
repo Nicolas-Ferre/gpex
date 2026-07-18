@@ -31,3 +31,15 @@ Before you consider using this language, please keep in mind that:
 - ![macOS supported](https://img.shields.io/badge/macOS-Supported-808080?logo=apple)
 - ![Web planned](https://img.shields.io/badge/Web-Planned-d65600?logo=html5)
 - ![Android planned](https://img.shields.io/badge/Android-Planned-008f11?logo=android)
+
+## AI usage
+
+Parts of this project were developed with the assistance of AI agents.
+
+Quality and maintainability are crucial to this project. AI-generated changes are therefore not
+accepted without human oversight. Every AI-assisted contribution is reviewed, understood, tested and
+critically evaluated by a human before it is incorporated into the project.
+
+AI is used as a development tool, not as a substitute for engineering judgment. Human maintainers
+remain fully responsible for the correctness, security, licensing and long-term maintainability of
+the codebase.
