@@ -9,11 +9,7 @@ CLI is written in Rust (minimal supported version and edition is in `Cargo.toml`
 
 See `doc/architecture.md`.
 
-## Rust coding conventions to respect
-
-See `doc/coding_conventions.md`.
-
-## Test structure and conventions
+## Test structure
 
 See `doc/testing.md`.
 
@@ -44,3 +40,12 @@ See `doc/testing.md`.
 - Follow explicit and implicit conventions already existing in the codebase
 - New item names should be aligned with other existing items.
 - Always test implementations in `tests/integration/`
+
+## General coding guidelines
+
+- For boolean variables and functions returning booleans:
+    - Name should start with `is_`, `are_`, `has_` or `have_`.
+    - Noun is placed before the adjective (e.g. `is_user_connected` instead of
+      `is_connected_user`).
+    - Avoid including a negation in the name (e.g. avoid `is_not_active`,
+      `is_disconnected`, ...).
