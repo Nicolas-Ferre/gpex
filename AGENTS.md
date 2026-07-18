@@ -1,9 +1,9 @@
 # Repository guidelines
 
 The project contains a compiler and runner CLI for GPEx, a custom programming language that runs
-entirely on GPU side.
+entirely on the GPU side.
 
-CLI is written in Rust (minimal supported version and edition is in `Cargo.toml`).
+The CLI is written in Rust (minimal supported version and edition is in `Cargo.toml`).
 
 ## Project structure
 
@@ -39,7 +39,7 @@ See `doc/testing.md`.
 - Plans must follow `.agents/PLANS.md`
 - Follow explicit and implicit conventions already existing in the codebase
 - New item names should be aligned with other existing items.
-- Always test implementations in `tests/integration/`
+- Always add tests.
 
 ## General coding guidelines
 

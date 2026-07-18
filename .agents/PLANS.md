@@ -16,7 +16,8 @@ Rules:
     - `move`
     - `rename`
     - `refactor`
-- During plan creation, don't hesitate to ask architectural questions if there is a doubt.
+- During plan creation, don't hesitate to ask architectural questions when an architectural decision
+  is unclear.
 
 ### Plan
 

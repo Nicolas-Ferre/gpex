@@ -1,8 +1,7 @@
 # Integration tests guidelines
 
 - Prioritize adding tests to an existing test folder/file.
-- In case no existing test folder/file correspond to the test to add, then create a new test
-  folder/file.
+- If no existing test folder or file corresponds to the test being added, create one.
 - Follow existing conventions (file naming, GPEx function/variable naming, ...).
 - When a literal value doesn't matter in a `nok_` test, it is set to zero.
 - Example literals within a test file are generally ordered (first expected value `1`, then
