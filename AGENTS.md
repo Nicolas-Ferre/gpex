@@ -35,7 +35,7 @@ See `doc/testing.md`.
 - Don't use any skill automatically, except if explicitly stated
 - Always keep `README.md`, `AGENTS.md` and `doc/*.md` files up-to-date
 - Take into account all `AGENTS.md` files within the path of a modified file. For example, the file
-  `./a/b/c.rs` should respect `./AGENTS.md`, `./a/AGENTS.md` and , `./a/b/AGENTS.md` if they exist.
+  `./a/b/c.rs` should respect `./AGENTS.md`, `./a/AGENTS.md` and `./a/b/AGENTS.md` if they exist.
 - Plans must follow `.agents/PLANS.md`
 - Follow explicit and implicit conventions already existing in the codebase
 - New item names should be aligned with other existing items.

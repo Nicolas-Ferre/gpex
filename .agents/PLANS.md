@@ -36,8 +36,8 @@ Short description of the scope of the task.
     - reason why test is important
 
 Be complete, but avoid duplicated/unnecessary tests.
-Remains aligned with existing tests.
-Try to add straightforward tests in priority.
+Remain aligned with existing tests.
+Prioritize adding straightforward tests.
 
 #### Acceptance criteria
 
