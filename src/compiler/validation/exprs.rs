@@ -93,6 +93,7 @@ impl Validator<'_, '_> {
             node.span,
             &mut self.context,
         )?;
+        self.validate_mul_add_candidate(node, source);
         Ok(())
     }
 
@@ -117,5 +118,17 @@ impl Validator<'_, '_> {
             )?;
         }
         Ok(())
+    }
+
+    fn validate_mul_add_candidate(&mut self, node: &Call, source: ItemRef<'_>) {
+        if let Some(first_arg) = node.args.first() {
+            validators::expr::check_mul_add_candidate(
+                source,
+                self.value_resolver.expr_type(&first_arg.value),
+                node,
+                &mut self.context,
+                self.indexes,
+            );
+        }
     }
 }

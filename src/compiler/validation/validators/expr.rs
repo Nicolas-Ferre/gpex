@@ -2,7 +2,8 @@ use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::Arg;
+use crate::compiler::parsing::exprs::calls::{Arg, Call};
+use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::refs::RefChecker;
 use crate::compiler::validation::ParamConstness;
@@ -78,6 +79,33 @@ pub(crate) fn check_f32_const_bounds(
     } else {
         Ok(())
     }
+}
+
+pub(crate) fn check_mul_add_candidate(
+    source: ItemRef<'_>,
+    first_arg_type: Type<'_>,
+    node: &Call,
+    context: &mut ValidateContext<'_>,
+    indexes: &Indexes<'_>,
+) {
+    let ItemRef::Fn(source) = source else {
+        return;
+    };
+    if source.compilerimpl() != Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add))
+        || first_arg_type != Type::Struct(indexes.search_prelude_type("f32"))
+        || !node
+            .args
+            .iter()
+            .any(|arg| is_expr_compilerimpl_mul(&arg.value, indexes))
+    {
+        return;
+    }
+    context.logs.push(Log {
+        level: LogLevel::Warning,
+        msg: "candidate expression for `mul_add()`".into(),
+        location: Some(context.location(node.span)),
+        inner: vec![],
+    });
 }
 
 pub(crate) fn check_arg_name(
@@ -193,4 +221,16 @@ fn is_item_const(node: ItemRef<'_>, param_constness: ParamConstness) -> bool {
             ParamConstness::All => true,
         },
     }
+}
+
+fn is_expr_compilerimpl_mul(node: &Expr, indexes: &Indexes<'_>) -> bool {
+    let Expr::Call(node) = node else {
+        return false;
+    };
+    matches!(
+        indexes.sources.get(&node.id),
+        Some(ItemRef::Fn(source))
+            if source.compilerimpl()
+                == Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul))
+    )
 }
