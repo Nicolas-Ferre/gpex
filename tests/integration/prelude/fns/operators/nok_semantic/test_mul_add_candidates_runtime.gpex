@@ -1,7 +1,6 @@
-var two = 2.0;
-var four = 4.0;
+var zero = 0.0;
 
-var _left = 1.0 * two + 3.0;
-var _right = 1.0 + two * 3.0;
-var _explicit = __add__(__mul__(1.0, two), 3.0);
-var _both = 1.0 * two + 3.0 * four;
+var _left = 0.0 * zero + 0.0;
+var _right = 0.0 + zero * 0.0;
+var _explicit = __add__(__mul__(0.0, zero), 0.0);
+var _both = 0.0 * zero + 0.0 * zero;

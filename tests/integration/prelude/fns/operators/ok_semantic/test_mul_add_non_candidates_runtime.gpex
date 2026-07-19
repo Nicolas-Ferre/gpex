@@ -6,7 +6,7 @@ fn __add__(_left: f32, _right: bool) -> f32 {
     return 0.0;
 }
 
-const _INTEGER = 1 * 2 + 3; // expected: 5
-const _SUBTRACT = 1.0 * 2.0 - 3.0; // expected: -1.0
+var _integer = 1 * 2 + 3; // expected: 5
+var _subtract = 1.0 * 2.0 - 3.0; // expected: -1.0
 var _custom_mul = true * false + 1.0; // expected: 1.0
 var _custom_add = 1.0 * 2.0 + true; // expected: 0.0
