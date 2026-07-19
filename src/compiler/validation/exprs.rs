@@ -5,6 +5,7 @@ use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::validation::{ParamConstness, Validator, validators};
+use crate::compiler::values::types::Type;
 use crate::utils::validation::ValidateError;
 
 impl Validator<'_, '_> {
@@ -93,6 +94,7 @@ impl Validator<'_, '_> {
             node.span,
             &mut self.context,
         )?;
+        self.validate_mul_add_candidate(node, source);
         Ok(())
     }
 
@@ -117,5 +119,20 @@ impl Validator<'_, '_> {
             )?;
         }
         Ok(())
+    }
+
+    fn validate_mul_add_candidate(&mut self, node: &Call, source: ItemRef<'_>) {
+        let f32_type = self.indexes.search_prelude_type("f32");
+        let are_all_args_f32 = node
+            .args
+            .iter()
+            .all(|arg| self.value_resolver.expr_type(&arg.value) == Type::Struct(f32_type));
+        validators::expr::check_mul_add_candidate(
+            source,
+            node,
+            are_all_args_f32,
+            &mut self.context,
+            self.indexes,
+        );
     }
 }

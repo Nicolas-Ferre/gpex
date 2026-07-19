@@ -33,8 +33,8 @@ Short description of the scope of the task.
 #### Test changes
 
 - `<action label>` test in `<repository relative path>`:
-    - short description of the test
-    - reason why test is important
+    - Description: short description of the test
+    - Reason: reason why test is important
 
 Be complete, but avoid duplicated/unnecessary tests.
 Remain aligned with existing tests.

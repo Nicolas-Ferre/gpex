@@ -1,0 +1,4 @@
+const _LEFT = 0.0 * 0.0 + 0.0;
+const _RIGHT = 0.0 + 0.0 * 0.0;
+const _EXPLICIT = __add__(__mul__(0.0, 0.0), 0.0);
+const _BOTH = 0.0 * 0.0 + 0.0 * 0.0;
