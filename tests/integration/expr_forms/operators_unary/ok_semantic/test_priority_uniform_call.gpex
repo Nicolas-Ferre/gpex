@@ -5,7 +5,3 @@ var _result = -VALUE.called(); // expected: -1
 fn called(_param: i32) -> i32 {
     return 1;
 }
-
-fn __neg__(_param: i32) -> i32 {
-    return -1;
-}

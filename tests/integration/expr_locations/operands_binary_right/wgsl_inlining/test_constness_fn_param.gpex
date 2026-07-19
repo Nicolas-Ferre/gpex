@@ -1,9 +1,5 @@
-const _RESULT = fn_(true); // expected: true
+const _RESULT = fn_(true); // expected: false
 
 const fn fn_(param: bool) -> bool {
-    return false + param;
-}
-
-const fn __add__(_param1: bool, param2: bool) -> bool {
-    return param2;
+    return false && param;
 }

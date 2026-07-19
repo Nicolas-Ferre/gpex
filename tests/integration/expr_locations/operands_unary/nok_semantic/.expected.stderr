@@ -21,11 +21,11 @@ error: `circular_item_1` item has circular dependencies
 ┴
 error: expression not constant
 │  → <root>/test_constness.gpex:2:16
-│    ¦ const _ITEM = -not_const;
+│    ¦ const _ITEM = !not_const;
 │    ¦                ^^^^^^^^^
 ├─ info: expression must be constant
 │  → <root>/test_constness.gpex:2:1
-│    ¦ const _ITEM = -not_const;
+│    ¦ const _ITEM = !not_const;
 │    ¦ ^^^^^
 ┴
 error: invalid wildcard expression

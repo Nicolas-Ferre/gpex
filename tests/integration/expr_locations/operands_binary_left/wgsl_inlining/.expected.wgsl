@@ -10,7 +10,7 @@ var<storage, read_write> b: Buffer;
 
 @compute @workgroup_size(1, 1, 1)
 fn main() {
-    b.ident1 = u32(1);
+    b.ident1 = u32(0);
     b.ident0 = i32(1);
 }
 
