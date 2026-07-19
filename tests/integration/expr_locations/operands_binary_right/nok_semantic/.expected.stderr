@@ -20,12 +20,12 @@ error: `circular_item_1` item has circular dependencies
 │    ¦                          ^^^^^^^^^^^^^^^
 ┴
 error: expression not constant
-│  → <root>/test_constness.gpex:2:19
-│    ¦ const _ITEM = 0 + not_const;
-│    ¦                   ^^^^^^^^^
+│  → <root>/test_constness.gpex:2:24
+│    ¦ const _ITEM = false && not_const;
+│    ¦                        ^^^^^^^^^
 ├─ info: expression must be constant
 │  → <root>/test_constness.gpex:2:1
-│    ¦ const _ITEM = 0 + not_const;
+│    ¦ const _ITEM = false && not_const;
 │    ¦ ^^^^^
 ┴
 error: invalid wildcard expression
@@ -33,9 +33,4 @@ error: invalid wildcard expression
 │    ¦ const _ITEM = 0 + ?;
 │    ¦                   ^
 ├─ info: wildcards are only allowed as function parameter types
-┴
-warning: `__add__(bool, bool)` item unused
-│  → <root>/test_constness.gpex:4:10
-│    ¦ const fn __add__(param1: bool, _param2: bool) -> bool {
-│    ¦          ^^^^^^^
 ┴

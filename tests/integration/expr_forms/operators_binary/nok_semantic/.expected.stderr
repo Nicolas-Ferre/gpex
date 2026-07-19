@@ -9,8 +9,8 @@ error: expression not constant
 ┴
 error: expression with invalid type `bool`
 │  → <root>/test_type.gpex:2:12
-│    ¦     return true - false;
-│    ¦            ^^^^^^^^^^^^
+│    ¦     return 0 == 0;
+│    ¦            ^^^^^^
 ├─ info: expected `i32` type
 │  → <root>/test_type.gpex:1:13
 │    ¦ fn _fn() -> i32 {

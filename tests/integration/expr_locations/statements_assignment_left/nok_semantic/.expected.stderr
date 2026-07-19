@@ -70,13 +70,13 @@ error: expression is not a reference
 ┴
 error: expression is not a reference
 │  → <root>/test_form_operator_binary.gpex:2:5
-│    ¦     true + false = false;
-│    ¦     ^^^^^^^^^^^^
+│    ¦     0 + 0 = 0;
+│    ¦     ^^^^^
 ┴
 error: expression is not a reference
 │  → <root>/test_form_operator_unary.gpex:2:5
-│    ¦     !0 = 0;
-│    ¦     ^^
+│    ¦     !true = false;
+│    ¦     ^^^^^
 ┴
 error: expression is not a reference
 │  → <root>/test_form_typeref.gpex:2:5

@@ -1,9 +1,5 @@
-const _RESULT = 0u + fn_(1); // expected: 1
+const _RESULT = 0 + fn_(1); // expected: 1
 
 const fn fn_(param: i32) -> i32 {
     return param;
-}
-
-const fn __add__(_param1: u32, param2: i32) -> i32 {
-    return param2;
 }

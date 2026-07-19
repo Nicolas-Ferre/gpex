@@ -1,6 +1,2 @@
 var not_const = false;
-const _ITEM = -not_const;
-
-const fn __neg__(param: bool) -> bool {
-    return param;
-}
+const _ITEM = !not_const;
