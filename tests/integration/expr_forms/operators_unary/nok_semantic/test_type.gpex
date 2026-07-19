@@ -1,7 +1,3 @@
 fn _fn() -> i32 {
     return !true;
 }
-
-fn __not__(param: bool) -> bool {
-    return param;
-}
