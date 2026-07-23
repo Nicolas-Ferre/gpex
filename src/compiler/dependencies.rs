@@ -47,10 +47,10 @@ fn scan_call<'item>(
     } else {
         // Covers case where there is function circular dependency from their signature.
         // As call source resolution is not done in this case, candidates are followed instead.
-        let candidate_count = state.candidate_sources.get(&call.id).map_or(0, Vec::len);
-        for index in 0..candidate_count {
-            let source = state.candidate_sources[&call.id][index];
-            scan_item(source, call.span, dependencies, state)?;
+        if let Some(candidates) = state.candidate_sources.get(&call.id) {
+            for &source in candidates {
+                scan_item(source, call.span, dependencies, state)?;
+            }
         }
         Ok(())
     }
