@@ -28,13 +28,13 @@ pub(crate) fn validate_modules<'item>(
             validate_module_import_usage(module, state);
         }
     }
-    state.validation_context.logs.sort_by_key(Log::sort_key);
+    state.validation.logs.sort_by_key(Log::sort_key);
     let is_log_error = state
-        .validation_context
+        .validation
         .logs
         .iter()
         .any(|log| is_log_error(log, is_warning_treated_as_error));
-    let logs = mem::take(&mut state.validation_context.logs);
+    let logs = mem::take(&mut state.validation.logs);
     if is_log_error { Err(logs) } else { Ok(logs) }
 }
 

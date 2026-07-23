@@ -23,8 +23,7 @@ pub(crate) struct State<'item> {
     pub(crate) candidate_sources: HashMap<u64, Vec<ItemRef<'item>>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
-    pub(crate) validation_context: ValidateContext<'item>,
-    pub(crate) scopes: Vec<Scope<'item>>,
+    pub(crate) validation: ValidateContext<'item>,
     pub(crate) is_indexing_source_only: bool,
     pub(crate) const_mark_span: Option<Span>,
     pub(crate) param_constness: ParamConstness,
@@ -32,6 +31,7 @@ pub(crate) struct State<'item> {
     pub(crate) shader: String,
     pub(crate) specialized_fns: HashMap<SpecializedFn<'item>, usize>,
     pub(crate) transpiled_specialized_fn_indexes: HashSet<usize>,
+    scopes: Vec<Scope<'item>>,
     compilerimpl_types: HashMap<u64, CompilerImplType>,
 }
 
@@ -44,7 +44,7 @@ impl<'item> State<'item> {
             candidate_sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
-            validation_context: ValidateContext::new(files, root_path),
+            validation: ValidateContext::new(files, root_path),
             scopes: vec![],
             is_indexing_source_only: false,
             const_mark_span: None,
@@ -104,7 +104,7 @@ impl<'item> State<'item> {
     }
 
     pub(crate) fn span_location(&self, span: Span) -> LogLocation {
-        self.validation_context.location(span)
+        self.validation.location(span)
     }
 
     pub(crate) fn wildcard_type(&self, param_id: u64) -> Option<Type<'item>> {
@@ -123,7 +123,7 @@ impl<'item> State<'item> {
     }
 
     pub(crate) fn add_log(&mut self, log: Log) {
-        self.validation_context.logs.push(log);
+        self.validation.logs.push(log);
     }
 
     pub(crate) fn add_wildcard_type(&mut self, param_id: u64, type_: Type<'item>) {
@@ -182,12 +182,6 @@ impl<'item> State<'item> {
     }
 }
 
-#[derive(Debug, Default)]
-pub(crate) struct Scope<'item> {
-    pub(crate) const_values: HashMap<u64, ConstValue<'item>>,
-    pub(crate) wildcard_types: HashMap<u64, Type<'item>>,
-}
-
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum ParamConstness {
     ExplicitOnly,
@@ -201,4 +195,10 @@ pub(crate) enum CompilerImplType {
     F32,
     Bool,
     Typeref,
+}
+
+#[derive(Debug, Default)]
+struct Scope<'item> {
+    pub(crate) const_values: HashMap<u64, ConstValue<'item>>,
+    pub(crate) wildcard_types: HashMap<u64, Type<'item>>,
 }

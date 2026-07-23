@@ -19,7 +19,7 @@ pub(crate) fn check_circular_dependencies(
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
-    let name = state.validation_context.slice(name_span);
+    let name = state.validation.slice(name_span);
     if let Err(stack) = dependency_result {
         if stack.iter().min() != Some(&stack[0]) {
             // avoid repeating the same error for each item of the stack
@@ -150,7 +150,7 @@ pub(crate) fn check_prelude_location(
 
 pub(crate) fn check_usage<'item>(item: ItemRef<'item>, state: &mut State<'item>) {
     let name_span = item.name_span();
-    let name = state.validation_context.slice(name_span);
+    let name = state.validation.slice(name_span);
     let ref_span = state.item_first_refs.get(&item.id()).copied();
     let is_unused_lint_ignored =
         name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
@@ -226,7 +226,7 @@ pub(crate) fn check_found<'item>(
                         level: LogLevel::Info,
                         msg: format!(
                             "item can be imported from `{}`",
-                            state.validation_context.dot_path(item.file_index())
+                            state.validation.dot_path(item.file_index())
                         ),
                         location: Some(state.span_location(item.name_span())),
                     })

@@ -4,7 +4,7 @@ use crate::{Log, LogLevel};
 use itertools::Itertools;
 
 pub(crate) fn check_char_count(span: Span, state: &mut State<'_>) {
-    let slice = state.validation_context.slice(span);
+    let slice = state.validation.slice(span);
     if slice.len() == 1 && slice != "_" {
         state.add_log(Log {
             level: LogLevel::Warning,
@@ -16,7 +16,7 @@ pub(crate) fn check_char_count(span: Span, state: &mut State<'_>) {
 }
 
 pub(crate) fn check_case(span: Span, expected_cases: &[Case], state: &mut State<'_>) {
-    let slice = state.validation_context.slice(span);
+    let slice = state.validation.slice(span);
     if !expected_cases.iter().any(|case| case.is_valid(slice)) {
         let case_labels = expected_cases.iter().map(|case| case.labels()).join(" or ");
         state.add_log(Log {

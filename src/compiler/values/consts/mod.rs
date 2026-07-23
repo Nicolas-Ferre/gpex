@@ -161,16 +161,12 @@ fn run_assignment_statement(
 ) -> Result<(), ()> {
     let assigned_param = param(&assignment.assigned, state).ok_or(())?;
     let new_value = expr_value(&assignment.value, state);
-    let param_value = state
-        .scopes
-        .last_mut()
-        .and_then(|scope| scope.const_values.get_mut(&assigned_param.id))
-        .unwrap_or_else(|| unreachable!("param should be registered before"));
-    *param_value = if matches!(new_value, ConstValue::RuntimeValue) {
+    let assigned_value = if matches!(new_value, ConstValue::RuntimeValue) {
         ConstValue::Unknown // runtime value in a constant assignment means the code is invalid
     } else {
         new_value
     };
+    state.add_const_value(assigned_param.id, assigned_value);
     Ok(())
 }
 

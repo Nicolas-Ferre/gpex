@@ -15,7 +15,7 @@ pub(crate) fn check_found(
         Ok(())
     } else {
         let dot_path = dot_path_from_segments(segments, state);
-        let context = &state.validation_context;
+        let context = &state.validation;
         let fs_path = ImportSegment::fs_path(segments, context, context.root_path);
         let first_segment = segments[0];
         let last_segment = segments[segments.len() - 1];
@@ -97,6 +97,6 @@ pub(crate) fn check_usage(
 fn dot_path_from_segments(segments: &[ImportSegment], state: &State<'_>) -> String {
     segments
         .iter()
-        .map(|&segment| state.validation_context.slice(segment.span()))
+        .map(|&segment| state.validation.slice(segment.span()))
         .join(".")
 }
