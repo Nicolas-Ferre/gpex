@@ -23,31 +23,31 @@ pub(crate) enum ItemRef<'item> {
 impl NodeRef for ItemRef<'_> {
     fn file_index(&self) -> usize {
         match self {
-            Self::Var(node) => node.name_span.file_index,
-            Self::Const(node) => node.name_span.file_index,
-            Self::Struct(node) => node.name_span.file_index,
-            Self::Fn(node) => node.name_span.file_index,
-            Self::Param(node) => node.name_span.file_index,
+            Self::Var(var) => var.name_span.file_index,
+            Self::Const(const_) => const_.name_span.file_index,
+            Self::Struct(struct_) => struct_.name_span.file_index,
+            Self::Fn(fn_) => fn_.name_span.file_index,
+            Self::Param(param) => param.name_span.file_index,
         }
     }
 
     fn id(&self) -> u64 {
         match self {
-            Self::Var(node) => node.id,
-            Self::Const(node) => node.id,
-            Self::Struct(node) => node.id,
-            Self::Fn(node) => node.id,
-            Self::Param(node) => node.id,
+            Self::Var(var) => var.id,
+            Self::Const(const_) => const_.id,
+            Self::Struct(struct_) => struct_.id,
+            Self::Fn(fn_) => fn_.id,
+            Self::Param(param) => param.id,
         }
     }
 
     fn scope(&self) -> &[u64] {
         match self {
-            Self::Var(node) => &node.scope,
-            Self::Const(node) => &node.scope,
-            Self::Struct(node) => &node.scope,
-            Self::Fn(node) => &node.scope,
-            Self::Param(node) => &node.scope,
+            Self::Var(var) => &var.scope,
+            Self::Const(const_) => &const_.scope,
+            Self::Struct(struct_) => &struct_.scope,
+            Self::Fn(fn_) => &fn_.scope,
+            Self::Param(param) => &param.scope,
         }
     }
 }
@@ -55,21 +55,21 @@ impl NodeRef for ItemRef<'_> {
 impl ItemNodeRef for ItemRef<'_> {
     fn is_pub(&self) -> bool {
         match self {
-            Self::Var(node) => node.pub_keyword_span.is_some(),
-            Self::Const(node) => node.pub_keyword_span.is_some(),
-            Self::Struct(node) => node.pub_keyword_span.is_some(),
-            Self::Fn(node) => node.pub_keyword_span.is_some(),
+            Self::Var(var) => var.pub_keyword_span.is_some(),
+            Self::Const(const_) => const_.pub_keyword_span.is_some(),
+            Self::Struct(struct_) => struct_.pub_keyword_span.is_some(),
+            Self::Fn(fn_) => fn_.pub_keyword_span.is_some(),
             Self::Param(_) => false,
         }
     }
 
     fn key(&self) -> String {
         match self {
-            Self::Var(node) => node.name.clone(),
-            Self::Const(node) => node.name.clone(),
-            Self::Struct(node) => node.name.clone(),
-            Self::Fn(node) => node.key(),
-            Self::Param(node) => node.name.clone(),
+            Self::Var(var) => var.name.clone(),
+            Self::Const(const_) => const_.name.clone(),
+            Self::Struct(struct_) => struct_.name.clone(),
+            Self::Fn(fn_) => fn_.key(),
+            Self::Param(param) => param.name.clone(),
         }
     }
 }
@@ -77,17 +77,17 @@ impl ItemNodeRef for ItemRef<'_> {
 impl<'item> ItemRef<'item> {
     pub(crate) fn name_span(self) -> Span {
         match self {
-            Self::Var(node) => node.name_span,
-            Self::Const(node) => node.name_span,
-            Self::Struct(node) => node.name_span,
-            Self::Fn(node) => node.name_span,
-            Self::Param(node) => node.name_span,
+            Self::Var(var) => var.name_span,
+            Self::Const(const_) => const_.name_span,
+            Self::Struct(struct_) => struct_.name_span,
+            Self::Fn(fn_) => fn_.name_span,
+            Self::Param(param) => param.name_span,
         }
     }
 
     pub(crate) fn signature_span_with_return(self) -> Span {
         match self {
-            Self::Fn(node) => node.signature_span_with_return,
+            Self::Fn(fn_) => fn_.signature_span_with_return,
             // coverage: off (only functions can be called)
             Self::Var(_) | Self::Const(_) | Self::Struct(_) | Self::Param(_) => {
                 unreachable!("only functions can be called")

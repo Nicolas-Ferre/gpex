@@ -13,10 +13,10 @@ use crate::compiler::values::{consts, types};
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;
 
-pub(super) fn transpile_expr(node: &Expr, state: &mut State<'_>) {
-    let value = consts::expr_const_value(node, state);
+pub(super) fn transpile_expr(expr: &Expr, state: &mut State<'_>) {
+    let value = consts::expr_const_value(expr, state);
     if value == ConstValue::RuntimeValue {
-        match node {
+        match expr {
             Expr::Call(child) => transpile_call(child, state),
             Expr::Ident(child) => transpile_ident(child, state),
             Expr::F32Literal(_)
@@ -30,16 +30,16 @@ pub(super) fn transpile_expr(node: &Expr, state: &mut State<'_>) {
     }
 }
 
-pub(super) fn transpile_var_ref(node: &VarDefinition, state: &mut State<'_>) {
+pub(super) fn transpile_var_ref(var: &VarDefinition, state: &mut State<'_>) {
     state.shader += MAIN_BUFFER_NAME;
-    _ = write!(state.shader, ".v{}", node.id);
+    _ = write!(state.shader, ".v{}", var.id);
 }
 
-pub(super) fn transpile_call(node: &Call, state: &mut State<'_>) {
-    match state.sources[&node.id] {
+pub(super) fn transpile_call(call: &Call, state: &mut State<'_>) {
+    match state.sources[&call.id] {
         ItemRef::Fn(child) => match &child.body {
-            FnBody::Compilerimpl(_) => compilerimpl::transpile_call(node, child, state),
-            FnBody::Statements(body) => transpile_custom_fn_call(node, child, body, state),
+            FnBody::Compilerimpl(_) => compilerimpl::transpile_call(call, child, state),
+            FnBody::Statements(body) => transpile_custom_fn_call(call, child, body, state),
         },
         ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {
             unreachable!("function calls cannot reference values")
@@ -48,15 +48,15 @@ pub(super) fn transpile_call(node: &Call, state: &mut State<'_>) {
 }
 
 fn transpile_custom_fn_call<'item>(
-    node: &Call,
+    call: &Call,
     child: &'item FnDefinition,
     body: &'item FnStatementsBody,
     state: &mut State<'item>,
 ) {
-    let specialized_fn_id = register_specialized_fn(node, child, body, state);
+    let specialized_fn_id = register_specialized_fn(call, child, body, state);
     _ = write!(state.shader, "_{}_{specialized_fn_id}", child.id);
     state.shader += "(";
-    for (arg, param) in node.args.iter().zip(&child.params.params) {
+    for (arg, param) in call.args.iter().zip(&child.params.params) {
         if param.const_mark_span().is_none() {
             transpile_expr(&arg.value, state);
             state.shader += ", ";
@@ -65,10 +65,10 @@ fn transpile_custom_fn_call<'item>(
     state.shader += ")";
 }
 
-fn transpile_ident(node: &Ident, state: &mut State<'_>) {
-    match state.sources[&node.id] {
-        ItemRef::Var(node) => transpile_var_ref(node, state),
-        ItemRef::Param(node) => transpile_param_ref(node, state),
+fn transpile_ident(ident: &Ident, state: &mut State<'_>) {
+    match state.sources[&ident.id] {
+        ItemRef::Var(var) => transpile_var_ref(var, state),
+        ItemRef::Param(param) => transpile_param_ref(param, state),
         ItemRef::Fn(_) => unreachable!("identifiers cannot reference functions"),
         ItemRef::Const(_) | ItemRef::Struct(_) => {
             unreachable!("constant item should be transpiled in `Expression::transpile`")
@@ -76,8 +76,8 @@ fn transpile_ident(node: &Ident, state: &mut State<'_>) {
     }
 }
 
-fn transpile_const_value(node: &ConstValue<'_>, state: &mut State<'_>) {
-    match node {
+fn transpile_const_value(value: &ConstValue<'_>, state: &mut State<'_>) {
+    match value {
         ConstValue::TypeRef(value) => transpile_struct_ref(value, state),
         ConstValue::I32(value) => _ = write!(state.shader, "i32({value})"),
         ConstValue::U32(value) => _ = write!(state.shader, "u32({value})"),
@@ -94,18 +94,18 @@ fn transpile_const_value(node: &ConstValue<'_>, state: &mut State<'_>) {
     }
 }
 
-fn transpile_param_ref(node: &Param, state: &mut State<'_>) {
-    let id = node.id;
+fn transpile_param_ref(param: &Param, state: &mut State<'_>) {
+    let id = param.id;
     _ = write!(state.shader, "_{id}");
 }
 
-fn transpile_struct_ref(node: &StructDefinition, state: &mut State<'_>) {
-    let [id_part1, id_part2] = endianness::to_portable_u32x2(node.id);
+fn transpile_struct_ref(struct_: &StructDefinition, state: &mut State<'_>) {
+    let [id_part1, id_part2] = endianness::to_portable_u32x2(struct_.id);
     _ = write!(state.shader, "vec2<u32>({id_part1}, {id_part2})");
 }
 
 fn register_specialized_fn<'item>(
-    node: &Call,
+    call: &Call,
     child: &'item FnDefinition,
     body: &'item FnStatementsBody,
     state: &mut State<'item>,
@@ -113,8 +113,8 @@ fn register_specialized_fn<'item>(
     let specialized_fn_id = state.specialized_fns.len();
     let specialized_fn = SpecializedFn {
         fn_: child,
-        const_param_values: fn_const_param_values(node, child, state),
-        wildcard_param_types: fn_param_wildcard_types(node, child, state),
+        const_param_values: fn_const_param_values(call, child, state),
+        wildcard_param_types: fn_param_wildcard_types(call, child, state),
         fn_body: body,
     };
     *state
@@ -124,11 +124,11 @@ fn register_specialized_fn<'item>(
 }
 
 fn fn_const_param_values<'item>(
-    node: &Call,
+    call: &Call,
     child: &FnDefinition,
     state: &mut State<'item>,
 ) -> Vec<ConstValue<'item>> {
-    node.args
+    call.args
         .iter()
         .zip(&child.params.params)
         .filter(|(_, param)| param.const_mark_span().is_some())
@@ -137,11 +137,11 @@ fn fn_const_param_values<'item>(
 }
 
 fn fn_param_wildcard_types<'item>(
-    node: &Call,
+    call: &Call,
     child: &FnDefinition,
     state: &mut State<'item>,
 ) -> Vec<&'item StructDefinition> {
-    node.args
+    call.args
         .iter()
         .zip(&child.params.params)
         .filter(|(_, param)| matches!(param.type_, Expr::Wildcard(_)))

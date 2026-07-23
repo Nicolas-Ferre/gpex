@@ -6,9 +6,9 @@ use crate::compiler::state::State;
 use crate::compiler::values::types::{expr_as_type, expr_type};
 use crate::utils::validation::ValidateError;
 
-pub(crate) fn call_key(node: &Call, state: &mut State<'_>) -> Result<String, ValidateError> {
-    let fn_name = &node.name;
-    let arg_types = node
+pub(crate) fn call_key(call: &Call, state: &mut State<'_>) -> Result<String, ValidateError> {
+    let fn_name = &call.name;
+    let arg_types = call
         .args
         .iter()
         .map(|arg| expr_type(&arg.value, state).name())
@@ -17,9 +17,9 @@ pub(crate) fn call_key(node: &Call, state: &mut State<'_>) -> Result<String, Val
     Ok(format!("{fn_name}({arg_types})"))
 }
 
-pub(crate) fn fn_key(node: &FnDefinition, state: &mut State<'_>) -> Result<String, ValidateError> {
-    let fn_name = &node.name;
-    let param_types = node
+pub(crate) fn fn_key(fn_: &FnDefinition, state: &mut State<'_>) -> Result<String, ValidateError> {
+    let fn_name = &fn_.name;
+    let param_types = fn_
         .params
         .params
         .iter()

@@ -11,30 +11,28 @@ use crate::compiler::state::State;
 use crate::compiler::values::{compilerimpl, types};
 use std::hash::{Hash, Hasher};
 
-// TODO: in the whole project, replace "node" by a more representative name (e.g. call, fn_, var_, ...)
-
-pub(crate) fn expr_const_value<'item>(node: &Expr, state: &mut State<'item>) -> ConstValue<'item> {
-    match node {
-        Expr::F32Literal(node) => f32_literal_value(node),
-        Expr::U32Literal(node) => u32_literal_value(node),
-        Expr::I32Literal(node) => i32_literal_value(node),
-        Expr::BoolLiteral(node) => ConstValue::Bool(node.value),
+pub(crate) fn expr_const_value<'item>(expr: &Expr, state: &mut State<'item>) -> ConstValue<'item> {
+    match expr {
+        Expr::F32Literal(literal) => f32_literal_value(literal),
+        Expr::U32Literal(literal) => u32_literal_value(literal),
+        Expr::I32Literal(literal) => i32_literal_value(literal),
+        Expr::BoolLiteral(literal) => ConstValue::Bool(literal.value),
         Expr::Wildcard(_) => ConstValue::Unknown,
-        Expr::Call(node) => call_const_value(node, state),
-        Expr::Ident(node) => ident_const_value(node, state),
+        Expr::Call(call) => call_const_value(call, state),
+        Expr::Ident(ident) => ident_const_value(ident, state),
     }
 }
 
-pub(crate) fn is_const_infinite_f32(node: &Call, state: &mut State<'_>) -> bool {
+pub(crate) fn is_const_infinite_f32(call: &Call, state: &mut State<'_>) -> bool {
     matches!(
-        call_const_value(node, state),
+        call_const_value(call, state),
         ConstValue::F32(value) if !value.0.is_finite()
     )
 }
 
-pub(crate) fn call_const_value<'item>(node: &Call, state: &mut State<'item>) -> ConstValue<'item> {
-    match state.sources.get(&node.id).copied() {
-        Some(ItemRef::Fn(source)) => fn_call_const_value(node, source, state),
+pub(crate) fn call_const_value<'item>(call: &Call, state: &mut State<'item>) -> ConstValue<'item> {
+    match state.sources.get(&call.id).copied() {
+        Some(ItemRef::Fn(source)) => fn_call_const_value(call, source, state),
         Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_)) => {
             unreachable!("identifier should not refer to a value")
         }
@@ -42,32 +40,32 @@ pub(crate) fn call_const_value<'item>(node: &Call, state: &mut State<'item>) -> 
     }
 }
 
-fn i32_literal_value(node: &I32Literal) -> ConstValue<'static> {
-    if let Some(value) = node.value {
+fn i32_literal_value(literal: &I32Literal) -> ConstValue<'static> {
+    if let Some(value) = literal.value {
         ConstValue::I32(value)
     } else {
         ConstValue::Unknown
     }
 }
 
-fn u32_literal_value(node: &U32Literal) -> ConstValue<'static> {
-    if let Some(value) = node.value {
+fn u32_literal_value(literal: &U32Literal) -> ConstValue<'static> {
+    if let Some(value) = literal.value {
         ConstValue::U32(value)
     } else {
         ConstValue::Unknown
     }
 }
 
-fn f32_literal_value(node: &F32Literal) -> ConstValue<'static> {
-    if let Some(value) = node.value {
+fn f32_literal_value(literal: &F32Literal) -> ConstValue<'static> {
+    if let Some(value) = literal.value {
         ConstValue::F32(HashableF32(value))
     } else {
         ConstValue::Unknown
     }
 }
 
-fn ident_const_value<'item>(node: &Ident, state: &mut State<'item>) -> ConstValue<'item> {
-    match state.sources.get(&node.id).copied() {
+fn ident_const_value<'item>(ident: &Ident, state: &mut State<'item>) -> ConstValue<'item> {
+    match state.sources.get(&ident.id).copied() {
         Some(ItemRef::Var(_)) => ConstValue::RuntimeValue,
         Some(ItemRef::Const(child)) => expr_const_value(&child.value, state),
         Some(ItemRef::Struct(child)) => ConstValue::TypeRef(child),
@@ -85,15 +83,15 @@ fn ident_const_value<'item>(node: &Ident, state: &mut State<'item>) -> ConstValu
 }
 
 fn fn_call_const_value<'item>(
-    node: &Call,
+    call: &Call,
     source: &'item FnDefinition,
     state: &mut State<'item>,
 ) -> ConstValue<'item> {
-    debug_assert_eq!(node.args.len(), source.params.params.len());
+    debug_assert_eq!(call.args.len(), source.params.params.len());
     if ItemRef::Fn(source).is_param_constness_ignored() {
-        return compilerimpl::call_const_value(node, source, state);
+        return compilerimpl::call_const_value(call, source, state);
     }
-    let param_args = node
+    let param_args = call
         .args
         .iter()
         .zip(&source.params.params)
@@ -121,7 +119,7 @@ fn fn_call_const_value<'item>(
                 ConstValue::Unknown | ConstValue::RuntimeValue => return arg_value,
             }
         }
-        fn_const_value(node, source, state_)
+        fn_const_value(call, source, state_)
     })
 }
 
@@ -145,11 +143,11 @@ fn fn_body_const_value<'item>(
 ) -> ConstValue<'item> {
     for statement in &body.statements {
         match statement {
-            Statement::Return(statement) => {
-                return expr_const_value(&statement.value, state);
+            Statement::Return(return_) => {
+                return expr_const_value(&return_.value, state);
             }
-            Statement::Assignment(statement) => {
-                if run_const_assignment_statement(statement, state).is_err() {
+            Statement::Assignment(assignment) => {
+                if run_const_assignment_statement(assignment, state).is_err() {
                     return ConstValue::Unknown;
                 }
             }
@@ -159,11 +157,11 @@ fn fn_body_const_value<'item>(
 }
 
 fn run_const_assignment_statement(
-    node: &AssignmentStatement,
+    assignment: &AssignmentStatement,
     state: &mut State<'_>,
 ) -> Result<(), ()> {
-    let assigned_param = param(&node.assigned, state).ok_or(())?;
-    let new_value = expr_const_value(&node.value, state);
+    let assigned_param = param(&assignment.assigned, state).ok_or(())?;
+    let new_value = expr_const_value(&assignment.value, state);
     let param_value = state
         .scopes
         .last_mut()

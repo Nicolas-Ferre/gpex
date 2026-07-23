@@ -14,7 +14,7 @@ use crate::compiler::values::types::Type;
 use std::fmt::Write;
 
 pub(super) fn transpile_specialized_fn<'item>(
-    node: SpecializedFn<'item>,
+    fn_: SpecializedFn<'item>,
     fn_index: usize,
     state: &mut State<'item>,
 ) {
@@ -22,13 +22,13 @@ pub(super) fn transpile_specialized_fn<'item>(
         return;
     }
     state.enter_scope();
-    let source = node.fn_;
+    let source = fn_.fn_;
     let id = source.id;
     _ = write!(state.shader, "fn _{id}_{fn_index}");
     transpile_params(
         &source.params,
-        node.const_param_values.into_iter(),
-        node.wildcard_param_types.into_iter(),
+        fn_.const_param_values.into_iter(),
+        fn_.wildcard_param_types.into_iter(),
         state,
     );
     if let Some(return_type) = types::fn_type(source, state).struct_ref() {
@@ -38,65 +38,65 @@ pub(super) fn transpile_specialized_fn<'item>(
         _ = write!(state.shader, " {{ ");
     }
     transpile_mut_param_definitions(&source.params, state);
-    for statement in &node.fn_body.statements {
+    for statement in &fn_.fn_body.statements {
         transpile_statement(statement, state);
     }
     _ = write!(state.shader, " }}");
     state.exit_scope();
 }
 
-pub(super) fn transpile_var_init(node: &VarDefinition, state: &mut State<'_>) {
-    exprs::transpile_var_ref(node, state);
+pub(super) fn transpile_var_init(var: &VarDefinition, state: &mut State<'_>) {
+    exprs::transpile_var_ref(var, state);
     state.shader += " = ";
-    exprs::transpile_expr(&node.default_value, state);
+    exprs::transpile_expr(&var.default_value, state);
     state.shader += "; ";
 }
 
-pub(super) fn transpile_repeat(node: &RepeatDefinition, state: &mut State<'_>) {
-    exprs::transpile_call(&node.call, state);
+pub(super) fn transpile_repeat(repeat: &RepeatDefinition, state: &mut State<'_>) {
+    exprs::transpile_call(&repeat.call, state);
     state.shader += "; ";
 }
 
-pub(super) fn transpile_var_as_struct_field(node: &VarDefinition, state: &mut State<'_>) {
-    let type_ = types::var_type(node, state)
+pub(super) fn transpile_var_as_struct_field(var: &VarDefinition, state: &mut State<'_>) {
+    let type_ = types::var_type(var, state)
         .struct_ref()
         .unwrap_or_else(|| unreachable!("variable type should be validated before"));
     _ = write!(
         state.shader,
         "v{}: {}, ",
-        node.id,
+        var.id,
         transpile_type_name(type_)
     );
 }
 
-fn transpile_statement(node: &Statement, state: &mut State<'_>) {
-    match node {
-        Statement::Return(node) => transpile_return_statement(node, state),
-        Statement::Assignment(node) => transpile_assignment_statement(node, state),
+fn transpile_statement(statement: &Statement, state: &mut State<'_>) {
+    match statement {
+        Statement::Return(return_statement) => transpile_return_statement(return_statement, state),
+        Statement::Assignment(assignment) => transpile_assignment_statement(assignment, state),
     }
 }
 
-fn transpile_return_statement(node: &ReturnStatement, state: &mut State<'_>) {
+fn transpile_return_statement(return_: &ReturnStatement, state: &mut State<'_>) {
     state.shader += "return ";
-    exprs::transpile_expr(&node.value, state);
+    exprs::transpile_expr(&return_.value, state);
     state.shader += ";";
 }
 
-fn transpile_assignment_statement(node: &AssignmentStatement, state: &mut State<'_>) {
-    exprs::transpile_expr(&node.assigned, state);
+fn transpile_assignment_statement(assignment: &AssignmentStatement, state: &mut State<'_>) {
+    exprs::transpile_expr(&assignment.assigned, state);
     state.shader += " = ";
-    exprs::transpile_expr(&node.value, state);
+    exprs::transpile_expr(&assignment.value, state);
     state.shader += ";";
 }
 
 fn transpile_params<'item>(
-    node: &'item ParamGroup,
+    params: &'item ParamGroup,
     mut const_param_values: impl Iterator<Item = ConstValue<'item>>,
     mut wildcard_param_types: impl Iterator<Item = &'item StructDefinition>,
     state: &mut State<'item>,
 ) {
     state.shader += "(";
-    for param in &node.params {
+    for param in &params.params {
         resolve_param_wildcard_type(param, &mut wildcard_param_types, state);
         if param.const_mark_span().is_some() {
             resolve_const_param_value(param, &mut const_param_values, state);
@@ -108,25 +108,25 @@ fn transpile_params<'item>(
     state.shader += ")";
 }
 
-fn transpile_param<'item>(node: &'item Param, state: &mut State<'item>) {
-    let id = node.id;
-    let type_ = types::param_type(node, state)
+fn transpile_param<'item>(param: &'item Param, state: &mut State<'item>) {
+    let id = param.id;
+    let type_ = types::param_type(param, state)
         .struct_ref()
         .unwrap_or_else(|| unreachable!("parameter type should be validated before"));
     let type_name = transpile_type_name(type_);
     _ = write!(state.shader, "_{id}_const: {type_name}");
 }
 
-fn transpile_mut_param_definitions(node: &ParamGroup, state: &mut State<'_>) {
-    for param in &node.params {
+fn transpile_mut_param_definitions(params: &ParamGroup, state: &mut State<'_>) {
+    for param in &params.params {
         if param.const_mark_span().is_none() {
             transpile_mut_param_definition(param, state);
         }
     }
 }
 
-fn transpile_mut_param_definition(node: &Param, state: &mut State<'_>) {
-    let id = node.id;
+fn transpile_mut_param_definition(param: &Param, state: &mut State<'_>) {
+    let id = param.id;
     _ = write!(state.shader, "var _{id} = _{id}_const; ");
 }
 

@@ -34,12 +34,12 @@ pub(super) fn call_const_value<'item>(
 }
 
 fn fn_binary_const_value<'item>(
-    node: &'item FnDefinition,
+    source: &'item FnDefinition,
     fn_: BinaryCompilerImplFn,
     state: &State<'item>,
 ) -> ConstValue<'item> {
-    let left = state.const_value(node.params.params[0].id);
-    let right = state.const_value(node.params.params[1].id);
+    let left = state.const_value(source.params.params[0].id);
+    let right = state.const_value(source.params.params[1].id);
     match (left, right) {
         (ConstValue::I32(left), ConstValue::I32(right)) => {
             fn_binary_i32_const_value(left, right, fn_)
@@ -56,7 +56,7 @@ fn fn_binary_const_value<'item>(
         (ConstValue::TypeRef(left), ConstValue::TypeRef(right)) => {
             fn_binary_typeref_const_value(left, right, fn_)
         }
-        _ => unreachable!("not implemented `{}` constant GPU function", node.name),
+        _ => unreachable!("not implemented `{}` constant GPU function", source.name),
     }
 }
 

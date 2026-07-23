@@ -43,12 +43,12 @@ fn is_log_error(log: &Log, is_warning_treated_as_error: bool) -> bool {
 }
 
 fn validate_module<'item>(
-    node: &'item Module,
+    module: &'item Module,
     state: &mut State<'item>,
 ) -> Result<(), ValidateError> {
     let mut is_module_valid = true;
     let mut are_imports_finished = false;
-    for item in &node.items {
+    for item in &module.items {
         if let Item::Import(import) = item {
             is_module_valid &= validate_import(import, !are_imports_finished, state).is_ok();
         } else {
@@ -58,7 +58,7 @@ fn validate_module<'item>(
     if !is_module_valid {
         return Err(ValidateError);
     }
-    for item in &node.items {
+    for item in &module.items {
         is_module_valid &= items::validate_item(item, state).is_ok();
     }
     if !is_module_valid {
@@ -68,15 +68,15 @@ fn validate_module<'item>(
 }
 
 fn validate_import(
-    node: &Import,
+    import: &Import,
     is_top_import: bool,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let is_found = node.imported_file_index.is_some();
-    validators::import::check_found(is_found, &node.segments, state)?;
-    validators::import::check_top(is_top_import, node.span, state)?;
-    validators::import::check_self_import(node.imported_file_index, node.span, state);
-    for &segment in &node.segments {
+    let is_found = import.imported_file_index.is_some();
+    validators::import::check_found(is_found, &import.segments, state)?;
+    validators::import::check_top(is_top_import, import.span, state)?;
+    validators::import::check_self_import(import.imported_file_index, import.span, state);
+    for &segment in &import.segments {
         if let ImportSegment::Name(span) = segment {
             validators::ident::check_case(span, naming::IMPORT_ALLOWED_CASES, state);
         }
@@ -84,8 +84,8 @@ fn validate_import(
     Ok(())
 }
 
-fn validate_module_import_usage(node: &Module, state: &mut State<'_>) {
-    for item in &node.items {
+fn validate_module_import_usage(module: &Module, state: &mut State<'_>) {
+    for item in &module.items {
         if let Item::Import(import) = item {
             validators::import::check_usage(
                 import.id,

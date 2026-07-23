@@ -90,13 +90,13 @@ impl Expr {
 
     pub(crate) fn span(&self) -> Span {
         match self {
-            Self::F32Literal(node) => node.span,
-            Self::U32Literal(node) => node.span,
-            Self::I32Literal(node) => node.span,
-            Self::BoolLiteral(node) => node.span,
+            Self::F32Literal(literal) => literal.span,
+            Self::U32Literal(literal) => literal.span,
+            Self::I32Literal(literal) => literal.span,
+            Self::BoolLiteral(literal) => literal.span,
             Self::Wildcard(span) => *span,
-            Self::Call(node) => node.span,
-            Self::Ident(node) => node.span,
+            Self::Call(call) => call.span,
+            Self::Ident(ident) => ident.span,
         }
     }
 

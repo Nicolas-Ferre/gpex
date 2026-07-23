@@ -10,10 +10,10 @@ pub(super) const IMPORT_ALLOWED_CASES: &[Case] = &[Case::Snake];
 pub(super) const VAR_ALLOWED_CASES: &[Case] = &[Case::Snake];
 
 pub(super) fn const_allowed_cases(
-    node: &ConstDefinition,
+    const_: &ConstDefinition,
     state: &mut State<'_>,
 ) -> &'static [Case] {
-    let type_ = types::expr_type(&node.value, state);
+    let type_ = types::expr_type(&const_.value, state);
     let may_be_typeref = type_.struct_ref().is_none()
         || state.is_compilerimpl_type(type_, CompilerImplType::Typeref);
     if may_be_typeref {
@@ -23,14 +23,14 @@ pub(super) fn const_allowed_cases(
     }
 }
 
-pub(super) fn fn_allowed_cases(node: &FnDefinition, state: &mut State<'_>) -> &'static [Case] {
-    let type_ = types::fn_type(node, state);
+pub(super) fn fn_allowed_cases(fn_: &FnDefinition, state: &mut State<'_>) -> &'static [Case] {
+    let type_ = types::fn_type(fn_, state);
     let may_return_typeref = match type_ {
         Type::Struct(_) => state.is_compilerimpl_type(type_, CompilerImplType::Typeref),
         Type::Param(_) | Type::Wildcard(_) | Type::NoReturn => false,
         Type::Unknown => unreachable!("return type should be validated before"),
     };
-    if may_return_typeref && node.const_keyword_span.is_some() {
+    if may_return_typeref && fn_.const_keyword_span.is_some() {
         &[Case::Snake, Case::Pascal]
     } else {
         &[Case::Snake]
@@ -38,12 +38,12 @@ pub(super) fn fn_allowed_cases(node: &FnDefinition, state: &mut State<'_>) -> &'
 }
 
 pub(super) fn param_allowed_cases<'item>(
-    node: &'item Param,
+    param: &'item Param,
     state: &mut State<'item>,
 ) -> &'static [Case] {
-    let type_ = types::param_type(node, state);
+    let type_ = types::param_type(param, state);
     let is_typeref = state.is_compilerimpl_type(type_, CompilerImplType::Typeref);
-    if is_typeref && node.const_mark_span().is_some() {
+    if is_typeref && param.const_mark_span().is_some() {
         &[Case::Snake, Case::Pascal]
     } else {
         &[Case::Snake]

@@ -36,11 +36,11 @@ pub(crate) fn index_modules<'item>(modules: &'item [Module], state: &mut State<'
     }
 }
 
-fn index_module_imports(node: &Module, state: &mut State<'_>) {
+fn index_module_imports(module: &Module, state: &mut State<'_>) {
     state
         .imports
-        .register(None, None, node.file_index, PRELUDE_FILE_INDEX, false);
-    for item in &node.items {
+        .register(None, None, module.file_index, PRELUDE_FILE_INDEX, false);
+    for item in &module.items {
         let Item::Import(import) = item else { continue };
         let Some(file_index) = import.imported_file_index else {
             continue;
@@ -56,8 +56,8 @@ fn index_module_imports(node: &Module, state: &mut State<'_>) {
     }
 }
 
-fn index_module_items<'item>(node: &'item Module, state: &mut State<'item>) {
-    for item in &node.items {
+fn index_module_items<'item>(module: &'item Module, state: &mut State<'item>) {
+    for item in &module.items {
         match item {
             Item::Import(_) | Item::Repeat(_) => (),
             Item::Var(item) => state.items.register(ItemRef::Var(item)),
@@ -91,8 +91,8 @@ fn index_consts_until_full_registration<'item>(modules: &'item [Module], state: 
     }
 }
 
-fn index_consts<'item>(node: &'item Module, state: &mut State<'item>) {
-    for item in &node.items {
+fn index_consts<'item>(module: &'item Module, state: &mut State<'item>) {
+    for item in &module.items {
         match item {
             Item::Const(item) => index_expr(&item.value, state),
             Item::Fn(item) => index_fn_const_parts(item, state),
@@ -101,8 +101,8 @@ fn index_consts<'item>(node: &'item Module, state: &mut State<'item>) {
     }
 }
 
-fn index_not_consts<'item>(node: &'item Module, state: &mut State<'item>) {
-    for item in &node.items {
+fn index_not_consts<'item>(module: &'item Module, state: &mut State<'item>) {
+    for item in &module.items {
         match item {
             Item::Import(_) | Item::Struct(_) | Item::Const(_) => (),
             Item::Var(item) => index_expr(&item.default_value, state),
@@ -112,18 +112,18 @@ fn index_not_consts<'item>(node: &'item Module, state: &mut State<'item>) {
     }
 }
 
-fn index_fn_const_parts<'item>(node: &'item FnDefinition, state: &mut State<'item>) {
-    for param in &node.params.params {
+fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut State<'item>) {
+    for param in &fn_.params.params {
         index_expr(&param.type_, state);
         if let Some(requirement) = &param.requirement {
             index_expr(&requirement.condition, state);
         }
     }
-    if let Some(return_type) = &node.return_type {
+    if let Some(return_type) = &fn_.return_type {
         index_expr(return_type, state);
     }
-    if node.const_keyword_span.is_some()
-        && let FnBody::Statements(body) = &node.body
+    if fn_.const_keyword_span.is_some()
+        && let FnBody::Statements(body) = &fn_.body
     {
         for statement in &body.statements {
             index_statement_refs(statement, state);
@@ -131,9 +131,9 @@ fn index_fn_const_parts<'item>(node: &'item FnDefinition, state: &mut State<'ite
     }
 }
 
-fn index_fn_not_const_parts<'item>(node: &'item FnDefinition, state: &mut State<'item>) {
-    if node.const_keyword_span.is_none()
-        && let FnBody::Statements(body) = &node.body
+fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut State<'item>) {
+    if fn_.const_keyword_span.is_none()
+        && let FnBody::Statements(body) = &fn_.body
     {
         for statement in &body.statements {
             index_statement_refs(statement, state);
@@ -141,38 +141,38 @@ fn index_fn_not_const_parts<'item>(node: &'item FnDefinition, state: &mut State<
     }
 }
 
-fn index_statement_refs<'item>(node: &'item Statement, state: &mut State<'item>) {
-    match node {
-        Statement::Return(statement) => index_expr(&statement.value, state),
-        Statement::Assignment(statement) => {
-            index_expr(&statement.assigned, state);
-            index_expr(&statement.value, state);
+fn index_statement_refs<'item>(statement: &'item Statement, state: &mut State<'item>) {
+    match statement {
+        Statement::Return(return_) => index_expr(&return_.value, state),
+        Statement::Assignment(assignment) => {
+            index_expr(&assignment.assigned, state);
+            index_expr(&assignment.value, state);
         }
     }
 }
 
-fn index_expr<'item>(node: &'item Expr, state: &mut State<'item>) {
-    match node {
+fn index_expr<'item>(expr: &'item Expr, state: &mut State<'item>) {
+    match expr {
         Expr::F32Literal(_)
         | Expr::U32Literal(_)
         | Expr::I32Literal(_)
         | Expr::BoolLiteral(_)
         | Expr::Wildcard(_) => {}
-        Expr::Call(expr) => index_call(expr, state),
-        Expr::Ident(expr) => index_ident(expr, state),
+        Expr::Call(call) => index_call(call, state),
+        Expr::Ident(ident) => index_ident(ident, state),
     }
 }
 
-fn index_call<'item>(node: &'item Call, state: &mut State<'item>) {
-    if state.is_indexing_source_only && state.sources.contains_key(&node.id) {
+fn index_call<'item>(call: &'item Call, state: &mut State<'item>) {
+    if state.is_indexing_source_only && state.sources.contains_key(&call.id) {
         return;
     }
-    for arg in &node.args {
+    for arg in &call.args {
         index_expr(&arg.value, state); // no-fn-check (recursivity)
     }
     let accessible_search_params = SearchParams {
-        key: &node.key(),
-        location: node,
+        key: &call.key(),
+        location: call,
         imports: &state.imports,
         config: FN_CALL_SEARCH_CONFIG,
     };
@@ -181,8 +181,8 @@ fn index_call<'item>(node: &'item Call, state: &mut State<'item>) {
         .search(accessible_search_params, Visibility::Enforced)
         .collect::<Vec<_>>();
     let ignored_search_params = SearchParams {
-        key: &node.key(),
-        location: node,
+        key: &call.key(),
+        location: call,
         imports: &state.imports,
         config: FN_CALL_SEARCH_CONFIG,
     };
@@ -190,38 +190,38 @@ fn index_call<'item>(node: &'item Call, state: &mut State<'item>) {
         .items
         .search(ignored_search_params, Visibility::Ignored)
         .collect::<Vec<_>>();
-    match search_accessible_call_source(node, &accessible_items, state) {
-        CallSource::Found(source) => index_accessible_source(&node, node.span, source, state),
+    match search_accessible_call_source(call, &accessible_items, state) {
+        CallSource::Found(source) => index_accessible_source(&call, call.span, source, state),
         CallSource::NotFound => {
-            if let Some(source) = search_not_accessible_call_source(node, &ignored_items, state) {
-                index_not_accessible_source(node.id, source, state);
+            if let Some(source) = search_not_accessible_call_source(call, &ignored_items, state) {
+                index_not_accessible_source(call.id, source, state);
             } else {
                 let candidates = search_candidate_call_sources(&accessible_items);
-                index_call_candidates(node.id, candidates, state);
+                index_call_candidates(call.id, candidates, state);
             }
         }
         CallSource::Unknown => {
             let candidates = search_candidate_call_sources(&accessible_items);
-            index_call_candidates(node.id, candidates, state);
+            index_call_candidates(call.id, candidates, state);
         }
     }
 }
 
-fn index_ident<'item>(node: &'item Ident, state: &mut State<'item>) {
-    if state.is_indexing_source_only && state.sources.contains_key(&node.id) {
+fn index_ident<'item>(ident: &'item Ident, state: &mut State<'item>) {
+    if state.is_indexing_source_only && state.sources.contains_key(&ident.id) {
         return;
     }
     let search_params = SearchParams {
-        key: &node.slice,
-        location: node,
+        key: &ident.slice,
+        location: ident,
         imports: &state.imports,
         config: IDENT_SEARCH_CONFIG,
     };
     let matching_value = search_accessible_ident_source(search_params, state);
     if let Some(source) = matching_value {
-        index_accessible_source(&node, node.span, source, state);
+        index_accessible_source(&ident, ident.span, source, state);
     } else if let Some(source) = search_not_accessible_ident_source(search_params, state) {
-        index_not_accessible_source(node.id, source, state);
+        index_not_accessible_source(ident.id, source, state);
     }
 }
 

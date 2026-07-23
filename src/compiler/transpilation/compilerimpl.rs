@@ -10,94 +10,94 @@ use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types;
 use std::fmt::Write;
 
-pub(super) fn transpile_call(node: &Call, source: &FnDefinition, state: &mut State<'_>) {
+pub(super) fn transpile_call(call: &Call, source: &FnDefinition, state: &mut State<'_>) {
     match source.compilerimpl() {
         Some(CompilerImplFn::Binary(fn_)) => {
-            transpile_fn_call_binary(node, fn_, state);
+            transpile_fn_call_binary(call, fn_, state);
         }
         Some(CompilerImplFn::Unary(fn_)) => {
-            transpile_fn_call_unary(node, fn_, state);
+            transpile_fn_call_unary(call, fn_, state);
         }
-        Some(CompilerImplFn::MulAdd) => transpile_mul_add(node, state),
+        Some(CompilerImplFn::MulAdd) => transpile_mul_add(call, state),
         Some(CompilerImplFn::Typeof | CompilerImplFn::Sizeof) | None => {
             unreachable!("not implemented `{}` GPU function", source.name)
         }
     }
 }
 
-fn transpile_fn_call_binary(node: &Call, fn_: BinaryCompilerImplFn, state: &mut State<'_>) {
-    let type_ = type_(&node.args[0].value, state);
+fn transpile_fn_call_binary(call: &Call, fn_: BinaryCompilerImplFn, state: &mut State<'_>) {
+    let type_ = type_(&call.args[0].value, state);
     match type_ {
         CompilerImplType::I32 | CompilerImplType::U32 => {
-            transpile_fn_call_int_binary(node, fn_, type_, state);
+            transpile_fn_call_int_binary(call, fn_, type_, state);
         }
-        CompilerImplType::F32 => transpile_fn_call_f32_binary(node, fn_, type_, state),
-        CompilerImplType::Bool => transpile_fn_call_bool_binary(node, fn_, type_, state),
-        CompilerImplType::Typeref => transpile_fn_call_typeref_binary(node, fn_, type_, state),
+        CompilerImplType::F32 => transpile_fn_call_f32_binary(call, fn_, type_, state),
+        CompilerImplType::Bool => transpile_fn_call_bool_binary(call, fn_, type_, state),
+        CompilerImplType::Typeref => transpile_fn_call_typeref_binary(call, fn_, type_, state),
     }
 }
 
 fn transpile_fn_call_int_binary(
-    node: &Call,
+    call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
     state: &mut State<'_>,
 ) {
-    let is_divisor_zero = is_zero_int(&node.args[1].value, state);
+    let is_divisor_zero = is_zero_int(&call.args[1].value, state);
     if is_divisor_zero && fn_ == BinaryCompilerImplFn::Div {
-        transpile_arg(&node.args[0], type_, true, state);
+        transpile_arg(&call.args[0], type_, true, state);
     } else if is_divisor_zero && fn_ == BinaryCompilerImplFn::Mod {
-        transpile_arg(&node.args[1], type_, true, state);
+        transpile_arg(&call.args[1], type_, true, state);
     } else {
-        transpile_fn_call_scalar_binary(node, fn_, type_, true, state);
+        transpile_fn_call_scalar_binary(call, fn_, type_, true, state);
     }
 }
 
 fn transpile_fn_call_f32_binary(
-    node: &Call,
+    call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
     state: &mut State<'_>,
 ) {
     if fn_ == BinaryCompilerImplFn::Div {
         state.shader += "(";
-        transpile_arg(&node.args[0], type_, true, state);
+        transpile_arg(&call.args[0], type_, true, state);
         state.shader += " / select(";
-        transpile_arg(&node.args[1], type_, true, state);
+        transpile_arg(&call.args[1], type_, true, state);
         state.shader += ", f32(1), ";
-        transpile_arg(&node.args[1], type_, true, state);
+        transpile_arg(&call.args[1], type_, true, state);
         state.shader += " == f32(0)))";
     } else {
-        transpile_fn_call_scalar_binary(node, fn_, type_, true, state);
+        transpile_fn_call_scalar_binary(call, fn_, type_, true, state);
     }
 }
 
 fn transpile_fn_call_bool_binary(
-    node: &Call,
+    call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
     state: &mut State<'_>,
 ) {
     let is_bool_arg_converted = !fn_.is_comparison_operator();
-    transpile_fn_call_scalar_binary(node, fn_, type_, is_bool_arg_converted, state);
+    transpile_fn_call_scalar_binary(call, fn_, type_, is_bool_arg_converted, state);
 }
 
 fn transpile_fn_call_typeref_binary(
-    node: &Call,
+    call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
     state: &mut State<'_>,
 ) {
     let negation = wgsl_comparison_to_negation_operator(fn_);
     _ = write!(state.shader, "u32({negation}all(");
-    transpile_arg(&node.args[0], type_, true, state);
+    transpile_arg(&call.args[0], type_, true, state);
     state.shader += " == ";
-    transpile_arg(&node.args[1], type_, true, state);
+    transpile_arg(&call.args[1], type_, true, state);
     state.shader += "))";
 }
 
 fn transpile_fn_call_scalar_binary(
-    node: &Call,
+    call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
     is_bool_arg_converted: bool,
@@ -107,30 +107,30 @@ fn transpile_fn_call_scalar_binary(
         state.shader += "u32(";
     }
     state.shader += "(";
-    transpile_arg(&node.args[0], type_, is_bool_arg_converted, state);
+    transpile_arg(&call.args[0], type_, is_bool_arg_converted, state);
     _ = write!(state.shader, " {} ", wgsl_binary_operator(fn_));
-    transpile_arg(&node.args[1], type_, is_bool_arg_converted, state);
+    transpile_arg(&call.args[1], type_, is_bool_arg_converted, state);
     state.shader += ")";
     if fn_.is_comparison_operator() || fn_.is_logical_operator() {
         state.shader += ")";
     }
 }
 
-fn transpile_fn_call_unary(node: &Call, fn_: UnaryCompilerImplFn, state: &mut State<'_>) {
-    let type_ = type_(&node.args[0].value, state);
+fn transpile_fn_call_unary(call: &Call, fn_: UnaryCompilerImplFn, state: &mut State<'_>) {
+    let type_ = type_(&call.args[0].value, state);
     let (prefix, suffix) = match fn_ {
         UnaryCompilerImplFn::Neg => ("(-", ")"),
         UnaryCompilerImplFn::Not => ("u32(!", ")"),
     };
     state.shader += prefix;
-    transpile_arg(&node.args[0], type_, true, state);
+    transpile_arg(&call.args[0], type_, true, state);
     state.shader += suffix;
 }
 
-fn transpile_mul_add(node: &Call, state: &mut State<'_>) {
-    let type_ = type_(&node.args[0].value, state);
+fn transpile_mul_add(call: &Call, state: &mut State<'_>) {
+    let type_ = type_(&call.args[0].value, state);
     state.shader += "fma(";
-    for arg in &node.args {
+    for arg in &call.args {
         transpile_arg(arg, type_, true, state);
         state.shader += ", ";
     }
@@ -152,13 +152,13 @@ fn transpile_arg(
     }
 }
 
-fn is_zero_int(node: &Expr, state: &mut State<'_>) -> bool {
-    let value = consts::expr_const_value(node, state);
+fn is_zero_int(expr: &Expr, state: &mut State<'_>) -> bool {
+    let value = consts::expr_const_value(expr, state);
     matches!(value, ConstValue::I32(0) | ConstValue::U32(0))
 }
 
-fn type_(node: &Expr, state: &mut State<'_>) -> CompilerImplType {
-    let type_ = types::expr_type(node, state)
+fn type_(expr: &Expr, state: &mut State<'_>) -> CompilerImplType {
+    let type_ = types::expr_type(expr, state)
         .struct_ref()
         .unwrap_or_else(|| unreachable!("unexpected value that is not a type"));
     state

@@ -83,7 +83,7 @@ pub(crate) fn check_f32_const_bounds(
 
 pub(crate) fn check_mul_add_candidate(
     source: ItemRef<'_>,
-    node: &Call,
+    call: &Call,
     are_all_args_f32: bool,
     state: &mut State<'_>,
 ) {
@@ -92,7 +92,7 @@ pub(crate) fn check_mul_add_candidate(
     };
     if !are_all_args_f32
         || source.compilerimpl() != Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add))
-        || !node
+        || !call
             .args
             .iter()
             .any(|arg| is_expr_compilerimpl_mul(&arg.value, state))
@@ -102,7 +102,7 @@ pub(crate) fn check_mul_add_candidate(
     state.add_log(Log {
         level: LogLevel::Warning,
         msg: "candidate expression for `mul_add()`".into(),
-        location: Some(state.span_location(node.span)),
+        location: Some(state.span_location(call.span)),
         inner: vec![],
     });
 }
@@ -180,12 +180,12 @@ pub(crate) fn check_has_return_type(
     Ok(())
 }
 
-pub(crate) fn check_ref(node: &Expr, state: &mut State<'_>) {
-    if refs::is_expr_ref(node, state) == Some(false) {
+pub(crate) fn check_ref(expr: &Expr, state: &mut State<'_>) {
+    if refs::is_expr_ref(expr, state) == Some(false) {
         state.add_log(Log {
             level: LogLevel::Error,
             msg: "expression is not a reference".into(),
-            location: Some(state.span_location(node.span())),
+            location: Some(state.span_location(expr.span())),
             inner: vec![],
         });
     }
@@ -208,24 +208,24 @@ pub(crate) fn report_invalid_wildcard_location(
     Err(ValidateError)
 }
 
-fn is_item_const(node: ItemRef<'_>, param_constness: ParamConstness) -> bool {
-    match node {
+fn is_item_const(item: ItemRef<'_>, param_constness: ParamConstness) -> bool {
+    match item {
         ItemRef::Var(_) => false,
         ItemRef::Const(_) | ItemRef::Struct(_) => true,
-        ItemRef::Fn(node) => node.const_keyword_span.is_some(),
-        ItemRef::Param(node) => match param_constness {
-            ParamConstness::ExplicitOnly => node.const_mark_span().is_some(),
+        ItemRef::Fn(fn_) => fn_.const_keyword_span.is_some(),
+        ItemRef::Param(param) => match param_constness {
+            ParamConstness::ExplicitOnly => param.const_mark_span().is_some(),
             ParamConstness::All => true,
         },
     }
 }
 
-fn is_expr_compilerimpl_mul(node: &Expr, state: &State<'_>) -> bool {
-    let Expr::Call(node) = node else {
+fn is_expr_compilerimpl_mul(expr: &Expr, state: &State<'_>) -> bool {
+    let Expr::Call(call) = expr else {
         return false;
     };
     matches!(
-        state.sources.get(&node.id),
+        state.sources.get(&call.id),
         Some(ItemRef::Fn(source))
             if source.compilerimpl()
                 == Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul))

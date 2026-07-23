@@ -10,12 +10,12 @@ use crate::compiler::values::{ConstValue, consts};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
-pub(crate) fn var_type<'item>(node: &VarDefinition, state: &mut State<'item>) -> Type<'item> {
-    expr_type(&node.default_value, state)
+pub(crate) fn var_type<'item>(var: &VarDefinition, state: &mut State<'item>) -> Type<'item> {
+    expr_type(&var.default_value, state)
 }
 
-pub(crate) fn fn_type<'item>(node: &FnDefinition, state: &mut State<'item>) -> Type<'item> {
-    if let Some(return_type) = node.return_type.as_ref() {
+pub(crate) fn fn_type<'item>(fn_: &FnDefinition, state: &mut State<'item>) -> Type<'item> {
+    if let Some(return_type) = fn_.return_type.as_ref() {
         expr_as_type(return_type, state)
     } else {
         Type::NoReturn
@@ -23,13 +23,13 @@ pub(crate) fn fn_type<'item>(node: &FnDefinition, state: &mut State<'item>) -> T
 }
 
 pub(crate) fn const_fn_type<'item>(
-    node: &'item FnDefinition,
+    fn_: &'item FnDefinition,
     args: &[Arg],
     state: &mut State<'item>,
 ) -> Type<'item> {
     state.in_scope(|state_| {
-        bind_params_to_args(&node.params, args, state_).for_each(drop);
-        if let Some(return_type) = node.return_type.as_ref() {
+        bind_params_to_args(&fn_.params, args, state_).for_each(drop);
+        if let Some(return_type) = fn_.return_type.as_ref() {
             expr_as_type(return_type, state_)
         } else {
             Type::NoReturn
@@ -67,28 +67,30 @@ pub(crate) fn bind_param_to_arg<'item>(
     (param_type, arg_type)
 }
 
-pub(crate) fn param_type<'item>(node: &'item Param, state: &mut State<'item>) -> Type<'item> {
-    if matches!(node.type_, Expr::Wildcard(_)) {
-        state.wildcard_type(node.id).unwrap_or(Type::Wildcard(node))
+pub(crate) fn param_type<'item>(param: &'item Param, state: &mut State<'item>) -> Type<'item> {
+    if matches!(param.type_, Expr::Wildcard(_)) {
+        state
+            .wildcard_type(param.id)
+            .unwrap_or(Type::Wildcard(param))
     } else {
-        expr_as_type(&node.type_, state)
+        expr_as_type(&param.type_, state)
     }
 }
 
-pub(crate) fn expr_type<'item>(node: &Expr, state: &mut State<'item>) -> Type<'item> {
-    match node {
+pub(crate) fn expr_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type<'item> {
+    match expr {
         Expr::F32Literal(_) => Type::Struct(state.search_prelude_type("f32")),
         Expr::U32Literal(_) => Type::Struct(state.search_prelude_type("u32")),
         Expr::I32Literal(_) => Type::Struct(state.search_prelude_type("i32")),
         Expr::BoolLiteral(_) => Type::Struct(state.search_prelude_type("bool")),
         Expr::Wildcard(_) => Type::Unknown,
-        Expr::Call(node) => source_type(node.id, &node.args, state),
-        Expr::Ident(node) => source_type(node.id, &[], state),
+        Expr::Call(call) => source_type(call.id, &call.args, state),
+        Expr::Ident(ident) => source_type(ident.id, &[], state),
     }
 }
 
-pub(crate) fn expr_as_type<'item>(node: &Expr, state: &mut State<'item>) -> Type<'item> {
-    match consts::expr_const_value(node, state) {
+pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type<'item> {
+    match consts::expr_const_value(expr, state) {
         ConstValue::TypeRef(type_) => Type::Struct(type_),
         ConstValue::Param(type_) => Type::Param(type_),
         ConstValue::WildcardType(type_) => Type::Wildcard(type_),
@@ -108,13 +110,13 @@ fn source_type<'item>(node_id: u64, args: &[Arg], state: &mut State<'item>) -> T
     }
 }
 
-fn item_type<'item>(node: ItemRef<'item>, args: &[Arg], state: &mut State<'item>) -> Type<'item> {
-    match node {
-        ItemRef::Var(node) => var_type(node, state),
-        ItemRef::Const(node) => expr_type(&node.value, state),
+fn item_type<'item>(item: ItemRef<'item>, args: &[Arg], state: &mut State<'item>) -> Type<'item> {
+    match item {
+        ItemRef::Var(var) => var_type(var, state),
+        ItemRef::Const(const_) => expr_type(&const_.value, state),
         ItemRef::Struct(_) => Type::Struct(state.search_prelude_type("typeref")),
-        ItemRef::Fn(node) => const_fn_type(node, args, state),
-        ItemRef::Param(node) => param_type(node, state),
+        ItemRef::Fn(fn_) => const_fn_type(fn_, args, state),
+        ItemRef::Param(param) => param_type(param, state),
     }
 }
 
