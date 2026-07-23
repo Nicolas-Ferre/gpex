@@ -1,4 +1,4 @@
-use crate::compiler::validation::{logs, ValidateState};
+use crate::compiler::validation::{ValidateState, logs};
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 
