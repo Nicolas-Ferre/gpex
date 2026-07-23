@@ -2,25 +2,16 @@ use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::parsing::items::params::Param;
+use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::state::State;
-use crate::compiler::values;
 use crate::compiler::values::{ConstValue, consts};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
 pub(crate) fn var_type<'item>(node: &VarDefinition, state: &mut State<'item>) -> Type<'item> {
     expr_type(&node.default_value, state)
-}
-
-pub(crate) fn param_type<'item>(node: &'item Param, state: &mut State<'item>) -> Type<'item> {
-    if matches!(node.type_, Expr::Wildcard(_)) {
-        state.wildcard_type(node.id).unwrap_or(Type::Wildcard(node))
-    } else {
-        expr_as_type(&node.type_, state)
-    }
 }
 
 pub(crate) fn fn_type<'item>(node: &FnDefinition, state: &mut State<'item>) -> Type<'item> {
@@ -37,13 +28,51 @@ pub(crate) fn const_fn_type<'item>(
     state: &mut State<'item>,
 ) -> Type<'item> {
     state.in_scope(|state_| {
-        values::bind_params_to_args(&node.params, args, state_).for_each(drop);
+        bind_params_to_args(&node.params, args, state_).for_each(drop);
         if let Some(return_type) = node.return_type.as_ref() {
             expr_as_type(return_type, state_)
         } else {
             Type::NoReturn
         }
     })
+}
+
+pub(crate) fn bind_params_to_args<'item>(
+    params: &'item ParamGroup,
+    args: &[Arg],
+    state: &mut State<'item>,
+) -> impl Iterator<Item = (Type<'item>, Type<'item>)> {
+    debug_assert_eq!(params.params.len(), args.len());
+    params
+        .params
+        .iter()
+        .zip(args)
+        .map(|(param, arg)| bind_param_to_arg(param, arg, state))
+}
+
+pub(crate) fn bind_param_to_arg<'item>(
+    param: &'item Param,
+    arg: &Arg,
+    state: &mut State<'item>,
+) -> (Type<'item>, Type<'item>) {
+    let param_type = param_type(param, state);
+    let arg_type = expr_type(&arg.value, state);
+    if matches!(param.type_, Expr::Wildcard(_)) {
+        state.add_wildcard_type(param.id, arg_type);
+    }
+    if param.const_mark_span().is_some() {
+        let value = consts::expr_const_value(&arg.value, state);
+        state.add_const_value(param.id, value);
+    }
+    (param_type, arg_type)
+}
+
+pub(crate) fn param_type<'item>(node: &'item Param, state: &mut State<'item>) -> Type<'item> {
+    if matches!(node.type_, Expr::Wildcard(_)) {
+        state.wildcard_type(node.id).unwrap_or(Type::Wildcard(node))
+    } else {
+        expr_as_type(&node.type_, state)
+    }
 }
 
 pub(crate) fn expr_type<'item>(node: &Expr, state: &mut State<'item>) -> Type<'item> {

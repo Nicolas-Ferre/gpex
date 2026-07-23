@@ -1,3 +1,4 @@
+use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::{CompilerImplFn, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
@@ -6,8 +7,7 @@ use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::state::State;
 use crate::compiler::values::consts;
 use crate::compiler::values::consts::ConstValue;
-use crate::compiler::values::types::Type;
-use crate::compiler::{key_rendering, values};
+use crate::compiler::values::types::{self, Type};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 
@@ -101,7 +101,7 @@ impl<'item> ItemRef<'item> {
         state.in_scope(|state| {
             let mut result = ArgsMatch::Matching;
             for (param, arg) in params.params.iter().zip(args) {
-                let (param_type, arg_type) = values::bind_param_to_arg(param, arg, state);
+                let (param_type, arg_type) = types::bind_param_to_arg(param, arg, state);
                 for param_match in [
                     Self::arg_match(param_type, arg_type),
                     Self::requirement_match(param, state),
