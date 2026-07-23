@@ -8,6 +8,7 @@ pub(crate) fn circular_dependencies(
     dependency_spans: &[Span],
     state: &ValidateState<'_, '_>,
 ) -> Log {
+    debug_assert!(!dependency_spans.is_empty());
     Log {
         level: LogLevel::Error,
         msg: format!("`{item_name}` item has circular dependencies"),
@@ -115,10 +116,10 @@ pub(crate) fn not_found_with_priv_candidate(
     )
 }
 
-pub(crate) fn not_found_with_importable_candidate(
+pub(crate) fn not_found_with_importable_candidate<'path>(
     item_key: &str,
     item_ref_span: Span,
-    candidate_dot_paths_and_spans: impl IntoIterator<Item = (String, Span)>,
+    candidate_dot_paths_and_spans: impl IntoIterator<Item = (&'path str, Span)>,
     state: &ValidateState<'_, '_>,
 ) -> Log {
     not_found(

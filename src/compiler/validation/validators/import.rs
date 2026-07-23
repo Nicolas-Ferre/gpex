@@ -1,6 +1,5 @@
-use crate::compiler::logs;
 use crate::compiler::parsing::items::imports::ImportSegment;
-use crate::compiler::validation::ValidateState;
+use crate::compiler::validation::{logs, ValidateState};
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::ValidateError;
 use itertools::Itertools;

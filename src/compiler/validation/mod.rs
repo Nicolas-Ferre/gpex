@@ -1,6 +1,7 @@
 mod exprs;
 mod fns;
 mod items;
+mod logs;
 mod naming;
 mod validators;
 
@@ -15,7 +16,7 @@ use crate::{Log, LogLevel, LogLocation};
 use std::mem;
 use std::path::Path;
 
-pub(crate) struct ValidateState<'state, 'item> {
+struct ValidateState<'state, 'item> {
     inner: &'state State<'item>,
     context: ValidateContext<'item>,
     const_mark_span: Option<Span>,
@@ -23,10 +24,6 @@ pub(crate) struct ValidateState<'state, 'item> {
 }
 
 impl<'state, 'item> ValidateState<'state, 'item> {
-    pub(crate) fn span_location(&self, span: Span) -> LogLocation {
-        self.context.location(span)
-    }
-
     fn new(state: &'state State<'item>, files: &'item [ReadFile], root_path: &'item Path) -> Self {
         Self {
             inner: state,
@@ -34,6 +31,10 @@ impl<'state, 'item> ValidateState<'state, 'item> {
             const_mark_span: None,
             param_constness: ParamConstness::ExplicitOnly,
         }
+    }
+
+    fn span_location(&self, span: Span) -> LogLocation {
+        self.context.location(span)
     }
 
     fn add_log(&mut self, log: Log) {

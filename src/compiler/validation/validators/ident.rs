@@ -1,5 +1,4 @@
-use crate::compiler::logs;
-use crate::compiler::validation::ValidateState;
+use crate::compiler::validation::{ValidateState, logs};
 use crate::utils::parsing::span::{Span, SpanProps};
 
 pub(crate) fn check_char_count(span: Span, state: &mut ValidateState<'_, '_>) {

@@ -24,9 +24,9 @@ Key directories and files:
       structs, ...), expressions, statements. This layer also defines utility methods run on AST
       nodes.
     - `indexing/`: Symbol table construction (imports, item references, ...).
-    - `logs/`: Construction of user-facing compiler errors and warnings.
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...).
+    - `validation/logs/`: Construction of user-facing compiler errors and warnings.
     - `transpilation/`: AST-to-WGSL conversion.
     - `dependencies.rs`: Item dependency resolution.
     - `key_rendering.rs`: Rendering of item keys for compiler logs.

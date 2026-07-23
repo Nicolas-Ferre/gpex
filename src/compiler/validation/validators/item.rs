@@ -1,12 +1,11 @@
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
-use crate::compiler::logs;
 use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
 use crate::compiler::parsing::exprs::{BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
-use crate::compiler::validation::ValidateState;
+use crate::compiler::validation::{ValidateState, logs};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, Visibility};
@@ -188,12 +187,7 @@ pub(crate) fn check_found<'item>(
                     .items
                     .iter_by_key(key)
                     .filter(ItemNodeRef::is_pub)
-                    .map(|item| {
-                        (
-                            state.context.dot_path(item.file_index()).to_owned(),
-                            item.name_span(),
-                        )
-                    }),
+                    .map(|item| (state.context.dot_path(item.file_index()), item.name_span())),
                 state,
             )
         };

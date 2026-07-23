@@ -1,12 +1,11 @@
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
-use crate::compiler::logs;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::refs;
-use crate::compiler::validation::{ParamConstness, ValidateState};
+use crate::compiler::validation::{logs, ParamConstness, ValidateState};
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::span::Span;

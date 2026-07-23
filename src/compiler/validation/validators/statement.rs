@@ -1,7 +1,6 @@
-use crate::compiler::logs;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::statements::{ReturnStatement, Statement};
-use crate::compiler::validation::ValidateState;
+use crate::compiler::validation::{ValidateState, logs};
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 
