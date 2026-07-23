@@ -168,7 +168,7 @@ fn transpile_repeats<'item>(modules: &'item [Module], state: &mut State<'item>) 
         |state_| {
             for module in modules {
                 for repeat in module.repeats() {
-                    exprs::transpile_repeat(repeat, state_);
+                    items::transpile_repeat(repeat, state_);
                 }
             }
         },

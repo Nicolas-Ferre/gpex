@@ -1,4 +1,5 @@
 use crate::compiler::parsing::exprs::Expr;
+use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
@@ -48,6 +49,11 @@ pub(super) fn transpile_var_init(node: &VarDefinition, state: &mut State<'_>) {
     exprs::transpile_var_ref(node, state);
     state.shader += " = ";
     exprs::transpile_expr(&node.default_value, state);
+    state.shader += "; ";
+}
+
+pub(super) fn transpile_repeat(node: &RepeatDefinition, state: &mut State<'_>) {
+    exprs::transpile_call(&node.call, state);
     state.shader += "; ";
 }
 

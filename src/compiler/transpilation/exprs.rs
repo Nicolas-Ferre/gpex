@@ -2,7 +2,6 @@ use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -31,18 +30,12 @@ pub(super) fn transpile_expr(node: &Expr, state: &mut State<'_>) {
     }
 }
 
-// TODO: why in exprs module?
-pub(super) fn transpile_repeat(node: &RepeatDefinition, state: &mut State<'_>) {
-    transpile_call(&node.call, state);
-    state.shader += "; ";
-}
-
 pub(super) fn transpile_var_ref(node: &VarDefinition, state: &mut State<'_>) {
     state.shader += MAIN_BUFFER_NAME;
     _ = write!(state.shader, ".v{}", node.id);
 }
 
-fn transpile_call(node: &Call, state: &mut State<'_>) {
+pub(super) fn transpile_call(node: &Call, state: &mut State<'_>) {
     match state.sources[&node.id] {
         ItemRef::Fn(child) => match &child.body {
             FnBody::Compilerimpl(_) => compilerimpl::transpile_call(node, child, state),
