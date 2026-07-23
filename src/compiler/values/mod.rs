@@ -34,11 +34,11 @@ pub(crate) fn bind_param_to_arg<'item>(
     let param_type = types::param_type(param, state);
     let arg_type = types::expr_type(&arg.value, state);
     if matches!(param.type_, Expr::Wildcard(_)) {
-        types::add_type(param.id, arg_type, state);
+        state.add_wildcard_type(param.id, arg_type);
     }
     if param.const_mark_span().is_some() {
         let value = consts::expr_const_value(&arg.value, state);
-        consts::add_value(param.id, value, state);
+        state.add_const_value(param.id, value);
     }
     (param_type, arg_type)
 }

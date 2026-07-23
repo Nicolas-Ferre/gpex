@@ -7,8 +7,7 @@ mod validators;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::imports::{Import, ImportSegment};
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::state::{ParamConstness, State};
-use crate::utils::parsing::span::Span;
+use crate::compiler::state::State;
 use crate::utils::validation::ValidateError;
 use crate::{Log, LogLevel};
 use std::mem;
@@ -98,30 +97,4 @@ fn validate_module_import_usage(node: &Module, state: &mut State<'_>) {
             );
         }
     }
-}
-
-// TODO: should be associated method of State
-fn with_param_constness<'item, O>(
-    param_constness: ParamConstness,
-    callback: impl FnOnce(&mut State<'item>) -> O,
-    state: &mut State<'item>,
-) -> O {
-    let previous_param_constness = state.param_constness;
-    state.param_constness = param_constness;
-    let result = callback(state);
-    state.param_constness = previous_param_constness;
-    result
-}
-
-// TODO: should be associated method of State
-fn with_const_mark_span<'item, O>(
-    span: Option<Span>,
-    callback: impl FnOnce(&mut State<'item>) -> O,
-    state: &mut State<'item>,
-) -> O {
-    let previous_const_mark_span = state.const_mark_span;
-    state.const_mark_span = span;
-    let output = callback(state);
-    state.const_mark_span = previous_const_mark_span;
-    output
 }

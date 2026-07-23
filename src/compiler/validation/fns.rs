@@ -1,3 +1,4 @@
+use crate::compiler::dependencies;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
@@ -5,7 +6,6 @@ use crate::compiler::state::{ParamConstness, State};
 use crate::compiler::validation::{exprs, items, naming, validators};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
-use crate::compiler::{dependencies, validation};
 use crate::utils::validation::ValidateError;
 
 pub(super) fn validate_fn<'item>(
@@ -17,15 +17,11 @@ pub(super) fn validate_fn<'item>(
     let dependency_result = dependencies::scan_fn(node, state);
     validators::item::check_circular_dependencies(ref_, dependency_result, state)?;
     validators::item::check_prelude_location(ref_, compilerimpl_span, state)?;
-    validation::with_param_constness(
-        ParamConstness::ExplicitOnly,
-        |state| {
-            items::validate_params(&node.params, compilerimpl_span.is_some(), state)?;
-            validate_fn_return_type(node, state)?;
-            Ok(())
-        },
-        state,
-    )?;
+    state.with_param_constness(ParamConstness::ExplicitOnly, |state| {
+        items::validate_params(&node.params, compilerimpl_span.is_some(), state)?;
+        validate_fn_return_type(node, state)?;
+        Ok(())
+    })?;
     validators::item::check_unique_fn_signature(node, state);
     validators::item::check_unary_operator_fn(node, state)?;
     validators::item::check_binary_operator_fn(node, state)?;
@@ -48,11 +44,9 @@ fn validate_fn_return_type<'item>(
     let (Some(arrow_span), Some(return_type)) = (node.arrow_span, &node.return_type) else {
         return Ok(());
     };
-    validation::with_const_mark_span(
-        Some(arrow_span),
-        |state| exprs::validate_expr(return_type, state),
-        state,
-    )?;
+    state.with_const_mark_span(Some(arrow_span), |state| {
+        exprs::validate_expr(return_type, state)
+    })?;
     let actual_type = types::expr_type(return_type, state);
     let expected_type = Type::Struct(state.search_prelude_type("typeref"));
     validators::expr::check_types(return_type.span(), actual_type, None, expected_type, state)?;
@@ -68,11 +62,7 @@ fn validate_body<'item>(
     } else {
         ParamConstness::ExplicitOnly
     };
-    validation::with_param_constness(
-        param_constness,
-        |state| validate_fn_statements(node, state),
-        state,
-    )?;
+    state.with_param_constness(param_constness, |state| validate_fn_statements(node, state))?;
     Ok(())
 }
 
@@ -84,29 +74,25 @@ fn validate_fn_statements<'item>(
         return Ok(());
     };
     let mut is_error_detected = false;
-    validation::with_const_mark_span(
-        node.const_keyword_span,
-        |state| {
-            for (index, statement) in body.statements.iter().enumerate() {
-                is_error_detected |= validate_statement(statement, state).is_err();
-                if let Statement::Return(return_) = statement {
-                    let next_statement_span = body
-                        .statements
-                        .get(index + 1)
-                        .map_or(body.body_end_span, Statement::span);
-                    is_error_detected |= validators::statement::check_return_before_end(
-                        return_.span,
-                        next_statement_span,
-                        index,
-                        body.statements.len(),
-                        state,
-                    )
-                    .is_err();
-                }
+    state.with_const_mark_span(node.const_keyword_span, |state| {
+        for (index, statement) in body.statements.iter().enumerate() {
+            is_error_detected |= validate_statement(statement, state).is_err();
+            if let Statement::Return(return_) = statement {
+                let next_statement_span = body
+                    .statements
+                    .get(index + 1)
+                    .map_or(body.body_end_span, Statement::span);
+                is_error_detected |= validators::statement::check_return_before_end(
+                    return_.span,
+                    next_statement_span,
+                    index,
+                    body.statements.len(),
+                    state,
+                )
+                .is_err();
             }
-        },
-        state,
-    );
+        }
+    });
     if is_error_detected {
         return Err(ValidateError);
     }

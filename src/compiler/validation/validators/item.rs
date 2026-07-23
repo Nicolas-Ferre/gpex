@@ -18,18 +18,17 @@ pub(crate) fn check_circular_dependencies(
     dependency_result: Result<(), Vec<Span>>,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     let name_span = item.name_span();
-    let name = context.slice(name_span);
+    let name = state.validation_context.slice(name_span);
     if let Err(stack) = dependency_result {
         if stack.iter().min() != Some(&stack[0]) {
             // avoid repeating the same error for each item of the stack
             return Err(ValidateError);
         }
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{name}` item has circular dependencies"),
-            location: Some(context.location(name_span)),
+            location: Some(state.span_location(name_span)),
             inner: stack
                 .iter()
                 .enumerate()
@@ -40,7 +39,7 @@ pub(crate) fn check_circular_dependencies(
                     } else {
                         "depends on this item".into()
                     },
-                    location: Some(context.location(*ref_)),
+                    location: Some(state.span_location(*ref_)),
                 })
                 .collect(),
         });
@@ -70,15 +69,14 @@ pub(crate) fn check_unique_definition<'item>(
         .search_in_same_file(search_params, Visibility::Enforced)
         .next();
     if let Some(duplicated_item) = duplicated_item {
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{key}` item defined multiple times"),
-            location: Some(context.location(name_span)),
+            location: Some(state.span_location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "item also defined here".into(),
-                location: Some(context.location(duplicated_item.name_span())),
+                location: Some(state.span_location(duplicated_item.name_span())),
             }],
         });
         Err(ValidateError)
@@ -91,21 +89,20 @@ pub(crate) fn check_unique_params(
     params: &[Param],
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     let mut is_error = false;
     for (param_index, param) in params.iter().enumerate() {
         let duplicated_param = params[..param_index]
             .iter()
             .find(|other_param| other_param.name == param.name);
         if let Some(duplicated_param) = duplicated_param {
-            context.logs.push(Log {
+            state.add_log(Log {
                 level: LogLevel::Error,
                 msg: format!("`{}` parameter defined multiple times", param.name),
-                location: Some(context.location(param.name_span)),
+                location: Some(state.span_location(param.name_span)),
                 inner: vec![LogInner {
                     level: LogLevel::Info,
                     msg: "parameter also defined here".into(),
-                    location: Some(context.location(duplicated_param.name_span)),
+                    location: Some(state.span_location(duplicated_param.name_span)),
                 }],
             });
             is_error = true;
@@ -118,15 +115,14 @@ pub(crate) fn check_unique_fn_signature<'item>(fn_: &'item FnDefinition, state: 
     if let Some(previous_fn) = find_previous_same_fn_signature(fn_, state) {
         let fn_key = key_rendering::fn_key(fn_, state)
             .unwrap_or_else(|_| unreachable!("function should be validated before"));
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{fn_key}` function defined multiple times"),
-            location: Some(context.location(fn_.signature_span_without_return)),
+            location: Some(state.span_location(fn_.signature_span_without_return)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "function also defined here".into(),
-                location: Some(context.location(previous_fn.signature_span_without_return)),
+                location: Some(state.span_location(previous_fn.signature_span_without_return)),
             }],
         });
     }
@@ -137,14 +133,13 @@ pub(crate) fn check_prelude_location(
     compilerimpl_keyword_span: Option<Span>,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     if let Some(compilerimpl_keyword_span) = compilerimpl_keyword_span
         && item.file_index() != PRELUDE_FILE_INDEX
     {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: "forbidden `compilerimpl` item outside prelude".into(),
-            location: Some(context.location(compilerimpl_keyword_span)),
+            location: Some(state.span_location(compilerimpl_keyword_span)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -161,35 +156,32 @@ pub(crate) fn check_usage<'item>(item: ItemRef<'item>, state: &mut State<'item>)
         name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state);
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item unused"),
-            location: Some(context.location(name_span)),
+            location: Some(state.span_location(name_span)),
             inner: vec![],
         });
     } else if item.is_pub() && is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state);
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item public but name starting with `_`"),
-            location: Some(context.location(name_span)),
+            location: Some(state.span_location(name_span)),
             inner: vec![],
         });
     } else if let Some(ref_span) = ref_span
         && is_unused_lint_ignored
     {
         let displayed_key = item.displayed_key(state);
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item used but name starting with `_`"),
-            location: Some(context.location(name_span)),
+            location: Some(state.span_location(name_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "item used here".into(),
-                location: Some(context.location(ref_span)),
+                location: Some(state.span_location(ref_span)),
             }],
         });
     }
@@ -206,25 +198,24 @@ pub(crate) fn check_found<'item>(
     if let Some(source) = source {
         Ok(source)
     } else {
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{displayed_key}` item not found"),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: if let Some(candidates) = state.candidate_sources.get(&node.id()) {
                 candidates
                     .iter()
                     .map(|candidate| LogInner {
                         level: LogLevel::Info,
                         msg: "similar candidate".into(),
-                        location: Some(context.location(candidate.signature_span_with_return())),
+                        location: Some(state.span_location(candidate.signature_span_with_return())),
                     })
                     .collect()
             } else if let Some(priv_source) = state.priv_sources.get(&node.id()) {
                 vec![LogInner {
                     level: LogLevel::Info,
                     msg: "item not qualified with `pub`".into(),
-                    location: Some(context.location(priv_source.name_span())),
+                    location: Some(state.span_location(priv_source.name_span())),
                 }]
             } else {
                 state
@@ -235,9 +226,9 @@ pub(crate) fn check_found<'item>(
                         level: LogLevel::Info,
                         msg: format!(
                             "item can be imported from `{}`",
-                            context.dot_path(item.file_index())
+                            state.validation_context.dot_path(item.file_index())
                         ),
-                        location: Some(context.location(item.name_span())),
+                        location: Some(state.span_location(item.name_span())),
                     })
                     .collect()
             },
@@ -254,21 +245,19 @@ pub(crate) fn check_unary_operator_fn(
         Ok(())
     } else if fn_.params.params.len() != 1 {
         let fn_key = key_rendering::fn_key(fn_, state)?;
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function must have exactly one parameter"),
-            location: Some(context.location(fn_.signature_span_with_return)),
+            location: Some(state.span_location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
     } else if fn_.return_type.is_none() {
         let fn_key = key_rendering::fn_key(fn_, state)?;
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function without return type"),
-            location: Some(context.location(fn_.signature_span_with_return)),
+            location: Some(state.span_location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -285,21 +274,19 @@ pub(crate) fn check_binary_operator_fn(
         Ok(())
     } else if fn_.params.params.len() != 2 {
         let fn_key = key_rendering::fn_key(fn_, state)?;
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function must have exactly two parameters"),
-            location: Some(context.location(fn_.signature_span_with_return)),
+            location: Some(state.span_location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)
     } else if fn_.return_type.is_none() {
         let fn_key = key_rendering::fn_key(fn_, state)?;
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function without return type"),
-            location: Some(context.location(fn_.signature_span_with_return)),
+            location: Some(state.span_location(fn_.signature_span_with_return)),
             inner: vec![],
         });
         Err(ValidateError)

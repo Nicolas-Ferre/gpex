@@ -17,13 +17,7 @@ pub(crate) fn var_type<'item>(node: &VarDefinition, state: &mut State<'item>) ->
 
 pub(crate) fn param_type<'item>(node: &'item Param, state: &mut State<'item>) -> Type<'item> {
     if matches!(node.type_, Expr::Wildcard(_)) {
-        // TODO: access to wildcard type and const values in latest scope layer should be 2 associated methods of State
-        state
-            .scopes
-            .last()
-            .and_then(|scope| scope.wildcard_types.get(&node.id))
-            .copied()
-            .unwrap_or(Type::Wildcard(node))
+        state.wildcard_type(node.id).unwrap_or(Type::Wildcard(node))
     } else {
         expr_as_type(&node.type_, state)
     }
@@ -42,7 +36,7 @@ pub(crate) fn const_fn_type<'item>(
     args: &[Arg],
     state: &mut State<'item>,
 ) -> Type<'item> {
-    state.run_scoped(|state_| {
+    state.in_scope(|state_| {
         values::bind_params_to_args(&node.params, args, state_).for_each(drop);
         if let Some(return_type) = node.return_type.as_ref() {
             expr_as_type(return_type, state_)
@@ -76,16 +70,6 @@ pub(crate) fn expr_as_type<'item>(node: &Expr, state: &mut State<'item>) -> Type
         | ConstValue::Unknown
         | ConstValue::RuntimeValue => Type::Unknown,
     }
-}
-
-// TODO: should method associated to State
-pub(crate) fn add_type<'item>(id: u64, type_: Type<'item>, state: &mut State<'item>) {
-    state
-        .scopes
-        .last_mut()
-        .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
-        .wildcard_types
-        .insert(id, type_);
 }
 
 fn source_type<'item>(node_id: u64, args: &[Arg], state: &mut State<'item>) -> Type<'item> {

@@ -1,3 +1,4 @@
+use crate::compiler::dependencies;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::Item;
@@ -10,7 +11,6 @@ use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
 use crate::compiler::validation::{exprs, fns, naming, validators};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
-use crate::compiler::{dependencies, validation};
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_item<'item>(
@@ -74,11 +74,9 @@ fn validate_const<'item>(
     validators::ident::check_char_count(node.name_span, state);
     let allowed_cases = naming::const_allowed_cases(node, state);
     validators::ident::check_case(node.name_span, allowed_cases, state);
-    validation::with_const_mark_span(
-        Some(node.const_keyword_span),
-        |state| exprs::validate_expr(&node.value, state),
-        state,
-    )?;
+    state.with_const_mark_span(Some(node.const_keyword_span), |state| {
+        exprs::validate_expr(&node.value, state)
+    })?;
     Ok(())
 }
 
@@ -124,11 +122,9 @@ fn validate_param_type<'item>(
     if matches!(node.type_, Expr::Wildcard(_)) {
         return Ok(());
     }
-    validation::with_const_mark_span(
-        Some(node.colon_span),
-        |state| exprs::validate_expr(&node.type_, state),
-        state,
-    )?;
+    state.with_const_mark_span(Some(node.colon_span), |state| {
+        exprs::validate_expr(&node.type_, state)
+    })?;
     let actual_type = types::expr_type(&node.type_, state);
     let expected_type = Type::Struct(state.search_prelude_type("typeref"));
     validators::expr::check_types(node.type_.span(), actual_type, None, expected_type, state)?;
@@ -142,11 +138,9 @@ fn validate_param_requirement<'item>(
     let Some(requirement) = &node.requirement else {
         return Ok(());
     };
-    validation::with_const_mark_span(
-        Some(requirement.require_span),
-        |state| exprs::validate_expr(&requirement.condition, state),
-        state,
-    )?;
+    state.with_const_mark_span(Some(requirement.require_span), |state| {
+        exprs::validate_expr(&requirement.condition, state)
+    })?;
     let actual_type = types::expr_type(&requirement.condition, state);
     let expected_type = Type::Struct(state.search_prelude_type("bool"));
     validators::expr::check_types(

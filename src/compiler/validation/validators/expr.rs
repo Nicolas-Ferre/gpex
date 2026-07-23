@@ -20,20 +20,19 @@ pub(crate) fn check_types(
     expected_type: Type<'_>,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     if !actual_type.is_comparable() || !expected_type.is_comparable() {
         Err(ValidateError)
     } else if actual_type == expected_type {
         Ok(())
     } else {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("expression with invalid type `{}`", actual_type.name()?),
-            location: Some(context.location(actual_span)),
+            location: Some(state.span_location(actual_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: format!("expected `{}` type", expected_type.name()?),
-                location: expected_span.map(|span| context.location(span)),
+                location: expected_span.map(|span| state.span_location(span)),
             }],
         });
         Err(ValidateError)
@@ -47,18 +46,17 @@ pub(crate) fn check_const_value(
     param_constness: ParamConstness,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     if is_item_const(source, param_constness) {
         Ok(())
     } else {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: "expression not constant".into(),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "expression must be constant".into(),
-                location: Some(context.location(const_mark_span)),
+                location: Some(state.span_location(const_mark_span)),
             }],
         });
         Err(ValidateError)
@@ -70,12 +68,11 @@ pub(crate) fn check_f32_const_bounds(
     span: Span,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     if is_out_of_bounds {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: "`f32` constant expression out of bounds".into(),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![],
         });
         Err(ValidateError)
@@ -102,10 +99,10 @@ pub(crate) fn check_mul_add_candidate(
     {
         return;
     }
-    state.validation_context.logs.push(Log {
+    state.add_log(Log {
         level: LogLevel::Warning,
         msg: "candidate expression for `mul_add()`".into(),
-        location: Some(state.validation_context.location(node.span)),
+        location: Some(state.span_location(node.span)),
         inner: vec![],
     });
 }
@@ -115,21 +112,20 @@ pub(crate) fn check_arg_name(
     param: &Param,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     let Some(name) = &arg.name else {
         return Ok(());
     };
     if name == &param.name {
         Ok(())
     } else {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{name}` argument name not matching parameter"),
-            location: arg.name_span.map(|span| context.location(span)),
+            location: arg.name_span.map(|span| state.span_location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: format!("expected `{}` parameter name", param.name),
-                location: Some(context.location(param.name_span)),
+                location: Some(state.span_location(param.name_span)),
             }],
         });
         Err(ValidateError)
@@ -145,15 +141,14 @@ pub(crate) fn check_no_return_type(
         && fn_.return_type.is_none()
     {
         let fn_key = key_rendering::fn_key(fn_, state)?;
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("called function `{fn_key}` with no return type"),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "function has no return type".into(),
-                location: Some(context.location(fn_.signature_span_with_return)),
+                location: Some(state.span_location(fn_.signature_span_with_return)),
             }],
         });
         return Err(ValidateError);
@@ -170,15 +165,14 @@ pub(crate) fn check_has_return_type(
         && fn_.return_type.is_some()
     {
         let fn_key = key_rendering::fn_key(fn_, state)?;
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("repeated function `{fn_key}` with a return type"),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "function has a return type".into(),
-                location: Some(context.location(fn_.signature_span_with_return)),
+                location: Some(state.span_location(fn_.signature_span_with_return)),
             }],
         });
         return Err(ValidateError);
@@ -188,11 +182,10 @@ pub(crate) fn check_has_return_type(
 
 pub(crate) fn check_ref(node: &Expr, state: &mut State<'_>) {
     if refs::is_expr_ref(node, state) == Some(false) {
-        let context = &mut state.validation_context;
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: "expression is not a reference".into(),
-            location: Some(context.location(node.span())),
+            location: Some(state.span_location(node.span())),
             inner: vec![],
         });
     }
@@ -202,11 +195,10 @@ pub(crate) fn report_invalid_wildcard_location(
     span: Span,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
-    context.logs.push(Log {
+    state.add_log(Log {
         level: LogLevel::Error,
         msg: "invalid wildcard expression".into(),
-        location: Some(context.location(span)),
+        location: Some(state.span_location(span)),
         inner: vec![LogInner {
             level: LogLevel::Info,
             msg: "wildcards are only allowed as function parameter types".into(),

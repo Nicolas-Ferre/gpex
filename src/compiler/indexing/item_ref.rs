@@ -100,7 +100,7 @@ impl<'item> ItemRef<'item> {
     #[expect(clippy::excessive_nesting)] // scope cleanup adds one level around existing matching logic
     pub(crate) fn args_match(self, args: &[Arg], state: &mut State<'item>) -> ArgsMatch {
         let params = self.params();
-        state.run_scoped(|state| {
+        state.in_scope(|state| {
             let mut result = ArgsMatch::Matching;
             for (param, arg) in params.params.iter().zip(args) {
                 let (param_type, arg_type) = values::bind_param_to_arg(param, arg, state);

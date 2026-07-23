@@ -9,6 +9,7 @@ use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams,
 use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::ValidateContext;
+use crate::{Log, LogLocation};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
@@ -88,10 +89,73 @@ impl<'item> State<'item> {
         }
     }
 
-    pub(crate) fn run_scoped<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
+    pub(crate) fn span_location(&self, span: Span) -> LogLocation {
+        self.validation_context.location(span)
+    }
+
+    pub(crate) fn wildcard_type(&self, param_id: u64) -> Option<Type<'item>> {
+        self.scopes
+            .last()
+            .and_then(|scope| scope.wildcard_types.get(&param_id))
+            .copied()
+    }
+
+    pub(crate) fn const_value(&self, id: u64) -> ConstValue<'item> {
+        self.scopes
+            .last()
+            .and_then(|scope| scope.const_values.get(&id))
+            .cloned()
+            .unwrap_or(ConstValue::RuntimeValue)
+    }
+
+    pub(crate) fn add_log(&mut self, log: Log) {
+        self.validation_context.logs.push(log);
+    }
+
+    pub(crate) fn add_wildcard_type(&mut self, param_id: u64, type_: Type<'item>) {
+        self.scopes
+            .last_mut()
+            .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
+            .wildcard_types
+            .insert(param_id, type_);
+    }
+
+    pub(crate) fn add_const_value(&mut self, id: u64, value: ConstValue<'item>) {
+        self.scopes
+            .last_mut()
+            .unwrap_or_else(|| unreachable!("constant value scope should be entered"))
+            .const_values
+            .insert(id, value);
+    }
+
+    pub(crate) fn in_scope<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
         self.enter_scope();
         let output = callback(self);
         self.exit_scope();
+        output
+    }
+
+    pub(crate) fn with_param_constness<O>(
+        &mut self,
+        param_constness: ParamConstness,
+        callback: impl FnOnce(&mut Self) -> O,
+    ) -> O {
+        let previous_param_constness = self.param_constness;
+        self.param_constness = param_constness;
+        let output = callback(self);
+        self.param_constness = previous_param_constness;
+        output
+    }
+
+    pub(crate) fn with_const_mark_span<O>(
+        &mut self,
+        span: Option<Span>,
+        callback: impl FnOnce(&mut Self) -> O,
+    ) -> O {
+        let previous_const_mark_span = self.const_mark_span;
+        self.const_mark_span = span;
+        let output = callback(self);
+        self.const_mark_span = previous_const_mark_span;
         output
     }
 

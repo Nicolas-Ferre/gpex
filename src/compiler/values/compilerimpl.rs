@@ -7,8 +7,8 @@ use crate::compiler::parsing::items::fns::{
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::state::State;
 use crate::compiler::values::consts::{ConstValue, HashableF32};
+use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
-use crate::compiler::values::{consts, types};
 
 pub(super) fn call_const_value<'item>(
     call: &Call,
@@ -17,7 +17,7 @@ pub(super) fn call_const_value<'item>(
 ) -> ConstValue<'item> {
     for param in &source.params.params {
         if matches!(
-            consts::const_value(param.id, state),
+            state.const_value(param.id),
             ConstValue::Param(_) | ConstValue::WildcardType(_)
         ) {
             return ConstValue::Unknown;
@@ -38,8 +38,8 @@ fn fn_binary_const_value<'item>(
     fn_: BinaryCompilerImplFn,
     state: &State<'item>,
 ) -> ConstValue<'item> {
-    let left = consts::const_value(node.params.params[0].id, state);
-    let right = consts::const_value(node.params.params[1].id, state);
+    let left = state.const_value(node.params.params[0].id);
+    let right = state.const_value(node.params.params[1].id);
     match (left, right) {
         (ConstValue::I32(left), ConstValue::I32(right)) => {
             fn_binary_i32_const_value(left, right, fn_)
@@ -178,7 +178,7 @@ fn fn_unary_const_value<'item>(
     fn_: UnaryCompilerImplFn,
     state: &State<'item>,
 ) -> ConstValue<'item> {
-    match consts::const_value(source.params.params[0].id, state) {
+    match state.const_value(source.params.params[0].id) {
         ConstValue::I32(value) => ConstValue::I32(value.wrapping_neg()),
         ConstValue::F32(value) => ConstValue::F32(HashableF32(-value.0)),
         ConstValue::Bool(value) => ConstValue::Bool(!value),
@@ -191,9 +191,9 @@ fn fn_mul_add_const_value<'item>(
     state: &State<'item>,
 ) -> ConstValue<'item> {
     let (ConstValue::F32(value), ConstValue::F32(multiplier), ConstValue::F32(addend)) = (
-        consts::const_value(source.params.params[0].id, state),
-        consts::const_value(source.params.params[1].id, state),
-        consts::const_value(source.params.params[2].id, state),
+        state.const_value(source.params.params[0].id),
+        state.const_value(source.params.params[1].id),
+        state.const_value(source.params.params[2].id),
     ) else {
         unreachable!("not implemented `{}` constant GPU function", source.name)
     };
@@ -213,7 +213,7 @@ fn fn_sizeof_const_value<'item>(
     source: &'item FnDefinition,
     state: &State<'item>,
 ) -> ConstValue<'item> {
-    match consts::const_value(source.params.params[0].id, state) {
+    match state.const_value(source.params.params[0].id) {
         ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
         _ => unreachable!("not implemented `{}` constant GPU function", source.name),
     }

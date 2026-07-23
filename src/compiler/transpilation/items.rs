@@ -8,8 +8,8 @@ use crate::compiler::state::State;
 use crate::compiler::transpilation::SpecializedFn;
 use crate::compiler::transpilation::exprs;
 use crate::compiler::values::consts::ConstValue;
+use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
-use crate::compiler::values::{consts, types};
 use std::fmt::Write;
 
 pub(super) fn transpile_specialized_fn<'item>(
@@ -142,7 +142,7 @@ fn resolve_const_param_value<'item>(
     let value = const_param_values
         .next()
         .unwrap_or_else(|| unreachable!("mismatching number of const params"));
-    consts::add_value(param.id, value, state);
+    state.add_const_value(param.id, value);
 }
 
 fn resolve_param_wildcard_type<'item>(
@@ -156,5 +156,5 @@ fn resolve_param_wildcard_type<'item>(
     let type_ = wildcard_param_types
         .next()
         .unwrap_or_else(|| unreachable!("mismatching number of wildcard params"));
-    types::add_type(param.id, Type::Struct(type_), state);
+    state.add_wildcard_type(param.id, Type::Struct(type_));
 }

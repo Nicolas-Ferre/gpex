@@ -9,14 +9,13 @@ pub(crate) fn check_bounds(
     type_name: &str,
     state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
-    let context = &mut state.validation_context;
     if is_value_valid {
         Ok(())
     } else {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{type_name}` literal out of bounds"),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![],
         });
         Err(ValidateError)

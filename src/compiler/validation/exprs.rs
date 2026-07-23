@@ -1,4 +1,5 @@
 use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -8,7 +9,6 @@ use crate::compiler::state::{ParamConstness, State};
 use crate::compiler::validation::validators;
 use crate::compiler::values::types::Type;
 use crate::compiler::values::{consts, types};
-use crate::compiler::{key_rendering, validation};
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_expr(node: &Expr, state: &mut State<'_>) -> Result<(), ValidateError> {
@@ -62,19 +62,11 @@ pub(crate) fn validate_call(node: &Call, state: &mut State<'_>) -> Result<(), Va
         } else {
             state.param_constness
         };
-        validation::with_param_constness(
-            param_constness,
-            |state| {
-                validation::with_const_mark_span(
-                    const_mark_span,
-                    |state| {
-                        is_error_detected |= validate_expr(&arg.value, state).is_err(); // no-fn-check (recursivity)
-                    },
-                    state,
-                );
-            },
-            state,
-        );
+        state.with_param_constness(param_constness, |state| {
+            state.with_const_mark_span(const_mark_span, |state| {
+                is_error_detected |= validate_expr(&arg.value, state).is_err(); // no-fn-check (recursivity)
+            });
+        });
     }
     if is_error_detected {
         return Err(ValidateError);

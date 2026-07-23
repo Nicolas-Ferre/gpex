@@ -13,16 +13,6 @@ use std::hash::{Hash, Hasher};
 
 // TODO: in the whole project, replace "node" by a more representative name (e.g. call, fn_, var_, ...)
 
-// TODO: should method associated to State
-pub(crate) fn add_value<'item>(id: u64, value: ConstValue<'item>, state: &mut State<'item>) {
-    state
-        .scopes
-        .last_mut()
-        .unwrap_or_else(|| unreachable!("constant value scope should be entered"))
-        .const_values
-        .insert(id, value);
-}
-
 pub(crate) fn expr_const_value<'item>(node: &Expr, state: &mut State<'item>) -> ConstValue<'item> {
     match node {
         Expr::F32Literal(node) => f32_literal_value(node),
@@ -33,16 +23,6 @@ pub(crate) fn expr_const_value<'item>(node: &Expr, state: &mut State<'item>) -> 
         Expr::Call(node) => call_const_value(node, state),
         Expr::Ident(node) => ident_const_value(node, state),
     }
-}
-
-// TODO: can be associated method of State
-pub(crate) fn const_value<'item>(id: u64, state: &State<'item>) -> ConstValue<'item> {
-    state
-        .scopes
-        .last()
-        .and_then(|scope| scope.const_values.get(&id))
-        .cloned()
-        .unwrap_or(ConstValue::RuntimeValue)
 }
 
 pub(crate) fn is_const_infinite_f32(node: &Call, state: &mut State<'_>) -> bool {
@@ -92,7 +72,7 @@ fn ident_const_value<'item>(node: &Ident, state: &mut State<'item>) -> ConstValu
         Some(ItemRef::Const(child)) => expr_const_value(&child.value, state),
         Some(ItemRef::Struct(child)) => ConstValue::TypeRef(child),
         Some(ItemRef::Param(child)) => {
-            let value = const_value(child.id, state);
+            let value = state.const_value(child.id);
             if value == ConstValue::RuntimeValue && child.const_mark_span().is_some() {
                 ConstValue::Param(child)
             } else {
@@ -125,10 +105,10 @@ fn fn_call_const_value<'item>(
             )
         })
         .collect::<Vec<_>>();
-    state.run_scoped(|state_| {
+    state.in_scope(|state_| {
         for (param, arg_value, arg_type) in param_args {
             if matches!(param.type_, Expr::Wildcard(_)) {
-                types::add_type(param.id, arg_type, state_);
+                state_.add_wildcard_type(param.id, arg_type);
             }
             match arg_value {
                 ConstValue::TypeRef(_)
@@ -137,7 +117,7 @@ fn fn_call_const_value<'item>(
                 | ConstValue::I32(_)
                 | ConstValue::U32(_)
                 | ConstValue::F32(_)
-                | ConstValue::Bool(_) => add_value(param.id, arg_value, state_),
+                | ConstValue::Bool(_) => state_.add_const_value(param.id, arg_value),
                 ConstValue::Unknown | ConstValue::RuntimeValue => return arg_value,
             }
         }
