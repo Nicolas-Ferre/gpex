@@ -1,4 +1,4 @@
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;

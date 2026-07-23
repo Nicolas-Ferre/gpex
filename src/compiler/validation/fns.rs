@@ -1,5 +1,5 @@
 use crate::compiler::dependencies;
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use crate::compiler::state::{ParamConstness, State};

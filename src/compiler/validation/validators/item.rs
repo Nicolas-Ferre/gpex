@@ -1,4 +1,4 @@
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
 use crate::compiler::parsing::exprs::{BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX};

@@ -3,7 +3,7 @@ mod exprs;
 mod items;
 
 use crate::compiler::dependencies;
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;

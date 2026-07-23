@@ -11,8 +11,6 @@ use crate::compiler::{key_rendering, values};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 
-// TODO: move this module at better location
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(crate) enum ItemRef<'item> {
     Var(&'item VarDefinition),

@@ -1,4 +1,4 @@
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::prelude::PreludeEndLocation;
 use crate::compiler::transpilation::SpecializedFn;

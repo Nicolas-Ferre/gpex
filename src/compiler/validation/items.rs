@@ -1,5 +1,5 @@
 use crate::compiler::dependencies;
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;

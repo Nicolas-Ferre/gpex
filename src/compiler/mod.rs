@@ -1,5 +1,6 @@
 pub(crate) mod dependencies;
 pub(crate) mod indexing;
+pub(crate) mod item_ref;
 pub(crate) mod key_rendering;
 pub(crate) mod parsing;
 pub(crate) mod prelude;

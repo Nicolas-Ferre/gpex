@@ -1,6 +1,4 @@
-pub(crate) mod item_ref;
-
-use crate::compiler::indexing::item_ref::{ArgsMatch, ItemRef};
+use crate::compiler::item_ref::{ArgsMatch, ItemRef};
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
