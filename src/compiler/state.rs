@@ -1,7 +1,6 @@
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::prelude::PreludeEndLocation;
-use crate::compiler::transpilation::SpecializedFn;
 use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
@@ -10,7 +9,7 @@ use crate::utils::reading::ReadFile;
 use crate::utils::validation::ValidateContext;
 use crate::{Log, LogLocation};
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::path::Path;
 
 #[derive(Debug)]
@@ -25,9 +24,6 @@ pub(crate) struct State<'item> {
     pub(crate) is_indexing_source_only: bool,
     pub(crate) const_mark_span: Option<Span>,
     pub(crate) param_constness: ParamConstness,
-    pub(crate) shader: String,
-    pub(crate) specialized_fns: HashMap<SpecializedFn<'item>, usize>,
-    pub(crate) transpiled_specialized_fn_indexes: HashSet<usize>,
     scopes: RefCell<Vec<Scope<'item>>>,
     compilerimpl_types: HashMap<u64, CompilerImplType>,
 }
@@ -46,9 +42,6 @@ impl<'item> State<'item> {
             is_indexing_source_only: false,
             const_mark_span: None,
             param_constness: ParamConstness::ExplicitOnly,
-            shader: String::new(),
-            specialized_fns: HashMap::default(),
-            transpiled_specialized_fn_indexes: HashSet::default(),
             compilerimpl_types: HashMap::default(),
         }
     }

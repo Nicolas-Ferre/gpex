@@ -13,7 +13,7 @@ use crate::utils::parsing::span::Span;
 pub(crate) fn scan_var<'item>(
     var: &VarDefinition,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     scan_var_inner(var, dependencies, state)
 }
@@ -21,7 +21,7 @@ pub(crate) fn scan_var<'item>(
 pub(crate) fn scan_const<'item>(
     const_: &ConstDefinition,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     scan_const_inner(const_, dependencies, state)
 }
@@ -29,7 +29,7 @@ pub(crate) fn scan_const<'item>(
 pub(crate) fn scan_fn<'item>(
     fn_: &FnDefinition,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     scan_fn_inner(fn_, dependencies, state)
 }
@@ -37,7 +37,7 @@ pub(crate) fn scan_fn<'item>(
 fn scan_call<'item>(
     call: &Call,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     for arg in &call.args {
         scan_expr(&arg.value, dependencies, state)?;
@@ -60,7 +60,7 @@ fn scan_item<'item>(
     item: ItemRef<'item>,
     ref_span: Span,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     dependencies.enter_item(ref_span, item)?;
     match item {
@@ -76,7 +76,7 @@ fn scan_item<'item>(
 fn scan_var_inner<'item>(
     var: &VarDefinition,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     scan_expr(&var.default_value, dependencies, state)
 }
@@ -84,7 +84,7 @@ fn scan_var_inner<'item>(
 fn scan_const_inner<'item>(
     const_: &ConstDefinition,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     scan_expr(&const_.value, dependencies, state)
 }
@@ -92,7 +92,7 @@ fn scan_const_inner<'item>(
 fn scan_fn_inner<'item>(
     fn_: &FnDefinition,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     scan_params(&fn_.params, dependencies, state)?;
     if let Some(return_type) = &fn_.return_type {
@@ -109,7 +109,7 @@ fn scan_fn_inner<'item>(
 fn scan_statement<'item>(
     statement: &Statement,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     match statement {
         Statement::Return(child) => scan_expr(&child.value, dependencies, state)?,
@@ -124,7 +124,7 @@ fn scan_statement<'item>(
 fn scan_params<'item>(
     params: &ParamGroup,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     for param in &params.params {
         scan_param(param, dependencies, state)?;
@@ -135,7 +135,7 @@ fn scan_params<'item>(
 fn scan_param<'item>(
     param: &Param,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     scan_expr(&param.type_, dependencies, state)?;
     if let Some(requirement) = &param.requirement {
@@ -147,7 +147,7 @@ fn scan_param<'item>(
 fn scan_expr<'item>(
     expr: &Expr,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     match expr {
         Expr::F32Literal(_)
@@ -163,7 +163,7 @@ fn scan_expr<'item>(
 fn scan_ident<'item>(
     ident: &Ident,
     dependencies: &mut Dependencies<ItemRef<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Result<(), Vec<Span>> {
     if let Some(&source) = state.sources.get(&ident.id) {
         scan_item(source, ident.span, dependencies, state) // no-fn-check (recursivity)

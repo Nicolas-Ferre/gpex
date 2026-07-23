@@ -34,7 +34,7 @@ pub fn compile_program(
     indexing::index_modules(&modules, &mut state);
     state.init_cache();
     let errors = validation::validate_modules(&modules, is_warning_treated_as_error, &mut state)?;
-    let program = transpilation::transpile(&files, &modules, &mut state);
+    let program = transpilation::transpile(&files, &modules, &state);
     Ok((program, errors))
 }
 

@@ -16,7 +16,7 @@ use crate::utils::reading::ReadFile;
 use itertools::Itertools;
 use petgraph::graphmap::DiGraphMap;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::mem;
 
 const MAIN_BUFFER_NAME: &str = "b";
@@ -57,23 +57,42 @@ pub struct BufferField {
     pub offset: u32,
 }
 
+struct TranspileState<'state, 'item> {
+    inner: &'state State<'item>,
+    shader: String,
+    specialized_fns: HashMap<SpecializedFn<'item>, usize>,
+    transpiled_specialized_fn_indexes: HashSet<usize>,
+}
+
+impl<'state, 'item> TranspileState<'state, 'item> {
+    fn new(state: &'state State<'item>) -> Self {
+        Self {
+            inner: state,
+            shader: String::new(),
+            specialized_fns: HashMap::new(),
+            transpiled_specialized_fn_indexes: HashSet::new(),
+        }
+    }
+}
+
 pub(crate) fn transpile<'item>(
     files: &[ReadFile],
     modules: &'item [Module],
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Program {
-    let init_shader = transpile_init(modules, state);
-    let update_shader = transpile_repeats(modules, state);
+    let mut state = TranspileState::new(state);
+    let init_shader = transpile_init(modules, &mut state);
+    let update_shader = transpile_repeats(modules, &mut state);
     let mut offset = 0;
     let variables: Vec<_> = sorted_global_vars_for_definition(modules);
-    let buffer_alignment = main_buffer_alignment(&variables, state);
+    let buffer_alignment = main_buffer_alignment(&variables, &state);
     let fields = variables
         .iter()
         .enumerate()
         .map(|(index, var)| {
             let dot_path = &files[var.name_span.file_index].dot_path;
             let path = format!("{}:{}", dot_path, var.name);
-            let type_ = types::var_type(var, state)
+            let type_ = types::var_type(var, state.inner)
                 .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"));
             let field = BufferField {
@@ -81,12 +100,12 @@ pub(crate) fn transpile<'item>(
                 size: type_.size(),
                 offset,
             };
-            offset = main_buffer_next_field_offset(&variables, index, offset, type_, state);
+            offset = main_buffer_next_field_offset(&variables, index, offset, type_, &state);
             (path, field)
         })
         .collect::<HashMap<_, _>>();
     Program {
-        type_paths: type_paths(state),
+        type_paths: type_paths(&state),
         buffer: Buffer {
             size: round_up(buffer_alignment, offset),
             fields,
@@ -101,10 +120,10 @@ fn main_buffer_next_field_offset(
     current_field_index: usize,
     current_field_offset: u32,
     current_field_type: &StructDefinition,
-    state: &State<'_>,
+    state: &TranspileState<'_, '_>,
 ) -> u32 {
     if let Some(next_var) = fields.get(current_field_index + 1) {
-        let next_var_type = types::var_type(next_var, state)
+        let next_var_type = types::var_type(next_var, state.inner)
             .struct_ref()
             .unwrap_or_else(|| unreachable!("variable type should be validated before"));
         round_up(
@@ -116,10 +135,10 @@ fn main_buffer_next_field_offset(
     }
 }
 
-fn main_buffer_alignment(vars: &[&VarDefinition], state: &State<'_>) -> u32 {
+fn main_buffer_alignment(vars: &[&VarDefinition], state: &TranspileState<'_, '_>) -> u32 {
     vars.iter()
         .map(|var| {
-            types::var_type(var, state)
+            types::var_type(var, state.inner)
                 .struct_ref()
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"))
                 .alignment()
@@ -136,8 +155,9 @@ fn round_up(rounded_to: u32, value: u32) -> u32 {
     }
 }
 
-fn type_paths(state: &State<'_>) -> HashMap<u64, String> {
+fn type_paths(state: &TranspileState<'_, '_>) -> HashMap<u64, String> {
     state
+        .inner
         .items
         .iter()
         .filter_map(|item| {
@@ -150,7 +170,10 @@ fn type_paths(state: &State<'_>) -> HashMap<u64, String> {
         .collect()
 }
 
-fn transpile_init<'item>(modules: &'item [Module], state: &mut State<'item>) -> String {
+fn transpile_init<'item>(
+    modules: &'item [Module],
+    state: &mut TranspileState<'_, 'item>,
+) -> String {
     transpile_shader(
         modules,
         |state_| {
@@ -163,7 +186,10 @@ fn transpile_init<'item>(modules: &'item [Module], state: &mut State<'item>) -> 
     mem::take(&mut state.shader)
 }
 
-fn transpile_repeats<'item>(modules: &'item [Module], state: &mut State<'item>) -> String {
+fn transpile_repeats<'item>(
+    modules: &'item [Module],
+    state: &mut TranspileState<'_, 'item>,
+) -> String {
     transpile_shader(
         modules,
         |state_| {
@@ -178,10 +204,10 @@ fn transpile_repeats<'item>(modules: &'item [Module], state: &mut State<'item>) 
     mem::take(&mut state.shader)
 }
 
-fn transpile_shader<'item>(
+fn transpile_shader<'state, 'item>(
     modules: &[Module],
-    transpile_body: impl FnOnce(&mut State<'item>),
-    state: &mut State<'item>,
+    transpile_body: impl FnOnce(&mut TranspileState<'state, 'item>),
+    state: &mut TranspileState<'state, 'item>,
 ) {
     transpile_buffer_header(modules, state);
     state.shader += " @compute @workgroup_size(1, 1, 1) fn main() { ";
@@ -203,7 +229,7 @@ fn transpile_shader<'item>(
     state.transpiled_specialized_fn_indexes.clear();
 }
 
-fn transpile_buffer_header(modules: &[Module], state: &mut State<'_>) {
+fn transpile_buffer_header(modules: &[Module], state: &mut TranspileState<'_, '_>) {
     let is_buffer_empty = modules
         .iter()
         .flat_map(Module::global_vars)
@@ -223,13 +249,13 @@ fn transpile_buffer_header(modules: &[Module], state: &mut State<'_>) {
 
 fn sorted_global_vars_for_init<'item>(
     modules: &'item [Module],
-    state: &mut State<'item>,
+    state: &TranspileState<'_, 'item>,
 ) -> Vec<&'item VarDefinition> {
     let mut dependency_graph = DiGraphMap::<&VarDefinition, ()>::new();
     for var in modules.iter().flat_map(Module::global_vars) {
         dependency_graph.add_node(var);
         let mut dependencies = Dependencies::new();
-        dependencies::scan_var(var, &mut dependencies, state)
+        dependencies::scan_var(var, &mut dependencies, state.inner)
             .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"));
         for dependency in dependencies.iter() {
             if let ItemRef::Var(dependency) = dependency {

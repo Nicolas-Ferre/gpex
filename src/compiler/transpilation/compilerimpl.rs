@@ -3,14 +3,18 @@ use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{
     BinaryCompilerImplFn, CompilerImplFn, FnDefinition, UnaryCompilerImplFn,
 };
-use crate::compiler::state::{CompilerImplType, State};
-use crate::compiler::transpilation::exprs;
+use crate::compiler::state::CompilerImplType;
+use crate::compiler::transpilation::{TranspileState, exprs};
 use crate::compiler::values::consts;
 use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types;
 use std::fmt::Write;
 
-pub(super) fn transpile_call(call: &Call, source: &FnDefinition, state: &mut State<'_>) {
+pub(super) fn transpile_call(
+    call: &Call,
+    source: &FnDefinition,
+    state: &mut TranspileState<'_, '_>,
+) {
     match source.compilerimpl() {
         Some(CompilerImplFn::Binary(fn_)) => {
             transpile_fn_call_binary(call, fn_, state);
@@ -25,7 +29,11 @@ pub(super) fn transpile_call(call: &Call, source: &FnDefinition, state: &mut Sta
     }
 }
 
-fn transpile_fn_call_binary(call: &Call, fn_: BinaryCompilerImplFn, state: &mut State<'_>) {
+fn transpile_fn_call_binary(
+    call: &Call,
+    fn_: BinaryCompilerImplFn,
+    state: &mut TranspileState<'_, '_>,
+) {
     let type_ = type_(&call.args[0].value, state);
     match type_ {
         CompilerImplType::I32 | CompilerImplType::U32 => {
@@ -41,7 +49,7 @@ fn transpile_fn_call_int_binary(
     call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
-    state: &mut State<'_>,
+    state: &mut TranspileState<'_, '_>,
 ) {
     let is_divisor_zero = is_zero_int(&call.args[1].value, state);
     if is_divisor_zero && fn_ == BinaryCompilerImplFn::Div {
@@ -57,7 +65,7 @@ fn transpile_fn_call_f32_binary(
     call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
-    state: &mut State<'_>,
+    state: &mut TranspileState<'_, '_>,
 ) {
     if fn_ == BinaryCompilerImplFn::Div {
         state.shader += "(";
@@ -76,7 +84,7 @@ fn transpile_fn_call_bool_binary(
     call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
-    state: &mut State<'_>,
+    state: &mut TranspileState<'_, '_>,
 ) {
     let is_bool_arg_converted = !fn_.is_comparison_operator();
     transpile_fn_call_scalar_binary(call, fn_, type_, is_bool_arg_converted, state);
@@ -86,7 +94,7 @@ fn transpile_fn_call_typeref_binary(
     call: &Call,
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
-    state: &mut State<'_>,
+    state: &mut TranspileState<'_, '_>,
 ) {
     let negation = wgsl_comparison_to_negation_operator(fn_);
     _ = write!(state.shader, "u32({negation}all(");
@@ -101,7 +109,7 @@ fn transpile_fn_call_scalar_binary(
     fn_: BinaryCompilerImplFn,
     type_: CompilerImplType,
     is_bool_arg_converted: bool,
-    state: &mut State<'_>,
+    state: &mut TranspileState<'_, '_>,
 ) {
     if fn_.is_comparison_operator() || fn_.is_logical_operator() {
         state.shader += "u32(";
@@ -116,7 +124,11 @@ fn transpile_fn_call_scalar_binary(
     }
 }
 
-fn transpile_fn_call_unary(call: &Call, fn_: UnaryCompilerImplFn, state: &mut State<'_>) {
+fn transpile_fn_call_unary(
+    call: &Call,
+    fn_: UnaryCompilerImplFn,
+    state: &mut TranspileState<'_, '_>,
+) {
     let type_ = type_(&call.args[0].value, state);
     let (prefix, suffix) = match fn_ {
         UnaryCompilerImplFn::Neg => ("(-", ")"),
@@ -127,7 +139,7 @@ fn transpile_fn_call_unary(call: &Call, fn_: UnaryCompilerImplFn, state: &mut St
     state.shader += suffix;
 }
 
-fn transpile_mul_add(call: &Call, state: &mut State<'_>) {
+fn transpile_mul_add(call: &Call, state: &mut TranspileState<'_, '_>) {
     let type_ = type_(&call.args[0].value, state);
     state.shader += "fma(";
     for arg in &call.args {
@@ -141,7 +153,7 @@ fn transpile_arg(
     arg: &Arg,
     type_: CompilerImplType,
     is_bool_converted: bool,
-    state: &mut State<'_>,
+    state: &mut TranspileState<'_, '_>,
 ) {
     if type_ == CompilerImplType::Bool && is_bool_converted {
         state.shader += "(";
@@ -152,16 +164,17 @@ fn transpile_arg(
     }
 }
 
-fn is_zero_int(expr: &Expr, state: &State<'_>) -> bool {
-    let value = consts::expr_value(expr, state);
+fn is_zero_int(expr: &Expr, state: &TranspileState<'_, '_>) -> bool {
+    let value = consts::expr_value(expr, state.inner);
     matches!(value, ConstValue::I32(0) | ConstValue::U32(0))
 }
 
-fn type_(expr: &Expr, state: &State<'_>) -> CompilerImplType {
-    let type_ = types::expr_type(expr, state)
+fn type_(expr: &Expr, state: &TranspileState<'_, '_>) -> CompilerImplType {
+    let type_ = types::expr_type(expr, state.inner)
         .struct_ref()
         .unwrap_or_else(|| unreachable!("unexpected value that is not a type"));
     state
+        .inner
         .compilerimpl_type(type_)
         .unwrap_or_else(|| unreachable!("unsupported `compilerimpl` type"))
 }
