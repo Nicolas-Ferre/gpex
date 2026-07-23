@@ -5,9 +5,8 @@ use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::state::{ParamConstness, State};
+use crate::compiler::state::{CompilerImplType, ParamConstness, State};
 use crate::compiler::validation::validators;
-use crate::compiler::values::types::Type;
 use crate::compiler::values::{consts, types};
 use crate::utils::validation::ValidateError;
 
@@ -114,10 +113,9 @@ fn validate_mul_add_candidate<'item>(
     source: ItemRef<'item>,
     state: &mut State<'item>,
 ) {
-    let f32_type = state.search_prelude_type("f32");
-    let are_all_args_f32 = node
-        .args
-        .iter()
-        .all(|arg| types::expr_type(&arg.value, state) == Type::Struct(f32_type));
+    let are_all_args_f32 = node.args.iter().all(|arg| {
+        let type_ = types::expr_type(&arg.value, state);
+        state.is_compilerimpl_type(type_, CompilerImplType::F32)
+    });
     validators::expr::check_mul_add_candidate(source, node, are_all_args_f32, state);
 }

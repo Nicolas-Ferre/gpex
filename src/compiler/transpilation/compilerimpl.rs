@@ -158,14 +158,11 @@ fn is_zero_int(node: &Expr, state: &mut State<'_>) -> bool {
 }
 
 fn type_(node: &Expr, state: &mut State<'_>) -> CompilerImplType {
-    let type_id = types::expr_type(node, state)
+    let type_ = types::expr_type(node, state)
         .struct_ref()
-        .unwrap_or_else(|| unreachable!("unexpected value that is not a type"))
-        .id;
+        .unwrap_or_else(|| unreachable!("unexpected value that is not a type"));
     state
-        .compilerimpl_types
-        .get(&type_id)
-        .copied()
+        .compilerimpl_type(type_)
         .unwrap_or_else(|| unreachable!("unsupported `compilerimpl` type"))
 }
 

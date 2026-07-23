@@ -23,7 +23,6 @@ pub(crate) struct State<'item> {
     pub(crate) candidate_sources: HashMap<u64, Vec<ItemRef<'item>>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
-    pub(crate) compilerimpl_types: HashMap<u64, CompilerImplType>, // TODO: use anywhere possible
     pub(crate) validation_context: ValidateContext<'item>,
     pub(crate) scopes: Vec<Scope<'item>>,
     pub(crate) is_indexing_source_only: bool,
@@ -33,6 +32,7 @@ pub(crate) struct State<'item> {
     pub(crate) shader: String,
     pub(crate) specialized_fns: HashMap<SpecializedFn<'item>, usize>,
     pub(crate) transpiled_specialized_fn_indexes: HashSet<usize>,
+    compilerimpl_types: HashMap<u64, CompilerImplType>,
 }
 
 impl<'item> State<'item> {
@@ -44,7 +44,6 @@ impl<'item> State<'item> {
             candidate_sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
-            compilerimpl_types: HashMap::default(),
             validation_context: ValidateContext::new(files, root_path),
             scopes: vec![],
             is_indexing_source_only: false,
@@ -54,6 +53,7 @@ impl<'item> State<'item> {
             shader: String::new(),
             specialized_fns: HashMap::default(),
             transpiled_specialized_fn_indexes: HashSet::default(),
+            compilerimpl_types: HashMap::default(),
         }
     }
 
@@ -87,6 +87,20 @@ impl<'item> State<'item> {
             Some(ItemRef::Struct(item)) => item,
             Some(_) | None => unreachable!("missing `{type_name}` type in prelude"),
         }
+    }
+
+    pub(crate) fn is_compilerimpl_type(
+        &self,
+        type_: Type<'item>,
+        compilerimpl_type: CompilerImplType,
+    ) -> bool {
+        type_
+            .struct_ref()
+            .is_some_and(|type_| self.compilerimpl_type(type_) == Some(compilerimpl_type))
+    }
+
+    pub(crate) fn compilerimpl_type(&self, type_: &StructDefinition) -> Option<CompilerImplType> {
+        self.compilerimpl_types.get(&type_.id).copied()
     }
 
     pub(crate) fn span_location(&self, span: Span) -> LogLocation {
