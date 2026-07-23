@@ -8,8 +8,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 3. **Index**: Builds symbol tables, e.g., to index imports and items for following stages
    (`src/compiler/indexing/`)
 4. **Validate**: Semantic checks (type checking, circular dependency detection, naming
-   conventions, ...) via `src/compiler/validation/`, with diagnostics constructed by
-   `src/compiler/logs/`
+   conventions, ...) via `src/compiler/validation/`
 5. **Transpile**: Converts ASTs to JSON file containing WGSL of each shader to execute
    (`src/compiler/transpilation/`)
 6. **Run** (optional): Executes WGSL compute shaders on the GPU via wgpu (`src/runner/`)
