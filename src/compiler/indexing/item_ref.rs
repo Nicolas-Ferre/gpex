@@ -1,15 +1,17 @@
-use crate::compiler::indexing::indexes::Indexes;
-use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::{CompilerImplFn, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::values::ValueResolver;
+use crate::compiler::state::State;
+use crate::compiler::values::consts;
 use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types::Type;
+use crate::compiler::{key_rendering, values};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
+
+// TODO: move this module at better location
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(crate) enum ItemRef<'item> {
@@ -95,25 +97,26 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn args_match(self, args: &[Arg], indexes: &Indexes<'_>) -> ArgsMatch {
+    #[expect(clippy::excessive_nesting)] // scope cleanup adds one level around existing matching logic
+    pub(crate) fn args_match(self, args: &[Arg], state: &mut State<'item>) -> ArgsMatch {
         let params = self.params();
-        let mut value_resolver = ValueResolver::new(indexes);
-        value_resolver.enter_scope();
-        let mut result = ArgsMatch::Matching;
-        for (param, arg) in params.params.iter().zip(args) {
-            let (param_type, arg_type) = value_resolver.bind_param_to_arg(param, arg);
-            for param_match in [
-                Self::arg_match(param_type, arg_type),
-                Self::requirement_match(param, &mut value_resolver),
-            ] {
-                match param_match {
-                    ArgsMatch::Matching => {}
-                    ArgsMatch::NotMatching => return ArgsMatch::NotMatching,
-                    ArgsMatch::Unknown => result = ArgsMatch::Unknown,
+        state.run_scoped(|state| {
+            let mut result = ArgsMatch::Matching;
+            for (param, arg) in params.params.iter().zip(args) {
+                let (param_type, arg_type) = values::bind_param_to_arg(param, arg, state);
+                for param_match in [
+                    Self::arg_match(param_type, arg_type),
+                    Self::requirement_match(param, state),
+                ] {
+                    match param_match {
+                        ArgsMatch::Matching => {}
+                        ArgsMatch::NotMatching => return ArgsMatch::NotMatching,
+                        ArgsMatch::Unknown => result = ArgsMatch::Unknown,
+                    }
                 }
             }
-        }
-        result
+            result
+        })
     }
 
     pub(crate) fn params(self) -> &'item ParamGroup {
@@ -125,10 +128,9 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn displayed_key(self, key_renderer: &mut KeyRenderer<'_, '_>) -> String {
+    pub(crate) fn displayed_key(self, state: &mut State<'item>) -> String {
         match self {
-            ItemRef::Fn(item) => key_renderer
-                .fn_key(item)
+            ItemRef::Fn(item) => key_rendering::fn_key(item, state)
                 .unwrap_or_else(|_| unreachable!("function should be validated before")),
             ItemRef::Var(item) => item.name.clone(),
             ItemRef::Const(item) => item.name.clone(),
@@ -151,9 +153,9 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    fn requirement_match(param: &Param, value_resolver: &mut ValueResolver<'_, '_>) -> ArgsMatch {
+    fn requirement_match(param: &Param, state: &mut State<'item>) -> ArgsMatch {
         if let Some(requirement) = &param.requirement {
-            match value_resolver.expr_const_value(&requirement.condition) {
+            match consts::expr_const_value(&requirement.condition, state) {
                 ConstValue::Bool(true) => ArgsMatch::Matching,
                 ConstValue::Unknown => ArgsMatch::Unknown,
                 ConstValue::TypeRef(_)

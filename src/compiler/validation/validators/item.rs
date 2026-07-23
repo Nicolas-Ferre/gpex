@@ -1,23 +1,24 @@
-use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
-use crate::compiler::key_rendering::KeyRenderer;
+use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
 use crate::compiler::parsing::exprs::{BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
-use crate::compiler::values::ValueResolver;
+use crate::compiler::state::State;
+use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::{Span, SpanProps};
-use crate::utils::validation::{ValidateContext, ValidateError};
+use crate::utils::validation::ValidateError;
 use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_circular_dependencies(
     item: ItemRef<'_>,
     dependency_result: Result<(), Vec<Span>>,
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
+    let context = &mut state.validation_context;
     let name_span = item.name_span();
     let name = context.slice(name_span);
     if let Err(stack) = dependency_result {
@@ -49,27 +50,27 @@ pub(crate) fn check_circular_dependencies(
     }
 }
 
-pub(crate) fn check_unique_definition(
-    item: ItemRef<'_>,
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
+pub(crate) fn check_unique_definition<'item>(
+    item: ItemRef<'item>,
+    state: &mut State<'item>,
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let key = item.key();
     let search_params = SearchParams {
         key: &key,
         location: item,
-        imports: &indexes.imports,
+        imports: &state.imports,
         config: SearchConfig {
             can_be_after: false,
             can_be_parent_node: false,
         },
     };
-    if let Some(duplicated_item) = indexes
+    let duplicated_item = state
         .items
         .search_in_same_file(search_params, Visibility::Enforced)
-        .next()
-    {
+        .next();
+    if let Some(duplicated_item) = duplicated_item {
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{key}` item defined multiple times"),
@@ -88,8 +89,9 @@ pub(crate) fn check_unique_definition(
 
 pub(crate) fn check_unique_params(
     params: &[Param],
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
+    let context = &mut state.validation_context;
     let mut is_error = false;
     for (param_index, param) in params.iter().enumerate() {
         let duplicated_param = params[..param_index]
@@ -112,15 +114,11 @@ pub(crate) fn check_unique_params(
     if is_error { Err(ValidateError) } else { Ok(()) }
 }
 
-pub(crate) fn check_unique_fn_signature(
-    fn_: &FnDefinition,
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
-) {
-    if let Some(previous_fn) = find_previous_same_fn_signature(fn_, indexes) {
-        let fn_key = KeyRenderer::new(indexes)
-            .fn_key(fn_)
+pub(crate) fn check_unique_fn_signature<'item>(fn_: &'item FnDefinition, state: &mut State<'item>) {
+    if let Some(previous_fn) = find_previous_same_fn_signature(fn_, state) {
+        let fn_key = key_rendering::fn_key(fn_, state)
             .unwrap_or_else(|_| unreachable!("function should be validated before"));
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{fn_key}` function defined multiple times"),
@@ -137,8 +135,9 @@ pub(crate) fn check_unique_fn_signature(
 pub(crate) fn check_prelude_location(
     item: ItemRef<'_>,
     compilerimpl_keyword_span: Option<Span>,
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
+    let context = &mut state.validation_context;
     if let Some(compilerimpl_keyword_span) = compilerimpl_keyword_span
         && item.file_index() != PRELUDE_FILE_INDEX
     {
@@ -154,19 +153,15 @@ pub(crate) fn check_prelude_location(
     }
 }
 
-pub(crate) fn check_usage(
-    item: ItemRef<'_>,
-    context: &mut ValidateContext<'_>,
-    key_renderer: &mut KeyRenderer<'_, '_>,
-    indexes: &Indexes<'_>,
-) {
+pub(crate) fn check_usage<'item>(item: ItemRef<'item>, state: &mut State<'item>) {
     let name_span = item.name_span();
-    let name = context.slice(name_span);
-    let ref_span = indexes.item_first_refs.get(&item.id());
+    let name = state.validation_context.slice(name_span);
+    let ref_span = state.item_first_refs.get(&item.id()).copied();
     let is_unused_lint_ignored =
         name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(key_renderer);
+        let displayed_key = item.displayed_key(state);
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item unused"),
@@ -174,17 +169,19 @@ pub(crate) fn check_usage(
             inner: vec![],
         });
     } else if item.is_pub() && is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(key_renderer);
+        let displayed_key = item.displayed_key(state);
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item public but name starting with `_`"),
             location: Some(context.location(name_span)),
             inner: vec![],
         });
-    } else if let Some(&ref_span) = ref_span
+    } else if let Some(ref_span) = ref_span
         && is_unused_lint_ignored
     {
-        let displayed_key = item.displayed_key(key_renderer);
+        let displayed_key = item.displayed_key(state);
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item used but name starting with `_`"),
@@ -198,23 +195,23 @@ pub(crate) fn check_usage(
     }
 }
 
-pub(crate) fn check_found<'index>(
-    source: Option<ItemRef<'index>>,
+pub(crate) fn check_found<'item>(
+    source: Option<ItemRef<'item>>,
     node: impl NodeRef,
     span: Span,
     key: &str,
     displayed_key: &str,
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'index>,
-) -> Result<ItemRef<'index>, ValidateError> {
+    state: &mut State<'item>,
+) -> Result<ItemRef<'item>, ValidateError> {
     if let Some(source) = source {
         Ok(source)
     } else {
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{displayed_key}` item not found"),
             location: Some(context.location(span)),
-            inner: if let Some(candidates) = indexes.candidate_sources.get(&node.id()) {
+            inner: if let Some(candidates) = state.candidate_sources.get(&node.id()) {
                 candidates
                     .iter()
                     .map(|candidate| LogInner {
@@ -223,14 +220,14 @@ pub(crate) fn check_found<'index>(
                         location: Some(context.location(candidate.signature_span_with_return())),
                     })
                     .collect()
-            } else if let Some(priv_source) = indexes.priv_sources.get(&node.id()) {
+            } else if let Some(priv_source) = state.priv_sources.get(&node.id()) {
                 vec![LogInner {
                     level: LogLevel::Info,
                     msg: "item not qualified with `pub`".into(),
                     location: Some(context.location(priv_source.name_span())),
                 }]
             } else {
-                indexes
+                state
                     .items
                     .iter_by_key(key)
                     .filter(ItemNodeRef::is_pub)
@@ -251,13 +248,13 @@ pub(crate) fn check_found<'index>(
 
 pub(crate) fn check_unary_operator_fn(
     fn_: &FnDefinition,
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
     if !UNARY_FN_NAMES.contains(&fn_.name.as_str()) {
         Ok(())
     } else if fn_.params.params.len() != 1 {
-        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
+        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function must have exactly one parameter"),
@@ -266,7 +263,8 @@ pub(crate) fn check_unary_operator_fn(
         });
         Err(ValidateError)
     } else if fn_.return_type.is_none() {
-        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
+        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function without return type"),
@@ -281,13 +279,13 @@ pub(crate) fn check_unary_operator_fn(
 
 pub(crate) fn check_binary_operator_fn(
     fn_: &FnDefinition,
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
     if !BINARY_FN_NAMES.contains(&fn_.name.as_str()) {
         Ok(())
     } else if fn_.params.params.len() != 2 {
-        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
+        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function must have exactly two parameters"),
@@ -296,7 +294,8 @@ pub(crate) fn check_binary_operator_fn(
         });
         Err(ValidateError)
     } else if fn_.return_type.is_none() {
-        let fn_key = KeyRenderer::new(indexes).fn_key(fn_)?;
+        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let context = &mut state.validation_context;
         context.logs.push(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function without return type"),
@@ -309,20 +308,23 @@ pub(crate) fn check_binary_operator_fn(
     }
 }
 
-fn find_previous_same_fn_signature<'index>(
-    fn_: &FnDefinition,
-    indexes: &'index Indexes<'_>,
-) -> Option<&'index FnDefinition> {
+fn find_previous_same_fn_signature<'item>(
+    fn_: &'item FnDefinition,
+    state: &mut State<'item>,
+) -> Option<&'item FnDefinition> {
     let search_params = SearchParams {
         key: &fn_.key(),
         location: ItemRef::Fn(fn_),
-        imports: &indexes.imports,
+        imports: &state.imports,
         config: SearchConfig {
             can_be_after: false,
             can_be_parent_node: false,
         },
     };
-    indexes
+    // TODO: how to avoid costly collect?
+    // releases the item index borrow before type resolution mutates state
+    #[expect(clippy::needless_collect)]
+    let previous_fns = state
         .items
         .search_in_same_file(search_params, Visibility::Enforced)
         .map(|item| match item {
@@ -331,28 +333,29 @@ fn find_previous_same_fn_signature<'index>(
                 unreachable!("only functions are searched with parameter types")
             }
         })
-        .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, indexes))
+        .collect::<Vec<_>>();
+    previous_fns
+        .into_iter()
+        .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, state))
 }
 
-fn are_same_fn_signatures(
-    fn_: &FnDefinition,
-    other_fn: &FnDefinition,
-    indexes: &Indexes<'_>,
+fn are_same_fn_signatures<'item>(
+    fn_: &'item FnDefinition,
+    other_fn: &'item FnDefinition,
+    state: &mut State<'item>,
 ) -> bool {
     debug_assert!(fn_.name == other_fn.name);
     debug_assert!(fn_.params.params.len() == other_fn.params.params.len());
     if fn_.has_requirement() || other_fn.has_requirement() {
         return false;
     }
-    let mut value_resolver = ValueResolver::new(indexes);
-    let mut other_value_resolver = ValueResolver::new(indexes);
     fn_.params
         .params
         .iter()
         .zip(&other_fn.params.params)
         .all(|(param, other_param)| {
-            let type_ = value_resolver.param_type(param);
-            let other_type = other_value_resolver.param_type(other_param);
+            let type_ = types::param_type(param, state);
+            let other_type = types::param_type(other_param, state);
             are_same_param_types(type_, other_type, fn_, other_fn)
         })
 }

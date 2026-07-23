@@ -1,5 +1,5 @@
-use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::parsing::items::imports::ImportSegment;
+use crate::compiler::state::State;
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::{ValidateContext, ValidateError};
 use crate::{Log, LogInner, LogLevel};
@@ -8,8 +8,9 @@ use itertools::Itertools;
 pub(crate) fn check_found(
     is_found: bool,
     segments: &[ImportSegment],
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
+    let context = &mut state.validation_context;
     debug_assert!(!segments.is_empty());
     if is_found {
         Ok(())
@@ -36,8 +37,9 @@ pub(crate) fn check_found(
 pub(crate) fn check_top(
     is_top: bool,
     span: Span,
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
+    let context = &mut state.validation_context;
     if is_top {
         Ok(())
     } else {
@@ -58,8 +60,9 @@ pub(crate) fn check_top(
 pub(crate) fn check_self_import(
     imported_file_index: Option<usize>,
     span: Span,
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) {
+    let context = &mut state.validation_context;
     if let Some(imported_file_index) = imported_file_index
         && imported_file_index == span.file_index
     {
@@ -78,11 +81,12 @@ pub(crate) fn check_usage(
     span: Span,
     is_pub: bool,
     segments: &[ImportSegment],
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
+    state: &mut State<'_>,
 ) {
+    let is_used = state.imports.is_used(span.file_index, import_id);
+    let context = &mut state.validation_context;
     let is_self_import = imported_file_index == Some(span.file_index);
-    if !is_self_import && !is_pub && !indexes.imports.is_used(span.file_index, import_id) {
+    if !is_self_import && !is_pub && !is_used {
         let dot_path = dot_path_from_segments(segments, context);
         context.logs.push(Log {
             level: LogLevel::Warning,

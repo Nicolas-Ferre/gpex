@@ -4,13 +4,13 @@ pub(crate) mod key_rendering;
 pub(crate) mod parsing;
 pub(crate) mod prelude;
 pub(crate) mod refs;
+pub(crate) mod state;
 pub(crate) mod transpilation;
 pub(crate) mod validation;
 pub(crate) mod values;
 
-use crate::compiler::indexing::indexer::Indexer;
-use crate::compiler::transpilation::{Program, Transpiler};
-use crate::compiler::validation::Validator;
+use crate::compiler::state::State;
+use crate::compiler::transpilation::Program;
 use crate::utils::logs::Log;
 use crate::utils::reading;
 use std::fs;
@@ -29,10 +29,11 @@ pub fn compile_program(
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
     let files = reading::read(root_path, EXT)?;
     let modules = parsing::parse(root_path, &files)?;
-    let indexes = Indexer::run(&modules);
-    let errors = Validator::new(&files, root_path, &indexes)
-        .validate_modules(&modules, is_warning_treated_as_error)?;
-    let program = Transpiler::new(&indexes).transpile(&files, &modules);
+    let mut state = State::new(&files, root_path);
+    indexing::index_modules(&modules, &mut state);
+    state.init_cache();
+    let errors = validation::validate_modules(&modules, is_warning_treated_as_error, &mut state)?;
+    let program = transpilation::transpile(&files, &modules, &mut state);
     Ok((program, errors))
 }
 

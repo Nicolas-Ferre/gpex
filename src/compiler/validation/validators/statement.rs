@@ -1,7 +1,8 @@
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::statements::{ReturnStatement, Statement};
+use crate::compiler::state::State;
 use crate::utils::parsing::span::Span;
-use crate::utils::validation::{ValidateContext, ValidateError};
+use crate::utils::validation::ValidateError;
 use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn check_return_before_end(
@@ -9,8 +10,9 @@ pub(crate) fn check_return_before_end(
     next_statement_span: Span,
     position: usize,
     statement_count: usize,
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
+    let context = &mut state.validation_context;
     debug_assert_ne!(statement_count, 0);
     if position == statement_count - 1 {
         Ok(())
@@ -34,8 +36,9 @@ pub(crate) fn check_missing_return<'statement>(
     previous_statement_span: Span,
     block_end_span: Span,
     return_type_span: Span,
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<&'statement ReturnStatement, ValidateError> {
+    let context = &mut state.validation_context;
     if let Some(Statement::Return(return_statement)) = statements.last() {
         Ok(return_statement)
     } else {
@@ -56,8 +59,9 @@ pub(crate) fn check_missing_return<'statement>(
 pub(crate) fn check_disallowed_return(
     statements: &[Statement],
     fn_: &FnDefinition,
-    context: &mut ValidateContext<'_>,
+    state: &mut State<'_>,
 ) -> Result<(), ValidateError> {
+    let context = &mut state.validation_context;
     let mut result = Ok(());
     for statement in statements {
         if let Statement::Return(return_statement) = statement {
@@ -77,11 +81,8 @@ pub(crate) fn check_disallowed_return(
     result
 }
 
-pub(crate) fn check_empty_block(
-    statements: &[Statement],
-    body_span: Span,
-    context: &mut ValidateContext<'_>,
-) {
+pub(crate) fn check_empty_block(statements: &[Statement], body_span: Span, state: &mut State<'_>) {
+    let context = &mut state.validation_context;
     if statements.is_empty() {
         context.logs.push(Log {
             level: LogLevel::Warning,

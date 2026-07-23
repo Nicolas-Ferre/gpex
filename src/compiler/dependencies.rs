@@ -1,4 +1,3 @@
-use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::indexing::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
@@ -7,121 +6,127 @@ use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::parsing::statements::Statement;
+use crate::compiler::state::State;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::span::Span;
 
-#[derive(Debug)]
-pub(crate) struct DependencyResolver<'item, 'index> {
-    pub(crate) dependencies: Dependencies<ItemRef<'item>>,
-    indexes: &'index Indexes<'item>,
+// TODO: reduce number of no-fn-check comments
+
+pub(crate) fn scan_var(node: &VarDefinition, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    state.dependencies = Dependencies::new();
+    scan_var_inner(node, state)
 }
 
-impl<'item, 'index> DependencyResolver<'item, 'index> {
-    pub(crate) fn new(indexes: &'index Indexes<'item>) -> Self {
-        Self {
-            dependencies: Dependencies::new(),
-            indexes,
+pub(crate) fn scan_const(node: &ConstDefinition, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    state.dependencies = Dependencies::new();
+    scan_const_inner(node, state)
+}
+
+pub(crate) fn scan_fn(node: &FnDefinition, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    state.dependencies = Dependencies::new();
+    scan_fn_inner(node, state)
+}
+
+fn scan_var_inner(node: &VarDefinition, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    scan_expr(&node.default_value, state)
+}
+
+fn scan_const_inner(node: &ConstDefinition, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    scan_expr(&node.value, state)
+}
+
+fn scan_fn_inner(node: &FnDefinition, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    scan_params(&node.params, state)?;
+    if let Some(return_type) = &node.return_type {
+        scan_expr(return_type, state)?;
+    }
+    if let FnBody::Statements(body) = &node.body {
+        for statement in &body.statements {
+            scan_statement(statement, state)?;
         }
     }
+    Ok(())
+}
 
-    pub(crate) fn scan_var(&mut self, node: &VarDefinition) -> Result<(), Vec<Span>> {
-        self.scan_expr(&node.default_value)
-    }
-
-    pub(crate) fn scan_const(&mut self, node: &ConstDefinition) -> Result<(), Vec<Span>> {
-        self.scan_expr(&node.value)
-    }
-
-    pub(crate) fn scan_fn(&mut self, node: &FnDefinition) -> Result<(), Vec<Span>> {
-        self.scan_params(&node.params)?;
-        if let Some(return_type) = &node.return_type {
-            self.scan_expr(return_type)?;
+fn scan_statement(node: &Statement, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    match node {
+        Statement::Return(child) => scan_expr(&child.value, state)?,
+        Statement::Assignment(child) => {
+            scan_expr(&child.assigned, state)?;
+            scan_expr(&child.value, state)?;
         }
-        if let FnBody::Statements(body) = &node.body {
-            for statement in &body.statements {
-                self.scan_statement(statement)?;
-            }
+    }
+    Ok(())
+}
+
+fn scan_expr(node: &Expr, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    match node {
+        Expr::F32Literal(_)
+        | Expr::U32Literal(_)
+        | Expr::I32Literal(_)
+        | Expr::BoolLiteral(_)
+        | Expr::Wildcard(_) => Ok(()),
+        Expr::Call(node) => scan_call(node, state),
+        Expr::Ident(node) => scan_ident(node, state),
+    }
+}
+
+fn scan_ident(node: &Ident, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    if let Some(&source) = state.sources.get(&node.id) {
+        scan_item(source, node.span, state)
+    } else {
+        Ok(())
+    }
+}
+
+fn scan_call(node: &Call, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    for arg in &node.args {
+        scan_expr(&arg.value, state)?; // no-fn-check (recursivity)
+    }
+    if let Some(&source) = state.sources.get(&node.id) {
+        scan_item(source, node.span, state)
+    } else {
+        // Covers case where there is function circular dependency from their signature.
+        // As call source resolution is not done in this case, candidates are followed instead.
+        let candidates = state
+            .candidate_sources
+            .get(&node.id)
+            .cloned() // TODO: avoid costly Vec clone
+            .unwrap_or_default();
+        for source in candidates {
+            scan_item(source, node.span, state)?;
         }
         Ok(())
     }
+}
 
-    fn scan_statement(&mut self, node: &Statement) -> Result<(), Vec<Span>> {
-        match node {
-            Statement::Return(child) => self.scan_expr(&child.value)?,
-            Statement::Assignment(child) => {
-                self.scan_expr(&child.assigned)?;
-                self.scan_expr(&child.value)?;
-            }
-        }
-        Ok(())
+fn scan_item<'item>(
+    node: ItemRef<'item>,
+    ref_span: Span,
+    state: &mut State<'item>,
+) -> Result<(), Vec<Span>> {
+    state.dependencies.enter_item(ref_span, node)?;
+    match node {
+        ItemRef::Var(child) => scan_var_inner(child, state)?, // no-fn-check (recursivity)
+        ItemRef::Const(child) => scan_const_inner(child, state)?, // no-fn-check (recursivity)
+        ItemRef::Fn(child) => scan_fn_inner(child, state)?,   // no-fn-check (recursivity)
+        ItemRef::Struct(_) | ItemRef::Param(_) => (),
     }
+    state.dependencies.exit_item();
+    Ok(())
+}
 
-    fn scan_expr(&mut self, node: &Expr) -> Result<(), Vec<Span>> {
-        match node {
-            Expr::F32Literal(_)
-            | Expr::U32Literal(_)
-            | Expr::I32Literal(_)
-            | Expr::BoolLiteral(_)
-            | Expr::Wildcard(_) => Ok(()),
-            Expr::Call(node) => self.scan_call(node),
-            Expr::Ident(node) => self.scan_ident(node),
-        }
+fn scan_params(node: &ParamGroup, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    for param in &node.params {
+        scan_param(param, state)?;
     }
+    Ok(())
+}
 
-    fn scan_ident(&mut self, node: &Ident) -> Result<(), Vec<Span>> {
-        if let Some(&source) = self.indexes.sources.get(&node.id) {
-            self.scan_item(source, node.span)
-        } else {
-            Ok(())
-        }
+fn scan_param(node: &Param, state: &mut State<'_>) -> Result<(), Vec<Span>> {
+    scan_expr(&node.type_, state)?; // no-fn-check (recursivity)
+    if let Some(requirement) = &node.requirement {
+        scan_expr(&requirement.condition, state)?; // no-fn-check (recursivity)
     }
-
-    fn scan_call(&mut self, node: &Call) -> Result<(), Vec<Span>> {
-        for arg in &node.args {
-            self.scan_expr(&arg.value)?; // no-fn-check (recursivity)
-        }
-        if let Some(&source) = self.indexes.sources.get(&node.id) {
-            self.scan_item(source, node.span)
-        } else {
-            // Covers case where there is function circular dependency from their signature.
-            // As call source resolution is not done in this case, candidates are followed instead.
-            for &source in self
-                .indexes
-                .candidate_sources
-                .get(&node.id)
-                .into_iter()
-                .flatten()
-            {
-                self.scan_item(source, node.span)?;
-            }
-            Ok(())
-        }
-    }
-
-    fn scan_item(&mut self, node: ItemRef<'item>, ref_span: Span) -> Result<(), Vec<Span>> {
-        self.dependencies.enter_item(ref_span, node)?;
-        match node {
-            ItemRef::Var(child) => self.scan_var(child)?,
-            ItemRef::Const(child) => self.scan_const(child)?,
-            ItemRef::Fn(child) => self.scan_fn(child)?,
-            ItemRef::Struct(_) | ItemRef::Param(_) => (),
-        }
-        self.dependencies.exit_item();
-        Ok(())
-    }
-
-    fn scan_params(&mut self, node: &ParamGroup) -> Result<(), Vec<Span>> {
-        for param in &node.params {
-            self.scan_param(param)?;
-        }
-        Ok(())
-    }
-
-    fn scan_param(&mut self, node: &Param) -> Result<(), Vec<Span>> {
-        self.scan_expr(&node.type_)?; // no-fn-check (recursivity)
-        if let Some(requirement) = &node.requirement {
-            self.scan_expr(&requirement.condition)?; // no-fn-check (recursivity)
-        }
-        Ok(())
-    }
+    Ok(())
 }
