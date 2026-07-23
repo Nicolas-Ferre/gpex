@@ -12,8 +12,6 @@ use crate::{Log, LogLocation};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
-// TODO: too many fields ?
-
 #[derive(Debug)]
 pub(crate) struct State<'item> {
     pub(crate) imports: ImportIndex,
