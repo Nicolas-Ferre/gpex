@@ -308,10 +308,7 @@ fn find_previous_same_fn_signature<'item>(
             can_be_parent_node: false,
         },
     };
-    // TODO: how to avoid costly collect?
-    // releases the item index borrow before type resolution mutates state
-    #[expect(clippy::needless_collect)]
-    let previous_fns = state
+    state
         .items
         .search_in_same_file(search_params, Visibility::Enforced)
         .map(|item| match item {
@@ -320,8 +317,7 @@ fn find_previous_same_fn_signature<'item>(
                 unreachable!("only functions are searched with parameter types")
             }
         })
-        .collect::<Vec<_>>();
-    previous_fns
+        .collect::<Vec<_>>()
         .into_iter()
         .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, state))
 }
