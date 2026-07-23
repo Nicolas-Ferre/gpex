@@ -5,12 +5,8 @@ use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
-use crate::utils::reading::ReadFile;
-use crate::utils::validation::ValidateContext;
-use crate::{Log, LogLocation};
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::path::Path;
 
 #[derive(Debug)]
 pub(crate) struct State<'item> {
@@ -20,28 +16,22 @@ pub(crate) struct State<'item> {
     pub(crate) candidate_sources: HashMap<u64, Vec<ItemRef<'item>>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
-    pub(crate) validation: ValidateContext<'item>,
     pub(crate) is_indexing_source_only: bool,
-    pub(crate) const_mark_span: Option<Span>,
-    pub(crate) param_constness: ParamConstness,
     scopes: RefCell<Vec<Scope<'item>>>,
     compilerimpl_types: HashMap<u64, CompilerImplType>,
 }
 
 impl<'item> State<'item> {
-    pub(crate) fn new(files: &'item [ReadFile], root_path: &'item Path) -> Self {
+    pub(crate) fn new(file_count: usize) -> Self {
         Self {
-            imports: ImportIndex::new(files.len()),
-            items: NodeIndex::new(files.len()),
+            imports: ImportIndex::new(file_count),
+            items: NodeIndex::new(file_count),
             sources: HashMap::default(),
             candidate_sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
-            validation: ValidateContext::new(files, root_path),
             scopes: RefCell::default(),
             is_indexing_source_only: false,
-            const_mark_span: None,
-            param_constness: ParamConstness::ExplicitOnly,
             compilerimpl_types: HashMap::default(),
         }
     }
@@ -93,10 +83,6 @@ impl<'item> State<'item> {
         self.compilerimpl_types.get(&type_.id).copied()
     }
 
-    pub(crate) fn span_location(&self, span: Span) -> LogLocation {
-        self.validation.location(span)
-    }
-
     pub(crate) fn wildcard_type(&self, param_id: u64) -> Option<Type<'item>> {
         self.scopes
             .borrow()
@@ -112,10 +98,6 @@ impl<'item> State<'item> {
             .and_then(|scope| scope.const_values.get(&id))
             .cloned()
             .unwrap_or(ConstValue::RuntimeValue)
-    }
-
-    pub(crate) fn add_log(&mut self, log: Log) {
-        self.validation.logs.push(log);
     }
 
     pub(crate) fn add_wildcard_type(&self, param_id: u64, type_: Type<'item>) {
@@ -143,30 +125,6 @@ impl<'item> State<'item> {
         output
     }
 
-    pub(crate) fn with_param_constness<O>(
-        &mut self,
-        param_constness: ParamConstness,
-        callback: impl FnOnce(&mut Self) -> O,
-    ) -> O {
-        let previous_param_constness = self.param_constness;
-        self.param_constness = param_constness;
-        let output = callback(self);
-        self.param_constness = previous_param_constness;
-        output
-    }
-
-    pub(crate) fn with_const_mark_span<O>(
-        &mut self,
-        span: Option<Span>,
-        callback: impl FnOnce(&mut Self) -> O,
-    ) -> O {
-        let previous_const_mark_span = self.const_mark_span;
-        self.const_mark_span = span;
-        let output = callback(self);
-        self.const_mark_span = previous_const_mark_span;
-        output
-    }
-
     pub(crate) fn enter_scope(&self) {
         self.scopes.borrow_mut().push(Scope::default());
     }
@@ -174,12 +132,6 @@ impl<'item> State<'item> {
     pub(crate) fn exit_scope(&self) {
         self.scopes.borrow_mut().pop();
     }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub(crate) enum ParamConstness {
-    ExplicitOnly,
-    All,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

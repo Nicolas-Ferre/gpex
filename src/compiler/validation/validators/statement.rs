@@ -1,6 +1,6 @@
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::statements::{ReturnStatement, Statement};
-use crate::compiler::state::State;
+use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 use crate::{Log, LogInner, LogLevel};
@@ -10,7 +10,7 @@ pub(crate) fn check_return_before_end(
     next_statement_span: Span,
     position: usize,
     statement_count: usize,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     debug_assert_ne!(statement_count, 0);
     if position == statement_count - 1 {
@@ -35,7 +35,7 @@ pub(crate) fn check_missing_return<'statement>(
     previous_statement_span: Span,
     block_end_span: Span,
     return_type_span: Span,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<&'statement ReturnStatement, ValidateError> {
     if let Some(Statement::Return(return_statement)) = statements.last() {
         Ok(return_statement)
@@ -57,7 +57,7 @@ pub(crate) fn check_missing_return<'statement>(
 pub(crate) fn check_disallowed_return(
     statements: &[Statement],
     fn_: &FnDefinition,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     let mut result = Ok(());
     for statement in statements {
@@ -78,7 +78,11 @@ pub(crate) fn check_disallowed_return(
     result
 }
 
-pub(crate) fn check_empty_block(statements: &[Statement], body_span: Span, state: &mut State<'_>) {
+pub(crate) fn check_empty_block(
+    statements: &[Statement],
+    body_span: Span,
+    state: &mut ValidateState<'_, '_>,
+) {
     if statements.is_empty() {
         state.add_log(Log {
             level: LogLevel::Warning,

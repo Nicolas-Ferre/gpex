@@ -5,7 +5,7 @@ use crate::compiler::parsing::exprs::{BINARY_FN_NAMES, OPERATOR_FN_NAME_PREFIX};
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
-use crate::compiler::state::State;
+use crate::compiler::validation::ValidateState;
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::{ItemNodeRef, NodeRef, SearchConfig, SearchParams, Visibility};
@@ -16,10 +16,10 @@ use crate::{Log, LogInner, LogLevel};
 pub(crate) fn check_circular_dependencies(
     item: ItemRef<'_>,
     dependency_result: Result<(), Vec<Span>>,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
-    let name = state.validation.slice(name_span);
+    let name = state.context.slice(name_span);
     if let Err(stack) = dependency_result {
         if stack.iter().min() != Some(&stack[0]) {
             // avoid repeating the same error for each item of the stack
@@ -51,20 +51,21 @@ pub(crate) fn check_circular_dependencies(
 
 pub(crate) fn check_unique_definition<'item>(
     item: ItemRef<'item>,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let name_span = item.name_span();
     let key = item.key();
     let search_params = SearchParams {
         key: &key,
         location: item,
-        imports: &state.imports,
+        imports: &state.inner.imports,
         config: SearchConfig {
             can_be_after: false,
             can_be_parent_node: false,
         },
     };
     let duplicated_item = state
+        .inner
         .items
         .search_in_same_file(search_params, Visibility::Enforced)
         .next();
@@ -87,7 +88,7 @@ pub(crate) fn check_unique_definition<'item>(
 
 pub(crate) fn check_unique_params(
     params: &[Param],
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     let mut is_error = false;
     for (param_index, param) in params.iter().enumerate() {
@@ -111,9 +112,12 @@ pub(crate) fn check_unique_params(
     if is_error { Err(ValidateError) } else { Ok(()) }
 }
 
-pub(crate) fn check_unique_fn_signature<'item>(fn_: &'item FnDefinition, state: &mut State<'item>) {
+pub(crate) fn check_unique_fn_signature<'item>(
+    fn_: &'item FnDefinition,
+    state: &mut ValidateState<'_, 'item>,
+) {
     if let Some(previous_fn) = find_previous_same_fn_signature(fn_, state) {
-        let fn_key = key_rendering::fn_key(fn_, state)
+        let fn_key = key_rendering::fn_key(fn_, state.inner)
             .unwrap_or_else(|_| unreachable!("function should be validated before"));
         state.add_log(Log {
             level: LogLevel::Warning,
@@ -131,7 +135,7 @@ pub(crate) fn check_unique_fn_signature<'item>(fn_: &'item FnDefinition, state: 
 pub(crate) fn check_prelude_location(
     item: ItemRef<'_>,
     compilerimpl_keyword_span: Option<Span>,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if let Some(compilerimpl_keyword_span) = compilerimpl_keyword_span
         && item.file_index() != PRELUDE_FILE_INDEX
@@ -148,14 +152,14 @@ pub(crate) fn check_prelude_location(
     }
 }
 
-pub(crate) fn check_usage<'item>(item: ItemRef<'item>, state: &mut State<'item>) {
+pub(crate) fn check_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'item>) {
     let name_span = item.name_span();
-    let name = state.validation.slice(name_span);
-    let ref_span = state.item_first_refs.get(&item.id()).copied();
+    let name = state.context.slice(name_span);
+    let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
     let is_unused_lint_ignored =
         name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(state);
+        let displayed_key = item.displayed_key(state.inner);
         state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item unused"),
@@ -163,7 +167,7 @@ pub(crate) fn check_usage<'item>(item: ItemRef<'item>, state: &mut State<'item>)
             inner: vec![],
         });
     } else if item.is_pub() && is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(state);
+        let displayed_key = item.displayed_key(state.inner);
         state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item public but name starting with `_`"),
@@ -173,7 +177,7 @@ pub(crate) fn check_usage<'item>(item: ItemRef<'item>, state: &mut State<'item>)
     } else if let Some(ref_span) = ref_span
         && is_unused_lint_ignored
     {
-        let displayed_key = item.displayed_key(state);
+        let displayed_key = item.displayed_key(state.inner);
         state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{displayed_key}` item used but name starting with `_`"),
@@ -193,7 +197,7 @@ pub(crate) fn check_found<'item>(
     span: Span,
     key: &str,
     displayed_key: &str,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<ItemRef<'item>, ValidateError> {
     if let Some(source) = source {
         Ok(source)
@@ -202,7 +206,7 @@ pub(crate) fn check_found<'item>(
             level: LogLevel::Error,
             msg: format!("`{displayed_key}` item not found"),
             location: Some(state.span_location(span)),
-            inner: if let Some(candidates) = state.candidate_sources.get(&node.id()) {
+            inner: if let Some(candidates) = state.inner.candidate_sources.get(&node.id()) {
                 candidates
                     .iter()
                     .map(|candidate| LogInner {
@@ -211,7 +215,7 @@ pub(crate) fn check_found<'item>(
                         location: Some(state.span_location(candidate.signature_span_with_return())),
                     })
                     .collect()
-            } else if let Some(priv_source) = state.priv_sources.get(&node.id()) {
+            } else if let Some(priv_source) = state.inner.priv_sources.get(&node.id()) {
                 vec![LogInner {
                     level: LogLevel::Info,
                     msg: "item not qualified with `pub`".into(),
@@ -219,6 +223,7 @@ pub(crate) fn check_found<'item>(
                 }]
             } else {
                 state
+                    .inner
                     .items
                     .iter_by_key(key)
                     .filter(ItemNodeRef::is_pub)
@@ -226,7 +231,7 @@ pub(crate) fn check_found<'item>(
                         level: LogLevel::Info,
                         msg: format!(
                             "item can be imported from `{}`",
-                            state.validation.dot_path(item.file_index())
+                            state.context.dot_path(item.file_index())
                         ),
                         location: Some(state.span_location(item.name_span())),
                     })
@@ -239,12 +244,12 @@ pub(crate) fn check_found<'item>(
 
 pub(crate) fn check_unary_operator_fn(
     fn_: &FnDefinition,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if !UNARY_FN_NAMES.contains(&fn_.name.as_str()) {
         Ok(())
     } else if fn_.params.params.len() != 1 {
-        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let fn_key = key_rendering::fn_key(fn_, state.inner)?;
         state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function must have exactly one parameter"),
@@ -253,7 +258,7 @@ pub(crate) fn check_unary_operator_fn(
         });
         Err(ValidateError)
     } else if fn_.return_type.is_none() {
-        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let fn_key = key_rendering::fn_key(fn_, state.inner)?;
         state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` unary operator function without return type"),
@@ -268,12 +273,12 @@ pub(crate) fn check_unary_operator_fn(
 
 pub(crate) fn check_binary_operator_fn(
     fn_: &FnDefinition,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if !BINARY_FN_NAMES.contains(&fn_.name.as_str()) {
         Ok(())
     } else if fn_.params.params.len() != 2 {
-        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let fn_key = key_rendering::fn_key(fn_, state.inner)?;
         state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function must have exactly two parameters"),
@@ -282,7 +287,7 @@ pub(crate) fn check_binary_operator_fn(
         });
         Err(ValidateError)
     } else if fn_.return_type.is_none() {
-        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let fn_key = key_rendering::fn_key(fn_, state.inner)?;
         state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{fn_key}` binary operator function without return type"),
@@ -297,18 +302,19 @@ pub(crate) fn check_binary_operator_fn(
 
 fn find_previous_same_fn_signature<'item>(
     fn_: &'item FnDefinition,
-    state: &State<'item>,
+    state: &ValidateState<'_, 'item>,
 ) -> Option<&'item FnDefinition> {
     let search_params = SearchParams {
         key: &fn_.key(),
         location: ItemRef::Fn(fn_),
-        imports: &state.imports,
+        imports: &state.inner.imports,
         config: SearchConfig {
             can_be_after: false,
             can_be_parent_node: false,
         },
     };
     state
+        .inner
         .items
         .search_in_same_file(search_params, Visibility::Enforced)
         .map(|item| match item {
@@ -323,7 +329,7 @@ fn find_previous_same_fn_signature<'item>(
 fn are_same_fn_signatures<'item>(
     fn_: &'item FnDefinition,
     other_fn: &'item FnDefinition,
-    state: &State<'item>,
+    state: &ValidateState<'_, 'item>,
 ) -> bool {
     debug_assert!(fn_.name == other_fn.name);
     debug_assert!(fn_.params.params.len() == other_fn.params.params.len());
@@ -335,8 +341,8 @@ fn are_same_fn_signatures<'item>(
         .iter()
         .zip(&other_fn.params.params)
         .all(|(param, other_param)| {
-            let type_ = types::param_type(param, state);
-            let other_type = types::param_type(other_param, state);
+            let type_ = types::param_type(param, state.inner);
+            let other_type = types::param_type(other_param, state.inner);
             are_same_param_types(type_, other_type, fn_, other_fn)
         })
 }

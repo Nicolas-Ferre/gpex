@@ -5,8 +5,7 @@ use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::refs;
-use crate::compiler::state::ParamConstness;
-use crate::compiler::state::State;
+use crate::compiler::validation::{ParamConstness, ValidateState};
 use crate::compiler::values::types::Type;
 use crate::utils::indexing::NodeRef;
 use crate::utils::parsing::span::Span;
@@ -18,7 +17,7 @@ pub(crate) fn check_types(
     actual_type: Type<'_>,
     expected_span: Option<Span>,
     expected_type: Type<'_>,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if !actual_type.is_comparable() || !expected_type.is_comparable() {
         Err(ValidateError)
@@ -44,7 +43,7 @@ pub(crate) fn check_const_value(
     span: Span,
     const_mark_span: Span,
     param_constness: ParamConstness,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if is_item_const(source, param_constness) {
         Ok(())
@@ -66,7 +65,7 @@ pub(crate) fn check_const_value(
 pub(crate) fn check_f32_const_bounds(
     is_out_of_bounds: bool,
     span: Span,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if is_out_of_bounds {
         state.add_log(Log {
@@ -85,7 +84,7 @@ pub(crate) fn check_mul_add_candidate(
     source: ItemRef<'_>,
     call: &Call,
     are_all_args_f32: bool,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) {
     let ItemRef::Fn(source) = source else {
         unreachable!("calls can only be functions")
@@ -110,7 +109,7 @@ pub(crate) fn check_mul_add_candidate(
 pub(crate) fn check_arg_name(
     arg: &Arg,
     param: &Param,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     let Some(name) = &arg.name else {
         return Ok(());
@@ -135,12 +134,12 @@ pub(crate) fn check_arg_name(
 pub(crate) fn check_no_return_type(
     node: impl NodeRef,
     span: Span,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    if let Some(ItemRef::Fn(fn_)) = state.sources.get(&node.id()).copied()
+    if let Some(ItemRef::Fn(fn_)) = state.inner.sources.get(&node.id()).copied()
         && fn_.return_type.is_none()
     {
-        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let fn_key = key_rendering::fn_key(fn_, state.inner)?;
         state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("called function `{fn_key}` with no return type"),
@@ -159,12 +158,12 @@ pub(crate) fn check_no_return_type(
 pub(crate) fn check_has_return_type(
     node: impl NodeRef,
     span: Span,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    if let Some(ItemRef::Fn(fn_)) = state.sources.get(&node.id()).copied()
+    if let Some(ItemRef::Fn(fn_)) = state.inner.sources.get(&node.id()).copied()
         && fn_.return_type.is_some()
     {
-        let fn_key = key_rendering::fn_key(fn_, state)?;
+        let fn_key = key_rendering::fn_key(fn_, state.inner)?;
         state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("repeated function `{fn_key}` with a return type"),
@@ -180,8 +179,8 @@ pub(crate) fn check_has_return_type(
     Ok(())
 }
 
-pub(crate) fn check_ref(expr: &Expr, state: &mut State<'_>) {
-    if refs::is_expr_ref(expr, state) == Some(false) {
+pub(crate) fn check_ref(expr: &Expr, state: &mut ValidateState<'_, '_>) {
+    if refs::is_expr_ref(expr, state.inner) == Some(false) {
         state.add_log(Log {
             level: LogLevel::Error,
             msg: "expression is not a reference".into(),
@@ -193,7 +192,7 @@ pub(crate) fn check_ref(expr: &Expr, state: &mut State<'_>) {
 
 pub(crate) fn report_invalid_wildcard_location(
     span: Span,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     state.add_log(Log {
         level: LogLevel::Error,
@@ -220,12 +219,12 @@ fn is_item_const(item: ItemRef<'_>, param_constness: ParamConstness) -> bool {
     }
 }
 
-fn is_expr_compilerimpl_mul(expr: &Expr, state: &State<'_>) -> bool {
+fn is_expr_compilerimpl_mul(expr: &Expr, state: &ValidateState<'_, '_>) -> bool {
     let Expr::Call(call) = expr else {
         return false;
     };
     matches!(
-        state.sources.get(&call.id),
+        state.inner.sources.get(&call.id),
         Some(ItemRef::Fn(source))
             if source.compilerimpl()
                 == Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul))

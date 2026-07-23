@@ -1,10 +1,10 @@
-use crate::compiler::state::State;
+use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::{Log, LogLevel};
 use itertools::Itertools;
 
-pub(crate) fn check_char_count(span: Span, state: &mut State<'_>) {
-    let slice = state.validation.slice(span);
+pub(crate) fn check_char_count(span: Span, state: &mut ValidateState<'_, '_>) {
+    let slice = state.context.slice(span);
     if slice.len() == 1 && slice != "_" {
         state.add_log(Log {
             level: LogLevel::Warning,
@@ -15,8 +15,8 @@ pub(crate) fn check_char_count(span: Span, state: &mut State<'_>) {
     }
 }
 
-pub(crate) fn check_case(span: Span, expected_cases: &[Case], state: &mut State<'_>) {
-    let slice = state.validation.slice(span);
+pub(crate) fn check_case(span: Span, expected_cases: &[Case], state: &mut ValidateState<'_, '_>) {
+    let slice = state.context.slice(span);
     if !expected_cases.iter().any(|case| case.is_valid(slice)) {
         let case_labels = expected_cases.iter().map(|case| case.labels()).join(" or ");
         state.add_log(Log {

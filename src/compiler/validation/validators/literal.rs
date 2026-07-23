@@ -1,4 +1,4 @@
-use crate::compiler::state::State;
+use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 use crate::{Log, LogLevel};
@@ -7,7 +7,7 @@ pub(crate) fn check_bounds(
     is_value_valid: bool,
     span: Span,
     type_name: &str,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if is_value_valid {
         Ok(())

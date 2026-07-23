@@ -30,10 +30,16 @@ pub fn compile_program(
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
     let files = reading::read(root_path, EXT)?;
     let modules = parsing::parse(root_path, &files)?;
-    let mut state = State::new(&files, root_path);
+    let mut state = State::new(files.len());
     indexing::index_modules(&modules, &mut state);
     state.init_cache();
-    let errors = validation::validate_modules(&modules, is_warning_treated_as_error, &mut state)?;
+    let errors = validation::validate_modules(
+        root_path,
+        &files,
+        &modules,
+        is_warning_treated_as_error,
+        &state,
+    )?;
     let program = transpilation::transpile(&files, &modules, &state);
     Ok((program, errors))
 }

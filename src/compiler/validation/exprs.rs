@@ -5,12 +5,15 @@ use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::state::{CompilerImplType, ParamConstness, State};
-use crate::compiler::validation::validators;
+use crate::compiler::state::CompilerImplType;
+use crate::compiler::validation::{ParamConstness, ValidateState, validators};
 use crate::compiler::values::{consts, types};
 use crate::utils::validation::ValidateError;
 
-pub(crate) fn validate_expr(expr: &Expr, state: &mut State<'_>) -> Result<(), ValidateError> {
+pub(crate) fn validate_expr(
+    expr: &Expr,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
     match expr {
         Expr::F32Literal(child) => validate_f32_literal(child, state),
         Expr::U32Literal(child) => validate_u32_literal(child, state),
@@ -25,27 +28,30 @@ pub(crate) fn validate_expr(expr: &Expr, state: &mut State<'_>) -> Result<(), Va
 
 pub(crate) fn validate_f32_literal(
     literal: &F32Literal,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     validators::literal::check_bounds(literal.value.is_some(), literal.span, "f32", state)
 }
 
 pub(crate) fn validate_i32_literal(
     literal: &I32Literal,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     validators::literal::check_bounds(literal.value.is_some(), literal.span, "i32", state)
 }
 
 pub(crate) fn validate_u32_literal(
     literal: &U32Literal,
-    state: &mut State<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     validators::literal::check_bounds(literal.value.is_some(), literal.span, "u32", state)
 }
 
-pub(crate) fn validate_call(call: &Call, state: &mut State<'_>) -> Result<(), ValidateError> {
-    let source = state.sources.get(&call.id).copied();
+pub(crate) fn validate_call(
+    call: &Call,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    let source = state.inner.sources.get(&call.id).copied();
     let is_constness_ignored = source.is_some_and(ItemRef::is_param_constness_ignored);
     let mut is_error_detected = false;
     for (index, arg) in call.args.iter().enumerate() {
@@ -70,7 +76,7 @@ pub(crate) fn validate_call(call: &Call, state: &mut State<'_>) -> Result<(), Va
     if is_error_detected {
         return Err(ValidateError);
     }
-    let displayed_key = key_rendering::call_key(call, state)?;
+    let displayed_key = key_rendering::call_key(call, state.inner)?;
     let source =
         validators::item::check_found(source, call, call.span, &call.key(), &displayed_key, state)?;
     for (arg, param) in call.args.iter().zip(&source.params().params) {
@@ -86,14 +92,17 @@ pub(crate) fn validate_call(call: &Call, state: &mut State<'_>) -> Result<(), Va
             state,
         )?;
     }
-    let is_const_infinite_f32 = consts::is_const_infinite_f32(call, state);
+    let is_const_infinite_f32 = consts::is_const_infinite_f32(call, state.inner);
     validators::expr::check_f32_const_bounds(is_const_infinite_f32, call.span, state)?;
     validate_mul_add_candidate(call, source, state);
     Ok(())
 }
 
-pub(crate) fn validate_ident(ident: &Ident, state: &mut State<'_>) -> Result<(), ValidateError> {
-    let source = state.sources.get(&ident.id).copied();
+pub(crate) fn validate_ident(
+    ident: &Ident,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    let source = state.inner.sources.get(&ident.id).copied();
     let source = validators::item::check_found(
         source,
         ident,
@@ -117,11 +126,13 @@ pub(crate) fn validate_ident(ident: &Ident, state: &mut State<'_>) -> Result<(),
 fn validate_mul_add_candidate<'item>(
     call: &Call,
     source: ItemRef<'item>,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) {
     let are_all_args_f32 = call.args.iter().all(|arg| {
-        let type_ = types::expr_type(&arg.value, state);
-        state.is_compilerimpl_type(type_, CompilerImplType::F32)
+        let type_ = types::expr_type(&arg.value, state.inner);
+        state
+            .inner
+            .is_compilerimpl_type(type_, CompilerImplType::F32)
     });
     validators::expr::check_mul_add_candidate(source, call, are_all_args_f32, state);
 }

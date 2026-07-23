@@ -6,9 +6,8 @@ use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::state::State;
 use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
-use crate::compiler::validation::{exprs, fns, naming, validators};
+use crate::compiler::validation::{ValidateState, exprs, fns, naming, validators};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
 use crate::utils::dependencies::Dependencies;
@@ -16,7 +15,7 @@ use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_item<'item>(
     item: &'item Item,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     debug_assert!(state.const_mark_span.is_none());
     match item {
@@ -32,7 +31,7 @@ pub(crate) fn validate_item<'item>(
 pub(crate) fn validate_params<'item>(
     params: &'item ParamGroup,
     is_compilerimpl: bool,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let mut are_params_valid = true;
     for param in &params.params {
@@ -50,11 +49,11 @@ pub(crate) fn validate_params<'item>(
 
 fn validate_var<'item>(
     var: &'item VarDefinition,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Var(var);
     let mut dependencies = Dependencies::new();
-    let dependency_result = dependencies::scan_var(var, &mut dependencies, state);
+    let dependency_result = dependencies::scan_var(var, &mut dependencies, state.inner);
     validators::item::check_circular_dependencies(ref_, dependency_result, state)?;
     validators::item::check_unique_definition(ref_, state)?;
     validators::item::check_usage(ref_, state);
@@ -66,11 +65,11 @@ fn validate_var<'item>(
 
 fn validate_const<'item>(
     const_: &'item ConstDefinition,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Const(const_);
     let mut dependencies = Dependencies::new();
-    let dependency_result = dependencies::scan_const(const_, &mut dependencies, state);
+    let dependency_result = dependencies::scan_const(const_, &mut dependencies, state.inner);
     validators::item::check_circular_dependencies(ref_, dependency_result, state)?;
     validators::item::check_unique_definition(ref_, state)?;
     validators::item::check_usage(ref_, state);
@@ -85,7 +84,7 @@ fn validate_const<'item>(
 
 fn validate_struct<'item>(
     struct_: &'item StructDefinition,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     validators::item::check_prelude_location(
         ItemRef::Struct(struct_),
@@ -95,7 +94,10 @@ fn validate_struct<'item>(
     Ok(())
 }
 
-fn validate_repeat(repeat: &RepeatDefinition, state: &mut State<'_>) -> Result<(), ValidateError> {
+fn validate_repeat(
+    repeat: &RepeatDefinition,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
     exprs::validate_call(&repeat.call, state)?;
     validators::expr::check_has_return_type(&repeat.call, repeat.call.span, state)?;
     Ok(())
@@ -104,7 +106,7 @@ fn validate_repeat(repeat: &RepeatDefinition, state: &mut State<'_>) -> Result<(
 fn validate_param<'item>(
     param: &'item Param,
     is_compilerimpl: bool,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Param(param);
     validate_param_type(param, state)?;
@@ -120,7 +122,7 @@ fn validate_param<'item>(
 
 fn validate_param_type<'item>(
     param: &'item Param,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     if matches!(param.type_, Expr::Wildcard(_)) {
         return Ok(());
@@ -128,15 +130,15 @@ fn validate_param_type<'item>(
     state.with_const_mark_span(Some(param.colon_span), |state| {
         exprs::validate_expr(&param.type_, state)
     })?;
-    let actual_type = types::expr_type(&param.type_, state);
-    let expected_type = Type::Struct(state.search_prelude_type("typeref"));
+    let actual_type = types::expr_type(&param.type_, state.inner);
+    let expected_type = Type::Struct(state.inner.search_prelude_type("typeref"));
     validators::expr::check_types(param.type_.span(), actual_type, None, expected_type, state)?;
     Ok(())
 }
 
 fn validate_param_requirement<'item>(
     param: &'item Param,
-    state: &mut State<'item>,
+    state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let Some(requirement) = &param.requirement else {
         return Ok(());
@@ -144,8 +146,8 @@ fn validate_param_requirement<'item>(
     state.with_const_mark_span(Some(requirement.require_span), |state| {
         exprs::validate_expr(&requirement.condition, state)
     })?;
-    let actual_type = types::expr_type(&requirement.condition, state);
-    let expected_type = Type::Struct(state.search_prelude_type("bool"));
+    let actual_type = types::expr_type(&requirement.condition, state.inner);
+    let expected_type = Type::Struct(state.inner.search_prelude_type("bool"));
     validators::expr::check_types(
         requirement.condition.span(),
         actual_type,
