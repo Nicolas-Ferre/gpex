@@ -72,7 +72,7 @@ fn transpile_ident(ident: &Ident, state: &mut TranspileState<'_, '_>) {
         ItemRef::Param(param) => transpile_param_ref(param, state),
         ItemRef::Fn(_) => unreachable!("identifiers cannot reference functions"),
         ItemRef::Const(_) | ItemRef::Struct(_) => {
-            unreachable!("constant item should be transpiled in `Expression::transpile`")
+            unreachable!("constant item should be transpiled in `transpile_expr`")
         }
     }
 }
