@@ -1,6 +1,7 @@
 mod exprs;
 mod fns;
 mod items;
+mod logs;
 mod naming;
 mod validators;
 

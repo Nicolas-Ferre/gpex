@@ -25,6 +25,7 @@ Key directories and files:
     - `indexing/`: Symbol table construction (imports, item references, ...).
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...).
+    - `validation/logs/`: Construction of user-facing compiler errors and warnings.
     - `transpilation/`: AST-to-WGSL conversion.
     - `dependencies.rs`: Item dependency resolution.
     - `key_rendering.rs`: Rendering of item keys for compiler logs.

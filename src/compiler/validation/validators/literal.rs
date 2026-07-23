@@ -1,7 +1,6 @@
-use crate::compiler::validation::ValidateState;
+use crate::compiler::validation::{ValidateState, logs};
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
-use crate::{Log, LogLevel};
 
 pub(crate) fn check_bounds(
     is_value_valid: bool,
@@ -12,12 +11,7 @@ pub(crate) fn check_bounds(
     if is_value_valid {
         Ok(())
     } else {
-        state.add_log(Log {
-            level: LogLevel::Error,
-            msg: format!("`{type_name}` literal out of bounds"),
-            location: Some(state.span_location(span)),
-            inner: vec![],
-        });
+        state.add_log(logs::exprs::literal_out_of_bounds(type_name, span, state));
         Err(ValidateError)
     }
 }
