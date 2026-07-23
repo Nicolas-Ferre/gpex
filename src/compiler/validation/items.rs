@@ -11,6 +11,7 @@ use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
 use crate::compiler::validation::{exprs, fns, naming, validators};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
+use crate::utils::dependencies::Dependencies;
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_item<'item>(
@@ -52,7 +53,8 @@ fn validate_var<'item>(
     state: &mut State<'item>,
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Var(var);
-    let dependency_result = dependencies::scan_var(var, state);
+    let mut dependencies = Dependencies::new();
+    let dependency_result = dependencies::scan_var(var, &mut dependencies, state);
     validators::item::check_circular_dependencies(ref_, dependency_result, state)?;
     validators::item::check_unique_definition(ref_, state)?;
     validators::item::check_usage(ref_, state);
@@ -67,7 +69,8 @@ fn validate_const<'item>(
     state: &mut State<'item>,
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Const(const_);
-    let dependency_result = dependencies::scan_const(const_, state);
+    let mut dependencies = Dependencies::new();
+    let dependency_result = dependencies::scan_const(const_, &mut dependencies, state);
     validators::item::check_circular_dependencies(ref_, dependency_result, state)?;
     validators::item::check_unique_definition(ref_, state)?;
     validators::item::check_usage(ref_, state);

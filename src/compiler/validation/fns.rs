@@ -6,6 +6,7 @@ use crate::compiler::state::{ParamConstness, State};
 use crate::compiler::validation::{exprs, items, naming, validators};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
+use crate::utils::dependencies::Dependencies;
 use crate::utils::validation::ValidateError;
 
 pub(super) fn validate_fn<'item>(
@@ -14,7 +15,8 @@ pub(super) fn validate_fn<'item>(
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Fn(fn_);
     let compilerimpl_span = fn_.body.compilerimpl_keyword_span();
-    let dependency_result = dependencies::scan_fn(fn_, state);
+    let mut dependencies = Dependencies::new();
+    let dependency_result = dependencies::scan_fn(fn_, &mut dependencies, state);
     validators::item::check_circular_dependencies(ref_, dependency_result, state)?;
     validators::item::check_prelude_location(ref_, compilerimpl_span, state)?;
     state.with_param_constness(ParamConstness::ExplicitOnly, |state| {

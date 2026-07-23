@@ -11,6 +11,7 @@ use crate::compiler::parsing::modules::Module;
 use crate::compiler::state::State;
 use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types;
+use crate::utils::dependencies::Dependencies;
 use crate::utils::reading::ReadFile;
 use itertools::Itertools;
 use petgraph::graphmap::DiGraphMap;
@@ -227,9 +228,10 @@ fn sorted_global_vars_for_init<'item>(
     let mut dependency_graph = DiGraphMap::<&VarDefinition, ()>::new();
     for var in modules.iter().flat_map(Module::global_vars) {
         dependency_graph.add_node(var);
-        dependencies::scan_var(var, state)
+        let mut dependencies = Dependencies::new();
+        dependencies::scan_var(var, &mut dependencies, state)
             .unwrap_or_else(|_| unreachable!("circular dependencies should be validated before"));
-        for dependency in state.dependencies.iter() {
+        for dependency in dependencies.iter() {
             if let ItemRef::Var(dependency) = dependency {
                 dependency_graph.add_edge(dependency, var, ());
             }
