@@ -26,8 +26,7 @@ Key directories and files:
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...).
     - `transpilation/`: AST-to-WGSL conversion.
-    - `consts.rs`: Constness checking.
-    - `dependencies.rs`: Item dependencies resolution.
+    - `dependencies.rs`: Item dependency resolution.
     - `key_rendering.rs`: Rendering of item keys for compiler logs.
     - `prelude.rs`: Built-in types and functions.
     - `refs.rs`: Reference checking (in this context, a reference is an expression that is permitted

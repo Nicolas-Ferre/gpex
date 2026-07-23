@@ -26,8 +26,9 @@ pub(super) fn index_call<'item>(call: &'item Call, state: &mut State<'item>) {
     for arg in &call.args {
         index_expr(&arg.value, state); // no-fn-check (recursivity)
     }
+    let key = call.key();
     let accessible_search_params = SearchParams {
-        key: &call.key(),
+        key: &key,
         location: call,
         imports: &state.imports,
         config: FN_CALL_SEARCH_CONFIG,
@@ -36,19 +37,19 @@ pub(super) fn index_call<'item>(call: &'item Call, state: &mut State<'item>) {
         .items
         .search(accessible_search_params, Visibility::Enforced)
         .collect::<Vec<_>>();
-    let ignored_search_params = SearchParams {
-        key: &call.key(),
-        location: call,
-        imports: &state.imports,
-        config: FN_CALL_SEARCH_CONFIG,
-    };
-    let ignored_items = state
-        .items
-        .search(ignored_search_params, Visibility::Ignored)
-        .collect::<Vec<_>>();
     match search_accessible_call_source(call, &accessible_items, state) {
         CallSource::Found(source) => index_accessible_source(&call, call.span, source, state),
         CallSource::NotFound => {
+            let ignored_search_params = SearchParams {
+                key: &key,
+                location: call,
+                imports: &state.imports,
+                config: FN_CALL_SEARCH_CONFIG,
+            };
+            let ignored_items = state
+                .items
+                .search(ignored_search_params, Visibility::Ignored)
+                .collect::<Vec<_>>();
             if let Some(source) = search_not_accessible_call_source(call, &ignored_items, state) {
                 index_not_accessible_source(call.id, source, state);
             } else {

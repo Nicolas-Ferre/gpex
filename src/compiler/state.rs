@@ -95,6 +95,7 @@ impl<'item> State<'item> {
     }
 
     pub(crate) fn compilerimpl_type(&self, type_: &StructDefinition) -> Option<CompilerImplType> {
+        assert!(!self.compilerimpl_types.is_empty());
         self.compilerimpl_types.get(&type_.id).copied()
     }
 
