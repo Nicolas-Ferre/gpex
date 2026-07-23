@@ -10,11 +10,11 @@ use crate::compiler::values::{ConstValue, consts};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
-pub(crate) fn var_type<'item>(var: &VarDefinition, state: &mut State<'item>) -> Type<'item> {
+pub(crate) fn var_type<'item>(var: &VarDefinition, state: &State<'item>) -> Type<'item> {
     expr_type(&var.default_value, state)
 }
 
-pub(crate) fn fn_type<'item>(fn_: &FnDefinition, state: &mut State<'item>) -> Type<'item> {
+pub(crate) fn fn_type<'item>(fn_: &FnDefinition, state: &State<'item>) -> Type<'item> {
     if let Some(return_type) = fn_.return_type.as_ref() {
         expr_as_type(return_type, state)
     } else {
@@ -25,7 +25,7 @@ pub(crate) fn fn_type<'item>(fn_: &FnDefinition, state: &mut State<'item>) -> Ty
 pub(crate) fn const_fn_type<'item>(
     fn_: &'item FnDefinition,
     args: &[Arg],
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Type<'item> {
     state.in_scope(|state_| {
         bind_params_to_args(&fn_.params, args, state_).for_each(drop);
@@ -40,7 +40,7 @@ pub(crate) fn const_fn_type<'item>(
 pub(crate) fn bind_params_to_args<'item>(
     params: &'item ParamGroup,
     args: &[Arg],
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> impl Iterator<Item = (Type<'item>, Type<'item>)> {
     debug_assert_eq!(params.params.len(), args.len());
     params
@@ -53,7 +53,7 @@ pub(crate) fn bind_params_to_args<'item>(
 pub(crate) fn bind_param_to_arg<'item>(
     param: &'item Param,
     arg: &Arg,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> (Type<'item>, Type<'item>) {
     let param_type = param_type(param, state);
     let arg_type = expr_type(&arg.value, state);
@@ -67,7 +67,7 @@ pub(crate) fn bind_param_to_arg<'item>(
     (param_type, arg_type)
 }
 
-pub(crate) fn param_type<'item>(param: &'item Param, state: &mut State<'item>) -> Type<'item> {
+pub(crate) fn param_type<'item>(param: &'item Param, state: &State<'item>) -> Type<'item> {
     if matches!(param.type_, Expr::Wildcard(_)) {
         state
             .wildcard_type(param.id)
@@ -77,7 +77,7 @@ pub(crate) fn param_type<'item>(param: &'item Param, state: &mut State<'item>) -
     }
 }
 
-pub(crate) fn expr_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type<'item> {
+pub(crate) fn expr_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item> {
     match expr {
         Expr::F32Literal(_) => Type::Struct(state.search_prelude_type("f32")),
         Expr::U32Literal(_) => Type::Struct(state.search_prelude_type("u32")),
@@ -89,7 +89,7 @@ pub(crate) fn expr_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type<'i
     }
 }
 
-pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type<'item> {
+pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item> {
     match consts::expr_value(expr, state) {
         ConstValue::TypeRef(type_) => Type::Struct(type_),
         ConstValue::Param(type_) => Type::Param(type_),
@@ -103,14 +103,14 @@ pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type
     }
 }
 
-fn source_type<'item>(node_id: u64, args: &[Arg], state: &mut State<'item>) -> Type<'item> {
+fn source_type<'item>(node_id: u64, args: &[Arg], state: &State<'item>) -> Type<'item> {
     match state.sources.get(&node_id).copied() {
         Some(source) => item_type(source, args, state),
         None => Type::Unknown,
     }
 }
 
-fn item_type<'item>(item: ItemRef<'item>, args: &[Arg], state: &mut State<'item>) -> Type<'item> {
+fn item_type<'item>(item: ItemRef<'item>, args: &[Arg], state: &State<'item>) -> Type<'item> {
     match item {
         ItemRef::Var(var) => var_type(var, state),
         ItemRef::Const(const_) => expr_type(&const_.value, state),

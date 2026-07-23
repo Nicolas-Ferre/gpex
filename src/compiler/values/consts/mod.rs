@@ -13,14 +13,14 @@ use crate::compiler::state::State;
 use crate::compiler::values::types;
 use std::hash::{Hash, Hasher};
 
-pub(crate) fn is_const_infinite_f32(call: &Call, state: &mut State<'_>) -> bool {
+pub(crate) fn is_const_infinite_f32(call: &Call, state: &State<'_>) -> bool {
     matches!(
         call_value(call, state),
         ConstValue::F32(value) if !value.0.is_finite()
     )
 }
 
-pub(crate) fn expr_value<'item>(expr: &Expr, state: &mut State<'item>) -> ConstValue<'item> {
+pub(crate) fn expr_value<'item>(expr: &Expr, state: &State<'item>) -> ConstValue<'item> {
     match expr {
         Expr::F32Literal(literal) => f32_literal_value(literal),
         Expr::U32Literal(literal) => u32_literal_value(literal),
@@ -32,7 +32,7 @@ pub(crate) fn expr_value<'item>(expr: &Expr, state: &mut State<'item>) -> ConstV
     }
 }
 
-pub(crate) fn call_value<'item>(call: &Call, state: &mut State<'item>) -> ConstValue<'item> {
+pub(crate) fn call_value<'item>(call: &Call, state: &State<'item>) -> ConstValue<'item> {
     match state.sources.get(&call.id).copied() {
         Some(ItemRef::Fn(source)) => fn_call_value(call, source, state),
         Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_)) => {
@@ -66,7 +66,7 @@ fn f32_literal_value(literal: &F32Literal) -> ConstValue<'static> {
     }
 }
 
-fn ident_value<'item>(ident: &Ident, state: &mut State<'item>) -> ConstValue<'item> {
+fn ident_value<'item>(ident: &Ident, state: &State<'item>) -> ConstValue<'item> {
     match state.sources.get(&ident.id).copied() {
         Some(ItemRef::Var(_)) => ConstValue::RuntimeValue,
         Some(ItemRef::Const(child)) => expr_value(&child.value, state),
@@ -87,7 +87,7 @@ fn ident_value<'item>(ident: &Ident, state: &mut State<'item>) -> ConstValue<'it
 fn fn_call_value<'item>(
     call: &Call,
     source: &'item FnDefinition,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> ConstValue<'item> {
     debug_assert_eq!(call.args.len(), source.params.params.len());
     if ItemRef::Fn(source).is_param_constness_ignored() {
@@ -128,7 +128,7 @@ fn fn_call_value<'item>(
 fn fn_value<'item>(
     call: &Call,
     source: &'item FnDefinition,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> ConstValue<'item> {
     if source.const_keyword_span.is_none() {
         return ConstValue::RuntimeValue;
@@ -139,7 +139,7 @@ fn fn_value<'item>(
     }
 }
 
-fn fn_body_value<'item>(body: &FnStatementsBody, state: &mut State<'item>) -> ConstValue<'item> {
+fn fn_body_value<'item>(body: &FnStatementsBody, state: &State<'item>) -> ConstValue<'item> {
     for statement in &body.statements {
         match statement {
             Statement::Return(return_) => {
@@ -155,10 +155,7 @@ fn fn_body_value<'item>(body: &FnStatementsBody, state: &mut State<'item>) -> Co
     ConstValue::Unknown
 }
 
-fn run_assignment_statement(
-    assignment: &AssignmentStatement,
-    state: &mut State<'_>,
-) -> Result<(), ()> {
+fn run_assignment_statement(assignment: &AssignmentStatement, state: &State<'_>) -> Result<(), ()> {
     let assigned_param = param(&assignment.assigned, state).ok_or(())?;
     let new_value = expr_value(&assignment.value, state);
     let assigned_value = if matches!(new_value, ConstValue::RuntimeValue) {

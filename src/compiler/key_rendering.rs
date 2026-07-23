@@ -6,7 +6,7 @@ use crate::compiler::state::State;
 use crate::compiler::values::types;
 use crate::utils::validation::ValidateError;
 
-pub(crate) fn call_key(call: &Call, state: &mut State<'_>) -> Result<String, ValidateError> {
+pub(crate) fn call_key(call: &Call, state: &State<'_>) -> Result<String, ValidateError> {
     let fn_name = &call.name;
     let arg_types = call
         .args
@@ -17,7 +17,7 @@ pub(crate) fn call_key(call: &Call, state: &mut State<'_>) -> Result<String, Val
     Ok(format!("{fn_name}({arg_types})"))
 }
 
-pub(crate) fn fn_key(fn_: &FnDefinition, state: &mut State<'_>) -> Result<String, ValidateError> {
+pub(crate) fn fn_key(fn_: &FnDefinition, state: &State<'_>) -> Result<String, ValidateError> {
     let fn_name = &fn_.name;
     let param_types = fn_
         .params

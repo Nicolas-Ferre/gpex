@@ -9,6 +9,7 @@ use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::ValidateContext;
 use crate::{Log, LogLocation};
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
@@ -27,7 +28,7 @@ pub(crate) struct State<'item> {
     pub(crate) shader: String,
     pub(crate) specialized_fns: HashMap<SpecializedFn<'item>, usize>,
     pub(crate) transpiled_specialized_fn_indexes: HashSet<usize>,
-    scopes: Vec<Scope<'item>>,
+    scopes: RefCell<Vec<Scope<'item>>>,
     compilerimpl_types: HashMap<u64, CompilerImplType>,
 }
 
@@ -41,7 +42,7 @@ impl<'item> State<'item> {
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
             validation: ValidateContext::new(files, root_path),
-            scopes: vec![],
+            scopes: RefCell::default(),
             is_indexing_source_only: false,
             const_mark_span: None,
             param_constness: ParamConstness::ExplicitOnly,
@@ -105,6 +106,7 @@ impl<'item> State<'item> {
 
     pub(crate) fn wildcard_type(&self, param_id: u64) -> Option<Type<'item>> {
         self.scopes
+            .borrow()
             .last()
             .and_then(|scope| scope.wildcard_types.get(&param_id))
             .copied()
@@ -112,6 +114,7 @@ impl<'item> State<'item> {
 
     pub(crate) fn const_value(&self, id: u64) -> ConstValue<'item> {
         self.scopes
+            .borrow()
             .last()
             .and_then(|scope| scope.const_values.get(&id))
             .cloned()
@@ -122,23 +125,25 @@ impl<'item> State<'item> {
         self.validation.logs.push(log);
     }
 
-    pub(crate) fn add_wildcard_type(&mut self, param_id: u64, type_: Type<'item>) {
+    pub(crate) fn add_wildcard_type(&self, param_id: u64, type_: Type<'item>) {
         self.scopes
+            .borrow_mut()
             .last_mut()
             .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
             .wildcard_types
             .insert(param_id, type_);
     }
 
-    pub(crate) fn add_const_value(&mut self, id: u64, value: ConstValue<'item>) {
+    pub(crate) fn add_const_value(&self, id: u64, value: ConstValue<'item>) {
         self.scopes
+            .borrow_mut()
             .last_mut()
             .unwrap_or_else(|| unreachable!("constant value scope should be entered"))
             .const_values
             .insert(id, value);
     }
 
-    pub(crate) fn in_scope<O>(&mut self, callback: impl FnOnce(&mut Self) -> O) -> O {
+    pub(crate) fn in_scope<O>(&self, callback: impl FnOnce(&Self) -> O) -> O {
         self.enter_scope();
         let output = callback(self);
         self.exit_scope();
@@ -169,12 +174,12 @@ impl<'item> State<'item> {
         output
     }
 
-    pub(crate) fn enter_scope(&mut self) {
-        self.scopes.push(Scope::default());
+    pub(crate) fn enter_scope(&self) {
+        self.scopes.borrow_mut().push(Scope::default());
     }
 
-    pub(crate) fn exit_scope(&mut self) {
-        self.scopes.pop();
+    pub(crate) fn exit_scope(&self) {
+        self.scopes.borrow_mut().pop();
     }
 }
 

@@ -26,39 +26,24 @@ pub(super) fn index_call<'item>(call: &'item Call, state: &mut State<'item>) {
     for arg in &call.args {
         index_expr(&arg.value, state); // no-fn-check (recursivity)
     }
-    let key = call.key();
-    let accessible_search_params = SearchParams {
-        key: &key,
+    let search_params = SearchParams {
+        key: &call.key(),
         location: call,
         imports: &state.imports,
         config: FN_CALL_SEARCH_CONFIG,
     };
-    let accessible_items = state
-        .items
-        .search(accessible_search_params, Visibility::Enforced)
-        .collect::<Vec<_>>();
-    match search_accessible_call_source(call, &accessible_items, state) {
+    match search_accessible_call_source(call, search_params, state) {
         CallSource::Found(source) => index_accessible_source(&call, call.span, source, state),
         CallSource::NotFound => {
-            let ignored_search_params = SearchParams {
-                key: &key,
-                location: call,
-                imports: &state.imports,
-                config: FN_CALL_SEARCH_CONFIG,
-            };
-            let ignored_items = state
-                .items
-                .search(ignored_search_params, Visibility::Ignored)
-                .collect::<Vec<_>>();
-            if let Some(source) = search_not_accessible_call_source(call, &ignored_items, state) {
+            if let Some(source) = search_not_accessible_call_source(call, search_params, state) {
                 index_not_accessible_source(call.id, source, state);
             } else {
-                let candidates = search_candidate_call_sources(&accessible_items);
+                let candidates = search_candidate_call_sources(search_params, state);
                 index_call_candidates(call.id, candidates, state);
             }
         }
         CallSource::Unknown => {
-            let candidates = search_candidate_call_sources(&accessible_items);
+            let candidates = search_candidate_call_sources(search_params, state);
             index_call_candidates(call.id, candidates, state);
         }
     }
@@ -84,10 +69,10 @@ fn index_ident<'item>(ident: &'item Ident, state: &mut State<'item>) {
 
 fn search_accessible_call_source<'item>(
     call: &Call,
-    items: &[ItemRef<'item>],
-    state: &mut State<'item>,
+    search_params: SearchParams<'_, &Call>,
+    state: &State<'item>,
 ) -> CallSource<'item> {
-    for &item in items {
+    for item in state.items.search(search_params, Visibility::Enforced) {
         match item.args_match(&call.args, state) {
             ArgsMatch::Matching => return CallSource::Found(item),
             ArgsMatch::NotMatching => {}
@@ -97,22 +82,25 @@ fn search_accessible_call_source<'item>(
     CallSource::NotFound
 }
 
-fn search_candidate_call_sources<'item>(items: &[ItemRef<'item>]) -> Vec<ItemRef<'item>> {
-    items
-        .iter()
-        .copied()
+fn search_candidate_call_sources<'item>(
+    search_params: SearchParams<'_, &Call>,
+    state: &State<'item>,
+) -> Vec<ItemRef<'item>> {
+    state
+        .items
+        .search(search_params, Visibility::Enforced)
         .filter(|item| matches!(item, ItemRef::Fn(_)))
         .collect()
 }
 
 fn search_not_accessible_call_source<'item>(
     call: &Call,
-    items: &[ItemRef<'item>],
-    state: &mut State<'item>,
+    search_params: SearchParams<'_, &Call>,
+    state: &State<'item>,
 ) -> Option<ItemRef<'item>> {
-    items
-        .iter()
-        .copied()
+    state
+        .items
+        .search(search_params, Visibility::Ignored)
         .find(|item| item.args_match(&call.args, state) == ArgsMatch::Matching)
 }
 

@@ -96,7 +96,7 @@ impl<'item> ItemRef<'item> {
     }
 
     #[expect(clippy::excessive_nesting)] // scope cleanup adds one level around existing matching logic
-    pub(crate) fn args_match(self, args: &[Arg], state: &mut State<'item>) -> ArgsMatch {
+    pub(crate) fn args_match(self, args: &[Arg], state: &State<'item>) -> ArgsMatch {
         let params = self.params();
         state.in_scope(|state| {
             let mut result = ArgsMatch::Matching;
@@ -126,7 +126,7 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn displayed_key(self, state: &mut State<'item>) -> String {
+    pub(crate) fn displayed_key(self, state: &State<'item>) -> String {
         match self {
             ItemRef::Fn(item) => key_rendering::fn_key(item, state)
                 .unwrap_or_else(|_| unreachable!("function should be validated before")),
@@ -151,7 +151,7 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    fn requirement_match(param: &Param, state: &mut State<'item>) -> ArgsMatch {
+    fn requirement_match(param: &Param, state: &State<'item>) -> ArgsMatch {
         if let Some(requirement) = &param.requirement {
             match consts::expr_value(&requirement.condition, state) {
                 ConstValue::Bool(true) => ArgsMatch::Matching,

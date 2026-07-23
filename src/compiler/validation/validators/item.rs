@@ -297,7 +297,7 @@ pub(crate) fn check_binary_operator_fn(
 
 fn find_previous_same_fn_signature<'item>(
     fn_: &'item FnDefinition,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Option<&'item FnDefinition> {
     let search_params = SearchParams {
         key: &fn_.key(),
@@ -317,15 +317,13 @@ fn find_previous_same_fn_signature<'item>(
                 unreachable!("only functions are searched with parameter types")
             }
         })
-        .collect::<Vec<_>>()
-        .into_iter()
         .find(|previous_fn| are_same_fn_signatures(fn_, previous_fn, state))
 }
 
 fn are_same_fn_signatures<'item>(
     fn_: &'item FnDefinition,
     other_fn: &'item FnDefinition,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> bool {
     debug_assert!(fn_.name == other_fn.name);
     debug_assert!(fn_.params.params.len() == other_fn.params.params.len());

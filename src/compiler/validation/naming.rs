@@ -9,10 +9,7 @@ use crate::compiler::values::types::Type;
 pub(super) const IMPORT_ALLOWED_CASES: &[Case] = &[Case::Snake];
 pub(super) const VAR_ALLOWED_CASES: &[Case] = &[Case::Snake];
 
-pub(super) fn const_allowed_cases(
-    const_: &ConstDefinition,
-    state: &mut State<'_>,
-) -> &'static [Case] {
+pub(super) fn const_allowed_cases(const_: &ConstDefinition, state: &State<'_>) -> &'static [Case] {
     let type_ = types::expr_type(&const_.value, state);
     let may_be_typeref = type_.struct_ref().is_none()
         || state.is_compilerimpl_type(type_, CompilerImplType::Typeref);
@@ -23,7 +20,7 @@ pub(super) fn const_allowed_cases(
     }
 }
 
-pub(super) fn fn_allowed_cases(fn_: &FnDefinition, state: &mut State<'_>) -> &'static [Case] {
+pub(super) fn fn_allowed_cases(fn_: &FnDefinition, state: &State<'_>) -> &'static [Case] {
     let type_ = types::fn_type(fn_, state);
     let may_return_typeref = match type_ {
         Type::Struct(_) => state.is_compilerimpl_type(type_, CompilerImplType::Typeref),
@@ -39,7 +36,7 @@ pub(super) fn fn_allowed_cases(fn_: &FnDefinition, state: &mut State<'_>) -> &'s
 
 pub(super) fn param_allowed_cases<'item>(
     param: &'item Param,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> &'static [Case] {
     let type_ = types::param_type(param, state);
     let is_typeref = state.is_compilerimpl_type(type_, CompilerImplType::Typeref);

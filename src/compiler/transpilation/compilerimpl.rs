@@ -152,12 +152,12 @@ fn transpile_arg(
     }
 }
 
-fn is_zero_int(expr: &Expr, state: &mut State<'_>) -> bool {
+fn is_zero_int(expr: &Expr, state: &State<'_>) -> bool {
     let value = consts::expr_value(expr, state);
     matches!(value, ConstValue::I32(0) | ConstValue::U32(0))
 }
 
-fn type_(expr: &Expr, state: &mut State<'_>) -> CompilerImplType {
+fn type_(expr: &Expr, state: &State<'_>) -> CompilerImplType {
     let type_ = types::expr_type(expr, state)
         .struct_ref()
         .unwrap_or_else(|| unreachable!("unexpected value that is not a type"));

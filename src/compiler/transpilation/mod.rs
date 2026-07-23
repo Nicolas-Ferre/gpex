@@ -101,7 +101,7 @@ fn main_buffer_next_field_offset(
     current_field_index: usize,
     current_field_offset: u32,
     current_field_type: &StructDefinition,
-    state: &mut State<'_>,
+    state: &State<'_>,
 ) -> u32 {
     if let Some(next_var) = fields.get(current_field_index + 1) {
         let next_var_type = types::var_type(next_var, state)
@@ -116,7 +116,7 @@ fn main_buffer_next_field_offset(
     }
 }
 
-fn main_buffer_alignment(vars: &[&VarDefinition], state: &mut State<'_>) -> u32 {
+fn main_buffer_alignment(vars: &[&VarDefinition], state: &State<'_>) -> u32 {
     vars.iter()
         .map(|var| {
             types::var_type(var, state)

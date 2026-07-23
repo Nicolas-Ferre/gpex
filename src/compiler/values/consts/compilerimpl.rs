@@ -13,7 +13,7 @@ use crate::compiler::values::types::Type;
 pub(super) fn call_value<'item>(
     call: &Call,
     source: &'item FnDefinition,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> ConstValue<'item> {
     for param in &source.params.params {
         if matches!(
@@ -189,7 +189,7 @@ fn mul_add_value<'item>(source: &'item FnDefinition, state: &State<'item>) -> Co
     ConstValue::F32(HashableF32(value.0.mul_add(multiplier.0, addend.0)))
 }
 
-fn typeof_value<'item>(call: &Call, state: &mut State<'item>) -> ConstValue<'item> {
+fn typeof_value<'item>(call: &Call, state: &State<'item>) -> ConstValue<'item> {
     match types::expr_type(&call.args[0].value, state) {
         Type::Struct(type_) => ConstValue::TypeRef(type_),
         Type::Param(param) => ConstValue::Param(param),

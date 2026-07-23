@@ -126,7 +126,7 @@ fn register_specialized_fn<'item>(
 fn fn_const_param_values<'item>(
     call: &Call,
     child: &FnDefinition,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Vec<ConstValue<'item>> {
     call.args
         .iter()
@@ -139,7 +139,7 @@ fn fn_const_param_values<'item>(
 fn fn_param_wildcard_types<'item>(
     call: &Call,
     child: &FnDefinition,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) -> Vec<&'item StructDefinition> {
     call.args
         .iter()

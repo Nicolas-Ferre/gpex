@@ -143,7 +143,7 @@ fn transpile_type_name(type_: &StructDefinition) -> &str {
 fn resolve_const_param_value<'item>(
     param: &Param,
     const_param_values: &mut impl Iterator<Item = ConstValue<'item>>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) {
     let value = const_param_values
         .next()
@@ -154,7 +154,7 @@ fn resolve_const_param_value<'item>(
 fn resolve_param_wildcard_type<'item>(
     param: &Param,
     wildcard_param_types: &mut impl Iterator<Item = &'item StructDefinition>,
-    state: &mut State<'item>,
+    state: &State<'item>,
 ) {
     if !matches!(param.type_, Expr::Wildcard(_)) {
         return;
