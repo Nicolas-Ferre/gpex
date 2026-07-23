@@ -10,11 +10,7 @@ use crate::compiler::values::consts::ConstValue;
 use crate::compiler::values::types;
 use std::fmt::Write;
 
-pub(super) fn transpile_call(
-    node: &Call,
-    source: &FnDefinition,
-    state: &mut State<'_>,
-) {
+pub(super) fn transpile_call(node: &Call, source: &FnDefinition, state: &mut State<'_>) {
     match source.compilerimpl() {
         Some(CompilerImplFn::Binary(fn_)) => {
             transpile_fn_call_binary(node, fn_, state);
