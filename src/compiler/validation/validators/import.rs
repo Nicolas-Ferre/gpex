@@ -1,8 +1,8 @@
+use crate::compiler::logs;
 use crate::compiler::parsing::items::imports::ImportSegment;
 use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::validation::ValidateError;
-use crate::{Log, LogInner, LogLevel};
 use itertools::Itertools;
 
 pub(crate) fn check_found(
@@ -20,16 +20,12 @@ pub(crate) fn check_found(
         let first_segment = segments[0];
         let last_segment = segments[segments.len() - 1];
         let segments_span = first_segment.span().until(last_segment.span());
-        state.add_log(Log {
-            level: LogLevel::Error,
-            msg: format!("`{dot_path}` module not found"),
-            location: Some(state.span_location(segments_span)),
-            inner: vec![LogInner {
-                level: LogLevel::Info,
-                msg: format!("cannot read \"{}\"", fs_path.display()),
-                location: None,
-            }],
-        });
+        state.add_log(logs::imports::not_found(
+            &dot_path,
+            segments_span,
+            &fs_path,
+            state,
+        ));
         Err(ValidateError)
     }
 }
@@ -42,16 +38,7 @@ pub(crate) fn check_top(
     if is_top {
         Ok(())
     } else {
-        state.add_log(Log {
-            level: LogLevel::Error,
-            msg: "`import` statement not at the top of the module".into(),
-            location: Some(state.span_location(span)),
-            inner: vec![LogInner {
-                level: LogLevel::Info,
-                msg: "`import` statements should appear before anything else".into(),
-                location: None,
-            }],
-        });
+        state.add_log(logs::imports::not_at_top(span, state));
         Err(ValidateError)
     }
 }
@@ -64,12 +51,7 @@ pub(crate) fn check_self_import(
     if let Some(imported_file_index) = imported_file_index
         && imported_file_index == span.file_index
     {
-        state.add_log(Log {
-            level: LogLevel::Warning,
-            msg: "module importing itself".into(),
-            location: Some(state.span_location(span)),
-            inner: vec![],
-        });
+        state.add_log(logs::imports::self_import(span, state));
     }
 }
 
@@ -85,12 +67,7 @@ pub(crate) fn check_usage(
     let is_self_import = imported_file_index == Some(span.file_index);
     if !is_self_import && !is_pub && !is_used {
         let dot_path = dot_path_from_segments(segments, state);
-        state.add_log(Log {
-            level: LogLevel::Warning,
-            msg: format!("`{dot_path}` import unused"),
-            location: Some(state.span_location(span)),
-            inner: vec![],
-        });
+        state.add_log(logs::imports::unused(&dot_path, span, state));
     }
 }
 
