@@ -153,7 +153,7 @@ impl<'item> ItemRef<'item> {
 
     fn requirement_match(param: &Param, state: &mut State<'item>) -> ArgsMatch {
         if let Some(requirement) = &param.requirement {
-            match consts::expr_const_value(&requirement.condition, state) {
+            match consts::expr_value(&requirement.condition, state) {
                 ConstValue::Bool(true) => ArgsMatch::Matching,
                 ConstValue::Unknown => ArgsMatch::Unknown,
                 ConstValue::TypeRef(_)

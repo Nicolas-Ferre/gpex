@@ -14,7 +14,7 @@ use crate::utils::{endianness, formatting};
 use std::fmt::Write;
 
 pub(super) fn transpile_expr(expr: &Expr, state: &mut State<'_>) {
-    let value = consts::expr_const_value(expr, state);
+    let value = consts::expr_value(expr, state);
     if value == ConstValue::RuntimeValue {
         match expr {
             Expr::Call(child) => transpile_call(child, state),
@@ -132,7 +132,7 @@ fn fn_const_param_values<'item>(
         .iter()
         .zip(&child.params.params)
         .filter(|(_, param)| param.const_mark_span().is_some())
-        .map(|(arg, _)| consts::expr_const_value(&arg.value, state))
+        .map(|(arg, _)| consts::expr_value(&arg.value, state))
         .collect::<Vec<_>>()
 }
 

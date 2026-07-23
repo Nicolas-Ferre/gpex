@@ -61,7 +61,7 @@ pub(crate) fn bind_param_to_arg<'item>(
         state.add_wildcard_type(param.id, arg_type);
     }
     if param.const_mark_span().is_some() {
-        let value = consts::expr_const_value(&arg.value, state);
+        let value = consts::expr_value(&arg.value, state);
         state.add_const_value(param.id, value);
     }
     (param_type, arg_type)
@@ -90,7 +90,7 @@ pub(crate) fn expr_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type<'i
 }
 
 pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &mut State<'item>) -> Type<'item> {
-    match consts::expr_const_value(expr, state) {
+    match consts::expr_value(expr, state) {
         ConstValue::TypeRef(type_) => Type::Struct(type_),
         ConstValue::Param(type_) => Type::Param(type_),
         ConstValue::WildcardType(type_) => Type::Wildcard(type_),

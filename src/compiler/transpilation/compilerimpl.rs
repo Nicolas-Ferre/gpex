@@ -153,7 +153,7 @@ fn transpile_arg(
 }
 
 fn is_zero_int(expr: &Expr, state: &mut State<'_>) -> bool {
-    let value = consts::expr_const_value(expr, state);
+    let value = consts::expr_value(expr, state);
     matches!(value, ConstValue::I32(0) | ConstValue::U32(0))
 }
 

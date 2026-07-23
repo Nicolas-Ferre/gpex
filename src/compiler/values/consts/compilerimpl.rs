@@ -10,7 +10,7 @@ use crate::compiler::values::consts::{ConstValue, HashableF32};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
 
-pub(super) fn call_const_value<'item>(
+pub(super) fn call_value<'item>(
     call: &Call,
     source: &'item FnDefinition,
     state: &mut State<'item>,
@@ -24,16 +24,16 @@ pub(super) fn call_const_value<'item>(
         }
     }
     match source.compilerimpl() {
-        Some(CompilerImplFn::Binary(fn_)) => fn_binary_const_value(source, fn_, state),
-        Some(CompilerImplFn::Unary(fn_)) => fn_unary_const_value(source, fn_, state),
-        Some(CompilerImplFn::MulAdd) => fn_mul_add_const_value(source, state),
-        Some(CompilerImplFn::Sizeof) => fn_sizeof_const_value(source, state),
-        Some(CompilerImplFn::Typeof) => fn_typeof_const_value(call, state),
+        Some(CompilerImplFn::Binary(fn_)) => fn_binary_value(source, fn_, state),
+        Some(CompilerImplFn::Unary(fn_)) => fn_unary_value(source, fn_, state),
+        Some(CompilerImplFn::MulAdd) => mul_add_value(source, state),
+        Some(CompilerImplFn::Sizeof) => sizeof_value(source, state),
+        Some(CompilerImplFn::Typeof) => typeof_value(call, state),
         None => unreachable!("not implemented `{}` constant GPU function", source.name),
     }
 }
 
-fn fn_binary_const_value<'item>(
+fn fn_binary_value<'item>(
     source: &'item FnDefinition,
     fn_: BinaryCompilerImplFn,
     state: &State<'item>,
@@ -41,26 +41,18 @@ fn fn_binary_const_value<'item>(
     let left = state.const_value(source.params.params[0].id);
     let right = state.const_value(source.params.params[1].id);
     match (left, right) {
-        (ConstValue::I32(left), ConstValue::I32(right)) => {
-            fn_binary_i32_const_value(left, right, fn_)
-        }
-        (ConstValue::U32(left), ConstValue::U32(right)) => {
-            fn_binary_u32_const_value(left, right, fn_)
-        }
-        (ConstValue::F32(left), ConstValue::F32(right)) => {
-            fn_binary_f32_const_value(left, right, fn_)
-        }
-        (ConstValue::Bool(left), ConstValue::Bool(right)) => {
-            fn_binary_bool_const_value(left, right, fn_)
-        }
+        (ConstValue::I32(left), ConstValue::I32(right)) => fn_binary_i32_value(left, right, fn_),
+        (ConstValue::U32(left), ConstValue::U32(right)) => fn_binary_u32_value(left, right, fn_),
+        (ConstValue::F32(left), ConstValue::F32(right)) => fn_binary_f32_value(left, right, fn_),
+        (ConstValue::Bool(left), ConstValue::Bool(right)) => fn_binary_bool_value(left, right, fn_),
         (ConstValue::TypeRef(left), ConstValue::TypeRef(right)) => {
-            fn_binary_typeref_const_value(left, right, fn_)
+            fn_binary_typeref_value(left, right, fn_)
         }
         _ => unreachable!("not implemented `{}` constant GPU function", source.name),
     }
 }
 
-fn fn_binary_i32_const_value<'item>(
+fn fn_binary_i32_value<'item>(
     left: i32,
     right: i32,
     fn_: BinaryCompilerImplFn,
@@ -89,7 +81,7 @@ fn fn_binary_i32_const_value<'item>(
     }
 }
 
-fn fn_binary_u32_const_value<'item>(
+fn fn_binary_u32_value<'item>(
     left: u32,
     right: u32,
     fn_: BinaryCompilerImplFn,
@@ -119,7 +111,7 @@ fn fn_binary_u32_const_value<'item>(
 }
 
 #[expect(clippy::float_cmp)] // needed
-fn fn_binary_f32_const_value<'item>(
+fn fn_binary_f32_value<'item>(
     left: HashableF32,
     right: HashableF32,
     fn_: BinaryCompilerImplFn,
@@ -143,7 +135,7 @@ fn fn_binary_f32_const_value<'item>(
     }
 }
 
-fn fn_binary_bool_const_value<'item>(
+fn fn_binary_bool_value<'item>(
     left: bool,
     right: bool,
     fn_: BinaryCompilerImplFn,
@@ -161,7 +153,7 @@ fn fn_binary_bool_const_value<'item>(
     }
 }
 
-fn fn_binary_typeref_const_value<'item>(
+fn fn_binary_typeref_value<'item>(
     left: &'item StructDefinition,
     right: &'item StructDefinition,
     fn_: BinaryCompilerImplFn,
@@ -173,7 +165,7 @@ fn fn_binary_typeref_const_value<'item>(
     }
 }
 
-fn fn_unary_const_value<'item>(
+fn fn_unary_value<'item>(
     source: &'item FnDefinition,
     fn_: UnaryCompilerImplFn,
     state: &State<'item>,
@@ -186,10 +178,7 @@ fn fn_unary_const_value<'item>(
     }
 }
 
-fn fn_mul_add_const_value<'item>(
-    source: &'item FnDefinition,
-    state: &State<'item>,
-) -> ConstValue<'item> {
+fn mul_add_value<'item>(source: &'item FnDefinition, state: &State<'item>) -> ConstValue<'item> {
     let (ConstValue::F32(value), ConstValue::F32(multiplier), ConstValue::F32(addend)) = (
         state.const_value(source.params.params[0].id),
         state.const_value(source.params.params[1].id),
@@ -200,7 +189,7 @@ fn fn_mul_add_const_value<'item>(
     ConstValue::F32(HashableF32(value.0.mul_add(multiplier.0, addend.0)))
 }
 
-fn fn_typeof_const_value<'item>(call: &Call, state: &mut State<'item>) -> ConstValue<'item> {
+fn typeof_value<'item>(call: &Call, state: &mut State<'item>) -> ConstValue<'item> {
     match types::expr_type(&call.args[0].value, state) {
         Type::Struct(type_) => ConstValue::TypeRef(type_),
         Type::Param(param) => ConstValue::Param(param),
@@ -209,10 +198,7 @@ fn fn_typeof_const_value<'item>(call: &Call, state: &mut State<'item>) -> ConstV
     }
 }
 
-fn fn_sizeof_const_value<'item>(
-    source: &'item FnDefinition,
-    state: &State<'item>,
-) -> ConstValue<'item> {
+fn sizeof_value<'item>(source: &'item FnDefinition, state: &State<'item>) -> ConstValue<'item> {
     match state.const_value(source.params.params[0].id) {
         ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
         _ => unreachable!("not implemented `{}` constant GPU function", source.name),
