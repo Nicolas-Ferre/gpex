@@ -145,6 +145,6 @@ pub(crate) enum CompilerImplType {
 
 #[derive(Debug, Default)]
 struct Scope<'item> {
-    pub(crate) const_values: HashMap<u64, ConstValue<'item>>,
-    pub(crate) wildcard_types: HashMap<u64, Type<'item>>,
+    const_values: HashMap<u64, ConstValue<'item>>,
+    wildcard_types: HashMap<u64, Type<'item>>,
 }

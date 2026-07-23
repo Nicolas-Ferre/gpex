@@ -1,4 +1,4 @@
-pub(crate) mod compilerimpl;
+mod compilerimpl;
 mod exprs;
 mod items;
 

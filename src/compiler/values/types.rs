@@ -6,7 +6,7 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::state::State;
-use crate::compiler::values::{ConstValue, consts};
+use crate::compiler::values::consts::{self, ConstValue};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
