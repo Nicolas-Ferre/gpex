@@ -34,12 +34,9 @@ fn scan_call(node: &Call, state: &mut State<'_>) -> Result<(), Vec<Span>> {
     } else {
         // Covers case where there is function circular dependency from their signature.
         // As call source resolution is not done in this case, candidates are followed instead.
-        let candidates = state
-            .candidate_sources
-            .get(&node.id)
-            .cloned() // TODO: avoid costly Vec clone
-            .unwrap_or_default();
-        for source in candidates {
+        let candidate_count = state.candidate_sources.get(&node.id).map_or(0, Vec::len);
+        for index in 0..candidate_count {
+            let source = state.candidate_sources[&node.id][index];
             scan_item(source, node.span, state)?;
         }
         Ok(())
