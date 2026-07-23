@@ -24,6 +24,7 @@ pub(crate) async fn create_adapter(instance: &Instance) -> Result<Adapter, Vec<L
         power_preference: PowerPreference::default(),
         force_fallback_adapter: false,
         compatible_surface: None,
+        apply_limit_buckets: false,
     };
     instance.request_adapter(&options).await.map_err(|error| {
         // coverage: off (difficult to test)
@@ -120,7 +121,9 @@ pub(crate) fn read_buffer(
             timeout: None,
         })
         .unwrap_or_else(|_| unreachable!("GPU poll should never fail"));
-    let view = slice.get_mapped_range();
+    let view = slice
+        .get_mapped_range()
+        .unwrap_or_else(|_| unreachable!("GPU buffer should be mapped"));
     let content = view.to_vec();
     drop(view);
     read_buffer.unmap();
