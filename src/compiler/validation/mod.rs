@@ -1,148 +1,55 @@
-#![expect(clippy::multiple_inherent_impl)]
-
 mod exprs;
 mod fns;
 mod items;
 mod naming;
 mod validators;
 
-use crate::compiler::indexing::indexes::Indexes;
-use crate::compiler::key_rendering::KeyRenderer;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::imports::{Import, ImportSegment};
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::values::ValueResolver;
+use crate::compiler::state::State;
 use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::{ValidateContext, ValidateError};
-use crate::{Log, LogLevel};
+use crate::{Log, LogLevel, LogLocation};
+use std::mem;
 use std::path::Path;
 
-#[derive(Debug)]
-pub(crate) struct Validator<'item, 'index> {
-    pub(crate) context: ValidateContext<'index>,
-    indexes: &'index Indexes<'item>,
+struct ValidateState<'state, 'item> {
+    inner: &'state State<'item>,
+    context: ValidateContext<'item>,
     const_mark_span: Option<Span>,
     param_constness: ParamConstness,
-    value_resolver: ValueResolver<'item, 'index>,
-    key_renderer: KeyRenderer<'item, 'index>,
 }
 
-impl<'item, 'index> Validator<'item, 'index> {
-    pub(crate) fn new(
-        files: &'index [ReadFile],
-        root_path: &'index Path,
-        indexes: &'index Indexes<'item>,
-    ) -> Self {
+impl<'state, 'item> ValidateState<'state, 'item> {
+    fn new(state: &'state State<'item>, files: &'item [ReadFile], root_path: &'item Path) -> Self {
         Self {
+            inner: state,
             context: ValidateContext::new(files, root_path),
-            indexes,
             const_mark_span: None,
             param_constness: ParamConstness::ExplicitOnly,
-            value_resolver: ValueResolver::new(indexes),
-            key_renderer: KeyRenderer::new(indexes),
         }
     }
 
-    pub(crate) fn validate_modules(
-        mut self,
-        modules: &'item [Module],
-        is_warning_treated_as_error: bool,
-    ) -> Result<Vec<Log>, Vec<Log>> {
-        let mut is_error_detected = false;
-        for module in modules {
-            is_error_detected |= self.validate_module(module).is_err();
-        }
-        if !is_error_detected {
-            // Import usage is checked in dedicated pass to avoid false positive
-            // in case of cyclic dependencies.
-            for module in modules {
-                self.validate_module_import_usage(module);
-            }
-        }
-        self.context.logs.sort_by_key(Log::sort_key);
-        if self
-            .context
-            .logs
-            .iter()
-            .any(|log| Self::is_log_error(log, is_warning_treated_as_error))
-        {
-            Err(self.context.logs)
-        } else {
-            Ok(self.context.logs)
-        }
+    fn span_location(&self, span: Span) -> LogLocation {
+        self.context.location(span)
     }
 
-    fn is_log_error(log: &Log, is_warning_treated_as_error: bool) -> bool {
-        log.level == LogLevel::Error
-            || (is_warning_treated_as_error && log.level == LogLevel::Warning)
+    fn add_log(&mut self, log: Log) {
+        self.context.logs.push(log);
     }
 
-    fn validate_module(&mut self, node: &'item Module) -> Result<(), ValidateError> {
-        let mut is_module_valid = true;
-        let mut are_imports_finished = false;
-        for item in &node.items {
-            if let Item::Import(import) = item {
-                is_module_valid &= self.validate_import(import, !are_imports_finished).is_ok();
-            } else {
-                are_imports_finished = true;
-            }
-        }
-        if !is_module_valid {
-            return Err(ValidateError);
-        }
-        for item in &node.items {
-            is_module_valid &= self.validate_item(item).is_ok();
-        }
-        if !is_module_valid {
-            return Err(ValidateError);
-        }
-        Ok(())
-    }
-
-    fn validate_import(&mut self, node: &Import, is_top_import: bool) -> Result<(), ValidateError> {
-        let is_found = node.imported_file_index.is_some();
-        validators::import::check_found(is_found, &node.segments, &mut self.context)?;
-        validators::import::check_top(is_top_import, node.span, &mut self.context)?;
-        validators::import::check_self_import(
-            node.imported_file_index,
-            node.span,
-            &mut self.context,
-        );
-        for &segment in &node.segments {
-            if let ImportSegment::Name(span) = segment {
-                validators::ident::check_case(span, Self::IMPORT_ALLOWED_CASES, &mut self.context);
-            }
-        }
-        Ok(())
-    }
-
-    fn validate_module_import_usage(&mut self, node: &Module) {
-        for item in &node.items {
-            if let Item::Import(import) = item {
-                validators::import::check_usage(
-                    import.id,
-                    import.imported_file_index,
-                    import.span,
-                    import.pub_keyword_span.is_some(),
-                    &import.segments,
-                    &mut self.context,
-                    self.indexes,
-                );
-            }
-        }
-    }
-
-    fn run_with_param_constness<O>(
+    fn with_param_constness<O>(
         &mut self,
         param_constness: ParamConstness,
         callback: impl FnOnce(&mut Self) -> O,
     ) -> O {
         let previous_param_constness = self.param_constness;
         self.param_constness = param_constness;
-        let result = callback(self);
+        let output = callback(self);
         self.param_constness = previous_param_constness;
-        result
+        output
     }
 
     fn with_const_mark_span<O>(
@@ -162,4 +69,94 @@ impl<'item, 'index> Validator<'item, 'index> {
 enum ParamConstness {
     ExplicitOnly,
     All,
+}
+
+pub(crate) fn validate_modules<'item>(
+    root_path: &'item Path,
+    files: &'item [ReadFile],
+    modules: &'item [Module],
+    is_warning_treated_as_error: bool,
+    state: &State<'item>,
+) -> Result<Vec<Log>, Vec<Log>> {
+    let mut state = ValidateState::new(state, files, root_path);
+    let mut is_error_detected = false;
+    for module in modules {
+        is_error_detected |= validate_module(module, &mut state).is_err();
+    }
+    if !is_error_detected {
+        // Import usage is checked in dedicated pass to avoid false positive
+        // in case of cyclic dependencies.
+        for module in modules {
+            validate_module_import_usage(module, &mut state);
+        }
+    }
+    state.context.logs.sort_by_key(Log::sort_key);
+    let is_log_error = state
+        .context
+        .logs
+        .iter()
+        .any(|log| is_log_error(log, is_warning_treated_as_error));
+    let logs = mem::take(&mut state.context.logs);
+    if is_log_error { Err(logs) } else { Ok(logs) }
+}
+
+fn is_log_error(log: &Log, is_warning_treated_as_error: bool) -> bool {
+    log.level == LogLevel::Error || (is_warning_treated_as_error && log.level == LogLevel::Warning)
+}
+
+fn validate_module<'item>(
+    module: &'item Module,
+    state: &mut ValidateState<'_, 'item>,
+) -> Result<(), ValidateError> {
+    let mut is_module_valid = true;
+    let mut are_imports_finished = false;
+    for item in &module.items {
+        if let Item::Import(import) = item {
+            is_module_valid &= validate_import(import, !are_imports_finished, state).is_ok();
+        } else {
+            are_imports_finished = true;
+        }
+    }
+    if !is_module_valid {
+        return Err(ValidateError);
+    }
+    for item in &module.items {
+        is_module_valid &= items::validate_item(item, state).is_ok();
+    }
+    if !is_module_valid {
+        return Err(ValidateError);
+    }
+    Ok(())
+}
+
+fn validate_import(
+    import: &Import,
+    is_top_import: bool,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    let is_found = import.imported_file_index.is_some();
+    validators::import::check_found(is_found, &import.segments, state)?;
+    validators::import::check_top(is_top_import, import.span, state)?;
+    validators::import::check_self_import(import.imported_file_index, import.span, state);
+    for &segment in &import.segments {
+        if let ImportSegment::Name(span) = segment {
+            validators::ident::check_case(span, naming::IMPORT_ALLOWED_CASES, state);
+        }
+    }
+    Ok(())
+}
+
+fn validate_module_import_usage(module: &Module, state: &mut ValidateState<'_, '_>) {
+    for item in &module.items {
+        if let Item::Import(import) = item {
+            validators::import::check_usage(
+                import.id,
+                import.imported_file_index,
+                import.span,
+                import.pub_keyword_span.is_some(),
+                &import.segments,
+                state,
+            );
+        }
+    }
 }

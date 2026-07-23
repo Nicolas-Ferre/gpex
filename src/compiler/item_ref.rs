@@ -1,13 +1,13 @@
-use crate::compiler::indexing::indexes::Indexes;
-use crate::compiler::key_rendering::KeyRenderer;
+use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::{CompilerImplFn, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::values::ValueResolver;
+use crate::compiler::state::State;
+use crate::compiler::values::consts;
 use crate::compiler::values::consts::ConstValue;
-use crate::compiler::values::types::Type;
+use crate::compiler::values::types::{self, Type};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 
@@ -23,31 +23,31 @@ pub(crate) enum ItemRef<'item> {
 impl NodeRef for ItemRef<'_> {
     fn file_index(&self) -> usize {
         match self {
-            Self::Var(node) => node.name_span.file_index,
-            Self::Const(node) => node.name_span.file_index,
-            Self::Struct(node) => node.name_span.file_index,
-            Self::Fn(node) => node.name_span.file_index,
-            Self::Param(node) => node.name_span.file_index,
+            Self::Var(var) => var.name_span.file_index,
+            Self::Const(const_) => const_.name_span.file_index,
+            Self::Struct(struct_) => struct_.name_span.file_index,
+            Self::Fn(fn_) => fn_.name_span.file_index,
+            Self::Param(param) => param.name_span.file_index,
         }
     }
 
     fn id(&self) -> u64 {
         match self {
-            Self::Var(node) => node.id,
-            Self::Const(node) => node.id,
-            Self::Struct(node) => node.id,
-            Self::Fn(node) => node.id,
-            Self::Param(node) => node.id,
+            Self::Var(var) => var.id,
+            Self::Const(const_) => const_.id,
+            Self::Struct(struct_) => struct_.id,
+            Self::Fn(fn_) => fn_.id,
+            Self::Param(param) => param.id,
         }
     }
 
     fn scope(&self) -> &[u64] {
         match self {
-            Self::Var(node) => &node.scope,
-            Self::Const(node) => &node.scope,
-            Self::Struct(node) => &node.scope,
-            Self::Fn(node) => &node.scope,
-            Self::Param(node) => &node.scope,
+            Self::Var(var) => &var.scope,
+            Self::Const(const_) => &const_.scope,
+            Self::Struct(struct_) => &struct_.scope,
+            Self::Fn(fn_) => &fn_.scope,
+            Self::Param(param) => &param.scope,
         }
     }
 }
@@ -55,21 +55,21 @@ impl NodeRef for ItemRef<'_> {
 impl ItemNodeRef for ItemRef<'_> {
     fn is_pub(&self) -> bool {
         match self {
-            Self::Var(node) => node.pub_keyword_span.is_some(),
-            Self::Const(node) => node.pub_keyword_span.is_some(),
-            Self::Struct(node) => node.pub_keyword_span.is_some(),
-            Self::Fn(node) => node.pub_keyword_span.is_some(),
+            Self::Var(var) => var.pub_keyword_span.is_some(),
+            Self::Const(const_) => const_.pub_keyword_span.is_some(),
+            Self::Struct(struct_) => struct_.pub_keyword_span.is_some(),
+            Self::Fn(fn_) => fn_.pub_keyword_span.is_some(),
             Self::Param(_) => false,
         }
     }
 
     fn key(&self) -> String {
         match self {
-            Self::Var(node) => node.name.clone(),
-            Self::Const(node) => node.name.clone(),
-            Self::Struct(node) => node.name.clone(),
-            Self::Fn(node) => node.key(),
-            Self::Param(node) => node.name.clone(),
+            Self::Var(var) => var.name.clone(),
+            Self::Const(const_) => const_.name.clone(),
+            Self::Struct(struct_) => struct_.name.clone(),
+            Self::Fn(fn_) => fn_.key(),
+            Self::Param(param) => param.name.clone(),
         }
     }
 }
@@ -77,17 +77,17 @@ impl ItemNodeRef for ItemRef<'_> {
 impl<'item> ItemRef<'item> {
     pub(crate) fn name_span(self) -> Span {
         match self {
-            Self::Var(node) => node.name_span,
-            Self::Const(node) => node.name_span,
-            Self::Struct(node) => node.name_span,
-            Self::Fn(node) => node.name_span,
-            Self::Param(node) => node.name_span,
+            Self::Var(var) => var.name_span,
+            Self::Const(const_) => const_.name_span,
+            Self::Struct(struct_) => struct_.name_span,
+            Self::Fn(fn_) => fn_.name_span,
+            Self::Param(param) => param.name_span,
         }
     }
 
     pub(crate) fn signature_span_with_return(self) -> Span {
         match self {
-            Self::Fn(node) => node.signature_span_with_return,
+            Self::Fn(fn_) => fn_.signature_span_with_return,
             // coverage: off (only functions can be called)
             Self::Var(_) | Self::Const(_) | Self::Struct(_) | Self::Param(_) => {
                 unreachable!("only functions can be called")
@@ -95,25 +95,26 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn args_match(self, args: &[Arg], indexes: &Indexes<'_>) -> ArgsMatch {
+    #[expect(clippy::excessive_nesting)] // scope cleanup adds one level around existing matching logic
+    pub(crate) fn args_match(self, args: &[Arg], state: &State<'item>) -> ArgsMatch {
         let params = self.params();
-        let mut value_resolver = ValueResolver::new(indexes);
-        value_resolver.enter_scope();
-        let mut result = ArgsMatch::Matching;
-        for (param, arg) in params.params.iter().zip(args) {
-            let (param_type, arg_type) = value_resolver.bind_param_to_arg(param, arg);
-            for param_match in [
-                Self::arg_match(param_type, arg_type),
-                Self::requirement_match(param, &mut value_resolver),
-            ] {
-                match param_match {
-                    ArgsMatch::Matching => {}
-                    ArgsMatch::NotMatching => return ArgsMatch::NotMatching,
-                    ArgsMatch::Unknown => result = ArgsMatch::Unknown,
+        state.in_scope(|state| {
+            let mut result = ArgsMatch::Matching;
+            for (param, arg) in params.params.iter().zip(args) {
+                let (param_type, arg_type) = types::bind_param_to_arg(param, arg, state);
+                for param_match in [
+                    Self::arg_match(param_type, arg_type),
+                    Self::requirement_match(param, state),
+                ] {
+                    match param_match {
+                        ArgsMatch::Matching => {}
+                        ArgsMatch::NotMatching => return ArgsMatch::NotMatching,
+                        ArgsMatch::Unknown => result = ArgsMatch::Unknown,
+                    }
                 }
             }
-        }
-        result
+            result
+        })
     }
 
     pub(crate) fn params(self) -> &'item ParamGroup {
@@ -125,10 +126,9 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    pub(crate) fn displayed_key(self, key_renderer: &mut KeyRenderer<'_, '_>) -> String {
+    pub(crate) fn displayed_key(self, state: &State<'item>) -> String {
         match self {
-            ItemRef::Fn(item) => key_renderer
-                .fn_key(item)
+            ItemRef::Fn(item) => key_rendering::fn_key(item, state)
                 .unwrap_or_else(|_| unreachable!("function should be validated before")),
             ItemRef::Var(item) => item.name.clone(),
             ItemRef::Const(item) => item.name.clone(),
@@ -151,9 +151,9 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    fn requirement_match(param: &Param, value_resolver: &mut ValueResolver<'_, '_>) -> ArgsMatch {
+    fn requirement_match(param: &Param, state: &State<'item>) -> ArgsMatch {
         if let Some(requirement) = &param.requirement {
-            match value_resolver.expr_const_value(&requirement.condition) {
+            match consts::expr_value(&requirement.condition, state) {
                 ConstValue::Bool(true) => ArgsMatch::Matching,
                 ConstValue::Unknown => ArgsMatch::Unknown,
                 ConstValue::TypeRef(_)

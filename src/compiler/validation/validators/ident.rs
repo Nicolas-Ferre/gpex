@@ -1,28 +1,28 @@
+use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::{Span, SpanProps};
-use crate::utils::validation::ValidateContext;
 use crate::{Log, LogLevel};
 use itertools::Itertools;
 
-pub(crate) fn check_char_count(span: Span, context: &mut ValidateContext<'_>) {
-    let slice = context.slice(span);
+pub(crate) fn check_char_count(span: Span, state: &mut ValidateState<'_, '_>) {
+    let slice = state.context.slice(span);
     if slice.len() == 1 && slice != "_" {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{slice}` identifier is single character"),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![],
         });
     }
 }
 
-pub(crate) fn check_case(span: Span, expected_cases: &[Case], context: &mut ValidateContext<'_>) {
-    let slice = context.slice(span);
+pub(crate) fn check_case(span: Span, expected_cases: &[Case], state: &mut ValidateState<'_, '_>) {
+    let slice = state.context.slice(span);
     if !expected_cases.iter().any(|case| case.is_valid(slice)) {
         let case_labels = expected_cases.iter().map(|case| case.labels()).join(" or ");
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{slice}` identifier not in {case_labels}"),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![],
         });
     }

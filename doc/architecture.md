@@ -16,6 +16,9 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 Key directories and files:
 
 - `src/compiler/`: Compilation pipeline orchestration and definition of each pipeline stage:
+    - `state.rs`: Shared post-parse compiler state used by indexing, validation, value resolution,
+      dependency analysis, and transpilation.
+    - `item_ref.rs`: Shared item-reference representation used across compiler passes.
     - `parsing/`: AST definitions and parsing: modules, imports, items (functions, variables,
       structs, ...), expressions, statements. This layer also defines utility methods run on AST
       nodes.
@@ -23,8 +26,7 @@ Key directories and files:
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...).
     - `transpilation/`: AST-to-WGSL conversion.
-    - `consts.rs`: Constness checking.
-    - `dependencies.rs`: Item dependencies resolution.
+    - `dependencies.rs`: Item dependency resolution.
     - `key_rendering.rs`: Rendering of item keys for compiler logs.
     - `prelude.rs`: Built-in types and functions.
     - `refs.rs`: Reference checking (in this context, a reference is an expression that is permitted

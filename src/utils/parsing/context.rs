@@ -88,9 +88,9 @@ impl<'config> ParseContext<'config> {
         for parser in parsers {
             self.is_parse_any_error_forced = false;
             match parser(self) {
-                Ok(node) => {
+                Ok(value) => {
                     self.is_parse_any_error_forced = initial_context.is_parse_any_error_forced;
-                    return Ok(node);
+                    return Ok(value);
                 }
                 Err(error) if self.is_parse_any_error_forced => {
                     *self = initial_context;

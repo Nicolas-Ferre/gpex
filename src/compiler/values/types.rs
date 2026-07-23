@@ -1,99 +1,122 @@
-use crate::compiler::indexing::item_ref::ItemRef;
+use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::parsing::items::params::Param;
+use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::values::{ConstValue, ValueResolver};
+use crate::compiler::state::State;
+use crate::compiler::values::consts::{self, ConstValue};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
-impl<'item> ValueResolver<'item, '_> {
-    pub(crate) fn var_type(&mut self, node: &VarDefinition) -> Type<'item> {
-        self.expr_type(&node.default_value)
-    }
+pub(crate) fn var_type<'item>(var: &VarDefinition, state: &State<'item>) -> Type<'item> {
+    expr_type(&var.default_value, state)
+}
 
-    pub(crate) fn param_type(&mut self, node: &'item Param) -> Type<'item> {
-        if matches!(node.type_, Expr::Wildcard(_)) {
-            self.scopes
-                .last()
-                .and_then(|scope| scope.wildcard_types.get(&node.id))
-                .copied()
-                .unwrap_or(Type::Wildcard(node))
-        } else {
-            self.expr_as_type(&node.type_)
-        }
+pub(crate) fn fn_type<'item>(fn_: &FnDefinition, state: &State<'item>) -> Type<'item> {
+    if let Some(return_type) = fn_.return_type.as_ref() {
+        expr_as_type(return_type, state)
+    } else {
+        Type::NoReturn
     }
+}
 
-    pub(crate) fn fn_type(&mut self, node: &FnDefinition) -> Type<'item> {
-        if let Some(return_type) = node.return_type.as_ref() {
-            self.expr_as_type(return_type)
+pub(crate) fn const_fn_type<'item>(
+    fn_: &'item FnDefinition,
+    args: &[Arg],
+    state: &State<'item>,
+) -> Type<'item> {
+    state.in_scope(|state_| {
+        bind_params_to_args(&fn_.params, args, state_).for_each(drop);
+        if let Some(return_type) = fn_.return_type.as_ref() {
+            expr_as_type(return_type, state_)
         } else {
             Type::NoReturn
         }
-    }
+    })
+}
 
-    pub(crate) fn const_fn_type(&mut self, node: &'item FnDefinition, args: &[Arg]) -> Type<'item> {
-        self.run_scoped(|self_| {
-            self_.bind_params_to_args(&node.params, args).for_each(drop);
-            if let Some(return_type) = node.return_type.as_ref() {
-                self_.expr_as_type(return_type)
-            } else {
-                Type::NoReturn
-            }
-        })
-    }
+pub(crate) fn bind_params_to_args<'item>(
+    params: &'item ParamGroup,
+    args: &[Arg],
+    state: &State<'item>,
+) -> impl Iterator<Item = (Type<'item>, Type<'item>)> {
+    debug_assert_eq!(params.params.len(), args.len());
+    params
+        .params
+        .iter()
+        .zip(args)
+        .map(|(param, arg)| bind_param_to_arg(param, arg, state))
+}
 
-    pub(crate) fn expr_type(&mut self, node: &Expr) -> Type<'item> {
-        match node {
-            Expr::F32Literal(_) => Type::Struct(self.indexes.search_prelude_type("f32")),
-            Expr::U32Literal(_) => Type::Struct(self.indexes.search_prelude_type("u32")),
-            Expr::I32Literal(_) => Type::Struct(self.indexes.search_prelude_type("i32")),
-            Expr::BoolLiteral(_) => Type::Struct(self.indexes.search_prelude_type("bool")),
-            Expr::Wildcard(_) => Type::Unknown,
-            Expr::Call(node) => self.source_type(node.id, &node.args),
-            Expr::Ident(node) => self.source_type(node.id, &[]),
-        }
+pub(crate) fn bind_param_to_arg<'item>(
+    param: &'item Param,
+    arg: &Arg,
+    state: &State<'item>,
+) -> (Type<'item>, Type<'item>) {
+    let param_type = param_type(param, state);
+    let arg_type = expr_type(&arg.value, state);
+    if matches!(param.type_, Expr::Wildcard(_)) {
+        state.add_wildcard_type(param.id, arg_type);
     }
-
-    pub(crate) fn expr_as_type(&mut self, node: &Expr) -> Type<'item> {
-        match self.expr_const_value(node) {
-            ConstValue::TypeRef(type_) => Type::Struct(type_),
-            ConstValue::Param(type_) => Type::Param(type_),
-            ConstValue::WildcardType(type_) => Type::Wildcard(type_),
-            ConstValue::I32(_)
-            | ConstValue::U32(_)
-            | ConstValue::F32(_)
-            | ConstValue::Bool(_)
-            | ConstValue::Unknown
-            | ConstValue::RuntimeValue => Type::Unknown,
-        }
+    if param.const_mark_span().is_some() {
+        let value = consts::expr_value(&arg.value, state);
+        state.add_const_value(param.id, value);
     }
+    (param_type, arg_type)
+}
 
-    pub(crate) fn add_type(&mut self, id: u64, type_: Type<'item>) {
-        self.scopes
-            .last_mut()
-            .unwrap_or_else(|| unreachable!("wildcard parameter type scope should be entered"))
-            .wildcard_types
-            .insert(id, type_);
+pub(crate) fn param_type<'item>(param: &'item Param, state: &State<'item>) -> Type<'item> {
+    if matches!(param.type_, Expr::Wildcard(_)) {
+        state
+            .wildcard_type(param.id)
+            .unwrap_or(Type::Wildcard(param))
+    } else {
+        expr_as_type(&param.type_, state)
     }
+}
 
-    fn source_type(&mut self, node_id: u64, args: &[Arg]) -> Type<'item> {
-        match self.indexes.sources.get(&node_id) {
-            Some(source) => self.item_type(*source, args),
-            None => Type::Unknown,
-        }
+pub(crate) fn expr_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item> {
+    match expr {
+        Expr::F32Literal(_) => Type::Struct(state.search_prelude_type("f32")),
+        Expr::U32Literal(_) => Type::Struct(state.search_prelude_type("u32")),
+        Expr::I32Literal(_) => Type::Struct(state.search_prelude_type("i32")),
+        Expr::BoolLiteral(_) => Type::Struct(state.search_prelude_type("bool")),
+        Expr::Wildcard(_) => Type::Unknown,
+        Expr::Call(call) => source_type(call.id, &call.args, state),
+        Expr::Ident(ident) => source_type(ident.id, &[], state),
     }
+}
 
-    fn item_type(&mut self, node: ItemRef<'item>, args: &[Arg]) -> Type<'item> {
-        match node {
-            ItemRef::Var(node) => self.var_type(node),
-            ItemRef::Const(node) => self.expr_type(&node.value),
-            ItemRef::Struct(_) => Type::Struct(self.indexes.search_prelude_type("typeref")),
-            ItemRef::Fn(node) => self.const_fn_type(node, args),
-            ItemRef::Param(node) => self.param_type(node),
-        }
+pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item> {
+    match consts::expr_value(expr, state) {
+        ConstValue::TypeRef(type_) => Type::Struct(type_),
+        ConstValue::Param(type_) => Type::Param(type_),
+        ConstValue::WildcardType(type_) => Type::Wildcard(type_),
+        ConstValue::I32(_)
+        | ConstValue::U32(_)
+        | ConstValue::F32(_)
+        | ConstValue::Bool(_)
+        | ConstValue::Unknown
+        | ConstValue::RuntimeValue => Type::Unknown,
+    }
+}
+
+fn source_type<'item>(node_id: u64, args: &[Arg], state: &State<'item>) -> Type<'item> {
+    match state.sources.get(&node_id).copied() {
+        Some(source) => item_type(source, args, state),
+        None => Type::Unknown,
+    }
+}
+
+fn item_type<'item>(item: ItemRef<'item>, args: &[Arg], state: &State<'item>) -> Type<'item> {
+    match item {
+        ItemRef::Var(var) => var_type(var, state),
+        ItemRef::Const(const_) => expr_type(&const_.value, state),
+        ItemRef::Struct(_) => Type::Struct(state.search_prelude_type("typeref")),
+        ItemRef::Fn(fn_) => const_fn_type(fn_, args, state),
+        ItemRef::Param(param) => param_type(param, state),
     }
 }
 

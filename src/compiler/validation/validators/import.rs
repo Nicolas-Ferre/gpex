@@ -1,28 +1,29 @@
-use crate::compiler::indexing::indexes::Indexes;
 use crate::compiler::parsing::items::imports::ImportSegment;
+use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::{Span, SpanProps};
-use crate::utils::validation::{ValidateContext, ValidateError};
+use crate::utils::validation::ValidateError;
 use crate::{Log, LogInner, LogLevel};
 use itertools::Itertools;
 
 pub(crate) fn check_found(
     is_found: bool,
     segments: &[ImportSegment],
-    context: &mut ValidateContext<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     debug_assert!(!segments.is_empty());
     if is_found {
         Ok(())
     } else {
-        let dot_path = dot_path_from_segments(segments, context);
+        let dot_path = dot_path_from_segments(segments, state);
+        let context = &state.context;
         let fs_path = ImportSegment::fs_path(segments, context, context.root_path);
         let first_segment = segments[0];
         let last_segment = segments[segments.len() - 1];
         let segments_span = first_segment.span().until(last_segment.span());
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: format!("`{dot_path}` module not found"),
-            location: Some(context.location(segments_span)),
+            location: Some(state.span_location(segments_span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: format!("cannot read \"{}\"", fs_path.display()),
@@ -36,15 +37,15 @@ pub(crate) fn check_found(
 pub(crate) fn check_top(
     is_top: bool,
     span: Span,
-    context: &mut ValidateContext<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if is_top {
         Ok(())
     } else {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Error,
             msg: "`import` statement not at the top of the module".into(),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![LogInner {
                 level: LogLevel::Info,
                 msg: "`import` statements should appear before anything else".into(),
@@ -58,15 +59,15 @@ pub(crate) fn check_top(
 pub(crate) fn check_self_import(
     imported_file_index: Option<usize>,
     span: Span,
-    context: &mut ValidateContext<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) {
     if let Some(imported_file_index) = imported_file_index
         && imported_file_index == span.file_index
     {
-        context.logs.push(Log {
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: "module importing itself".into(),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![],
         });
     }
@@ -78,24 +79,24 @@ pub(crate) fn check_usage(
     span: Span,
     is_pub: bool,
     segments: &[ImportSegment],
-    context: &mut ValidateContext<'_>,
-    indexes: &Indexes<'_>,
+    state: &mut ValidateState<'_, '_>,
 ) {
+    let is_used = state.inner.imports.is_used(span.file_index, import_id);
     let is_self_import = imported_file_index == Some(span.file_index);
-    if !is_self_import && !is_pub && !indexes.imports.is_used(span.file_index, import_id) {
-        let dot_path = dot_path_from_segments(segments, context);
-        context.logs.push(Log {
+    if !is_self_import && !is_pub && !is_used {
+        let dot_path = dot_path_from_segments(segments, state);
+        state.add_log(Log {
             level: LogLevel::Warning,
             msg: format!("`{dot_path}` import unused"),
-            location: Some(context.location(span)),
+            location: Some(state.span_location(span)),
             inner: vec![],
         });
     }
 }
 
-fn dot_path_from_segments(segments: &[ImportSegment], context: &ValidateContext<'_>) -> String {
+fn dot_path_from_segments(segments: &[ImportSegment], state: &ValidateState<'_, '_>) -> String {
     segments
         .iter()
-        .map(|&segment| context.slice(segment.span()))
+        .map(|&segment| state.context.slice(segment.span()))
         .join(".")
 }
