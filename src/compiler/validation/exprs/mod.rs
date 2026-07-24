@@ -29,7 +29,7 @@ pub(crate) fn validate_expr(
             state.add_log(logs::exprs::invalid_wildcard(*span, state));
             Err(ValidateError)
         }
-        Expr::Call(child) => validate_no_return_type(child, child.span, state)
+        Expr::Call(child) => validate_has_return_type(child, child.span, state)
             .and_then(|()| calls::validate_call(child, state)),
         Expr::Ident(child) => validate_ident(child, state),
     }
@@ -78,7 +78,7 @@ pub(super) fn validate_type_match(
     }
 }
 
-pub(super) fn validate_has_return_type(
+pub(super) fn validate_no_return_type(
     node: impl NodeRef,
     span: Span,
     state: &mut ValidateState<'_, '_>,
@@ -127,7 +127,7 @@ fn validate_const_value(
     }
 }
 
-fn validate_no_return_type(
+fn validate_has_return_type(
     node: impl NodeRef,
     span: Span,
     state: &mut ValidateState<'_, '_>,

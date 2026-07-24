@@ -83,7 +83,7 @@ fn validate_repeat(
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     calls::validate_call(&repeat.call, state)?;
-    exprs::validate_has_return_type(&repeat.call, repeat.call.span, state)?;
+    exprs::validate_no_return_type(&repeat.call, repeat.call.span, state)?;
     Ok(())
 }
 
