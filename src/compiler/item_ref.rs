@@ -1,3 +1,5 @@
+use crate::compiler::consts;
+use crate::compiler::consts::ConstValue;
 use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::{CompilerImplFn, FnDefinition};
@@ -5,9 +7,7 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::state::State;
-use crate::compiler::values::consts;
-use crate::compiler::values::consts::ConstValue;
-use crate::compiler::values::types::{self, Type};
+use crate::compiler::types::{self, Type};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 

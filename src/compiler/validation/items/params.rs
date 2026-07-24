@@ -1,9 +1,9 @@
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
+use crate::compiler::types;
+use crate::compiler::types::Type;
 use crate::compiler::validation::{ValidateState, exprs, items, logs, naming};
-use crate::compiler::values::types;
-use crate::compiler::values::types::Type;
 use crate::utils::validation::ValidateError;
 
 pub(super) fn validate_params<'item>(

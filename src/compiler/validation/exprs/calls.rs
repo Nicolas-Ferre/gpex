@@ -6,7 +6,7 @@ use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn}
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::state::CompilerImplType;
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
-use crate::compiler::values::{consts, types};
+use crate::compiler::{consts, types};
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_call(

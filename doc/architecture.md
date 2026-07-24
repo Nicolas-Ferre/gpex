@@ -32,7 +32,8 @@ Key directories and files:
     - `prelude.rs`: Built-in types and functions.
     - `refs.rs`: Reference checking (in this context, a reference is an expression that is permitted
       on the left-hand side of an assignment statement).
-    - `values/`: Constant value and type resolution.
+    - `consts/`: Constant value resolution.
+    - `types.rs`: Type resolution.
 - `src/runner/`: GPU execution using wgpu (device setup, shader dispatch, buffer readback).
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
 - `res/prelude.gpex`: `GPEx` built-in types and functions.

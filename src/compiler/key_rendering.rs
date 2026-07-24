@@ -3,7 +3,7 @@ use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::symbols::QUESTION_MARK_SYMBOL;
 use crate::compiler::state::State;
-use crate::compiler::values::types;
+use crate::compiler::types;
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn call_key(call: &Call, state: &State<'_>) -> Result<String, ValidateError> {

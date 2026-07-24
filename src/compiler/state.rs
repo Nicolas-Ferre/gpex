@@ -1,8 +1,8 @@
+use crate::compiler::consts::ConstValue;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::prelude::PreludeEndLocation;
-use crate::compiler::values::consts::ConstValue;
-use crate::compiler::values::types::Type;
+use crate::compiler::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 use std::cell::RefCell;

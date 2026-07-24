@@ -1,3 +1,4 @@
+pub(crate) mod consts;
 pub(crate) mod dependencies;
 pub(crate) mod indexing;
 pub(crate) mod item_ref;
@@ -7,8 +8,8 @@ pub(crate) mod prelude;
 pub(crate) mod refs;
 pub(crate) mod state;
 pub(crate) mod transpilation;
+pub(crate) mod types;
 pub(crate) mod validation;
-pub(crate) mod values;
 
 use crate::compiler::state::State;
 use crate::compiler::transpilation::Program;

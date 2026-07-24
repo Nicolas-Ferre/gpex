@@ -1,14 +1,14 @@
 #![expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
 
+use crate::compiler::consts::{ConstValue, HashableF32};
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::{
     BinaryCompilerImplFn, CompilerImplFn, FnDefinition, UnaryCompilerImplFn,
 };
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::state::State;
-use crate::compiler::values::consts::{ConstValue, HashableF32};
-use crate::compiler::values::types;
-use crate::compiler::values::types::Type;
+use crate::compiler::types;
+use crate::compiler::types::Type;
 
 pub(super) fn call_value<'item>(
     call: &Call,
