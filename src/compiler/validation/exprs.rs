@@ -3,7 +3,6 @@ use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
 use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::state::CompilerImplType;
@@ -21,9 +20,15 @@ pub(crate) fn validate_expr(
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     match expr {
-        Expr::F32Literal(child) => validate_f32_literal(child, state),
-        Expr::U32Literal(child) => validate_u32_literal(child, state),
-        Expr::I32Literal(child) => validate_i32_literal(child, state),
+        Expr::F32Literal(child) => {
+            validate_literal(child.value.is_some(), child.span, "f32", state)
+        }
+        Expr::U32Literal(child) => {
+            validate_literal(child.value.is_some(), child.span, "u32", state)
+        }
+        Expr::I32Literal(child) => {
+            validate_literal(child.value.is_some(), child.span, "i32", state)
+        }
         Expr::BoolLiteral(_) => Ok(()),
         Expr::Wildcard(span) => {
             state.add_log(logs::exprs::invalid_wildcard(*span, state));
@@ -32,55 +37,6 @@ pub(crate) fn validate_expr(
         Expr::Call(child) => validate_no_return_type(child, child.span, state)
             .and_then(|()| validate_call(child, state)),
         Expr::Ident(child) => validate_ident(child, state),
-    }
-}
-
-// TODO: can refactor in a unique function for all literals (input: is literal valid + span + type name + state)
-pub(crate) fn validate_f32_literal(
-    literal: &F32Literal,
-    state: &mut ValidateState<'_, '_>,
-) -> Result<(), ValidateError> {
-    if literal.value.is_some() {
-        Ok(())
-    } else {
-        state.add_log(logs::exprs::literal_out_of_bounds(
-            "f32",
-            literal.span,
-            state,
-        ));
-        Err(ValidateError)
-    }
-}
-
-pub(crate) fn validate_i32_literal(
-    literal: &I32Literal,
-    state: &mut ValidateState<'_, '_>,
-) -> Result<(), ValidateError> {
-    if literal.value.is_some() {
-        Ok(())
-    } else {
-        state.add_log(logs::exprs::literal_out_of_bounds(
-            "i32",
-            literal.span,
-            state,
-        ));
-        Err(ValidateError)
-    }
-}
-
-pub(crate) fn validate_u32_literal(
-    literal: &U32Literal,
-    state: &mut ValidateState<'_, '_>,
-) -> Result<(), ValidateError> {
-    if literal.value.is_some() {
-        Ok(())
-    } else {
-        state.add_log(logs::exprs::literal_out_of_bounds(
-            "u32",
-            literal.span,
-            state,
-        ));
-        Err(ValidateError)
     }
 }
 
@@ -197,6 +153,20 @@ pub(super) fn validate_has_return_type(
         return Err(ValidateError);
     }
     Ok(())
+}
+
+fn validate_literal(
+    is_value_valid: bool,
+    span: Span,
+    type_name: &str,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    if is_value_valid {
+        Ok(())
+    } else {
+        state.add_log(logs::exprs::literal_out_of_bounds(type_name, span, state));
+        Err(ValidateError)
+    }
 }
 
 fn validate_mul_add_candidate<'item>(
