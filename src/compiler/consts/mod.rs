@@ -13,13 +13,6 @@ use crate::compiler::state::State;
 use crate::compiler::types;
 use std::hash::{Hash, Hasher};
 
-pub(crate) fn is_const_infinite_f32(call: &Call, state: &State<'_>) -> bool {
-    matches!(
-        call_value(call, state),
-        ConstValue::F32(value) if !value.0.is_finite()
-    )
-}
-
 pub(crate) fn expr_value<'item>(expr: &Expr, state: &State<'item>) -> ConstValue<'item> {
     match expr {
         Expr::F32Literal(literal) => f32_literal_value(literal),

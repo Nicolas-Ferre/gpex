@@ -6,7 +6,7 @@ use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn}
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::state::CompilerImplType;
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
-use crate::compiler::{consts, types};
+use crate::compiler::{queries, types};
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_call(
@@ -54,11 +54,11 @@ pub(crate) fn validate_call(
             state,
         )?;
     }
-    if consts::is_const_infinite_f32(call, state.inner) {
+    if queries::calls::is_const_infinite_f32(call, state.inner) {
         state.add_log(logs::exprs::f32_const_out_of_bounds(call.span, state));
         return Err(ValidateError);
     }
-    validate_mul_add_candidate(call, source, state);
+    validate_mul_add_candidate(call, state);
     Ok(())
 }
 
@@ -84,40 +84,43 @@ fn validate_arg_name(
     }
 }
 
-fn validate_mul_add_candidate<'item>(
-    call: &Call,
-    source: ItemRef<'item>,
-    state: &mut ValidateState<'_, 'item>,
-) {
-    let ItemRef::Fn(source) = source else {
-        unreachable!("calls can only be functions")
-    };
-    let are_all_args_f32 = call.args.iter().all(|arg| {
-        state.inner.is_compilerimpl_type(
-            types::expr_type(&arg.value, state.inner),
-            CompilerImplType::F32,
-        )
-    });
-    if !are_all_args_f32
-        || source.compilerimpl() != Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add))
-        || !call
-            .args
-            .iter()
-            .any(|arg| is_expr_compilerimpl_mul(&arg.value, state))
+fn validate_mul_add_candidate(call: &Call, state: &mut ValidateState<'_, '_>) {
+    if !are_all_args_f32(call, state)
+        || !is_call_compilerimpl_add(call, state)
+        || !has_compilerimpl_mul_arg(call, state)
     {
         return;
     }
     state.add_log(logs::exprs::mul_add_candidate(call.span, state));
 }
 
-fn is_expr_compilerimpl_mul(expr: &Expr, state: &ValidateState<'_, '_>) -> bool {
-    let Expr::Call(call) = expr else {
-        return false;
-    };
-    matches!(
-        state.inner.sources.get(&call.id),
-        Some(ItemRef::Fn(source))
-            if source.compilerimpl()
-                == Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul))
+fn is_call_compilerimpl_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+    queries::calls::is_compilerimpl(
+        call,
+        CompilerImplFn::Binary(BinaryCompilerImplFn::Add),
+        state.inner,
     )
+}
+
+fn has_compilerimpl_mul_arg(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+    call.args
+        .iter()
+        .any(|arg| matches!(&arg.value, Expr::Call(call) if is_call_compilerimpl_mul(call, state)))
+}
+
+fn is_call_compilerimpl_mul(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+    queries::calls::is_compilerimpl(
+        call,
+        CompilerImplFn::Binary(BinaryCompilerImplFn::Mul),
+        state.inner,
+    )
+}
+
+fn are_all_args_f32(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+    call.args.iter().all(|arg| {
+        state.inner.is_compilerimpl_type(
+            types::expr_type(&arg.value, state.inner),
+            CompilerImplType::F32,
+        )
+    })
 }

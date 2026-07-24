@@ -119,7 +119,8 @@ fn validate_const_value(
     param_constness: ParamConstness,
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    if is_item_const(source, param_constness) {
+    let are_params_const = matches!(param_constness, ParamConstness::All);
+    if source.is_const(are_params_const) {
         Ok(())
     } else {
         state.add_log(logs::exprs::non_const(span, const_mark_span, state));
@@ -181,17 +182,5 @@ fn validate_source<'item>(
         };
         state.add_log(log);
         Err(ValidateError)
-    }
-}
-
-fn is_item_const(item: ItemRef<'_>, param_constness: ParamConstness) -> bool {
-    match item {
-        ItemRef::Var(_) => false,
-        ItemRef::Const(_) | ItemRef::Struct(_) => true,
-        ItemRef::Fn(fn_) => fn_.const_keyword_span.is_some(),
-        ItemRef::Param(param) => match param_constness {
-            ParamConstness::ExplicitOnly => param.const_mark_span().is_some(),
-            ParamConstness::All => true,
-        },
     }
 }

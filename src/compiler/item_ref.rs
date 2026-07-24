@@ -141,6 +141,15 @@ impl<'item> ItemRef<'item> {
         matches!(self, ItemRef::Fn(fn_) if fn_.compilerimpl() == Some(CompilerImplFn::Typeof))
     }
 
+    pub(crate) fn is_const(self, are_params_const: bool) -> bool {
+        match self {
+            Self::Var(_) => false,
+            Self::Const(_) | Self::Struct(_) => true,
+            Self::Fn(fn_) => fn_.const_keyword_span.is_some(),
+            Self::Param(param) => are_params_const || param.const_mark_span().is_some(),
+        }
+    }
+
     fn arg_match(param_type: Type<'_>, arg_type: Type<'_>) -> ArgsMatch {
         if matches!(param_type, Type::Wildcard(_)) || param_type == arg_type {
             ArgsMatch::Matching

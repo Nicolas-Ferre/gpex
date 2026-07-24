@@ -1,10 +1,9 @@
-use crate::compiler::consts;
-use crate::compiler::consts::ConstValue;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{
     BinaryCompilerImplFn, CompilerImplFn, FnDefinition, UnaryCompilerImplFn,
 };
+use crate::compiler::queries;
 use crate::compiler::state::CompilerImplType;
 use crate::compiler::transpilation::{TranspileState, exprs};
 use crate::compiler::types;
@@ -51,7 +50,7 @@ fn transpile_fn_call_int_binary(
     type_: CompilerImplType,
     state: &mut TranspileState<'_, '_>,
 ) {
-    let is_divisor_zero = is_zero_int(&call.args[1].value, state);
+    let is_divisor_zero = queries::exprs::is_zero_int(&call.args[1].value, state.inner);
     if is_divisor_zero && fn_ == BinaryCompilerImplFn::Div {
         transpile_arg(&call.args[0], type_, true, state);
     } else if is_divisor_zero && fn_ == BinaryCompilerImplFn::Mod {
@@ -162,11 +161,6 @@ fn transpile_arg(
     if type_ == CompilerImplType::Bool && is_bool_converted {
         state.shader += " == u32(true))";
     }
-}
-
-fn is_zero_int(expr: &Expr, state: &TranspileState<'_, '_>) -> bool {
-    let value = consts::expr_value(expr, state.inner);
-    matches!(value, ConstValue::I32(0) | ConstValue::U32(0))
 }
 
 fn type_(expr: &Expr, state: &TranspileState<'_, '_>) -> CompilerImplType {
