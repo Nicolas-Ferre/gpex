@@ -2,9 +2,9 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::vars::ConstDefinition;
 use crate::compiler::state::CompilerImplType;
+use crate::compiler::types;
+use crate::compiler::types::Type;
 use crate::compiler::validation::{ValidateState, logs};
-use crate::compiler::values::types;
-use crate::compiler::values::types::Type;
 use crate::utils::parsing::span::{Span, SpanProps};
 
 pub(super) const IMPORT_ALLOWED_CASES: &[Case] = &[Case::Snake];

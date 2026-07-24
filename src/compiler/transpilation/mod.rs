@@ -2,6 +2,7 @@ mod compilerimpl;
 mod exprs;
 mod items;
 
+use crate::compiler::consts::ConstValue;
 use crate::compiler::dependencies;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnDefinition, FnStatementsBody};
@@ -9,8 +10,7 @@ use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::state::State;
-use crate::compiler::values::consts::ConstValue;
-use crate::compiler::values::types;
+use crate::compiler::types;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::reading::ReadFile;
 use itertools::Itertools;

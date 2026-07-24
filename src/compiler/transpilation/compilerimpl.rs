@@ -1,3 +1,5 @@
+use crate::compiler::consts;
+use crate::compiler::consts::ConstValue;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{
@@ -5,9 +7,7 @@ use crate::compiler::parsing::items::fns::{
 };
 use crate::compiler::state::CompilerImplType;
 use crate::compiler::transpilation::{TranspileState, exprs};
-use crate::compiler::values::consts;
-use crate::compiler::values::consts::ConstValue;
-use crate::compiler::values::types;
+use crate::compiler::types;
 use std::fmt::Write;
 
 pub(super) fn transpile_call(

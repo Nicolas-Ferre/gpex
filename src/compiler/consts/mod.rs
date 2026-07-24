@@ -10,7 +10,7 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use crate::compiler::state::State;
-use crate::compiler::values::types;
+use crate::compiler::types;
 use std::hash::{Hash, Hasher};
 
 pub(crate) fn is_const_infinite_f32(call: &Call, state: &State<'_>) -> bool {
