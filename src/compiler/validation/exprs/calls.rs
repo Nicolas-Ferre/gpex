@@ -87,7 +87,7 @@ fn validate_arg_name(
 fn validate_mul_add_candidate(call: &Call, state: &mut ValidateState<'_, '_>) {
     if !are_all_args_f32(call, state)
         || !is_call_compilerimpl_add(call, state)
-        || !is_any_arg_compilerimpl_mul(call, state)
+        || !has_compilerimpl_mul_arg(call, state)
     {
         return;
     }
@@ -102,10 +102,10 @@ fn is_call_compilerimpl_add(call: &Call, state: &ValidateState<'_, '_>) -> bool 
     )
 }
 
-fn is_any_arg_compilerimpl_mul(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+fn has_compilerimpl_mul_arg(call: &Call, state: &ValidateState<'_, '_>) -> bool {
     call.args
         .iter()
-        .any(|arg| matches!(&arg.value,Expr::Call(call) if is_call_compilerimpl_mul(call, state)))
+        .any(|arg| matches!(&arg.value, Expr::Call(call) if is_call_compilerimpl_mul(call, state)))
 }
 
 fn is_call_compilerimpl_mul(call: &Call, state: &ValidateState<'_, '_>) -> bool {
