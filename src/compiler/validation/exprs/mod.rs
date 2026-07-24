@@ -1,4 +1,4 @@
-pub(crate) mod calls;
+pub(super) mod calls;
 
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;

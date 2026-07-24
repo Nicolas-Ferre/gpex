@@ -6,7 +6,7 @@ use itertools::Itertools;
 
 pub(super) fn validate_import(
     import: &Import,
-    is_top_import: bool,
+    is_import_at_top: bool,
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     debug_assert!(!import.segments.is_empty());
@@ -25,7 +25,7 @@ pub(super) fn validate_import(
         ));
         return Err(ValidateError);
     }
-    if !is_top_import {
+    if !is_import_at_top {
         state.add_log(logs::imports::not_at_top(import.span, state));
         return Err(ValidateError);
     }
