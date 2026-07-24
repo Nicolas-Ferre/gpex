@@ -1,12 +1,10 @@
 mod exprs;
-mod fns;
+mod imports;
 mod items;
 mod logs;
 mod naming;
-mod validators;
 
 use crate::compiler::parsing::items::Item;
-use crate::compiler::parsing::items::imports::{Import, ImportSegment};
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::state::State;
 use crate::utils::parsing::span::Span;
@@ -113,7 +111,8 @@ fn validate_module<'item>(
     let mut are_imports_finished = false;
     for item in &module.items {
         if let Item::Import(import) = item {
-            is_module_valid &= validate_import(import, !are_imports_finished, state).is_ok();
+            is_module_valid &=
+                imports::validate_import(import, !are_imports_finished, state).is_ok();
         } else {
             are_imports_finished = true;
         }
@@ -130,34 +129,10 @@ fn validate_module<'item>(
     Ok(())
 }
 
-fn validate_import(
-    import: &Import,
-    is_top_import: bool,
-    state: &mut ValidateState<'_, '_>,
-) -> Result<(), ValidateError> {
-    let is_found = import.imported_file_index.is_some();
-    validators::import::check_found(is_found, &import.segments, state)?;
-    validators::import::check_top(is_top_import, import.span, state)?;
-    validators::import::check_self_import(import.imported_file_index, import.span, state);
-    for &segment in &import.segments {
-        if let ImportSegment::Name(span) = segment {
-            validators::ident::check_case(span, naming::IMPORT_ALLOWED_CASES, state);
-        }
-    }
-    Ok(())
-}
-
 fn validate_module_import_usage(module: &Module, state: &mut ValidateState<'_, '_>) {
     for item in &module.items {
         if let Item::Import(import) = item {
-            validators::import::check_usage(
-                import.id,
-                import.imported_file_index,
-                import.span,
-                import.pub_keyword_span.is_some(),
-                &import.segments,
-                state,
-            );
+            imports::validate_import_usage(import, state);
         }
     }
 }

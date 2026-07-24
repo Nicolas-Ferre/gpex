@@ -1,75 +1,12 @@
-use crate::compiler::dependencies;
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
-use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
-use crate::compiler::validation::{
-    ParamConstness, ValidateState, exprs, items, naming, validators,
-};
+use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
+use crate::compiler::refs;
+use crate::compiler::validation::{ValidateState, exprs, logs};
 use crate::compiler::values::types;
-use crate::compiler::values::types::Type;
-use crate::utils::dependencies::Dependencies;
+use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;
 
-pub(super) fn validate_fn<'item>(
-    fn_: &'item FnDefinition,
-    state: &mut ValidateState<'_, 'item>,
-) -> Result<(), ValidateError> {
-    let ref_ = ItemRef::Fn(fn_);
-    let compilerimpl_span = fn_.body.compilerimpl_keyword_span();
-    let mut dependencies = Dependencies::new();
-    let dependency_result = dependencies::scan_fn(fn_, &mut dependencies, state.inner);
-    validators::item::check_circular_dependencies(ref_, dependency_result, state)?;
-    validators::item::check_prelude_location(ref_, compilerimpl_span, state)?;
-    state.with_param_constness(ParamConstness::ExplicitOnly, |state| {
-        items::validate_params(&fn_.params, compilerimpl_span.is_some(), state)?;
-        validate_fn_return_type(fn_, state)?;
-        Ok(())
-    })?;
-    validators::item::check_unique_fn_signature(fn_, state);
-    validators::item::check_unary_operator_fn(fn_, state)?;
-    validators::item::check_binary_operator_fn(fn_, state)?;
-    validate_body(fn_, state)?;
-    validate_fn_name(fn_, state);
-    validators::item::check_usage(ref_, state);
-    Ok(())
-}
-
-fn validate_fn_name(fn_: &FnDefinition, state: &mut ValidateState<'_, '_>) {
-    let allowed_cases = naming::fn_allowed_cases(fn_, state);
-    validators::ident::check_case(fn_.name_span, allowed_cases, state);
-    validators::ident::check_char_count(fn_.name_span, state);
-}
-
-fn validate_fn_return_type<'item>(
-    fn_: &'item FnDefinition,
-    state: &mut ValidateState<'_, 'item>,
-) -> Result<(), ValidateError> {
-    let (Some(arrow_span), Some(return_type)) = (fn_.arrow_span, &fn_.return_type) else {
-        return Ok(());
-    };
-    state.with_const_mark_span(Some(arrow_span), |state| {
-        exprs::validate_expr(return_type, state)
-    })?;
-    let actual_type = types::expr_type(return_type, state.inner);
-    let expected_type = Type::Struct(state.inner.search_prelude_type("typeref"));
-    validators::expr::check_types(return_type.span(), actual_type, None, expected_type, state)?;
-    Ok(())
-}
-
-fn validate_body<'item>(
-    fn_: &'item FnDefinition,
-    state: &mut ValidateState<'_, 'item>,
-) -> Result<(), ValidateError> {
-    let param_constness = if fn_.const_keyword_span.is_some() {
-        ParamConstness::All
-    } else {
-        ParamConstness::ExplicitOnly
-    };
-    state.with_param_constness(param_constness, |state| validate_fn_statements(fn_, state))?;
-    Ok(())
-}
-
-fn validate_fn_statements<'item>(
+pub(super) fn validate_fn_statements<'item>(
     fn_: &'item FnDefinition,
     state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
@@ -85,7 +22,7 @@ fn validate_fn_statements<'item>(
                     .statements
                     .get(index + 1)
                     .map_or(body.body_end_span, Statement::span);
-                is_error_detected |= validators::statement::check_return_before_end(
+                is_error_detected |= validate_return_position(
                     return_.span,
                     next_statement_span,
                     index,
@@ -104,7 +41,7 @@ fn validate_fn_statements<'item>(
             .statements
             .last()
             .map_or(body.body_start_span, Statement::span);
-        let return_statement = validators::statement::check_missing_return(
+        let return_statement = validate_required_return(
             &body.statements,
             previous_statement_span,
             body.body_end_span,
@@ -113,7 +50,7 @@ fn validate_fn_statements<'item>(
         )?;
         let actual_type = types::expr_type(&return_statement.value, state.inner);
         let expected_type = types::fn_type(fn_, state.inner);
-        validators::expr::check_types(
+        exprs::validate_type_match(
             return_statement.value.span(),
             actual_type,
             Some(return_type.span()),
@@ -121,8 +58,10 @@ fn validate_fn_statements<'item>(
             state,
         )?;
     } else {
-        validators::statement::check_disallowed_return(&body.statements, fn_, state)?;
-        validators::statement::check_empty_block(&body.statements, body.body_span, state);
+        validate_disallowed_returns(&body.statements, fn_, state)?;
+        if body.statements.is_empty() {
+            state.add_log(logs::statements::empty_block(body.body_span, state));
+        }
     }
     Ok(())
 }
@@ -151,7 +90,10 @@ fn validate_assignment_statement_assigned(
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     exprs::validate_expr(&assignment.assigned, state)?;
-    validators::expr::check_ref(&assignment.assigned, state);
+    let expr = &assignment.assigned;
+    if refs::is_expr_ref(expr, state.inner) == Some(false) {
+        state.add_log(logs::exprs::not_ref(expr.span(), state));
+    }
     Ok(())
 }
 
@@ -162,7 +104,7 @@ fn validate_assignment_statement_value(
     exprs::validate_expr(&assignment.value, state)?;
     let actual_type = types::expr_type(&assignment.value, state.inner);
     let expected_type = types::expr_type(&assignment.assigned, state.inner);
-    validators::expr::check_types(
+    exprs::validate_type_match(
         assignment.value.span(),
         actual_type,
         Some(assignment.assigned.span()),
@@ -170,4 +112,62 @@ fn validate_assignment_statement_value(
         state,
     )?;
     Ok(())
+}
+
+fn validate_return_position(
+    return_span: Span,
+    next_statement_span: Span,
+    position: usize,
+    statement_count: usize,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    debug_assert_ne!(statement_count, 0);
+    if position == statement_count - 1 {
+        Ok(())
+    } else {
+        state.add_log(logs::statements::return_before_end(
+            return_span,
+            next_statement_span,
+            state,
+        ));
+        Err(ValidateError)
+    }
+}
+
+fn validate_required_return<'statement>(
+    statements: &'statement [Statement],
+    previous_statement_span: Span,
+    block_end_span: Span,
+    return_type_span: Span,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<&'statement ReturnStatement, ValidateError> {
+    if let Some(Statement::Return(return_statement)) = statements.last() {
+        Ok(return_statement)
+    } else {
+        state.add_log(logs::statements::missing_return(
+            previous_statement_span.until(block_end_span),
+            return_type_span,
+            state,
+        ));
+        Err(ValidateError)
+    }
+}
+
+fn validate_disallowed_returns(
+    statements: &[Statement],
+    fn_: &FnDefinition,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    let mut result = Ok(());
+    for statement in statements {
+        if let Statement::Return(return_statement) = statement {
+            state.add_log(logs::statements::disallowed_return(
+                return_statement.span,
+                fn_.signature_span_with_return,
+                state,
+            ));
+            result = Err(ValidateError);
+        }
+    }
+    result
 }
