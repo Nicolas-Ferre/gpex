@@ -30,6 +30,7 @@ Key directories and files:
     - `dependencies.rs`: Item dependency resolution.
     - `key_rendering.rs`: Rendering of item keys for compiler logs.
     - `prelude.rs`: Built-in types and functions.
+    - `queries/`: Node-oriented derived AST predicates that require the shared compiler state.
     - `refs.rs`: Reference checking (in this context, a reference is an expression that is permitted
       on the left-hand side of an assignment statement).
     - `consts/`: Constant value resolution.

@@ -1,12 +1,11 @@
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
-use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::state::CompilerImplType;
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
-use crate::compiler::{consts, types};
+use crate::compiler::{queries, types};
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_call(
@@ -54,7 +53,7 @@ pub(crate) fn validate_call(
             state,
         )?;
     }
-    if consts::is_const_infinite_f32(call, state.inner) {
+    if queries::calls::is_const_infinite_f32(call, state.inner) {
         state.add_log(logs::exprs::f32_const_out_of_bounds(call.span, state));
         return Err(ValidateError);
     }
@@ -103,21 +102,9 @@ fn validate_mul_add_candidate<'item>(
         || !call
             .args
             .iter()
-            .any(|arg| is_expr_compilerimpl_mul(&arg.value, state))
+            .any(|arg| queries::exprs::is_compilerimpl_mul(&arg.value, state.inner))
     {
         return;
     }
     state.add_log(logs::exprs::mul_add_candidate(call.span, state));
-}
-
-fn is_expr_compilerimpl_mul(expr: &Expr, state: &ValidateState<'_, '_>) -> bool {
-    let Expr::Call(call) = expr else {
-        return false;
-    };
-    matches!(
-        state.inner.sources.get(&call.id),
-        Some(ItemRef::Fn(source))
-            if source.compilerimpl()
-                == Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul))
-    )
 }
