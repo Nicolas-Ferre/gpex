@@ -1,5 +1,4 @@
 mod exprs;
-mod fns;
 mod imports;
 mod items;
 mod logs;

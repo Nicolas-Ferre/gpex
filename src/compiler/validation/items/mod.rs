@@ -1,3 +1,5 @@
+mod fns;
+
 use crate::compiler::dependencies;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::{Expr, OPERATOR_FN_NAME_PREFIX};
@@ -8,7 +10,7 @@ use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
-use crate::compiler::validation::{ValidateState, exprs, fns, logs, naming};
+use crate::compiler::validation::{ValidateState, exprs, logs, naming};
 use crate::compiler::values::types;
 use crate::compiler::values::types::Type;
 use crate::utils::dependencies::Dependencies;
@@ -33,7 +35,7 @@ pub(crate) fn validate_item<'item>(
     }
 }
 
-pub(crate) fn validate_params<'item>(
+fn validate_params<'item>(
     params: &'item ParamGroup,
     is_compilerimpl: bool,
     state: &mut ValidateState<'_, 'item>,
@@ -49,74 +51,6 @@ pub(crate) fn validate_params<'item>(
         Ok(())
     } else {
         Err(ValidateError)
-    }
-}
-
-pub(super) fn validate_no_circular_dependencies(
-    item: ItemRef<'_>,
-    dependency_result: Result<(), Vec<Span>>,
-    state: &mut ValidateState<'_, '_>,
-) -> Result<(), ValidateError> {
-    let name_span = item.name_span();
-    let name = state.context.slice(name_span);
-    if let Err(stack) = dependency_result {
-        if stack.iter().min() != Some(&stack[0]) {
-            // avoid repeating the same error for each item of the stack
-            return Err(ValidateError);
-        }
-        state.add_log(logs::items::circular_dependencies(
-            name, name_span, &stack, state,
-        ));
-        Err(ValidateError)
-    } else {
-        Ok(())
-    }
-}
-
-pub(super) fn validate_compilerimpl_location(
-    item: ItemRef<'_>,
-    compilerimpl_keyword_span: Option<Span>,
-    state: &mut ValidateState<'_, '_>,
-) -> Result<(), ValidateError> {
-    if let Some(compilerimpl_keyword_span) = compilerimpl_keyword_span
-        && item.file_index() != PRELUDE_FILE_INDEX
-    {
-        state.add_log(logs::items::forbidden_compilerimpl(
-            compilerimpl_keyword_span,
-            state,
-        ));
-        Err(ValidateError)
-    } else {
-        Ok(())
-    }
-}
-
-pub(super) fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'item>) {
-    let name_span = item.name_span();
-    let name = state.context.slice(name_span);
-    let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
-    let is_unused_lint_ignored =
-        name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
-    if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(state.inner);
-        state.add_log(logs::items::unused(&displayed_key, name_span, state));
-    } else if item.is_pub() && is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(state.inner);
-        state.add_log(logs::items::pub_with_ignored_name(
-            &displayed_key,
-            name_span,
-            state,
-        ));
-    } else if let Some(ref_span) = ref_span
-        && is_unused_lint_ignored
-    {
-        let displayed_key = item.displayed_key(state.inner);
-        state.add_log(logs::items::used_with_ignored_name(
-            &displayed_key,
-            name_span,
-            ref_span,
-            state,
-        ));
     }
 }
 
@@ -226,6 +160,74 @@ fn validate_param_requirement<'item>(
         state,
     )?;
     Ok(())
+}
+
+fn validate_no_circular_dependencies(
+    item: ItemRef<'_>,
+    dependency_result: Result<(), Vec<Span>>,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    let name_span = item.name_span();
+    let name = state.context.slice(name_span);
+    if let Err(stack) = dependency_result {
+        if stack.iter().min() != Some(&stack[0]) {
+            // avoid repeating the same error for each item of the stack
+            return Err(ValidateError);
+        }
+        state.add_log(logs::items::circular_dependencies(
+            name, name_span, &stack, state,
+        ));
+        Err(ValidateError)
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_compilerimpl_location(
+    item: ItemRef<'_>,
+    compilerimpl_keyword_span: Option<Span>,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    if let Some(compilerimpl_keyword_span) = compilerimpl_keyword_span
+        && item.file_index() != PRELUDE_FILE_INDEX
+    {
+        state.add_log(logs::items::forbidden_compilerimpl(
+            compilerimpl_keyword_span,
+            state,
+        ));
+        Err(ValidateError)
+    } else {
+        Ok(())
+    }
+}
+
+fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'item>) {
+    let name_span = item.name_span();
+    let name = state.context.slice(name_span);
+    let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
+    let is_unused_lint_ignored =
+        name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
+    if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
+        let displayed_key = item.displayed_key(state.inner);
+        state.add_log(logs::items::unused(&displayed_key, name_span, state));
+    } else if item.is_pub() && is_unused_lint_ignored {
+        let displayed_key = item.displayed_key(state.inner);
+        state.add_log(logs::items::pub_with_ignored_name(
+            &displayed_key,
+            name_span,
+            state,
+        ));
+    } else if let Some(ref_span) = ref_span
+        && is_unused_lint_ignored
+    {
+        let displayed_key = item.displayed_key(state.inner);
+        state.add_log(logs::items::used_with_ignored_name(
+            &displayed_key,
+            name_span,
+            ref_span,
+            state,
+        ));
+    }
 }
 
 fn validate_unique_definition<'item>(

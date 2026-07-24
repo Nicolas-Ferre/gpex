@@ -32,7 +32,7 @@ pub(super) fn validate_import(
     if import.imported_file_index == Some(import.span.file_index) {
         state.add_log(logs::imports::self_import(import.span, state));
     }
-    validate_segments(&import, state);
+    validate_segments(import, state);
     Ok(())
 }
 
