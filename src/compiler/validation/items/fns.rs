@@ -39,8 +39,7 @@ pub(super) fn validate_fn<'item>(
 
 fn validate_fn_name(fn_: &FnDefinition, state: &mut ValidateState<'_, '_>) {
     let allowed_cases = naming::fn_allowed_cases(fn_, state);
-    naming::validate_case(fn_.name_span, allowed_cases, state);
-    naming::validate_char_count(fn_.name_span, state);
+    naming::validate_name(fn_.name_span, allowed_cases, state);
 }
 
 fn validate_fn_return_type<'item>(
