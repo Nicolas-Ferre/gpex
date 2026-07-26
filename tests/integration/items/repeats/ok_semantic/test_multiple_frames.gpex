@@ -1,0 +1,7 @@
+var value = 0; // expected: 2, 4, 6
+
+fn increment() {
+    value = value + 2;
+}
+
+repeat increment();

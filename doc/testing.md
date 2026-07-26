@@ -30,11 +30,15 @@ These directories are tested the following way:
   directory.
 - Run the program.
 - Verify that expected values of variables match actual values stored on GPU.
-  An expected value can be indicated in a `.gpex` file using the following type of comment:
+  Expected values can be indicated for variables and constants in `.gpex` files using the following
+  type of comment:
   ```gpex
-  var _result = 2_147_483_647; // expected: 2147483647
-  const _RESULT = 2_147_483_647; // expected: 2147483647
+  var value = 0; // expected: 1, 2, 3
+  const _RESULT = 2_147_483_647; // expected: 2147483647, 2147483647
   ```
+  Comma-separated values are checked after successive frames. A variable is no longer checked after
+  its final expected value. Each test directory runs as many frames as its longest expected-value
+  list across all `.gpex` files, or one frame if it contains no expected values.
 
 ### `wgsl_*` test directories
 
