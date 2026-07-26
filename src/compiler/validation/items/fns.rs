@@ -17,13 +17,13 @@ pub(super) fn validate_fn<'item>(
     state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Fn(fn_);
-    let compilerimpl_span = fn_.body.compilerimpl_keyword_span();
+    let intrinsic_span = fn_.body.intrinsic_keyword_span();
     let mut dependencies = Dependencies::new();
     let dependency_result = dependencies::scan_fn(fn_, &mut dependencies, state.inner);
     items::validate_no_circular_dependencies(ref_, dependency_result, state)?;
-    items::validate_compilerimpl_location(ref_, compilerimpl_span, state)?;
+    items::validate_intrinsic_location(ref_, intrinsic_span, state)?;
     state.with_param_constness(ParamConstness::ExplicitOnly, |state| {
-        params::validate_params(&fn_.params, compilerimpl_span.is_some(), state)?;
+        params::validate_params(&fn_.params, intrinsic_span.is_some(), state)?;
         validate_fn_return_type(fn_, state)?;
         Ok(())
     })?;

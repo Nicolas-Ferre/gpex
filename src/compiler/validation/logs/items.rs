@@ -65,14 +65,14 @@ pub(crate) fn duplicate_param(
     }
 }
 
-pub(crate) fn forbidden_compilerimpl(
-    compilerimpl_keyword_span: Span,
+pub(crate) fn forbidden_intrinsic(
+    intrinsic_keyword_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
     Log {
         level: LogLevel::Error,
-        msg: "forbidden `compilerimpl` item outside prelude".into(),
-        location: Some(state.span_location(compilerimpl_keyword_span)),
+        msg: "forbidden `intrinsic` item outside prelude".into(),
+        location: Some(state.span_location(intrinsic_keyword_span)),
         inner: vec![],
     }
 }

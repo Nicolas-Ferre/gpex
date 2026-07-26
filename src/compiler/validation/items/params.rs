@@ -8,12 +8,12 @@ use crate::utils::validation::ValidateError;
 
 pub(super) fn validate_params<'item>(
     params: &'item ParamGroup,
-    is_compilerimpl: bool,
+    is_intrinsic: bool,
     state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let mut are_params_valid = true;
     for param in &params.params {
-        if validate_param(param, is_compilerimpl, state).is_err() {
+        if validate_param(param, is_intrinsic, state).is_err() {
             are_params_valid = false;
         }
     }
@@ -27,13 +27,13 @@ pub(super) fn validate_params<'item>(
 
 fn validate_param<'item>(
     param: &'item Param,
-    is_compilerimpl: bool,
+    is_intrinsic: bool,
     state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
     let ref_ = ItemRef::Param(param);
     validate_param_type(param, state)?;
     validate_param_requirement(param, state)?;
-    if !is_compilerimpl {
+    if !is_intrinsic {
         items::validate_usage(ref_, state);
     }
     let allowed_cases = naming::param_allowed_cases(param, state);

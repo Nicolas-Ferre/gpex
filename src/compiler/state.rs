@@ -18,7 +18,7 @@ pub(crate) struct State<'item> {
     pub(crate) item_first_refs: HashMap<u64, Span>,
     pub(crate) is_indexing_source_only: bool,
     scopes: RefCell<Vec<Scope<'item>>>,
-    compilerimpl_types: HashMap<u64, CompilerImplType>,
+    intrinsic_types: HashMap<u64, IntrinsicType>,
 }
 
 impl<'item> State<'item> {
@@ -32,17 +32,17 @@ impl<'item> State<'item> {
             item_first_refs: HashMap::default(),
             scopes: RefCell::default(),
             is_indexing_source_only: false,
-            compilerimpl_types: HashMap::default(),
+            intrinsic_types: HashMap::default(),
         }
     }
 
     pub(crate) fn init_cache(&mut self) {
-        self.compilerimpl_types = [
-            ("i32", CompilerImplType::I32),
-            ("u32", CompilerImplType::U32),
-            ("f32", CompilerImplType::F32),
-            ("bool", CompilerImplType::Bool),
-            ("typeref", CompilerImplType::Typeref),
+        self.intrinsic_types = [
+            ("i32", IntrinsicType::I32),
+            ("u32", IntrinsicType::U32),
+            ("f32", IntrinsicType::F32),
+            ("bool", IntrinsicType::Bool),
+            ("typeref", IntrinsicType::Typeref),
         ]
         .map(|(name, type_)| (self.search_prelude_type(name).id, type_))
         .into();
@@ -68,19 +68,19 @@ impl<'item> State<'item> {
         }
     }
 
-    pub(crate) fn is_compilerimpl_type(
+    pub(crate) fn is_intrinsic_type(
         &self,
         type_: Type<'item>,
-        compilerimpl_type: CompilerImplType,
+        intrinsic_type: IntrinsicType,
     ) -> bool {
         type_
             .struct_ref()
-            .is_some_and(|type_| self.compilerimpl_type(type_) == Some(compilerimpl_type))
+            .is_some_and(|type_| self.intrinsic_type(type_) == Some(intrinsic_type))
     }
 
-    pub(crate) fn compilerimpl_type(&self, type_: &StructDefinition) -> Option<CompilerImplType> {
-        debug_assert!(!self.compilerimpl_types.is_empty());
-        self.compilerimpl_types.get(&type_.id).copied()
+    pub(crate) fn intrinsic_type(&self, type_: &StructDefinition) -> Option<IntrinsicType> {
+        debug_assert!(!self.intrinsic_types.is_empty());
+        self.intrinsic_types.get(&type_.id).copied()
     }
 
     pub(crate) fn wildcard_type(&self, param_id: u64) -> Option<Type<'item>> {
@@ -135,7 +135,7 @@ impl<'item> State<'item> {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub(crate) enum CompilerImplType {
+pub(crate) enum IntrinsicType {
     I32,
     U32,
     F32,

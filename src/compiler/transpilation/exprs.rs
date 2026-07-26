@@ -7,9 +7,7 @@ use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBod
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::transpilation::{
-    MAIN_BUFFER_NAME, SpecializedFn, TranspileState, compilerimpl,
-};
+use crate::compiler::transpilation::{MAIN_BUFFER_NAME, SpecializedFn, TranspileState, intrinsic};
 use crate::compiler::{consts, types};
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;
@@ -39,7 +37,7 @@ pub(super) fn transpile_var_ref(var: &VarDefinition, state: &mut TranspileState<
 pub(super) fn transpile_call(call: &Call, state: &mut TranspileState<'_, '_>) {
     match state.inner.sources[&call.id] {
         ItemRef::Fn(child) => match &child.body {
-            FnBody::Compilerimpl(_) => compilerimpl::transpile_call(call, child, state),
+            FnBody::Intrinsic(_) => intrinsic::transpile_call(call, child, state),
             FnBody::Statements(body) => transpile_custom_fn_call(call, child, body, state),
         },
         ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Param(_) => {

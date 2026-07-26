@@ -2,9 +2,9 @@ use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
-use crate::compiler::parsing::items::fns::{BinaryCompilerImplFn, CompilerImplFn};
+use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::state::CompilerImplType;
+use crate::compiler::state::IntrinsicType;
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
 use crate::compiler::{queries, types};
 use crate::utils::validation::ValidateError;
@@ -86,41 +86,41 @@ fn validate_arg_name(
 
 fn validate_mul_add_candidate(call: &Call, state: &mut ValidateState<'_, '_>) {
     if !are_all_args_f32(call, state)
-        || !is_call_compilerimpl_add(call, state)
-        || !has_compilerimpl_mul_arg(call, state)
+        || !is_call_intrinsic_add(call, state)
+        || !has_intrinsic_mul_arg(call, state)
     {
         return;
     }
     state.add_log(logs::exprs::mul_add_candidate(call.span, state));
 }
 
-fn is_call_compilerimpl_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
-    queries::calls::is_compilerimpl(
+fn is_call_intrinsic_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+    queries::calls::is_intrinsic(
         call,
-        CompilerImplFn::Binary(BinaryCompilerImplFn::Add),
+        IntrinsicFn::Binary(BinaryIntrinsicFn::Add),
         state.inner,
     )
 }
 
-fn has_compilerimpl_mul_arg(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+fn has_intrinsic_mul_arg(call: &Call, state: &ValidateState<'_, '_>) -> bool {
     call.args
         .iter()
-        .any(|arg| matches!(&arg.value, Expr::Call(call) if is_call_compilerimpl_mul(call, state)))
+        .any(|arg| matches!(&arg.value, Expr::Call(call) if is_call_intrinsic_mul(call, state)))
 }
 
-fn is_call_compilerimpl_mul(call: &Call, state: &ValidateState<'_, '_>) -> bool {
-    queries::calls::is_compilerimpl(
+fn is_call_intrinsic_mul(call: &Call, state: &ValidateState<'_, '_>) -> bool {
+    queries::calls::is_intrinsic(
         call,
-        CompilerImplFn::Binary(BinaryCompilerImplFn::Mul),
+        IntrinsicFn::Binary(BinaryIntrinsicFn::Mul),
         state.inner,
     )
 }
 
 fn are_all_args_f32(call: &Call, state: &ValidateState<'_, '_>) -> bool {
     call.args.iter().all(|arg| {
-        state.inner.is_compilerimpl_type(
+        state.inner.is_intrinsic_type(
             types::expr_type(&arg.value, state.inner),
-            CompilerImplType::F32,
+            IntrinsicType::F32,
         )
     })
 }

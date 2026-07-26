@@ -2,7 +2,7 @@ use crate::compiler::consts;
 use crate::compiler::consts::ConstValue;
 use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::calls::Arg;
-use crate::compiler::parsing::items::fns::{CompilerImplFn, FnDefinition};
+use crate::compiler::parsing::items::fns::{FnDefinition, IntrinsicFn};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
@@ -138,7 +138,7 @@ impl<'item> ItemRef<'item> {
     }
 
     pub(crate) fn is_param_constness_ignored(self) -> bool {
-        matches!(self, ItemRef::Fn(fn_) if fn_.compilerimpl() == Some(CompilerImplFn::Typeof))
+        matches!(self, ItemRef::Fn(fn_) if fn_.intrinsic() == Some(IntrinsicFn::Typeof))
     }
 
     pub(crate) fn is_const(self, are_params_const: bool) -> bool {

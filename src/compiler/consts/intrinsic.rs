@@ -3,7 +3,7 @@
 use crate::compiler::consts::{ConstValue, HashableF32};
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::items::fns::{
-    BinaryCompilerImplFn, CompilerImplFn, FnDefinition, UnaryCompilerImplFn,
+    BinaryIntrinsicFn, FnDefinition, IntrinsicFn, UnaryIntrinsicFn,
 };
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::state::State;
@@ -23,19 +23,19 @@ pub(super) fn call_value<'item>(
             return ConstValue::Unknown;
         }
     }
-    match source.compilerimpl() {
-        Some(CompilerImplFn::Binary(fn_)) => fn_binary_value(source, fn_, state),
-        Some(CompilerImplFn::Unary(fn_)) => fn_unary_value(source, fn_, state),
-        Some(CompilerImplFn::MulAdd) => mul_add_value(source, state),
-        Some(CompilerImplFn::Sizeof) => sizeof_value(source, state),
-        Some(CompilerImplFn::Typeof) => typeof_value(call, state),
+    match source.intrinsic() {
+        Some(IntrinsicFn::Binary(fn_)) => fn_binary_value(source, fn_, state),
+        Some(IntrinsicFn::Unary(fn_)) => fn_unary_value(source, fn_, state),
+        Some(IntrinsicFn::MulAdd) => mul_add_value(source, state),
+        Some(IntrinsicFn::Sizeof) => sizeof_value(source, state),
+        Some(IntrinsicFn::Typeof) => typeof_value(call, state),
         None => unreachable!("not implemented `{}` constant GPU function", source.name),
     }
 }
 
 fn fn_binary_value<'item>(
     source: &'item FnDefinition,
-    fn_: BinaryCompilerImplFn,
+    fn_: BinaryIntrinsicFn,
     state: &State<'item>,
 ) -> ConstValue<'item> {
     let left = state.const_value(source.params.params[0].id);
@@ -52,60 +52,52 @@ fn fn_binary_value<'item>(
     }
 }
 
-fn fn_binary_i32_value<'item>(
-    left: i32,
-    right: i32,
-    fn_: BinaryCompilerImplFn,
-) -> ConstValue<'item> {
+fn fn_binary_i32_value<'item>(left: i32, right: i32, fn_: BinaryIntrinsicFn) -> ConstValue<'item> {
     match fn_ {
-        BinaryCompilerImplFn::Add => ConstValue::I32(left.wrapping_add(right)),
-        BinaryCompilerImplFn::Sub => ConstValue::I32(left.wrapping_sub(right)),
-        BinaryCompilerImplFn::Mul => ConstValue::I32(left.wrapping_mul(right)),
-        BinaryCompilerImplFn::Div => ConstValue::I32(if right == 0 {
+        BinaryIntrinsicFn::Add => ConstValue::I32(left.wrapping_add(right)),
+        BinaryIntrinsicFn::Sub => ConstValue::I32(left.wrapping_sub(right)),
+        BinaryIntrinsicFn::Mul => ConstValue::I32(left.wrapping_mul(right)),
+        BinaryIntrinsicFn::Div => ConstValue::I32(if right == 0 {
             left
         } else {
             left.wrapping_div(right)
         }),
-        BinaryCompilerImplFn::Mod => ConstValue::I32(if right == 0 {
+        BinaryIntrinsicFn::Mod => ConstValue::I32(if right == 0 {
             0
         } else {
             left.wrapping_rem(right)
         }),
-        BinaryCompilerImplFn::Eq => ConstValue::Bool(left == right),
-        BinaryCompilerImplFn::Ne => ConstValue::Bool(left != right),
-        BinaryCompilerImplFn::Lt => ConstValue::Bool(left < right),
-        BinaryCompilerImplFn::Le => ConstValue::Bool(left <= right),
-        BinaryCompilerImplFn::Gt => ConstValue::Bool(left > right),
-        BinaryCompilerImplFn::Ge => ConstValue::Bool(left >= right),
+        BinaryIntrinsicFn::Eq => ConstValue::Bool(left == right),
+        BinaryIntrinsicFn::Ne => ConstValue::Bool(left != right),
+        BinaryIntrinsicFn::Lt => ConstValue::Bool(left < right),
+        BinaryIntrinsicFn::Le => ConstValue::Bool(left <= right),
+        BinaryIntrinsicFn::Gt => ConstValue::Bool(left > right),
+        BinaryIntrinsicFn::Ge => ConstValue::Bool(left >= right),
         _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `i32`"),
     }
 }
 
-fn fn_binary_u32_value<'item>(
-    left: u32,
-    right: u32,
-    fn_: BinaryCompilerImplFn,
-) -> ConstValue<'item> {
+fn fn_binary_u32_value<'item>(left: u32, right: u32, fn_: BinaryIntrinsicFn) -> ConstValue<'item> {
     match fn_ {
-        BinaryCompilerImplFn::Add => ConstValue::U32(left.wrapping_add(right)),
-        BinaryCompilerImplFn::Sub => ConstValue::U32(left.wrapping_sub(right)),
-        BinaryCompilerImplFn::Mul => ConstValue::U32(left.wrapping_mul(right)),
-        BinaryCompilerImplFn::Div => ConstValue::U32(if right == 0 {
+        BinaryIntrinsicFn::Add => ConstValue::U32(left.wrapping_add(right)),
+        BinaryIntrinsicFn::Sub => ConstValue::U32(left.wrapping_sub(right)),
+        BinaryIntrinsicFn::Mul => ConstValue::U32(left.wrapping_mul(right)),
+        BinaryIntrinsicFn::Div => ConstValue::U32(if right == 0 {
             left
         } else {
             left.wrapping_div(right)
         }),
-        BinaryCompilerImplFn::Mod => ConstValue::U32(if right == 0 {
+        BinaryIntrinsicFn::Mod => ConstValue::U32(if right == 0 {
             0
         } else {
             left.wrapping_rem(right)
         }),
-        BinaryCompilerImplFn::Eq => ConstValue::Bool(left == right),
-        BinaryCompilerImplFn::Ne => ConstValue::Bool(left != right),
-        BinaryCompilerImplFn::Lt => ConstValue::Bool(left < right),
-        BinaryCompilerImplFn::Le => ConstValue::Bool(left <= right),
-        BinaryCompilerImplFn::Gt => ConstValue::Bool(left > right),
-        BinaryCompilerImplFn::Ge => ConstValue::Bool(left >= right),
+        BinaryIntrinsicFn::Eq => ConstValue::Bool(left == right),
+        BinaryIntrinsicFn::Ne => ConstValue::Bool(left != right),
+        BinaryIntrinsicFn::Lt => ConstValue::Bool(left < right),
+        BinaryIntrinsicFn::Le => ConstValue::Bool(left <= right),
+        BinaryIntrinsicFn::Gt => ConstValue::Bool(left > right),
+        BinaryIntrinsicFn::Ge => ConstValue::Bool(left >= right),
         _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `u32`"),
     }
 }
@@ -114,23 +106,23 @@ fn fn_binary_u32_value<'item>(
 fn fn_binary_f32_value<'item>(
     left: HashableF32,
     right: HashableF32,
-    fn_: BinaryCompilerImplFn,
+    fn_: BinaryIntrinsicFn,
 ) -> ConstValue<'item> {
     match fn_ {
-        BinaryCompilerImplFn::Add => ConstValue::F32(HashableF32(left.0 + right.0)),
-        BinaryCompilerImplFn::Sub => ConstValue::F32(HashableF32(left.0 - right.0)),
-        BinaryCompilerImplFn::Mul => ConstValue::F32(HashableF32(left.0 * right.0)),
-        BinaryCompilerImplFn::Div => ConstValue::F32(HashableF32(if right.0 == 0.0 {
+        BinaryIntrinsicFn::Add => ConstValue::F32(HashableF32(left.0 + right.0)),
+        BinaryIntrinsicFn::Sub => ConstValue::F32(HashableF32(left.0 - right.0)),
+        BinaryIntrinsicFn::Mul => ConstValue::F32(HashableF32(left.0 * right.0)),
+        BinaryIntrinsicFn::Div => ConstValue::F32(HashableF32(if right.0 == 0.0 {
             left.0
         } else {
             left.0 / right.0
         })),
-        BinaryCompilerImplFn::Eq => ConstValue::Bool(left.0 == right.0),
-        BinaryCompilerImplFn::Ne => ConstValue::Bool(left.0 != right.0),
-        BinaryCompilerImplFn::Lt => ConstValue::Bool(left.0 < right.0),
-        BinaryCompilerImplFn::Le => ConstValue::Bool(left.0 <= right.0),
-        BinaryCompilerImplFn::Gt => ConstValue::Bool(left.0 > right.0),
-        BinaryCompilerImplFn::Ge => ConstValue::Bool(left.0 >= right.0),
+        BinaryIntrinsicFn::Eq => ConstValue::Bool(left.0 == right.0),
+        BinaryIntrinsicFn::Ne => ConstValue::Bool(left.0 != right.0),
+        BinaryIntrinsicFn::Lt => ConstValue::Bool(left.0 < right.0),
+        BinaryIntrinsicFn::Le => ConstValue::Bool(left.0 <= right.0),
+        BinaryIntrinsicFn::Gt => ConstValue::Bool(left.0 > right.0),
+        BinaryIntrinsicFn::Ge => ConstValue::Bool(left.0 >= right.0),
         _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `f32`"),
     }
 }
@@ -138,17 +130,17 @@ fn fn_binary_f32_value<'item>(
 fn fn_binary_bool_value<'item>(
     left: bool,
     right: bool,
-    fn_: BinaryCompilerImplFn,
+    fn_: BinaryIntrinsicFn,
 ) -> ConstValue<'item> {
     match fn_ {
-        BinaryCompilerImplFn::Eq => ConstValue::Bool(left == right),
-        BinaryCompilerImplFn::Ne => ConstValue::Bool(left != right),
-        BinaryCompilerImplFn::Lt => ConstValue::Bool(!left && right),
-        BinaryCompilerImplFn::Le => ConstValue::Bool(left <= right),
-        BinaryCompilerImplFn::Gt => ConstValue::Bool(left && !right),
-        BinaryCompilerImplFn::Ge => ConstValue::Bool(left >= right),
-        BinaryCompilerImplFn::And => ConstValue::Bool(left && right),
-        BinaryCompilerImplFn::Or => ConstValue::Bool(left || right),
+        BinaryIntrinsicFn::Eq => ConstValue::Bool(left == right),
+        BinaryIntrinsicFn::Ne => ConstValue::Bool(left != right),
+        BinaryIntrinsicFn::Lt => ConstValue::Bool(!left && right),
+        BinaryIntrinsicFn::Le => ConstValue::Bool(left <= right),
+        BinaryIntrinsicFn::Gt => ConstValue::Bool(left && !right),
+        BinaryIntrinsicFn::Ge => ConstValue::Bool(left >= right),
+        BinaryIntrinsicFn::And => ConstValue::Bool(left && right),
+        BinaryIntrinsicFn::Or => ConstValue::Bool(left || right),
         _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `bool`"),
     }
 }
@@ -156,18 +148,18 @@ fn fn_binary_bool_value<'item>(
 fn fn_binary_typeref_value<'item>(
     left: &'item StructDefinition,
     right: &'item StructDefinition,
-    fn_: BinaryCompilerImplFn,
+    fn_: BinaryIntrinsicFn,
 ) -> ConstValue<'item> {
     match fn_ {
-        BinaryCompilerImplFn::Eq => ConstValue::Bool(left == right),
-        BinaryCompilerImplFn::Ne => ConstValue::Bool(left != right),
+        BinaryIntrinsicFn::Eq => ConstValue::Bool(left == right),
+        BinaryIntrinsicFn::Ne => ConstValue::Bool(left != right),
         _ => unreachable!("not implemented `{fn_:?}` constant GPU function for `typeref`"),
     }
 }
 
 fn fn_unary_value<'item>(
     source: &'item FnDefinition,
-    fn_: UnaryCompilerImplFn,
+    fn_: UnaryIntrinsicFn,
     state: &State<'item>,
 ) -> ConstValue<'item> {
     match state.const_value(source.params.params[0].id) {

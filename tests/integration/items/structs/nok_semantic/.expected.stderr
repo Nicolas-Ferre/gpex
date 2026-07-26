@@ -1,12 +1,7 @@
-error: forbidden `compilerimpl` item outside prelude
-│  → <root>/test_compilerimpl.gpex:1:15
-│    ¦ struct Type = compilerimpl {}
-│    ¦               ^^^^^^^^^^^^
-┴
-error: forbidden `compilerimpl` item outside prelude
+error: forbidden `intrinsic` item outside prelude
 │  → <root>/test_duplication.gpex:1:15
-│    ¦ struct item = compilerimpl {}
-│    ¦               ^^^^^^^^^^^^
+│    ¦ struct item = intrinsic {}
+│    ¦               ^^^^^^^^^
 ┴
 error: `item` item defined multiple times
 │  → <root>/test_duplication.gpex:2:5
@@ -14,6 +9,11 @@ error: `item` item defined multiple times
 │    ¦     ^^^^
 ├─ info: item also defined here
 │  → <root>/test_duplication.gpex:1:8
-│    ¦ struct item = compilerimpl {}
+│    ¦ struct item = intrinsic {}
 │    ¦        ^^^^
+┴
+error: forbidden `intrinsic` item outside prelude
+│  → <root>/test_intrinsic.gpex:1:15
+│    ¦ struct Type = intrinsic {}
+│    ¦               ^^^^^^^^^
 ┴

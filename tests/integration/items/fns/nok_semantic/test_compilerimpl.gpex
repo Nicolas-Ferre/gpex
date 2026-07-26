@@ -1,3 +1,0 @@
-var _value = fn_();
-
-fn fn_() -> i32 = compilerimpl;

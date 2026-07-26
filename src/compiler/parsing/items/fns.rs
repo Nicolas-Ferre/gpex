@@ -8,8 +8,8 @@ use crate::compiler::parsing::items::params::ParamGroup;
 use crate::compiler::parsing::patterns::IDENT_PATTERN;
 use crate::compiler::parsing::statements::Statement;
 use crate::compiler::parsing::symbols::{
-    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, COMPILERIMPL_KEYWORD, CONST_KEYWORD,
-    EQUAL_SYMBOL, FN_KEYWORD, PUB_KEYWORD, SEMICOLON_SYMBOL,
+    ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, EQUAL_SYMBOL, FN_KEYWORD,
+    INTRINSIC_KEYWORD, PUB_KEYWORD, SEMICOLON_SYMBOL,
 };
 use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
@@ -64,7 +64,7 @@ impl FnDefinition {
                     (None, None, params.span)
                 };
             let body =
-                context.parse_any(&[&Self::parse_body_statements, &Self::parse_compilerimpl])?;
+                context.parse_any(&[&Self::parse_body_statements, &Self::parse_intrinsic])?;
             Ok(Self {
                 id,
                 scope,
@@ -86,29 +86,29 @@ impl FnDefinition {
         format!("{}({})", self.name, self.params.params.len())
     }
 
-    pub(crate) fn compilerimpl(&self) -> Option<CompilerImplFn> {
-        if !matches!(self.body, FnBody::Compilerimpl(_)) {
+    pub(crate) fn intrinsic(&self) -> Option<IntrinsicFn> {
+        if !matches!(self.body, FnBody::Intrinsic(_)) {
             return None;
         }
         match self.name.as_str() {
-            BINARY_ADD_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Add)),
-            BINARY_SUB_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Sub)),
-            BINARY_MUL_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mul)),
-            BINARY_DIV_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Div)),
-            BINARY_MOD_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Mod)),
-            BINARY_EQ_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Eq)),
-            BINARY_NE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ne)),
-            BINARY_LT_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Lt)),
-            BINARY_LE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Le)),
-            BINARY_GT_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Gt)),
-            BINARY_GE_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Ge)),
-            BINARY_AND_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::And)),
-            BINARY_OR_FN_NAME => Some(CompilerImplFn::Binary(BinaryCompilerImplFn::Or)),
-            UNARY_NEG_FN_NAME => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Neg)),
-            UNARY_NOT_FN_NAME => Some(CompilerImplFn::Unary(UnaryCompilerImplFn::Not)),
-            "mul_add" => Some(CompilerImplFn::MulAdd),
-            "typeof" => Some(CompilerImplFn::Typeof),
-            "sizeof" => Some(CompilerImplFn::Sizeof),
+            BINARY_ADD_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Add)),
+            BINARY_SUB_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Sub)),
+            BINARY_MUL_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Mul)),
+            BINARY_DIV_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Div)),
+            BINARY_MOD_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Mod)),
+            BINARY_EQ_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Eq)),
+            BINARY_NE_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Ne)),
+            BINARY_LT_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Lt)),
+            BINARY_LE_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Le)),
+            BINARY_GT_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Gt)),
+            BINARY_GE_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Ge)),
+            BINARY_AND_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::And)),
+            BINARY_OR_FN_NAME => Some(IntrinsicFn::Binary(BinaryIntrinsicFn::Or)),
+            UNARY_NEG_FN_NAME => Some(IntrinsicFn::Unary(UnaryIntrinsicFn::Neg)),
+            UNARY_NOT_FN_NAME => Some(IntrinsicFn::Unary(UnaryIntrinsicFn::Not)),
+            "mul_add" => Some(IntrinsicFn::MulAdd),
+            "typeof" => Some(IntrinsicFn::Typeof),
+            "sizeof" => Some(IntrinsicFn::Sizeof),
             _ => None,
         }
     }
@@ -146,27 +146,27 @@ impl FnDefinition {
         }))
     }
 
-    fn parse_compilerimpl<'context>(
+    fn parse_intrinsic<'context>(
         context: &mut ParseContext<'context>,
     ) -> Result<FnBody, ParseError<'context>> {
         Span::parse_symbol(context, EQUAL_SYMBOL)?;
-        let compilerimpl_keyword_span = Span::parse_symbol(context, COMPILERIMPL_KEYWORD)?;
+        let intrinsic_keyword_span = Span::parse_symbol(context, INTRINSIC_KEYWORD)?;
         Span::parse_symbol(context, SEMICOLON_SYMBOL)?;
-        Ok(FnBody::Compilerimpl(compilerimpl_keyword_span))
+        Ok(FnBody::Intrinsic(intrinsic_keyword_span))
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum CompilerImplFn {
-    Binary(BinaryCompilerImplFn),
-    Unary(UnaryCompilerImplFn),
+pub(crate) enum IntrinsicFn {
+    Binary(BinaryIntrinsicFn),
+    Unary(UnaryIntrinsicFn),
     MulAdd,
     Typeof,
     Sizeof,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum BinaryCompilerImplFn {
+pub(crate) enum BinaryIntrinsicFn {
     Add,
     Sub,
     Mul,
@@ -182,7 +182,7 @@ pub(crate) enum BinaryCompilerImplFn {
     Or,
 }
 
-impl BinaryCompilerImplFn {
+impl BinaryIntrinsicFn {
     pub(crate) fn is_logical_operator(self) -> bool {
         matches!(self, Self::And | Self::Or)
     }
@@ -196,21 +196,21 @@ impl BinaryCompilerImplFn {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum UnaryCompilerImplFn {
+pub(crate) enum UnaryIntrinsicFn {
     Neg,
     Not,
 }
 
 #[derive(Debug)]
 pub(crate) enum FnBody {
-    Compilerimpl(Span),
+    Intrinsic(Span),
     Statements(FnStatementsBody),
 }
 
 impl FnBody {
-    pub(crate) fn compilerimpl_keyword_span(&self) -> Option<Span> {
+    pub(crate) fn intrinsic_keyword_span(&self) -> Option<Span> {
         match self {
-            Self::Compilerimpl(span) => Some(*span),
+            Self::Intrinsic(span) => Some(*span),
             Self::Statements(_) => None,
         }
     }

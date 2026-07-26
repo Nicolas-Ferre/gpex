@@ -1,4 +1,4 @@
-mod compilerimpl;
+mod intrinsic;
 
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
@@ -84,7 +84,7 @@ fn fn_call_value<'item>(
 ) -> ConstValue<'item> {
     debug_assert_eq!(call.args.len(), source.params.params.len());
     if ItemRef::Fn(source).is_param_constness_ignored() {
-        return compilerimpl::call_value(call, source, state);
+        return intrinsic::call_value(call, source, state);
     }
     let param_args = call
         .args
@@ -127,7 +127,7 @@ fn fn_value<'item>(
         return ConstValue::RuntimeValue;
     }
     match &source.body {
-        FnBody::Compilerimpl(_) => compilerimpl::call_value(call, source, state),
+        FnBody::Intrinsic(_) => intrinsic::call_value(call, source, state),
         FnBody::Statements(body) => fn_body_value(body, state),
     }
 }
