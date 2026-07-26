@@ -10,7 +10,7 @@ error: `__mod__(f32, f32)` item not found
 │    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦     right: typeof(left)
 │    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
-│    ¦ ) -> typeof(left) = compilerimpl;
+│    ¦ ) -> typeof(left) = intrinsic;
 │    ¦ ^^^^^^^^^^^^^^^^^
 ┴
 error: `f32` constant expression out of bounds

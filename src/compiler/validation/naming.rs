@@ -1,7 +1,7 @@
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::vars::ConstDefinition;
-use crate::compiler::state::CompilerImplType;
+use crate::compiler::state::IntrinsicType;
 use crate::compiler::types;
 use crate::compiler::types::Type;
 use crate::compiler::validation::{ValidateState, logs};
@@ -44,9 +44,7 @@ pub(super) fn const_allowed_cases(
 ) -> &'static [Case] {
     let type_ = types::expr_type(&const_.value, state.inner);
     let may_be_typeref = type_.struct_ref().is_none()
-        || state
-            .inner
-            .is_compilerimpl_type(type_, CompilerImplType::Typeref);
+        || state.inner.is_intrinsic_type(type_, IntrinsicType::Typeref);
     if may_be_typeref {
         &[Case::ScreamingSnake, Case::Pascal]
     } else {
@@ -60,9 +58,7 @@ pub(super) fn fn_allowed_cases(
 ) -> &'static [Case] {
     let type_ = types::fn_type(fn_, state.inner);
     let may_return_typeref = match type_ {
-        Type::Struct(_) => state
-            .inner
-            .is_compilerimpl_type(type_, CompilerImplType::Typeref),
+        Type::Struct(_) => state.inner.is_intrinsic_type(type_, IntrinsicType::Typeref),
         Type::Param(_) | Type::Wildcard(_) | Type::NoReturn => false,
         Type::Unknown => unreachable!("return type should be validated before"),
     };
@@ -78,9 +74,7 @@ pub(super) fn param_allowed_cases<'item>(
     state: &ValidateState<'_, 'item>,
 ) -> &'static [Case] {
     let type_ = types::param_type(param, state.inner);
-    let is_typeref = state
-        .inner
-        .is_compilerimpl_type(type_, CompilerImplType::Typeref);
+    let is_typeref = state.inner.is_intrinsic_type(type_, IntrinsicType::Typeref);
     if is_typeref && param.const_mark_span().is_some() {
         &[Case::Snake, Case::Pascal]
     } else {

@@ -7,7 +7,7 @@
 /// ```gpex
 /// const Integer = i32; // a type alias of type `typeref`
 /// ```
-pub struct typeref = compilerimpl {}
+pub struct typeref = intrinsic {}
 
 /// A 32-bit signed integer.
 ///
@@ -18,7 +18,7 @@ pub struct typeref = compilerimpl {}
 /// var positive = 123;
 /// var negative = -123;
 /// ```
-pub struct i32 = compilerimpl {}
+pub struct i32 = intrinsic {}
 
 /// A 32-bit unsigned integer.
 ///
@@ -28,7 +28,7 @@ pub struct i32 = compilerimpl {}
 /// var zero = 0u;
 /// var positive = 123u;
 /// ```
-pub struct u32 = compilerimpl {}
+pub struct u32 = intrinsic {}
 
 /// A 32-bit floating-point number.
 ///
@@ -41,7 +41,7 @@ pub struct u32 = compilerimpl {}
 /// var positive = 123.456;
 /// var negative = -123.456;
 /// ```
-pub struct f32 = compilerimpl {}
+pub struct f32 = intrinsic {}
 
 /// A boolean value.
 ///
@@ -51,7 +51,7 @@ pub struct f32 = compilerimpl {}
 /// var true_value = true;
 /// var false_value = false;
 /// ```
-pub struct bool = compilerimpl {}
+pub struct bool = intrinsic {}
 
 // TYPE OPERATIONS
 
@@ -63,7 +63,7 @@ pub struct bool = compilerimpl {}
 /// var value = 1;
 /// const ValueType = typeof(value); // i32
 /// ```
-pub const fn typeof(value: ?) -> typeref = compilerimpl;
+pub const fn typeof(value: ?) -> typeref = intrinsic;
 
 /// Returns the size of a `type_` in bytes.
 ///
@@ -72,7 +72,7 @@ pub const fn typeof(value: ?) -> typeref = compilerimpl;
 /// ```gpex
 /// const I32_SIZE = sizeof(i32); // 4u
 /// ```
-pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
+pub const fn sizeof(type_: const typeref) -> u32 = intrinsic;
 
 // OPERATORS
 
@@ -90,7 +90,7 @@ pub const fn sizeof(type_: const typeref) -> u32 = compilerimpl;
 pub const fn __add__(
     left: ? require typeof(left).is_numeric(),
     right: typeof(left)
-) -> typeof(left) = compilerimpl;
+) -> typeof(left) = intrinsic;
 
 /// Subtracts `right` from `left`.
 ///
@@ -106,7 +106,7 @@ pub const fn __add__(
 pub const fn __sub__(
     left: ? require typeof(left).is_numeric(),
     right: typeof(left)
-) -> typeof(left) = compilerimpl;
+) -> typeof(left) = intrinsic;
 
 /// Multiplies `left` by `right`.
 ///
@@ -122,7 +122,7 @@ pub const fn __sub__(
 pub const fn __mul__(
     left: ? require typeof(left).is_numeric(),
     right: typeof(left)
-) -> typeof(left) = compilerimpl;
+) -> typeof(left) = intrinsic;
 
 /// Divides `left` by `right`.
 ///
@@ -139,7 +139,7 @@ pub const fn __mul__(
 pub const fn __div__(
     left: ? require typeof(left).is_numeric(),
     right: typeof(left)
-) -> typeof(left) = compilerimpl;
+) -> typeof(left) = intrinsic;
 
 /// Returns the remainder of `left` divided by `right`.
 ///
@@ -155,7 +155,7 @@ pub const fn __div__(
 pub const fn __mod__(
     left: ? require typeof(left).is_integer(),
     right: typeof(left)
-) -> typeof(left) = compilerimpl;
+) -> typeof(left) = intrinsic;
 
 /// Returns whether `left` and `right` are equal.
 ///
@@ -170,7 +170,7 @@ pub const fn __mod__(
 pub const fn __eq__(
     left: ? require typeof(left).is_ordered(),
     right: typeof(left)
-) -> bool = compilerimpl;
+) -> bool = intrinsic;
 
 /// Returns whether `left` and `right` type references are equal.
 ///
@@ -179,7 +179,7 @@ pub const fn __eq__(
 /// ```gpex
 /// const ARE_EQUAL = i32 == i32; // true
 /// ```
-pub const fn __eq__(left: typeref, right: typeref) -> bool = compilerimpl;
+pub const fn __eq__(left: typeref, right: typeref) -> bool = intrinsic;
 
 /// Returns whether `left` and `right` are different.
 ///
@@ -194,7 +194,7 @@ pub const fn __eq__(left: typeref, right: typeref) -> bool = compilerimpl;
 pub const fn __ne__(
     left: ? require typeof(left).is_ordered(),
     right: typeof(left)
-) -> bool = compilerimpl;
+) -> bool = intrinsic;
 
 /// Returns whether `left` and `right` types are different.
 ///
@@ -203,7 +203,7 @@ pub const fn __ne__(
 /// ```gpex
 /// const ARE_DIFFERENT = i32 != u32; // true
 /// ```
-pub const fn __ne__(left: typeref, right: typeref) -> bool = compilerimpl;
+pub const fn __ne__(left: typeref, right: typeref) -> bool = intrinsic;
 
 /// Returns whether `left` is less than `right`.
 ///
@@ -218,7 +218,7 @@ pub const fn __ne__(left: typeref, right: typeref) -> bool = compilerimpl;
 pub const fn __lt__(
     left: ? require typeof(left).is_ordered(),
     right: typeof(left)
-) -> bool = compilerimpl;
+) -> bool = intrinsic;
 
 /// Returns whether `left` is less than or equal to `right`.
 ///
@@ -233,7 +233,7 @@ pub const fn __lt__(
 pub const fn __le__(
     left: ? require typeof(left).is_ordered(),
     right: typeof(left)
-) -> bool = compilerimpl;
+) -> bool = intrinsic;
 
 /// Returns whether `left` is greater than `right`.
 ///
@@ -248,7 +248,7 @@ pub const fn __le__(
 pub const fn __gt__(
     left: ? require typeof(left).is_ordered(),
     right: typeof(left)
-) -> bool = compilerimpl;
+) -> bool = intrinsic;
 
 /// Returns whether `left` is greater than or equal to `right`.
 ///
@@ -263,7 +263,7 @@ pub const fn __gt__(
 pub const fn __ge__(
     left: ? require typeof(left).is_ordered(),
     right: typeof(left)
-) -> bool = compilerimpl;
+) -> bool = intrinsic;
 
 /// Returns whether `left` and `right` are both true.
 ///
@@ -272,7 +272,7 @@ pub const fn __ge__(
 /// ```gpex
 /// var result = true && false; // false
 /// ```
-pub const fn __and__(left: bool, right: bool) -> bool = compilerimpl;
+pub const fn __and__(left: bool, right: bool) -> bool = intrinsic;
 
 /// Returns whether `left` or `right` is true.
 ///
@@ -281,7 +281,7 @@ pub const fn __and__(left: bool, right: bool) -> bool = compilerimpl;
 /// ```gpex
 /// var result = true || false; // true
 /// ```
-pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
+pub const fn __or__(left: bool, right: bool) -> bool = intrinsic;
 
 /// Negates `value`.
 ///
@@ -295,7 +295,7 @@ pub const fn __or__(left: bool, right: bool) -> bool = compilerimpl;
 /// var f32_one = 1.0; // 1.0
 /// var negated_f32_value = -f32_one; // -1.0
 /// ```
-pub const fn __neg__(value: ? require typeof(value).is_signed()) -> typeof(value) = compilerimpl;
+pub const fn __neg__(value: ? require typeof(value).is_signed()) -> typeof(value) = intrinsic;
 
 /// Returns whether `value` is false.
 ///
@@ -304,7 +304,7 @@ pub const fn __neg__(value: ? require typeof(value).is_signed()) -> typeof(value
 /// ```gpex
 /// var result = !false; // true
 /// ```
-pub const fn __not__(value: bool) -> bool = compilerimpl;
+pub const fn __not__(value: bool) -> bool = intrinsic;
 
 /// Multiplies `value` by `multiplier`, then adds `addend` with a single rounding.
 ///
@@ -315,7 +315,7 @@ pub const fn __not__(value: bool) -> bool = compilerimpl;
 /// ```gpex
 /// var result = mul_add(2.0, 3.0, 4.0); // 10.0
 /// ```
-pub const fn mul_add(value: f32, multiplier: f32, addend: f32) -> f32 = compilerimpl;
+pub const fn mul_add(value: f32, multiplier: f32, addend: f32) -> f32 = intrinsic;
 
 const fn is_numeric(type_: typeref) -> bool {
     return type_ == i32 || type_ == u32 || type_ == f32;

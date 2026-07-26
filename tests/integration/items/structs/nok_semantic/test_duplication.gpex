@@ -1,2 +1,2 @@
-struct item = compilerimpl {}
+struct item = intrinsic {}
 var item = 0;

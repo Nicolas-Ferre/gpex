@@ -1,10 +1,10 @@
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{
-    BinaryCompilerImplFn, CompilerImplFn, FnDefinition, UnaryCompilerImplFn,
+    BinaryIntrinsicFn, FnDefinition, IntrinsicFn, UnaryIntrinsicFn,
 };
 use crate::compiler::queries;
-use crate::compiler::state::CompilerImplType;
+use crate::compiler::state::IntrinsicType;
 use crate::compiler::transpilation::{TranspileState, exprs};
 use crate::compiler::types;
 use std::fmt::Write;
@@ -14,15 +14,15 @@ pub(super) fn transpile_call(
     source: &FnDefinition,
     state: &mut TranspileState<'_, '_>,
 ) {
-    match source.compilerimpl() {
-        Some(CompilerImplFn::Binary(fn_)) => {
+    match source.intrinsic() {
+        Some(IntrinsicFn::Binary(fn_)) => {
             transpile_fn_call_binary(call, fn_, state);
         }
-        Some(CompilerImplFn::Unary(fn_)) => {
+        Some(IntrinsicFn::Unary(fn_)) => {
             transpile_fn_call_unary(call, fn_, state);
         }
-        Some(CompilerImplFn::MulAdd) => transpile_mul_add(call, state),
-        Some(CompilerImplFn::Typeof | CompilerImplFn::Sizeof) | None => {
+        Some(IntrinsicFn::MulAdd) => transpile_mul_add(call, state),
+        Some(IntrinsicFn::Typeof | IntrinsicFn::Sizeof) | None => {
             unreachable!("not implemented `{}` GPU function", source.name)
         }
     }
@@ -30,30 +30,30 @@ pub(super) fn transpile_call(
 
 fn transpile_fn_call_binary(
     call: &Call,
-    fn_: BinaryCompilerImplFn,
+    fn_: BinaryIntrinsicFn,
     state: &mut TranspileState<'_, '_>,
 ) {
     let type_ = type_(&call.args[0].value, state);
     match type_ {
-        CompilerImplType::I32 | CompilerImplType::U32 => {
+        IntrinsicType::I32 | IntrinsicType::U32 => {
             transpile_fn_call_int_binary(call, fn_, type_, state);
         }
-        CompilerImplType::F32 => transpile_fn_call_f32_binary(call, fn_, type_, state),
-        CompilerImplType::Bool => transpile_fn_call_bool_binary(call, fn_, type_, state),
-        CompilerImplType::Typeref => transpile_fn_call_typeref_binary(call, fn_, type_, state),
+        IntrinsicType::F32 => transpile_fn_call_f32_binary(call, fn_, type_, state),
+        IntrinsicType::Bool => transpile_fn_call_bool_binary(call, fn_, type_, state),
+        IntrinsicType::Typeref => transpile_fn_call_typeref_binary(call, fn_, type_, state),
     }
 }
 
 fn transpile_fn_call_int_binary(
     call: &Call,
-    fn_: BinaryCompilerImplFn,
-    type_: CompilerImplType,
+    fn_: BinaryIntrinsicFn,
+    type_: IntrinsicType,
     state: &mut TranspileState<'_, '_>,
 ) {
     let is_divisor_zero = queries::exprs::is_zero_int(&call.args[1].value, state.inner);
-    if is_divisor_zero && fn_ == BinaryCompilerImplFn::Div {
+    if is_divisor_zero && fn_ == BinaryIntrinsicFn::Div {
         transpile_arg(&call.args[0], type_, true, state);
-    } else if is_divisor_zero && fn_ == BinaryCompilerImplFn::Mod {
+    } else if is_divisor_zero && fn_ == BinaryIntrinsicFn::Mod {
         transpile_arg(&call.args[1], type_, true, state);
     } else {
         transpile_fn_call_scalar_binary(call, fn_, type_, true, state);
@@ -62,11 +62,11 @@ fn transpile_fn_call_int_binary(
 
 fn transpile_fn_call_f32_binary(
     call: &Call,
-    fn_: BinaryCompilerImplFn,
-    type_: CompilerImplType,
+    fn_: BinaryIntrinsicFn,
+    type_: IntrinsicType,
     state: &mut TranspileState<'_, '_>,
 ) {
-    if fn_ == BinaryCompilerImplFn::Div {
+    if fn_ == BinaryIntrinsicFn::Div {
         state.shader += "(";
         transpile_arg(&call.args[0], type_, true, state);
         state.shader += " / select(";
@@ -81,8 +81,8 @@ fn transpile_fn_call_f32_binary(
 
 fn transpile_fn_call_bool_binary(
     call: &Call,
-    fn_: BinaryCompilerImplFn,
-    type_: CompilerImplType,
+    fn_: BinaryIntrinsicFn,
+    type_: IntrinsicType,
     state: &mut TranspileState<'_, '_>,
 ) {
     let is_bool_arg_converted = !fn_.is_comparison_operator();
@@ -91,8 +91,8 @@ fn transpile_fn_call_bool_binary(
 
 fn transpile_fn_call_typeref_binary(
     call: &Call,
-    fn_: BinaryCompilerImplFn,
-    type_: CompilerImplType,
+    fn_: BinaryIntrinsicFn,
+    type_: IntrinsicType,
     state: &mut TranspileState<'_, '_>,
 ) {
     let negation = wgsl_comparison_to_negation_operator(fn_);
@@ -105,8 +105,8 @@ fn transpile_fn_call_typeref_binary(
 
 fn transpile_fn_call_scalar_binary(
     call: &Call,
-    fn_: BinaryCompilerImplFn,
-    type_: CompilerImplType,
+    fn_: BinaryIntrinsicFn,
+    type_: IntrinsicType,
     is_bool_arg_converted: bool,
     state: &mut TranspileState<'_, '_>,
 ) {
@@ -123,15 +123,11 @@ fn transpile_fn_call_scalar_binary(
     }
 }
 
-fn transpile_fn_call_unary(
-    call: &Call,
-    fn_: UnaryCompilerImplFn,
-    state: &mut TranspileState<'_, '_>,
-) {
+fn transpile_fn_call_unary(call: &Call, fn_: UnaryIntrinsicFn, state: &mut TranspileState<'_, '_>) {
     let type_ = type_(&call.args[0].value, state);
     let (prefix, suffix) = match fn_ {
-        UnaryCompilerImplFn::Neg => ("(-", ")"),
-        UnaryCompilerImplFn::Not => ("u32(!", ")"),
+        UnaryIntrinsicFn::Neg => ("(-", ")"),
+        UnaryIntrinsicFn::Not => ("u32(!", ")"),
     };
     state.shader += prefix;
     transpile_arg(&call.args[0], type_, true, state);
@@ -150,52 +146,52 @@ fn transpile_mul_add(call: &Call, state: &mut TranspileState<'_, '_>) {
 
 fn transpile_arg(
     arg: &Arg,
-    type_: CompilerImplType,
+    type_: IntrinsicType,
     is_bool_converted: bool,
     state: &mut TranspileState<'_, '_>,
 ) {
-    if type_ == CompilerImplType::Bool && is_bool_converted {
+    if type_ == IntrinsicType::Bool && is_bool_converted {
         state.shader += "(";
     }
     exprs::transpile_expr(&arg.value, state);
-    if type_ == CompilerImplType::Bool && is_bool_converted {
+    if type_ == IntrinsicType::Bool && is_bool_converted {
         state.shader += " == u32(true))";
     }
 }
 
-fn type_(expr: &Expr, state: &TranspileState<'_, '_>) -> CompilerImplType {
+fn type_(expr: &Expr, state: &TranspileState<'_, '_>) -> IntrinsicType {
     let type_ = types::expr_type(expr, state.inner)
         .struct_ref()
         .unwrap_or_else(|| unreachable!("unexpected value that is not a type"));
     state
         .inner
-        .compilerimpl_type(type_)
-        .unwrap_or_else(|| unreachable!("unsupported `compilerimpl` type"))
+        .intrinsic_type(type_)
+        .unwrap_or_else(|| unreachable!("unsupported `intrinsic` type"))
 }
 
-fn wgsl_binary_operator(fn_: BinaryCompilerImplFn) -> &'static str {
+fn wgsl_binary_operator(fn_: BinaryIntrinsicFn) -> &'static str {
     match fn_ {
-        BinaryCompilerImplFn::Add => "+",
-        BinaryCompilerImplFn::Sub => "-",
-        BinaryCompilerImplFn::Mul => "*",
-        BinaryCompilerImplFn::Div => "/",
-        BinaryCompilerImplFn::Mod => "%",
-        BinaryCompilerImplFn::Eq => "==",
-        BinaryCompilerImplFn::Ne => "!=",
-        BinaryCompilerImplFn::Lt => "<",
-        BinaryCompilerImplFn::Le => "<=",
-        BinaryCompilerImplFn::Gt => ">",
-        BinaryCompilerImplFn::Ge => ">=",
-        BinaryCompilerImplFn::And => "&&",
-        BinaryCompilerImplFn::Or => "||",
+        BinaryIntrinsicFn::Add => "+",
+        BinaryIntrinsicFn::Sub => "-",
+        BinaryIntrinsicFn::Mul => "*",
+        BinaryIntrinsicFn::Div => "/",
+        BinaryIntrinsicFn::Mod => "%",
+        BinaryIntrinsicFn::Eq => "==",
+        BinaryIntrinsicFn::Ne => "!=",
+        BinaryIntrinsicFn::Lt => "<",
+        BinaryIntrinsicFn::Le => "<=",
+        BinaryIntrinsicFn::Gt => ">",
+        BinaryIntrinsicFn::Ge => ">=",
+        BinaryIntrinsicFn::And => "&&",
+        BinaryIntrinsicFn::Or => "||",
     }
 }
 
 #[expect(clippy::wildcard_enum_match_arm)]
-fn wgsl_comparison_to_negation_operator(fn_: BinaryCompilerImplFn) -> &'static str {
+fn wgsl_comparison_to_negation_operator(fn_: BinaryIntrinsicFn) -> &'static str {
     match fn_ {
-        BinaryCompilerImplFn::Eq => "",
-        BinaryCompilerImplFn::Ne => "!",
-        _ => unreachable!("invalid typeref compiler implementation"),
+        BinaryIntrinsicFn::Eq => "",
+        BinaryIntrinsicFn::Ne => "!",
+        _ => unreachable!("invalid typeref intrinsic"),
     }
 }

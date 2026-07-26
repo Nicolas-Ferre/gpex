@@ -1,7 +1,7 @@
 use crate::utils::parsing::span::Symbol;
 
 pub(crate) const KEYWORDS: &[&str] = &[
-    COMPILERIMPL_KEYWORD.slice,
+    INTRINSIC_KEYWORD.slice,
     CONST_KEYWORD.slice,
     FALSE_KEYWORD.slice,
     FN_KEYWORD.slice,
@@ -15,9 +15,9 @@ pub(crate) const KEYWORDS: &[&str] = &[
     VAR_KEYWORD.slice,
 ];
 
-pub(crate) const COMPILERIMPL_KEYWORD: Symbol = Symbol {
-    name: "`compilerimpl`",
-    slice: "compilerimpl",
+pub(crate) const INTRINSIC_KEYWORD: Symbol = Symbol {
+    name: "`intrinsic`",
+    slice: "intrinsic",
 };
 pub(crate) const CONST_KEYWORD: Symbol = Symbol {
     name: "`const`",

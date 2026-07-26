@@ -70,9 +70,9 @@ fn validate_struct<'item>(
     struct_: &'item StructDefinition,
     state: &mut ValidateState<'_, 'item>,
 ) -> Result<(), ValidateError> {
-    validate_compilerimpl_location(
+    validate_intrinsic_location(
         ItemRef::Struct(struct_),
-        Some(struct_.compilerimpl_keyword_span),
+        Some(struct_.intrinsic_keyword_span),
         state,
     )?;
     Ok(())
@@ -108,16 +108,16 @@ fn validate_no_circular_dependencies(
     }
 }
 
-fn validate_compilerimpl_location(
+fn validate_intrinsic_location(
     item: ItemRef<'_>,
-    compilerimpl_keyword_span: Option<Span>,
+    intrinsic_keyword_span: Option<Span>,
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    if let Some(compilerimpl_keyword_span) = compilerimpl_keyword_span
+    if let Some(intrinsic_keyword_span) = intrinsic_keyword_span
         && item.file_index() != PRELUDE_FILE_INDEX
     {
-        state.add_log(logs::items::forbidden_compilerimpl(
-            compilerimpl_keyword_span,
+        state.add_log(logs::items::forbidden_intrinsic(
+            intrinsic_keyword_span,
             state,
         ));
         Err(ValidateError)

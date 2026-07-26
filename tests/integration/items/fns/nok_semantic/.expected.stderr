@@ -1,7 +1,7 @@
-error: forbidden `compilerimpl` item outside prelude
-│  → <root>/test_compilerimpl.gpex:3:19
-│    ¦ fn fn_() -> i32 = compilerimpl;
-│    ¦                   ^^^^^^^^^^^^
+error: forbidden `intrinsic` item outside prelude
+│  → <root>/test_intrinsic.gpex:3:19
+│    ¦ fn fn_() -> i32 = intrinsic;
+│    ¦                   ^^^^^^^^^
 ┴
 error: `__add__(i32, i32, i32)` binary operator function must have exactly two parameters
 │  → <root>/test_operator_binary_param_count_extra.gpex:1:4
