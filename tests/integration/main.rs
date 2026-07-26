@@ -29,6 +29,11 @@ enum CaseKind {
     Nok,
 }
 
+struct ExpectedVar {
+    path: String,
+    values: Vec<String>,
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     owo_colors::set_override(false);
     let runtime = Arc::new(Runtime::new()?);
@@ -107,9 +112,17 @@ async fn run_ok_cases(path: &Path, is_wgsl_check_enabled: bool) -> Result<(), Fa
         &generated_path,
         is_warning_treated_as_error,
     ))?;
+    let expected_values = expected_values(&generated_path, &generated_path)?;
+    let frame_count = expected_values
+        .iter()
+        .map(|expected_var| expected_var.values.len())
+        .max()
+        .unwrap_or(1);
     let mut runner = convert_gpex_result(Runner::new(program).await)?;
-    runner.run_step();
-    check_global_vars(&generated_path, &generated_path, &runner)?;
+    for frame_index in 0..frame_count {
+        runner.run_step();
+        check_global_vars(&expected_values, frame_index, &runner)?;
+    }
     if is_wgsl_check_enabled {
         check_wgsl_output(path, runner.program())?;
     }
@@ -194,29 +207,49 @@ fn generate_case_dir(dir_path: &Path) -> Result<(), Failed> {
     Ok(())
 }
 
-fn check_global_vars(dir_path: &Path, root_path: &Path, runner: &Runner) -> Result<(), Failed> {
-    let mut all_actual = String::new();
-    let mut all_expected = String::new();
+fn expected_values(dir_path: &Path, root_path: &Path) -> Result<Vec<ExpectedVar>, Failed> {
+    let mut expected_vars = vec![];
     let expected_regex = Regex::new(EXPECTED_VAR_REGEX)?;
     for entry in dir_path.read_dir()? {
         let entry = entry?;
         let path = entry.path();
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
-            check_global_vars(&path, root_path, runner)?;
+            expected_vars.extend(expected_values(&path, root_path)?);
         } else if path.extension() == Some(OsStr::new(GPEX_EXT)) {
             let code = fs::read_to_string(&path)?;
             let dot_path = to_dot_path(&path, root_path);
             for capture in expected_regex.captures_iter(&code) {
                 let var_name = &capture[1];
-                let expected_value = capture[2].trim();
-                let var_path = format!("{dot_path}:{var_name}");
-                let actual_value = runner
-                    .read_var(&var_path)
-                    .map_or_else(|| "<unknown>".into(), |value| value.to_string());
-                writeln!(all_actual, "{var_path}={actual_value}")?;
-                writeln!(all_expected, "{var_path}={expected_value}")?;
+                expected_vars.push(ExpectedVar {
+                    path: format!("{dot_path}:{var_name}"),
+                    values: capture[2]
+                        .split(',')
+                        .map(|value| value.trim().to_string())
+                        .collect(),
+                });
             }
+        }
+    }
+    Ok(expected_vars)
+}
+
+fn check_global_vars(
+    expected_vars: &[ExpectedVar],
+    frame_index: usize,
+    runner: &Runner,
+) -> Result<(), Failed> {
+    let frame_number = frame_index + 1;
+    let mut all_actual = format!("frame {frame_number}:\n");
+    let mut all_expected = format!("frame {frame_number}:\n");
+    for expected_var in expected_vars {
+        if let Some(expected_value) = expected_var.values.get(frame_index) {
+            let var_path = &expected_var.path;
+            let actual_value = runner
+                .read_var(var_path)
+                .map_or_else(|| "<unknown>".into(), |value| value.to_string());
+            writeln!(all_actual, "{var_path}={actual_value}")?;
+            writeln!(all_expected, "{var_path}={expected_value}")?;
         }
     }
     assert_eq!(all_expected, all_actual);
