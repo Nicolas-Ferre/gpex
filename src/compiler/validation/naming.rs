@@ -95,6 +95,7 @@ pub(super) fn param_cases<'item>(
     }
 }
 
+#[allow(clippy::wildcard_enum_match_arm)] // opt-in is preferred
 fn case_label(case: Case<'_>) -> &'static str {
     match case {
         Case::Snake => "snake_case",
