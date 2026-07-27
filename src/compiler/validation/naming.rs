@@ -37,20 +37,25 @@ pub(super) fn validate_case(
     state: &mut ValidateState<'_, '_>,
 ) {
     let slice = state.context.slice(span);
-    if !expected_cases
-        .iter()
-        .any(|case| is_case_valid(*case, slice, is_fn))
-    {
-        let case_labels = expected_cases.iter().map(|case| case_label(*case));
-        let replacements = expected_cases.iter().map(|case| convert_name(*case, slice));
-        state.add_log(logs::idents::invalid_case(
-            slice,
-            span,
-            case_labels,
-            replacements,
-            state,
-        ));
+    if is_fn && (BINARY_FN_NAMES.contains(&slice) || UNARY_FN_NAMES.contains(&slice)) {
+        return;
     }
+    let mut replacements = Vec::with_capacity(expected_cases.len());
+    for case in expected_cases {
+        let replacement = convert_name(*case, slice);
+        if replacement == slice {
+            return;
+        }
+        replacements.push(replacement);
+    }
+    let case_labels = expected_cases.iter().map(|case| case_label(*case));
+    state.add_log(logs::idents::invalid_case(
+        slice,
+        span,
+        case_labels,
+        replacements.into_iter(),
+        state,
+    ));
 }
 
 pub(super) fn const_cases(
@@ -105,11 +110,6 @@ fn case_label(case: Case<'_>) -> &'static str {
         Case::Pascal => "PascalCase",
         _ => unreachable!("unsupported case: {case:?}"),
     }
-}
-
-fn is_case_valid(case: Case<'_>, slice: &str, is_fn: bool) -> bool {
-    (is_fn && (BINARY_FN_NAMES.contains(&slice) || UNARY_FN_NAMES.contains(&slice)))
-        || convert_name(case, slice) == slice
 }
 
 fn convert_name(case: Case<'_>, slice: &str) -> String {
