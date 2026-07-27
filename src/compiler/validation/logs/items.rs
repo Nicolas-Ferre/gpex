@@ -193,18 +193,20 @@ pub(crate) fn used_with_ignored_name(
     item_ref_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
+    let replacement = item_name
+        .strip_prefix('_')
+        .filter(|replacement| !replacement.is_empty());
+    let mut inner = vec![LogInner {
+        level: LogLevel::Info,
+        msg: "item used here".into(),
+        location: Some(state.span_location(item_ref_span)),
+    }];
+    inner.extend(replacement.map(super::replacement));
     Log {
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item used but name starting with `_`"),
         location: Some(state.span_location(item_name_span)),
-        inner: vec![
-            LogInner {
-                level: LogLevel::Info,
-                msg: "item used here".into(),
-                location: Some(state.span_location(item_ref_span)),
-            },
-            super::replacement(item_name.strip_prefix('_').unwrap_or(item_name)),
-        ],
+        inner,
     }
 }
 
