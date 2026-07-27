@@ -2,31 +2,37 @@ warning: `camelCase` identifier not in snake_case
 │  → <root>/test_case_camel_path.gpex:1:12
 │    ¦ pub import camelCase.itemName;
 │    ¦            ^^^^^^^^^
+├─ hint: replace with `camel_case`
 ┴
 warning: `itemName` identifier not in snake_case
 │  → <root>/test_case_camel_path.gpex:1:22
 │    ¦ pub import camelCase.itemName;
 │    ¦                      ^^^^^^^^
+├─ hint: replace with `item_name`
 ┴
 warning: `PascalCase` identifier not in snake_case
 │  → <root>/test_case_pascal_path.gpex:1:12
 │    ¦ pub import PascalCase.ItemName;
 │    ¦            ^^^^^^^^^^
+├─ hint: replace with `pascal_case`
 ┴
 warning: `ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_path.gpex:1:23
 │    ¦ pub import PascalCase.ItemName;
 │    ¦                       ^^^^^^^^
+├─ hint: replace with `item_name`
 ┴
 warning: `SCREAMING_SNAKE_CASE` identifier not in snake_case
 │  → <root>/test_case_screaming_snake_path.gpex:1:12
 │    ¦ pub import SCREAMING_SNAKE_CASE.ITEM_NAME;
 │    ¦            ^^^^^^^^^^^^^^^^^^^^
+├─ hint: replace with `screaming_snake_case`
 ┴
 warning: `ITEM_NAME` identifier not in snake_case
 │  → <root>/test_case_screaming_snake_path.gpex:1:33
 │    ¦ pub import SCREAMING_SNAKE_CASE.ITEM_NAME;
 │    ¦                                 ^^^^^^^^^
+├─ hint: replace with `item_name`
 ┴
 warning: `unused` import unused
 │  → <root>/test_unused.gpex:1:1

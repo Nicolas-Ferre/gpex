@@ -2,71 +2,87 @@ warning: `_itemName` identifier not in snake_case or PascalCase
 │  → <root>/test_case_camel_const_return_typeref.gpex:1:10
 │    ¦ const fn _itemName() -> typeref {
 │    ¦          ^^^^^^^^^
+├─ hint: replace with `_item_name`
+├─ hint: replace with `_ItemName`
 ┴
 warning: `_itemName` identifier not in snake_case
 │  → <root>/test_case_camel_no_return.gpex:1:4
 │    ¦ fn _itemName(param: i32) {
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_itemName` identifier not in snake_case
 │  → <root>/test_case_camel_return_const_param.gpex:1:10
 │    ¦ const fn _itemName(type_: const typeref, value: type_) -> type_ {
 │    ¦          ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_itemName` identifier not in snake_case
 │  → <root>/test_case_camel_return_typeref.gpex:1:4
 │    ¦ fn _itemName() -> typeref {
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_itemName` identifier not in snake_case
 │  → <root>/test_case_camel_return_value.gpex:1:4
 │    ¦ fn _itemName() -> i32 {
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_no_return.gpex:1:4
 │    ¦ fn _ItemName(param: i32) {
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_return_const_param.gpex:1:10
 │    ¦ const fn _ItemName(type_: const typeref, value: type_) -> type_ {
 │    ¦          ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_return_typeref.gpex:1:4
 │    ¦ fn _ItemName() -> typeref {
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_return_value.gpex:1:4
 │    ¦ fn _ItemName() -> i32 {
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ITEM_NAME` identifier not in snake_case or PascalCase
 │  → <root>/test_case_screaming_snake_const_return_typeref.gpex:1:10
 │    ¦ const fn _ITEM_NAME() -> typeref {
 │    ¦          ^^^^^^^^^^
+├─ hint: replace with `_item_name`
+├─ hint: replace with `_ItemName`
 ┴
 warning: `_ITEM_NAME` identifier not in snake_case
 │  → <root>/test_case_screaming_snake_no_return.gpex:1:4
 │    ¦ fn _ITEM_NAME(param: i32) {
 │    ¦    ^^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ITEM_NAME` identifier not in snake_case
 │  → <root>/test_case_screaming_snake_return_const_param.gpex:1:10
 │    ¦ const fn _ITEM_NAME(type_: const typeref, value: type_) -> type_ {
 │    ¦          ^^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ITEM_NAME` identifier not in snake_case
 │  → <root>/test_case_screaming_snake_return_typeref.gpex:1:4
 │    ¦ fn _ITEM_NAME() -> typeref {
 │    ¦    ^^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_ITEM_NAME` identifier not in snake_case
 │  → <root>/test_case_screaming_snake_return_value.gpex:1:4
 │    ¦ fn _ITEM_NAME() -> i32 {
 │    ¦    ^^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `i` identifier is single character
 │  → <root>/test_len_single_letter.gpex:1:8
@@ -77,16 +93,19 @@ warning: `item_name()` item unused
 │  → <root>/test_prefix_priv_unused.gpex:1:4
 │    ¦ fn item_name() -> i32 { return 0; }
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
-warning: `__item_name()` item unused
+warning: `__item_name` identifier not in snake_case
 │  → <root>/test_prefix_priv_unused_double_underscore.gpex:1:4
 │    ¦ fn __item_name() -> i32 { return 0; }
 │    ¦    ^^^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `item_name(?)` item unused
 │  → <root>/test_prefix_priv_unused_wildcard_param.gpex:1:4
 │    ¦ fn item_name(_param: ?) -> i32 { return 0; }
 │    ¦    ^^^^^^^^^
+├─ hint: replace with `_item_name`
 ┴
 warning: `_item_name()` item used but name starting with `_`
 │  → <root>/test_prefix_priv_used.gpex:1:4
@@ -96,14 +115,17 @@ warning: `_item_name()` item used but name starting with `_`
 │  → <root>/test_prefix_priv_used.gpex:2:14
 │    ¦ var _usage = _item_name();
 │    ¦              ^^^^^^^^^^^^
+├─ hint: replace with `item_name`
 ┴
 warning: `_item_name()` item public but name starting with `_`
 │  → <root>/test_prefix_pub_unused.gpex:1:8
 │    ¦ pub fn _item_name() -> i32 { return 0; }
 │    ¦        ^^^^^^^^^^
+├─ hint: replace with `item_name`
 ┴
 warning: `_item_name()` item public but name starting with `_`
 │  → <root>/test_prefix_pub_used.gpex:1:8
 │    ¦ pub fn _item_name() -> i32 { return 0; }
 │    ¦        ^^^^^^^^^^
+├─ hint: replace with `item_name`
 ┴

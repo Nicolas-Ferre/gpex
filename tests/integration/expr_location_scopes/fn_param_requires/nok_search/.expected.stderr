@@ -48,4 +48,5 @@ warning: `used` item unused
 │  → <root>/test_usage_before_fn_param.gpex:1:40
 │    ¦ fn _fn(param: i32 require used == i32, used: typeref) -> i32 {
 │    ¦                                        ^^^^
+├─ hint: replace with `_used`
 ┴

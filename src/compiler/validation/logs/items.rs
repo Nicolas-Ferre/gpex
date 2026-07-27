@@ -155,17 +155,23 @@ pub(crate) fn duplicate_fn(
     }
 }
 
-pub(crate) fn unused(item_key: &str, item_name_span: Span, state: &ValidateState<'_, '_>) -> Log {
+pub(crate) fn unused(
+    item_key: &str,
+    item_name: &str,
+    item_name_span: Span,
+    state: &ValidateState<'_, '_>,
+) -> Log {
     Log {
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item unused"),
         location: Some(state.span_location(item_name_span)),
-        inner: vec![],
+        inner: vec![super::replacement(&format!("_{item_name}"))],
     }
 }
 
 pub(crate) fn pub_with_ignored_name(
     item_key: &str,
+    item_name: &str,
     item_name_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
@@ -173,12 +179,15 @@ pub(crate) fn pub_with_ignored_name(
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item public but name starting with `_`"),
         location: Some(state.span_location(item_name_span)),
-        inner: vec![],
+        inner: vec![super::replacement(
+            item_name.strip_prefix('_').unwrap_or(item_name),
+        )],
     }
 }
 
 pub(crate) fn used_with_ignored_name(
     item_key: &str,
+    item_name: &str,
     item_name_span: Span,
     item_ref_span: Span,
     state: &ValidateState<'_, '_>,
@@ -187,11 +196,14 @@ pub(crate) fn used_with_ignored_name(
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item used but name starting with `_`"),
         location: Some(state.span_location(item_name_span)),
-        inner: vec![LogInner {
-            level: LogLevel::Info,
-            msg: "item used here".into(),
-            location: Some(state.span_location(item_ref_span)),
-        }],
+        inner: vec![
+            LogInner {
+                level: LogLevel::Info,
+                msg: "item used here".into(),
+                location: Some(state.span_location(item_ref_span)),
+            },
+            super::replacement(item_name.strip_prefix('_').unwrap_or(item_name)),
+        ],
     }
 }
 

@@ -43,7 +43,6 @@ pub(crate) const BINARY_FN_NAMES: &[&str] = &[
     BINARY_AND_FN_NAME,
     BINARY_OR_FN_NAME,
 ];
-pub(crate) const OPERATOR_FN_NAME_PREFIX: &str = "__";
 const OPERATOR_PRIORITIES: &[&[&str]] = &[
     &[STAR_SYMBOL.slice, SLASH_SYMBOL.slice, PERCENT_SYMBOL.slice],
     &[PLUS_SYMBOL.slice, HYPHEN_SYMBOL.slice],

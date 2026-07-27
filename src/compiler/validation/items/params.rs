@@ -36,7 +36,7 @@ fn validate_param<'item>(
     if !is_intrinsic {
         items::validate_usage(ref_, state);
     }
-    let allowed_cases = naming::param_allowed_cases(param, state);
+    let allowed_cases = naming::param_cases(param, state);
     naming::validate_name(param.name_span, allowed_cases, state);
     Ok(())
 }

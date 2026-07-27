@@ -53,4 +53,5 @@ warning: `type_` item unused
 │  → <root>/test_usage_before_fn_param.gpex:1:22
 │    ¦ fn _fn(param: type_, type_: const typeref) -> i32 {
 │    ¦                      ^^^^^
+├─ hint: replace with `_type_`
 ┴
