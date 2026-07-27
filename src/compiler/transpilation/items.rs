@@ -5,7 +5,7 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
-use crate::compiler::prelude::PRELUDE_FILE_INDEX;
+use crate::compiler::prelude::PRELUDE_TYPES_FILE_INDEX;
 use crate::compiler::transpilation::exprs;
 use crate::compiler::transpilation::{SpecializedFn, TranspileState};
 use crate::compiler::types;
@@ -137,10 +137,10 @@ fn transpile_mut_param_definition(param: &Param, state: &mut TranspileState<'_, 
 
 fn transpile_type_name(type_: &StructDefinition) -> &str {
     match (type_.name_span.file_index, type_.name.as_str()) {
-        (PRELUDE_FILE_INDEX, "typeref") => "vec2<u32>",
-        (PRELUDE_FILE_INDEX, "f32") => "f32",
-        (PRELUDE_FILE_INDEX, "i32") => "i32",
-        (PRELUDE_FILE_INDEX, "u32" | "bool") => "u32",
+        (PRELUDE_TYPES_FILE_INDEX, "typeref") => "vec2<u32>",
+        (PRELUDE_TYPES_FILE_INDEX, "f32") => "f32",
+        (PRELUDE_TYPES_FILE_INDEX, "i32") => "i32",
+        (PRELUDE_TYPES_FILE_INDEX, "u32" | "bool") => "u32",
         _ => unreachable!("not implemented `{}` GPU type", type_.name),
     }
 }

@@ -9,7 +9,7 @@ use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::prelude::PRELUDE_FILE_INDEX;
+use crate::compiler::prelude;
 use crate::compiler::validation::exprs::calls;
 use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
 use crate::compiler::validation::{ValidateState, exprs, logs, naming};
@@ -114,7 +114,7 @@ fn validate_intrinsic_location(
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if let Some(intrinsic_keyword_span) = intrinsic_keyword_span
-        && item.file_index() != PRELUDE_FILE_INDEX
+        && !prelude::is_prelude_file_index(item.file_index())
     {
         state.add_log(logs::items::forbidden_intrinsic(
             intrinsic_keyword_span,

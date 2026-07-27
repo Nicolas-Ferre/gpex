@@ -1,0 +1,52 @@
+/// A reference to a type.
+///
+/// # Examples
+///
+/// ```gpex
+/// const Integer = i32; // a type alias of type `typeref`
+/// ```
+pub struct typeref = intrinsic {}
+
+/// A 32-bit signed integer.
+///
+/// # Examples
+///
+/// ```gpex
+/// var zero = 0;
+/// var positive = 123;
+/// var negative = -123;
+/// ```
+pub struct i32 = intrinsic {}
+
+/// A 32-bit unsigned integer.
+///
+/// # Examples
+///
+/// ```gpex
+/// var zero = 0u;
+/// var positive = 123u;
+/// ```
+pub struct u32 = intrinsic {}
+
+/// A 32-bit floating-point number.
+///
+/// Compile-time operations producing non-finite results are rejected.
+///
+/// # Examples
+///
+/// ```gpex
+/// var zero = 0.0;
+/// var positive = 123.456;
+/// var negative = -123.456;
+/// ```
+pub struct f32 = intrinsic {}
+
+/// A boolean value.
+///
+/// # Examples
+///
+/// ```gpex
+/// var true_value = true;
+/// var false_value = false;
+/// ```
+pub struct bool = intrinsic {}

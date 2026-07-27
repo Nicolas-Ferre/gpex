@@ -1,7 +1,7 @@
 use crate::compiler::consts::ConstValue;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::prelude::PreludeEndLocation;
+use crate::compiler::prelude::PreludeTypesEndLocation;
 use crate::compiler::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
@@ -51,7 +51,7 @@ impl<'item> State<'item> {
     pub(crate) fn search_prelude_type(&self, type_name: &str) -> &'item StructDefinition {
         let search_params = SearchParams {
             key: type_name,
-            location: PreludeEndLocation,
+            location: PreludeTypesEndLocation,
             imports: &self.imports,
             config: SearchConfig {
                 can_be_after: false,

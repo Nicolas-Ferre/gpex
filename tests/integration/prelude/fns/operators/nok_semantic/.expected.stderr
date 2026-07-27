@@ -3,7 +3,7 @@ error: `__mod__(f32, f32)` item not found
 │    ¦ var _result = 0.0 % 0.0;
 │    ¦               ^^^^^^^^^
 ├─ info: similar candidate
-│  → <project>/res/prelude.gpex:155:14
+│  → <project>/prelude/operators.gpex:79:14
 │    ¦ pub const fn __mod__(
 │    ¦              ^^^^^^^^
 │    ¦     left: ? require typeof(left).is_integer(),

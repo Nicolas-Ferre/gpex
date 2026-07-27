@@ -3,7 +3,7 @@ use crate::compiler::parsing::symbols::{
     BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, EQUAL_SYMBOL, INTRINSIC_KEYWORD, PUB_KEYWORD,
     STRUCT_KEYWORD,
 };
-use crate::compiler::prelude::PRELUDE_FILE_INDEX;
+use crate::compiler::prelude::PRELUDE_TYPES_FILE_INDEX;
 use crate::utils::parsing::context::ParseContext;
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
@@ -64,10 +64,10 @@ impl StructDefinition {
 
     pub(crate) fn size(&self) -> u32 {
         match (self.name_span.file_index, self.name.as_str()) {
-            (PRELUDE_FILE_INDEX, "typeref") => TYPEREF_SIZE,
-            (PRELUDE_FILE_INDEX, "f32") => F32_SIZE,
-            (PRELUDE_FILE_INDEX, "i32") => I32_SIZE,
-            (PRELUDE_FILE_INDEX, "u32" | "bool") => U32_SIZE,
+            (PRELUDE_TYPES_FILE_INDEX, "typeref") => TYPEREF_SIZE,
+            (PRELUDE_TYPES_FILE_INDEX, "f32") => F32_SIZE,
+            (PRELUDE_TYPES_FILE_INDEX, "i32") => I32_SIZE,
+            (PRELUDE_TYPES_FILE_INDEX, "u32" | "bool") => U32_SIZE,
             _ => unreachable!("not implemented `{}` GPU type", self.name),
         }
     }
