@@ -22,6 +22,12 @@ warning: `__add__` identifier not in snake_case
 │    ¦         ^^^^^^^
 ├─ hint: replace with `_add__`
 ┴
+warning: `Return` identifier not in snake_case
+│  → <root>/test_case_pascal_keyword.gpex:1:9
+│    ¦ pub var Return = 0;
+│    ¦         ^^^^^^
+├─ hint: replace with `return_`
+┴
 warning: `_ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_typeref.gpex:1:5
 │    ¦ var _ItemName = i32;
@@ -67,11 +73,27 @@ warning: `_item_name` item used but name starting with `_`
 │    ¦              ^^^^^^^^^^
 ├─ hint: replace with `item_name`
 ┴
+warning: `_return` item used but name starting with `_`
+│  → <root>/test_prefix_priv_used_keyword.gpex:1:5
+│    ¦ var _return = 0;
+│    ¦     ^^^^^^^
+├─ info: item used here
+│  → <root>/test_prefix_priv_used_keyword.gpex:2:14
+│    ¦ var _usage = _return;
+│    ¦              ^^^^^^^
+├─ hint: replace with `return_`
+┴
 warning: `_item_name` item public but name starting with `_`
 │  → <root>/test_prefix_pub_unused.gpex:1:9
 │    ¦ pub var _item_name = 0;
 │    ¦         ^^^^^^^^^^
 ├─ hint: replace with `item_name`
+┴
+warning: `_return` item public but name starting with `_`
+│  → <root>/test_prefix_pub_unused_keyword.gpex:1:9
+│    ¦ pub var _return = 0;
+│    ¦         ^^^^^^^
+├─ hint: replace with `return_`
 ┴
 warning: `_item_name` item public but name starting with `_`
 │  → <root>/test_prefix_pub_used.gpex:1:9

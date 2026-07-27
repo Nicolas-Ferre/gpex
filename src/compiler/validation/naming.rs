@@ -3,6 +3,7 @@ use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::vars::ConstDefinition;
+use crate::compiler::parsing::symbols::KEYWORDS;
 use crate::compiler::state::IntrinsicType;
 use crate::compiler::types;
 use crate::compiler::types::Type;
@@ -102,6 +103,12 @@ pub(super) fn param_cases<'item>(
     }
 }
 
+pub(super) fn make_keyword_safe(name: &mut String) {
+    if KEYWORDS.contains(&name.as_str()) {
+        name.push('_');
+    }
+}
+
 #[allow(clippy::wildcard_enum_match_arm)] // opt-in is preferred
 fn case_label(case: Case<'_>) -> &'static str {
     match case {
@@ -120,5 +127,7 @@ fn convert_name(case: Case<'_>, slice: &str) -> String {
     let converted_name = converter.convert(name);
     let has_leading_underscore = slice.len() - name.len() > 0;
     let underscore_prefixes = "_".repeat(has_leading_underscore.into());
-    format!("{underscore_prefixes}{converted_name}")
+    let mut converted_name = format!("{underscore_prefixes}{converted_name}");
+    make_keyword_safe(&mut converted_name);
+    converted_name
 }
