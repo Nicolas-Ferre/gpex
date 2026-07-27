@@ -157,7 +157,7 @@ pub(crate) fn duplicate_fn(
 
 pub(crate) fn unused(
     item_key: &str,
-    item_name: &str,
+    replacement: Option<&str>,
     item_name_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
@@ -165,7 +165,7 @@ pub(crate) fn unused(
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item unused"),
         location: Some(state.span_location(item_name_span)),
-        inner: vec![super::replacement(&format!("_{item_name}"))],
+        inner: replacement.map(super::replacement).into_iter().collect(),
     }
 }
 

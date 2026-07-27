@@ -131,15 +131,18 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
     let name_span = item.name_span();
     let name = state.context.slice(name_span);
     let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
-    if matches!(item, ItemRef::Fn(_))
-        && (BINARY_FN_NAMES.contains(&name) || UNARY_FN_NAMES.contains(&name))
-    {
-        return;
-    }
-    let is_unused_lint_ignored = name.starts_with('_');
+    let is_operator_fn = matches!(item, ItemRef::Fn(_))
+        && (BINARY_FN_NAMES.contains(&name) || UNARY_FN_NAMES.contains(&name));
+    let is_unused_lint_ignored = name.starts_with('_') && !is_operator_fn;
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state.inner);
-        state.add_log(logs::items::unused(&displayed_key, name, name_span, state));
+        let replacement = (!is_operator_fn).then(|| format!("_{name}"));
+        state.add_log(logs::items::unused(
+            &displayed_key,
+            replacement.as_deref(),
+            name_span,
+            state,
+        ));
     } else if item.is_pub() && is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state.inner);
         state.add_log(logs::items::pub_with_ignored_name(

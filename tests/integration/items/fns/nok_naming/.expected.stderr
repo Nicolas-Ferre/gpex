@@ -101,6 +101,16 @@ warning: `__item_name` identifier not in snake_case
 │    ¦    ^^^^^^^^^^^
 ├─ hint: replace with `_item_name`
 ┴
+warning: `__add__(i32, i32)` item unused
+│  → <root>/test_prefix_priv_unused_operator.gpex:1:4
+│    ¦ fn __add__(_left: i32, _right: i32) -> i32 { return 0; }
+│    ¦    ^^^^^^^
+┴
+warning: `__neg__(i32)` item unused
+│  → <root>/test_prefix_priv_unused_operator.gpex:2:4
+│    ¦ fn __neg__(_value: i32) -> i32 { return 0; }
+│    ¦    ^^^^^^^
+┴
 warning: `item_name(?)` item unused
 │  → <root>/test_prefix_priv_unused_wildcard_param.gpex:1:4
 │    ¦ fn item_name(_param: ?) -> i32 { return 0; }
