@@ -10,6 +10,12 @@ warning: `itemName` identifier not in snake_case
 │    ¦                      ^^^^^^^^
 ├─ hint: replace with `item_name`
 ┴
+warning: `__add__` identifier not in snake_case
+│  → <root>/test_case_operator.gpex:1:12
+│    ¦ pub import __add__;
+│    ¦            ^^^^^^^
+├─ hint: replace with `_add__`
+┴
 warning: `PascalCase` identifier not in snake_case
 │  → <root>/test_case_pascal_path.gpex:1:12
 │    ¦ pub import PascalCase.ItemName;

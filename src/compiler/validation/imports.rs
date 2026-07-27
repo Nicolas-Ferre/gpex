@@ -52,7 +52,7 @@ pub(super) fn validate_import_usage(import: &Import, state: &mut ValidateState<'
 fn validate_segments(import: &Import, state: &mut ValidateState<'_, '_>) {
     for &segment in &import.segments {
         if let ImportSegment::Name(span) = segment {
-            naming::validate_case(span, naming::IMPORT_ALLOWED_CASES, state);
+            naming::validate_case(span, false, naming::IMPORT_ALLOWED_CASES, state);
         }
     }
 }

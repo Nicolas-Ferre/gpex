@@ -44,7 +44,7 @@ fn validate_var<'item>(
     validate_no_circular_dependencies(ref_, dependency_result, state)?;
     validate_unique_definition(ref_, state)?;
     validate_usage(ref_, state);
-    naming::validate_name(var.name_span, VAR_ALLOWED_CASES, state);
+    naming::validate_name(var.name_span, false, VAR_ALLOWED_CASES, state);
     exprs::validate_expr(&var.default_value, state)?;
     Ok(())
 }
@@ -60,7 +60,7 @@ fn validate_const<'item>(
     validate_unique_definition(ref_, state)?;
     validate_usage(ref_, state);
     let allowed_cases = naming::const_cases(const_, state);
-    naming::validate_name(const_.name_span, allowed_cases, state);
+    naming::validate_name(const_.name_span, false, allowed_cases, state);
     state.with_const_mark_span(Some(const_.const_keyword_span), |state| {
         exprs::validate_expr(&const_.value, state)
     })?;

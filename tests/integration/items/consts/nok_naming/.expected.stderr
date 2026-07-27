@@ -11,6 +11,12 @@ warning: `_itemName` identifier not in SCREAMING_SNAKE_CASE
 │    ¦       ^^^^^^^^^
 ├─ hint: replace with `_ITEM_NAME`
 ┴
+warning: `__add__` identifier not in SCREAMING_SNAKE_CASE
+│  → <root>/test_case_operator.gpex:1:7
+│    ¦ const __add__ = 0;
+│    ¦       ^^^^^^^
+├─ hint: replace with `_ADD__`
+┴
 warning: `_ItemName` identifier not in SCREAMING_SNAKE_CASE
 │  → <root>/test_case_pascal_value.gpex:1:7
 │    ¦ const _ItemName = 0;

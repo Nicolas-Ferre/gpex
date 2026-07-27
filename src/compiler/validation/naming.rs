@@ -15,11 +15,12 @@ pub(super) const VAR_ALLOWED_CASES: &[Case<'static>] = &[Case::Snake];
 
 pub(super) fn validate_name(
     span: Span,
+    is_fn: bool,
     expected_cases: &[Case<'_>],
     state: &mut ValidateState<'_, '_>,
 ) {
     validate_char_count(span, state);
-    validate_case(span, expected_cases, state);
+    validate_case(span, is_fn, expected_cases, state);
 }
 
 pub(super) fn validate_char_count(span: Span, state: &mut ValidateState<'_, '_>) {
@@ -31,13 +32,14 @@ pub(super) fn validate_char_count(span: Span, state: &mut ValidateState<'_, '_>)
 
 pub(super) fn validate_case(
     span: Span,
+    is_fn: bool,
     expected_cases: &[Case<'_>],
     state: &mut ValidateState<'_, '_>,
 ) {
     let slice = state.context.slice(span);
     if !expected_cases
         .iter()
-        .any(|case| is_case_valid(*case, slice))
+        .any(|case| is_case_valid(*case, slice, is_fn))
     {
         let case_labels = expected_cases.iter().map(|case| case_label(*case));
         let replacements = expected_cases.iter().map(|case| convert_name(*case, slice));
@@ -105,9 +107,8 @@ fn case_label(case: Case<'_>) -> &'static str {
     }
 }
 
-fn is_case_valid(case: Case<'_>, slice: &str) -> bool {
-    BINARY_FN_NAMES.contains(&slice)
-        || UNARY_FN_NAMES.contains(&slice)
+fn is_case_valid(case: Case<'_>, slice: &str, is_fn: bool) -> bool {
+    (is_fn && (BINARY_FN_NAMES.contains(&slice) || UNARY_FN_NAMES.contains(&slice)))
         || convert_name(case, slice) == slice
 }
 

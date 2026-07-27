@@ -41,6 +41,12 @@ warning: `_itemName` identifier not in snake_case
 │    ¦        ^^^^^^^^^
 ├─ hint: replace with `_item_name`
 ┴
+warning: `__add__` identifier not in snake_case
+│  → <root>/test_case_operator.gpex:1:8
+│    ¦ fn _fn(__add__: i32) -> i32 {
+│    ¦        ^^^^^^^
+├─ hint: replace with `_add__`
+┴
 warning: `ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_param_type.gpex:1:30
 │    ¦ fn _fn(type_: const typeref, ItemName: type_) -> type_ {

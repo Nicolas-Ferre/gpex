@@ -10,6 +10,12 @@ warning: `_itemName` identifier not in snake_case
 │    ¦     ^^^^^^^^^
 ├─ hint: replace with `_item_name`
 ┴
+warning: `__add__` identifier not in snake_case
+│  → <root>/test_case_operator.gpex:1:5
+│    ¦ var __add__ = 0;
+│    ¦     ^^^^^^^
+├─ hint: replace with `_add__`
+┴
 warning: `_ItemName` identifier not in snake_case
 │  → <root>/test_case_pascal_typeref.gpex:1:5
 │    ¦ var _ItemName = i32;
