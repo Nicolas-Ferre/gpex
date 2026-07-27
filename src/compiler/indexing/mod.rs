@@ -5,7 +5,7 @@ use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::parsing::statements::Statement;
-use crate::compiler::prelude::PRELUDE_FILE_INDEX;
+use crate::compiler::prelude::PRELUDE_FILE_COUNT;
 use crate::compiler::state::State;
 use crate::utils::indexing::SearchConfig;
 
@@ -33,9 +33,11 @@ pub(crate) fn index_modules<'item>(modules: &'item [Module], state: &mut State<'
 }
 
 fn index_module_imports(module: &Module, state: &mut State<'_>) {
-    state
-        .imports
-        .register(None, None, module.file_index, PRELUDE_FILE_INDEX, false);
+    for prelude_file_index in 0..module.file_index.min(PRELUDE_FILE_COUNT) {
+        state
+            .imports
+            .register(None, None, module.file_index, prelude_file_index, false);
+    }
     for item in &module.items {
         let Item::Import(import) = item else { continue };
         let Some(file_index) = import.imported_file_index else {

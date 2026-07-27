@@ -1,5 +1,4 @@
 use crate::compiler::prelude;
-use crate::compiler::prelude::PRELUDE_FILE_INDEX;
 use crate::utils::logs::Log;
 use itertools::Itertools;
 use std::ffi::OsStr;
@@ -14,11 +13,9 @@ pub(crate) struct ReadFile {
     pub(crate) dot_path: String,
 }
 
-#[expect(clippy::absurd_extreme_comparisons)]
 pub(crate) fn read(path: &Path, ext: &str) -> Result<Vec<ReadFile>, Vec<Log>> {
-    let mut files = read_dir(path, path, ext)?;
-    debug_assert!(files.len() >= PRELUDE_FILE_INDEX);
-    files.insert(PRELUDE_FILE_INDEX, prelude::file());
+    let mut files = Vec::from(prelude::files());
+    files.extend(read_dir(path, path, ext)?);
     Ok(files)
 }
 

@@ -37,4 +37,4 @@ Key directories and files:
     - `types.rs`: Type resolution.
 - `src/runner/`: GPU execution using wgpu (device setup, shader dispatch, buffer readback).
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
-- `res/prelude.gpex`: `GPEx` built-in types and functions.
+- `prelude/`: built-in types and functions available in all `GPEx` modules.
