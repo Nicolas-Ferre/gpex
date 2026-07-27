@@ -4,8 +4,7 @@ mod statements;
 
 use crate::compiler::dependencies;
 use crate::compiler::item_ref::ItemRef;
-use crate::compiler::parsing::exprs::BINARY_FN_NAMES;
-use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
+use crate::compiler::parsing::exprs as parsing_exprs;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -131,8 +130,7 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
     let name_span = item.name_span();
     let name = state.context.slice(name_span);
     let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
-    let is_operator_fn = matches!(item, ItemRef::Fn(_))
-        && (BINARY_FN_NAMES.contains(&name) || UNARY_FN_NAMES.contains(&name));
+    let is_operator_fn = matches!(item, ItemRef::Fn(_)) && parsing_exprs::is_operator_fn_name(name);
     let is_unused_lint_ignored = name.starts_with('_') && !is_operator_fn;
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state.inner);

@@ -1,5 +1,4 @@
-use crate::compiler::parsing::exprs::BINARY_FN_NAMES;
-use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
+use crate::compiler::parsing::exprs;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::vars::ConstDefinition;
@@ -38,7 +37,7 @@ pub(super) fn validate_case(
     state: &mut ValidateState<'_, '_>,
 ) {
     let slice = state.context.slice(span);
-    if is_fn && (BINARY_FN_NAMES.contains(&slice) || UNARY_FN_NAMES.contains(&slice)) {
+    if is_fn && exprs::is_operator_fn_name(slice) {
         return;
     }
     let mut replacements = Vec::with_capacity(expected_cases.len());
