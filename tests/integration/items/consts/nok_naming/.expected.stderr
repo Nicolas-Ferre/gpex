@@ -11,10 +11,16 @@ warning: `_itemName` identifier not in SCREAMING_SNAKE_CASE
 │    ¦       ^^^^^^^^^
 ├─ hint: replace with `_ITEM_NAME`
 ┴
+warning: `__add__` item public but name starting with `_`
+│  → <root>/test_case_operator.gpex:1:11
+│    ¦ pub const __add__ = 0;
+│    ¦           ^^^^^^^
+├─ hint: replace with `_add__`
+┴
 warning: `__add__` identifier not in SCREAMING_SNAKE_CASE
-│  → <root>/test_case_operator.gpex:1:7
-│    ¦ const __add__ = 0;
-│    ¦       ^^^^^^^
+│  → <root>/test_case_operator.gpex:1:11
+│    ¦ pub const __add__ = 0;
+│    ¦           ^^^^^^^
 ├─ hint: replace with `_ADD__`
 ┴
 warning: `_ItemName` identifier not in SCREAMING_SNAKE_CASE

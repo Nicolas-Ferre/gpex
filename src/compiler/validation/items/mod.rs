@@ -131,7 +131,9 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
     let name_span = item.name_span();
     let name = state.context.slice(name_span);
     let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
-    if BINARY_FN_NAMES.contains(&name) || UNARY_FN_NAMES.contains(&name) {
+    if matches!(item, ItemRef::Fn(_))
+        && (BINARY_FN_NAMES.contains(&name) || UNARY_FN_NAMES.contains(&name))
+    {
         return;
     }
     let is_unused_lint_ignored = name.starts_with('_');
