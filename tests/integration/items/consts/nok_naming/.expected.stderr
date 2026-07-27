@@ -63,6 +63,11 @@ warning: `_ITEM_NAME` item used but name starting with `_`
 │    ¦              ^^^^^^^^^^
 ├─ hint: replace with `ITEM_NAME`
 ┴
+warning: `_` item public but name starting with `_`
+│  → <root>/test_prefix_pub_single_underscore.gpex:1:11
+│    ¦ pub const _ = 0;
+│    ¦           ^
+┴
 warning: `_ITEM_NAME` item public but name starting with `_`
 │  → <root>/test_prefix_pub_unused.gpex:1:11
 │    ¦ pub const _ITEM_NAME = 0;

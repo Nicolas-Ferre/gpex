@@ -175,13 +175,14 @@ pub(crate) fn pub_with_ignored_name(
     item_name_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
+    let replacement = item_name
+        .strip_prefix('_')
+        .filter(|replacement| !replacement.is_empty());
     Log {
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item public but name starting with `_`"),
         location: Some(state.span_location(item_name_span)),
-        inner: vec![super::replacement(
-            item_name.strip_prefix('_').unwrap_or(item_name),
-        )],
+        inner: replacement.map(super::replacement).into_iter().collect(),
     }
 }
 
