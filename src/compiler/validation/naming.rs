@@ -43,7 +43,7 @@ pub(super) fn validate_case(
     let mut replacements = Vec::with_capacity(expected_cases.len());
     for case in expected_cases {
         let replacement = convert_name(*case, slice);
-        if replacement == slice {
+        if is_case_valid(*case, slice, &replacement) {
             return;
         }
         replacements.push(replacement);
@@ -129,4 +129,18 @@ fn convert_name(case: Case<'_>, slice: &str) -> String {
     let mut converted_name = format!("{underscore_prefixes}{converted_name}");
     make_keyword_safe(&mut converted_name);
     converted_name
+}
+
+fn is_case_valid(case: Case<'_>, slice: &str, replacement: &str) -> bool {
+    if case == Case::Pascal {
+        let is_first_char_upper = slice
+            .strip_prefix('_')
+            .unwrap_or(slice)
+            .chars()
+            .next()
+            .is_some_and(char::is_uppercase);
+        is_first_char_upper && slice.to_lowercase() == replacement.to_lowercase()
+    } else {
+        replacement == slice
+    }
 }

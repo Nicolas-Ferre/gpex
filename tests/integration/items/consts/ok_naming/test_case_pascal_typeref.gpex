@@ -1,1 +1,2 @@
 const _ItemName = i32;
+const _HTTPRequest = i32;
