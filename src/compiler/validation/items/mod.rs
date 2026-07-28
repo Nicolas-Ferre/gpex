@@ -132,6 +132,9 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
     let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
     let is_operator_fn = matches!(item, ItemRef::Fn(_)) && parsing_exprs::is_operator_fn_name(name);
     let is_unused_lint_ignored = name.starts_with('_') && !is_operator_fn;
+    let ignored_name_replacement = is_unused_lint_ignored
+        .then(|| ignored_name_replacement(name))
+        .flatten();
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state.inner);
         let replacement = (!is_operator_fn).then(|| format!("_{name}"));
@@ -145,7 +148,7 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
         let displayed_key = item.displayed_key(state.inner);
         state.add_log(logs::items::pub_with_ignored_name(
             &displayed_key,
-            name,
+            ignored_name_replacement.as_deref(),
             name_span,
             state,
         ));
@@ -155,12 +158,21 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
         let displayed_key = item.displayed_key(state.inner);
         state.add_log(logs::items::used_with_ignored_name(
             &displayed_key,
-            name,
+            ignored_name_replacement.as_deref(),
             name_span,
             ref_span,
             state,
         ));
     }
+}
+
+fn ignored_name_replacement(item_name: &str) -> Option<String> {
+    let mut replacement = item_name
+        .strip_prefix('_')
+        .filter(|replacement| !replacement.is_empty())?
+        .to_string();
+    naming::make_keyword_safe(&mut replacement);
+    Some(replacement)
 }
 
 fn validate_unique_definition<'item>(

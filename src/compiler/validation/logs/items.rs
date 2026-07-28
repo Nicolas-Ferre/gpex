@@ -1,4 +1,4 @@
-use crate::compiler::validation::{ValidateState, naming};
+use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::Span;
 use crate::{Log, LogInner, LogLevel};
 
@@ -171,52 +171,37 @@ pub(crate) fn unused(
 
 pub(crate) fn pub_with_ignored_name(
     item_key: &str,
-    item_name: &str,
+    replacement: Option<&str>,
     item_name_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
-    let replacement = ignored_name_replacement(item_name);
     Log {
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item public but name starting with `_`"),
         location: Some(state.span_location(item_name_span)),
-        inner: replacement
-            .as_deref()
-            .map(super::replacement)
-            .into_iter()
-            .collect(),
+        inner: replacement.map(super::replacement).into_iter().collect(),
     }
 }
 
 pub(crate) fn used_with_ignored_name(
     item_key: &str,
-    item_name: &str,
+    replacement: Option<&str>,
     item_name_span: Span,
     item_ref_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
-    let replacement = ignored_name_replacement(item_name);
     let mut inner = vec![LogInner {
         level: LogLevel::Info,
         msg: "item used here".into(),
         location: Some(state.span_location(item_ref_span)),
     }];
-    inner.extend(replacement.as_deref().map(super::replacement));
+    inner.extend(replacement.map(super::replacement));
     Log {
         level: LogLevel::Warning,
         msg: format!("`{item_key}` item used but name starting with `_`"),
         location: Some(state.span_location(item_name_span)),
         inner,
     }
-}
-
-fn ignored_name_replacement(item_name: &str) -> Option<String> {
-    let mut replacement = item_name
-        .strip_prefix('_')
-        .filter(|replacement| !replacement.is_empty())?
-        .to_string();
-    naming::make_keyword_safe(&mut replacement);
-    Some(replacement)
 }
 
 fn not_found(
