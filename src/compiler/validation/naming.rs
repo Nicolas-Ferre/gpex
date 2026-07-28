@@ -6,8 +6,9 @@ use crate::compiler::state::IntrinsicType;
 use crate::compiler::types;
 use crate::compiler::types::Type;
 use crate::compiler::validation::{ValidateState, logs};
+use crate::utils::casing;
 use crate::utils::parsing::span::{Span, SpanProps};
-use convert_case::{Boundary, Case, Converter};
+use convert_case::Case;
 
 pub(super) const IMPORT_ALLOWED_CASES: &[Case<'static>] = &[Case::Snake];
 pub(super) const VAR_ALLOWED_CASES: &[Case<'static>] = &[Case::Snake];
@@ -36,10 +37,11 @@ pub(super) fn validate_case(
     let slice = state.context.slice(span);
     let mut replacements = Vec::with_capacity(expected_cases.len());
     for case in expected_cases {
-        let replacement = convert_name(*case, slice);
-        if is_case_valid(*case, slice, &replacement) {
+        let mut replacement = casing::convert(slice, *case);
+        if casing::is_valid(slice, *case, &replacement) {
             return;
         }
+        make_keyword_safe(&mut replacement);
         replacements.push(replacement);
     }
     let case_labels = expected_cases.iter().map(|case| case_label(*case));
@@ -109,32 +111,5 @@ fn case_label(case: Case<'_>) -> &'static str {
         Case::UpperSnake => "SCREAMING_SNAKE_CASE",
         Case::Pascal => "PascalCase",
         _ => unreachable!("unsupported case: {case:?}"),
-    }
-}
-
-fn convert_name(case: Case<'_>, slice: &str) -> String {
-    let name = slice.trim_start_matches('_');
-    let converter = Converter::new()
-        .remove_boundaries(&Boundary::digits())
-        .to_case(case);
-    let converted_name = converter.convert(name);
-    let has_leading_underscore = slice.len() - name.len() > 0;
-    let underscore_prefixes = "_".repeat(has_leading_underscore.into());
-    let mut converted_name = format!("{underscore_prefixes}{converted_name}");
-    make_keyword_safe(&mut converted_name);
-    converted_name
-}
-
-fn is_case_valid(case: Case<'_>, slice: &str, replacement: &str) -> bool {
-    if case == Case::Pascal {
-        let is_first_char_upper = slice
-            .strip_prefix('_')
-            .unwrap_or(slice)
-            .chars()
-            .next()
-            .is_some_and(char::is_uppercase);
-        is_first_char_upper && slice.to_lowercase() == replacement.to_lowercase()
-    } else {
-        replacement == slice
     }
 }
