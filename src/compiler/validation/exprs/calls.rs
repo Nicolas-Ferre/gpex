@@ -7,6 +7,7 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::state::IntrinsicType;
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
 use crate::compiler::{queries, types};
+use crate::utils::parsing::span::SpanProps;
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn validate_call(
@@ -85,13 +86,39 @@ fn validate_arg_name(
 }
 
 fn validate_mul_add_candidate(call: &Call, state: &mut ValidateState<'_, '_>) {
-    if !are_all_args_f32(call, state)
-        || !is_call_intrinsic_add(call, state)
-        || !has_intrinsic_mul_arg(call, state)
-    {
+    if !are_all_args_f32(call, state) || !is_call_intrinsic_add(call, state) {
         return;
     }
-    state.add_log(logs::exprs::mul_add_candidate(call.span, state));
+    let Some(replacement) = mul_add_replacement(call, state) else {
+        return;
+    };
+    state.add_log(logs::exprs::mul_add_candidate(
+        call.span,
+        &replacement,
+        state,
+    ));
+}
+
+fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<String> {
+    let [left_add_arg, right_add_arg] = call.args.as_slice() else {
+        return None;
+    };
+    let (mul_call, addend) = match (&left_add_arg.value, &right_add_arg.value) {
+        (Expr::Call(mul_call), addend) if is_call_intrinsic_mul(mul_call, state) => {
+            (mul_call, addend)
+        }
+        (addend, Expr::Call(mul_call)) if is_call_intrinsic_mul(mul_call, state) => {
+            (mul_call, addend)
+        }
+        _ => return None,
+    };
+    let [left_mul_arg, right_mul_arg] = mul_call.args.as_slice() else {
+        return None;
+    };
+    let left = state.context.slice(left_mul_arg.value.span());
+    let right = state.context.slice(right_mul_arg.value.span());
+    let addend = state.context.slice(addend.span());
+    Some(format!("mul_add({left}, {right}, {addend})"))
 }
 
 fn is_call_intrinsic_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
@@ -100,12 +127,6 @@ fn is_call_intrinsic_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
         IntrinsicFn::Binary(BinaryIntrinsicFn::Add),
         state.inner,
     )
-}
-
-fn has_intrinsic_mul_arg(call: &Call, state: &ValidateState<'_, '_>) -> bool {
-    call.args
-        .iter()
-        .any(|arg| matches!(&arg.value, Expr::Call(call) if is_call_intrinsic_mul(call, state)))
 }
 
 fn is_call_intrinsic_mul(call: &Call, state: &ValidateState<'_, '_>) -> bool {
