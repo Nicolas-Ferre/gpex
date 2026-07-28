@@ -55,7 +55,7 @@ These directories are tested the following way:
 
 - Compile the directory.
 - Verify the compilation returned errors or warnings.
-- Verify that the compilation error messages match the expected messages in `.expected.stderr`.
+- Verify that the compiler messages match the expected messages in `.expected.stderr`.
   If this file doesn't exist, it is auto-generated during the first test run.
 
 ### Test domains

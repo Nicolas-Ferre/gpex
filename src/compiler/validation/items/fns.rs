@@ -1,6 +1,7 @@
 use crate::compiler::dependencies;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
+use crate::compiler::parsing::exprs as parsing_exprs;
 use crate::compiler::parsing::exprs::BINARY_FN_NAMES;
 use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
 use crate::compiler::parsing::items::fns::FnDefinition;
@@ -37,7 +38,10 @@ pub(super) fn validate_fn<'item>(
 }
 
 fn validate_fn_name(fn_: &FnDefinition, state: &mut ValidateState<'_, '_>) {
-    let allowed_cases = naming::fn_allowed_cases(fn_, state);
+    if parsing_exprs::is_operator_fn_name(&fn_.name) {
+        return;
+    }
+    let allowed_cases = naming::fn_cases(fn_, state);
     naming::validate_name(fn_.name_span, allowed_cases, state);
 }
 

@@ -1,0 +1,2 @@
+fn __add__(_left: i32, _right: i32) -> i32 { return 0; }
+fn __neg__(_value: i32) -> i32 { return 0; }

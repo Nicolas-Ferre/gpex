@@ -1,18 +1,21 @@
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::vars::ConstDefinition;
+use crate::compiler::parsing::symbols::KEYWORDS;
 use crate::compiler::state::IntrinsicType;
 use crate::compiler::types;
 use crate::compiler::types::Type;
 use crate::compiler::validation::{ValidateState, logs};
+use crate::utils::casing;
 use crate::utils::parsing::span::{Span, SpanProps};
+use convert_case::Case;
 
-pub(super) const IMPORT_ALLOWED_CASES: &[Case] = &[Case::Snake];
-pub(super) const VAR_ALLOWED_CASES: &[Case] = &[Case::Snake];
+pub(super) const IMPORT_ALLOWED_CASES: &[Case<'static>] = &[Case::Snake];
+pub(super) const VAR_ALLOWED_CASES: &[Case<'static>] = &[Case::Snake];
 
 pub(super) fn validate_name(
     span: Span,
-    expected_cases: &[Case],
+    expected_cases: &[Case<'_>],
     state: &mut ValidateState<'_, '_>,
 ) {
     validate_char_count(span, state);
@@ -28,51 +31,64 @@ pub(super) fn validate_char_count(span: Span, state: &mut ValidateState<'_, '_>)
 
 pub(super) fn validate_case(
     span: Span,
-    expected_cases: &[Case],
+    expected_cases: &[Case<'_>],
     state: &mut ValidateState<'_, '_>,
 ) {
     let slice = state.context.slice(span);
-    if !expected_cases.iter().any(|case| case.is_valid(slice)) {
-        let case_labels = expected_cases.iter().map(|case| case.labels());
-        state.add_log(logs::idents::invalid_case(slice, span, case_labels, state));
+    let mut replacements = Vec::with_capacity(expected_cases.len());
+    for case in expected_cases {
+        let mut replacement = casing::convert(slice, *case);
+        if casing::is_valid(slice, *case, &replacement) {
+            return;
+        }
+        make_keyword_safe(&mut replacement);
+        replacements.push(replacement);
     }
+    let case_labels = expected_cases.iter().map(|case| case_label(*case));
+    state.add_log(logs::idents::invalid_case(
+        slice,
+        span,
+        case_labels,
+        replacements.into_iter(),
+        state,
+    ));
 }
 
-pub(super) fn const_allowed_cases(
+pub(super) fn const_cases(
     const_: &ConstDefinition,
     state: &ValidateState<'_, '_>,
-) -> &'static [Case] {
+) -> &'static [Case<'static>] {
     let type_ = types::expr_type(&const_.value, state.inner);
-    let may_be_typeref = type_.struct_ref().is_none()
-        || state.inner.is_intrinsic_type(type_, IntrinsicType::Typeref);
+    let is_typeref = state.inner.is_intrinsic_type(type_, IntrinsicType::Typeref);
+    let may_be_typeref = type_.struct_ref().is_none() || is_typeref;
     if may_be_typeref {
-        &[Case::ScreamingSnake, Case::Pascal]
+        &[Case::UpperSnake, Case::Pascal]
     } else {
-        &[Case::ScreamingSnake]
+        &[Case::UpperSnake]
     }
 }
 
-pub(super) fn fn_allowed_cases(
+pub(super) fn fn_cases(
     fn_: &FnDefinition,
     state: &ValidateState<'_, '_>,
-) -> &'static [Case] {
+) -> &'static [Case<'static>] {
     let type_ = types::fn_type(fn_, state.inner);
-    let may_return_typeref = match type_ {
+    let is_typeref = match type_ {
         Type::Struct(_) => state.inner.is_intrinsic_type(type_, IntrinsicType::Typeref),
         Type::Param(_) | Type::Wildcard(_) | Type::NoReturn => false,
         Type::Unknown => unreachable!("return type should be validated before"),
     };
-    if may_return_typeref && fn_.const_keyword_span.is_some() {
+    if is_typeref && fn_.const_keyword_span.is_some() {
         &[Case::Snake, Case::Pascal]
     } else {
         &[Case::Snake]
     }
 }
 
-pub(super) fn param_allowed_cases<'item>(
+pub(super) fn param_cases<'item>(
     param: &'item Param,
     state: &ValidateState<'_, 'item>,
-) -> &'static [Case] {
+) -> &'static [Case<'static>] {
     let type_ = types::param_type(param, state.inner);
     let is_typeref = state.inner.is_intrinsic_type(type_, IntrinsicType::Typeref);
     if is_typeref && param.const_mark_span().is_some() {
@@ -82,37 +98,18 @@ pub(super) fn param_allowed_cases<'item>(
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub(super) enum Case {
-    Snake,
-    ScreamingSnake,
-    Pascal,
+pub(super) fn make_keyword_safe(name: &mut String) {
+    if KEYWORDS.contains(&name.as_str()) {
+        name.push('_');
+    }
 }
 
-impl Case {
-    fn labels(self) -> &'static str {
-        match self {
-            Self::Snake => "snake_case",
-            Self::ScreamingSnake => "SCREAMING_SNAKE_CASE",
-            Self::Pascal => "PascalCase",
-        }
-    }
-
-    fn is_valid(self, slice: &str) -> bool {
-        match self {
-            Self::Snake => slice
-                .chars()
-                .all(|char| char.is_ascii_lowercase() || char.is_ascii_digit() || char == '_'),
-            Self::ScreamingSnake => slice
-                .chars()
-                .all(|char| char.is_ascii_uppercase() || char.is_ascii_digit() || char == '_'),
-            Self::Pascal => {
-                let first_uppercase_index = usize::from(slice.starts_with('_'));
-                slice.char_indices().all(|(index, char)| {
-                    (index != first_uppercase_index || char.is_ascii_uppercase())
-                        && (char.is_ascii_alphanumeric() || (index == 0 && char == '_'))
-                })
-            }
-        }
+#[allow(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+fn case_label(case: Case<'_>) -> &'static str {
+    match case {
+        Case::Snake => "snake_case",
+        Case::UpperSnake => "SCREAMING_SNAKE_CASE",
+        Case::Pascal => "PascalCase",
+        _ => unreachable!("unsupported case: {case:?}"),
     }
 }

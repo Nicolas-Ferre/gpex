@@ -16,6 +16,7 @@ pub(crate) fn invalid_case<'label>(
     ident_name: &str,
     ident_span: Span,
     mut case_labels: impl Iterator<Item = &'label str>,
+    replacements: impl Iterator<Item = String>,
     state: &ValidateState<'_, '_>,
 ) -> Log {
     let formatted_case_labels = case_labels.join(" or ");
@@ -23,6 +24,8 @@ pub(crate) fn invalid_case<'label>(
         level: LogLevel::Warning,
         msg: format!("`{ident_name}` identifier not in {formatted_case_labels}"),
         location: Some(state.span_location(ident_span)),
-        inner: vec![],
+        inner: replacements
+            .map(|replacement| super::replacement(&replacement))
+            .collect(),
     }
 }

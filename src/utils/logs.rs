@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use owo_colors::colors::xterm::LightGray;
-use owo_colors::colors::{Blue, Red, Yellow};
+use owo_colors::colors::{Blue, Green, Red, Yellow};
 use owo_colors::{Color, OwoColorize, Stream};
 use std::fmt::{Display, Formatter};
 use std::io;
@@ -217,6 +217,8 @@ pub enum LogLevel {
     Warning,
     /// An information.
     Info,
+    /// A hint.
+    Hint,
 }
 
 impl Display for LogLevel {
@@ -231,6 +233,7 @@ impl LogLevel {
             Self::Error => fmt_colored::<Red>(formatter, string),
             Self::Warning => fmt_colored::<Yellow>(formatter, string),
             Self::Info => fmt_colored::<Blue>(formatter, string),
+            Self::Hint => fmt_colored::<Green>(formatter, string),
         }
     }
 
@@ -239,6 +242,7 @@ impl LogLevel {
             Self::Error => "error",
             Self::Warning => "warning",
             Self::Info => "info",
+            Self::Hint => "hint",
         }
     }
 }

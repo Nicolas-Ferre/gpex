@@ -4,7 +4,7 @@ mod statements;
 
 use crate::compiler::dependencies;
 use crate::compiler::item_ref::ItemRef;
-use crate::compiler::parsing::exprs::OPERATOR_FN_NAME_PREFIX;
+use crate::compiler::parsing::exprs as parsing_exprs;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -58,7 +58,7 @@ fn validate_const<'item>(
     validate_no_circular_dependencies(ref_, dependency_result, state)?;
     validate_unique_definition(ref_, state)?;
     validate_usage(ref_, state);
-    let allowed_cases = naming::const_allowed_cases(const_, state);
+    let allowed_cases = naming::const_cases(const_, state);
     naming::validate_name(const_.name_span, allowed_cases, state);
     state.with_const_mark_span(Some(const_.const_keyword_span), |state| {
         exprs::validate_expr(&const_.value, state)
@@ -130,15 +130,25 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
     let name_span = item.name_span();
     let name = state.context.slice(name_span);
     let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
-    let is_unused_lint_ignored =
-        name.starts_with('_') && !name.starts_with(OPERATOR_FN_NAME_PREFIX);
+    let is_operator_fn = matches!(item, ItemRef::Fn(_)) && parsing_exprs::is_operator_fn_name(name);
+    let is_unused_lint_ignored = name.starts_with('_') && !is_operator_fn;
+    let ignored_name_replacement = is_unused_lint_ignored
+        .then(|| ignored_name_replacement(name))
+        .flatten();
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state.inner);
-        state.add_log(logs::items::unused(&displayed_key, name_span, state));
+        let replacement = (!is_operator_fn).then(|| format!("_{name}"));
+        state.add_log(logs::items::unused(
+            &displayed_key,
+            replacement.as_deref(),
+            name_span,
+            state,
+        ));
     } else if item.is_pub() && is_unused_lint_ignored {
         let displayed_key = item.displayed_key(state.inner);
         state.add_log(logs::items::pub_with_ignored_name(
             &displayed_key,
+            ignored_name_replacement.as_deref(),
             name_span,
             state,
         ));
@@ -148,11 +158,21 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
         let displayed_key = item.displayed_key(state.inner);
         state.add_log(logs::items::used_with_ignored_name(
             &displayed_key,
+            ignored_name_replacement.as_deref(),
             name_span,
             ref_span,
             state,
         ));
     }
+}
+
+fn ignored_name_replacement(item_name: &str) -> Option<String> {
+    let mut replacement = item_name
+        .strip_prefix('_')
+        .filter(|replacement| !replacement.is_empty())?
+        .to_string();
+    naming::make_keyword_safe(&mut replacement);
+    Some(replacement)
 }
 
 fn validate_unique_definition<'item>(
