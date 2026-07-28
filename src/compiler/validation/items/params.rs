@@ -37,7 +37,7 @@ fn validate_param<'item>(
         items::validate_usage(ref_, state);
     }
     let allowed_cases = naming::param_cases(param, state);
-    naming::validate_name(param.name_span, false, allowed_cases, state);
+    naming::validate_name(param.name_span, allowed_cases, state);
     Ok(())
 }
 

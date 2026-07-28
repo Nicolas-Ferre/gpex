@@ -1,4 +1,3 @@
-use crate::compiler::parsing::exprs;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::vars::ConstDefinition;
@@ -15,12 +14,11 @@ pub(super) const VAR_ALLOWED_CASES: &[Case<'static>] = &[Case::Snake];
 
 pub(super) fn validate_name(
     span: Span,
-    is_fn: bool,
     expected_cases: &[Case<'_>],
     state: &mut ValidateState<'_, '_>,
 ) {
     validate_char_count(span, state);
-    validate_case(span, is_fn, expected_cases, state);
+    validate_case(span, expected_cases, state);
 }
 
 pub(super) fn validate_char_count(span: Span, state: &mut ValidateState<'_, '_>) {
@@ -32,14 +30,10 @@ pub(super) fn validate_char_count(span: Span, state: &mut ValidateState<'_, '_>)
 
 pub(super) fn validate_case(
     span: Span,
-    is_fn: bool,
     expected_cases: &[Case<'_>],
     state: &mut ValidateState<'_, '_>,
 ) {
     let slice = state.context.slice(span);
-    if is_fn && exprs::is_operator_fn_name(slice) {
-        return;
-    }
     let mut replacements = Vec::with_capacity(expected_cases.len());
     for case in expected_cases {
         let replacement = convert_name(*case, slice);
