@@ -100,10 +100,7 @@ fn validate_mul_add_candidate(call: &Call, state: &mut ValidateState<'_, '_>) {
 }
 
 fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<String> {
-    let [left_add_arg, right_add_arg] = call.args.as_slice() else {
-        return None;
-    };
-    let (mul_call, addend) = match (&left_add_arg.value, &right_add_arg.value) {
+    let (mul_call, addend) = match (&call.args[0].value, &call.args[1].value) {
         (Expr::Call(mul_call), addend) if is_call_intrinsic_mul(mul_call, state) => {
             (mul_call, addend)
         }
@@ -112,11 +109,8 @@ fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<Str
         }
         _ => return None,
     };
-    let [left_mul_arg, right_mul_arg] = mul_call.args.as_slice() else {
-        return None;
-    };
-    let left = state.context.slice(left_mul_arg.value.span());
-    let right = state.context.slice(right_mul_arg.value.span());
+    let left = state.context.slice(mul_call.args[0].value.span());
+    let right = state.context.slice(mul_call.args[1].value.span());
     let addend = state.context.slice(addend.span());
     Some(format!("mul_add({left}, {right}, {addend})"))
 }
