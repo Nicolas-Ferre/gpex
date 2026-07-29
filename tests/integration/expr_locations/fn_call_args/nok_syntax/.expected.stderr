@@ -1,9 +1,9 @@
-error: expected identifier, `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, `-` or `!`
+error: expected identifier, `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, `-`, `!` or `(`
 │  → <root>/test_reserved.gpex:1:20
 │    ¦ var value = fn_(1, var);
 │    ¦                    ^
 ┴
-error: expected identifier, `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, `-`, `!` or `)`
+error: expected identifier, `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, `-`, `!`, `(` or `)`
 │  → <root>/test_separator_alone.gpex:1:17
 │    ¦ var value = fn_(,);
 │    ¦                 ^

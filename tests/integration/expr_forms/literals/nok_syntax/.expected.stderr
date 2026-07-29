@@ -1,4 +1,4 @@
-error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-` or `!`
+error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-`, `!` or `(`
 │  → <root>/test_suffix.gpex:1:13
 │    ¦ var value = 0suffix;
 │    ¦             ^

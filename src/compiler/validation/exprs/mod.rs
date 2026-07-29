@@ -32,6 +32,7 @@ pub(crate) fn validate_expr(
         Expr::Call(child) => validate_has_return_type(child, child.span, state)
             .and_then(|()| calls::validate_call(child, state)),
         Expr::Ident(child) => validate_ident(child, state),
+        Expr::Parenthesized(parenthesized) => validate_expr(&parenthesized.value, state),
     }
 }
 

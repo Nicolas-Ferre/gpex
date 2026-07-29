@@ -8,3 +8,4 @@
   `2`, ...).
 - Function, variable, type, ... names should be as short as possible and aligned across tests (e.g.
   `fn_`, `used`, `called`, ...). Most generally, they should be aligned with other similar tests.
+- It is preferred to have multiple simple `test_*.gpex` files instead of one big file.

@@ -22,6 +22,7 @@ pub(crate) fn expr_value<'item>(expr: &Expr, state: &State<'item>) -> ConstValue
         Expr::Wildcard(_) => ConstValue::Unknown,
         Expr::Call(call) => call_value(call, state),
         Expr::Ident(ident) => ident_value(ident, state),
+        Expr::Parenthesized(parenthesized) => expr_value(&parenthesized.value, state),
     }
 }
 
@@ -167,7 +168,8 @@ fn param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
         | Expr::I32Literal(_)
         | Expr::BoolLiteral(_)
         | Expr::Wildcard(_)
-        | Expr::Call(_) => None,
+        | Expr::Call(_)
+        | Expr::Parenthesized(_) => None,
         Expr::Ident(ident) => match state.sources.get(&ident.id)? {
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_) => None,
             ItemRef::Param(param) => Some(param),

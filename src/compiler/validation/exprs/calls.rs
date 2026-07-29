@@ -102,7 +102,9 @@ fn validate_mul_add_candidate(call: &Call, state: &mut ValidateState<'_, '_>) {
 }
 
 fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<String> {
-    let (mul_call, addend) = match (&call.args[0].value, &call.args[1].value) {
+    let left = unparenthesized(&call.args[0].value);
+    let right = unparenthesized(&call.args[1].value);
+    let (mul_call, addend) = match (left, right) {
         (Expr::Call(mul_call), addend) if is_call_intrinsic_mul(mul_call, state) => {
             (mul_call, addend)
         }
@@ -115,6 +117,19 @@ fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<Str
     let right = format_arg(state.context.slice(mul_call.args[1].value.span()));
     let addend = format_arg(state.context.slice(addend.span()));
     Some(format!("mul_add({left}, {right}, {addend})"))
+}
+
+fn unparenthesized(expr: &Expr) -> &Expr {
+    match expr {
+        Expr::Parenthesized(parenthesized) => unparenthesized(&parenthesized.value),
+        Expr::F32Literal(_)
+        | Expr::U32Literal(_)
+        | Expr::I32Literal(_)
+        | Expr::BoolLiteral(_)
+        | Expr::Wildcard(_)
+        | Expr::Call(_)
+        | Expr::Ident(_) => expr,
+    }
 }
 
 fn format_arg(source: &str) -> String {

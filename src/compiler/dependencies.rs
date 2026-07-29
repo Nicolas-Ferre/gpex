@@ -157,6 +157,7 @@ fn scan_expr<'item>(
         | Expr::Wildcard(_) => Ok(()),
         Expr::Call(call) => scan_call(call, dependencies, state), // no-fn-check (recursivity)
         Expr::Ident(ident) => scan_ident(ident, dependencies, state),
+        Expr::Parenthesized(parenthesized) => scan_expr(&parenthesized.value, dependencies, state),
     }
 }
 

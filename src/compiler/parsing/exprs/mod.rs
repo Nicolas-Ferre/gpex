@@ -1,6 +1,7 @@
 pub(crate) mod calls;
 pub(crate) mod idents;
 pub(crate) mod literals;
+pub(crate) mod parentheses;
 
 use crate::compiler::parsing::symbols::{
     AND_SYMBOL, ANGLE_BRACKET_CLOSE_SYMBOL, ANGLE_BRACKET_OPEN_SYMBOL, COMPARE_EQUAL_SYMBOL,
@@ -14,6 +15,7 @@ use crate::utils::parsing::span::{Span, SpanProps};
 use calls::Call;
 use idents::Ident;
 use literals::{BoolLiteral, F32Literal, I32Literal, U32Literal};
+use parentheses::ParenthesizedExpr;
 
 pub(crate) const BINARY_ADD_FN_NAME: &str = "__add__";
 pub(crate) const BINARY_SUB_FN_NAME: &str = "__sub__";
@@ -72,6 +74,7 @@ pub(crate) enum Expr {
     Wildcard(Span),
     Call(Call),
     Ident(Ident),
+    Parenthesized(ParenthesizedExpr),
 }
 
 impl Expr {
@@ -101,6 +104,7 @@ impl Expr {
             Self::Wildcard(span) => *span,
             Self::Call(call) => call.span,
             Self::Ident(ident) => ident.span,
+            Self::Parenthesized(parenthesized) => parenthesized.span,
         }
     }
 
@@ -142,6 +146,7 @@ impl Expr {
             &|context| Span::parse_symbol(context, QUESTION_MARK_SYMBOL).map(Self::Wildcard),
             &|context| Call::parse(context).map(Self::Call),
             &|context| Call::parse_unary(context, stop_excluded_parser).map(Self::Call),
+            &|context| ParenthesizedExpr::parse(context).map(Self::Parenthesized),
             &|context| Ident::parse(context).map(Self::Ident),
         ])
     }

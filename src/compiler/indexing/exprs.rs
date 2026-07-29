@@ -16,6 +16,7 @@ pub(super) fn index_expr<'item>(expr: &'item Expr, state: &mut State<'item>) {
         | Expr::Wildcard(_) => {}
         Expr::Call(call) => index_call(call, state),
         Expr::Ident(ident) => index_ident(ident, state),
+        Expr::Parenthesized(parenthesized) => index_expr(&parenthesized.value, state),
     }
 }
 
