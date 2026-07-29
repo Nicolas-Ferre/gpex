@@ -1,5 +1,6 @@
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
+use crate::compiler::parsing::COMMENT_PREFIX;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
@@ -110,18 +111,24 @@ fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<Str
         }
         _ => return None,
     };
-    let left = format_code(state.context.slice(mul_call.args[0].value.span()));
-    let right = format_code(state.context.slice(mul_call.args[1].value.span()));
-    let addend = format_code(state.context.slice(addend.span()));
+    let left = format_arg(state.context.slice(mul_call.args[0].value.span()));
+    let right = format_arg(state.context.slice(mul_call.args[1].value.span()));
+    let addend = format_arg(state.context.slice(addend.span()));
     Some(format!("mul_add({left}, {right}, {addend})"))
 }
 
-fn format_code(source: &str) -> String {
+fn format_arg(source: &str) -> String {
     source
         .lines()
-        .map(str::trim)
+        .map(format_arg_line)
         .filter(|line| !line.is_empty())
         .join(" ")
+}
+
+fn format_arg_line(line: &str) -> &str {
+    line.split_once(COMMENT_PREFIX)
+        .map_or(line, |(code, _)| code)
+        .trim()
 }
 
 fn is_call_intrinsic_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {

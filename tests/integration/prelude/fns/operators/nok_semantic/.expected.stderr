@@ -44,8 +44,8 @@ warning: candidate expression for `mul_add()`
 ┴
 warning: candidate expression for `mul_add()`
 │  → <root>/test_mul_add_candidates_const.gpex:5:20
-│    ¦ const _MULTILINE = -
-│    ¦                    ^
+│    ¦ const _MULTILINE = - // ignored in replacement
+│    ¦                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦     1.0 * 2.0 + 3.0;
 │    ¦ ^^^^^^^^^^^^^^^^^^^
 ├─ hint: replace with `mul_add(- 1.0, 2.0, 3.0)`
@@ -76,8 +76,8 @@ warning: candidate expression for `mul_add()`
 ┴
 warning: candidate expression for `mul_add()`
 │  → <root>/test_mul_add_candidates_runtime.gpex:7:18
-│    ¦ var _multiline = -
-│    ¦                  ^
+│    ¦ var _multiline = - // ignored in replacement
+│    ¦                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦     zero * 1.0 + 2.0;
 │    ¦ ^^^^^^^^^^^^^^^^^^^^
 ├─ hint: replace with `mul_add(- zero, 1.0, 2.0)`
