@@ -82,11 +82,15 @@ pub(crate) fn literal_out_of_bounds(
     }
 }
 
-pub(crate) fn mul_add_candidate(expr_span: Span, state: &ValidateState<'_, '_>) -> Log {
+pub(crate) fn mul_add_candidate(
+    expr_span: Span,
+    replacement: &str,
+    state: &ValidateState<'_, '_>,
+) -> Log {
     Log {
         level: LogLevel::Warning,
         msg: "candidate expression for `mul_add()`".into(),
         location: Some(state.span_location(expr_span)),
-        inner: vec![],
+        inner: vec![super::replacement(replacement)],
     }
 }

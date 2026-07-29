@@ -1,5 +1,6 @@
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
+use crate::compiler::parsing::COMMENT_PREFIX;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
@@ -7,7 +8,9 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::state::IntrinsicType;
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
 use crate::compiler::{queries, types};
+use crate::utils::parsing::span::SpanProps;
 use crate::utils::validation::ValidateError;
+use itertools::Itertools;
 
 pub(crate) fn validate_call(
     call: &Call,
@@ -85,13 +88,47 @@ fn validate_arg_name(
 }
 
 fn validate_mul_add_candidate(call: &Call, state: &mut ValidateState<'_, '_>) {
-    if !are_all_args_f32(call, state)
-        || !is_call_intrinsic_add(call, state)
-        || !has_intrinsic_mul_arg(call, state)
-    {
+    if !are_all_args_f32(call, state) || !is_call_intrinsic_add(call, state) {
         return;
     }
-    state.add_log(logs::exprs::mul_add_candidate(call.span, state));
+    let Some(replacement) = mul_add_replacement(call, state) else {
+        return;
+    };
+    state.add_log(logs::exprs::mul_add_candidate(
+        call.span,
+        &replacement,
+        state,
+    ));
+}
+
+fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<String> {
+    let (mul_call, addend) = match (&call.args[0].value, &call.args[1].value) {
+        (Expr::Call(mul_call), addend) if is_call_intrinsic_mul(mul_call, state) => {
+            (mul_call, addend)
+        }
+        (addend, Expr::Call(mul_call)) if is_call_intrinsic_mul(mul_call, state) => {
+            (mul_call, addend)
+        }
+        _ => return None,
+    };
+    let left = format_arg(state.context.slice(mul_call.args[0].value.span()));
+    let right = format_arg(state.context.slice(mul_call.args[1].value.span()));
+    let addend = format_arg(state.context.slice(addend.span()));
+    Some(format!("mul_add({left}, {right}, {addend})"))
+}
+
+fn format_arg(source: &str) -> String {
+    source
+        .lines()
+        .map(format_arg_line)
+        .filter(|line| !line.is_empty())
+        .join(" ")
+}
+
+fn format_arg_line(line: &str) -> &str {
+    line.split_once(COMMENT_PREFIX)
+        .map_or(line, |(code, _)| code)
+        .trim()
 }
 
 fn is_call_intrinsic_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
@@ -100,12 +137,6 @@ fn is_call_intrinsic_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
         IntrinsicFn::Binary(BinaryIntrinsicFn::Add),
         state.inner,
     )
-}
-
-fn has_intrinsic_mul_arg(call: &Call, state: &ValidateState<'_, '_>) -> bool {
-    call.args
-        .iter()
-        .any(|arg| matches!(&arg.value, Expr::Call(call) if is_call_intrinsic_mul(call, state)))
 }
 
 fn is_call_intrinsic_mul(call: &Call, state: &ValidateState<'_, '_>) -> bool {

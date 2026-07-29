@@ -14,7 +14,7 @@ use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use std::path::Path;
 
-const COMMENT_PREFIX: &str = "//";
+pub(crate) const COMMENT_PREFIX: &str = "//";
 
 pub(crate) fn parse(root_path: &Path, files: &[ReadFile]) -> Result<Vec<Module>, Vec<Log>> {
     let mut next_id = 0;
