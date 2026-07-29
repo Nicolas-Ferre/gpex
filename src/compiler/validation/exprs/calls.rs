@@ -9,6 +9,7 @@ use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
 use crate::compiler::{queries, types};
 use crate::utils::parsing::span::SpanProps;
 use crate::utils::validation::ValidateError;
+use itertools::Itertools;
 
 pub(crate) fn validate_call(
     call: &Call,
@@ -109,10 +110,18 @@ fn mul_add_replacement(call: &Call, state: &ValidateState<'_, '_>) -> Option<Str
         }
         _ => return None,
     };
-    let left = state.context.slice(mul_call.args[0].value.span());
-    let right = state.context.slice(mul_call.args[1].value.span());
-    let addend = state.context.slice(addend.span());
+    let left = format_code(state.context.slice(mul_call.args[0].value.span()));
+    let right = format_code(state.context.slice(mul_call.args[1].value.span()));
+    let addend = format_code(state.context.slice(addend.span()));
     Some(format!("mul_add({left}, {right}, {addend})"))
+}
+
+fn format_code(source: &str) -> String {
+    source
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .join(" ")
 }
 
 fn is_call_intrinsic_add(call: &Call, state: &ValidateState<'_, '_>) -> bool {
