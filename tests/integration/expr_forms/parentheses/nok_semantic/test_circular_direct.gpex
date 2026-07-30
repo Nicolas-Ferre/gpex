@@ -1,0 +1,3 @@
+fn circular_direct() -> i32 {
+    return (circular_direct());
+}

@@ -1,0 +1,9 @@
+error: `circular_direct` item has circular dependencies
+│  → <root>/test_circular_direct.gpex:1:4
+│    ¦ fn circular_direct() -> i32 {
+│    ¦    ^^^^^^^^^^^^^^^
+├─ info: depends on itself
+│  → <root>/test_circular_direct.gpex:2:13
+│    ¦     return (circular_direct());
+│    ¦             ^^^^^^^^^^^^^^^^^
+┴
