@@ -1,0 +1,5 @@
+var value = 0;
+
+fn _assign() {
+    (value) = 1;
+}

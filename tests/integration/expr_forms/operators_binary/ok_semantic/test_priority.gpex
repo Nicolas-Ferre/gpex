@@ -257,3 +257,9 @@ var _or_gt = 1 || 2 > 3; // expected: 13
 var _or_ge = 1 || 2 >= 3; // expected: 13
 var _or_and = 1 || 2 && 3; // expected: 13
 var _or_or = 1 || 2 || 3; // expected: 13
+
+// =========================| Parentheses |=========================
+
+var _parentheses_grouped_left = (1 + 2) * 3; // expected: 3
+var _parentheses_grouped_right = 8 / (2 + 2); // expected: 4
+var _parentheses_nested = (1 + 2) * (3 + 1); // expected: 3

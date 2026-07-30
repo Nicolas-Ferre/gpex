@@ -69,13 +69,19 @@ warning: candidate expression for `mul_add()`
 ├─ hint: replace with `mul_add(1.0, zero, 2.0)`
 ┴
 warning: candidate expression for `mul_add()`
-│  → <root>/test_mul_add_candidates_runtime.gpex:6:13
+│  → <root>/test_mul_add_candidates_runtime.gpex:6:20
+│    ¦ var _parentheses = (1.0 * zero) + 2.0;
+│    ¦                    ^^^^^^^^^^^^^^^^^^
+├─ hint: replace with `mul_add(1.0, zero, 2.0)`
+┴
+warning: candidate expression for `mul_add()`
+│  → <root>/test_mul_add_candidates_runtime.gpex:7:13
 │    ¦ var _both = 1.0 * zero + zero * 2.0;
 │    ¦             ^^^^^^^^^^^^^^^^^^^^^^^
 ├─ hint: replace with `mul_add(1.0, zero, zero * 2.0)`
 ┴
 warning: candidate expression for `mul_add()`
-│  → <root>/test_mul_add_candidates_runtime.gpex:7:18
+│  → <root>/test_mul_add_candidates_runtime.gpex:8:18
 │    ¦ var _multiline = - // ignored in replacement
 │    ¦                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦     zero * 1.0 + 2.0;
