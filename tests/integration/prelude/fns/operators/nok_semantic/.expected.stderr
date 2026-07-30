@@ -37,13 +37,25 @@ warning: candidate expression for `mul_add()`
 ├─ hint: replace with `mul_add(1.0, 2.0, 3.0)`
 ┴
 warning: candidate expression for `mul_add()`
-│  → <root>/test_mul_add_candidates_const.gpex:4:15
+│  → <root>/test_mul_add_candidates_const.gpex:4:27
+│    ¦ const _PARENTHESES_LEFT = (1.0 * 2.0) + 3.0;
+│    ¦                           ^^^^^^^^^^^^^^^^^
+├─ hint: replace with `mul_add(1.0, 2.0, 3.0)`
+┴
+warning: candidate expression for `mul_add()`
+│  → <root>/test_mul_add_candidates_const.gpex:5:28
+│    ¦ const _PARENTHESES_RIGHT = 1.0 + (2.0 * 3.0);
+│    ¦                            ^^^^^^^^^^^^^^^^^
+├─ hint: replace with `mul_add(2.0, 3.0, 1.0)`
+┴
+warning: candidate expression for `mul_add()`
+│  → <root>/test_mul_add_candidates_const.gpex:6:15
 │    ¦ const _BOTH = 1.0 * 2.0 + 3.0 * -4.0;
 │    ¦               ^^^^^^^^^^^^^^^^^^^^^^
 ├─ hint: replace with `mul_add(1.0, 2.0, 3.0 * -4.0)`
 ┴
 warning: candidate expression for `mul_add()`
-│  → <root>/test_mul_add_candidates_const.gpex:5:20
+│  → <root>/test_mul_add_candidates_const.gpex:7:20
 │    ¦ const _MULTILINE = - // ignored in replacement
 │    ¦                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦     1.0 * 2.0 + 3.0;
@@ -69,19 +81,25 @@ warning: candidate expression for `mul_add()`
 ├─ hint: replace with `mul_add(1.0, zero, 2.0)`
 ┴
 warning: candidate expression for `mul_add()`
-│  → <root>/test_mul_add_candidates_runtime.gpex:6:20
-│    ¦ var _parentheses = (1.0 * zero) + 2.0;
-│    ¦                    ^^^^^^^^^^^^^^^^^^
+│  → <root>/test_mul_add_candidates_runtime.gpex:6:25
+│    ¦ var _parentheses_left = (1.0 * zero) + 2.0;
+│    ¦                         ^^^^^^^^^^^^^^^^^^
 ├─ hint: replace with `mul_add(1.0, zero, 2.0)`
 ┴
 warning: candidate expression for `mul_add()`
-│  → <root>/test_mul_add_candidates_runtime.gpex:7:13
+│  → <root>/test_mul_add_candidates_runtime.gpex:7:26
+│    ¦ var _parentheses_right = 1.0 + (zero * 2.0);
+│    ¦                          ^^^^^^^^^^^^^^^^^^
+├─ hint: replace with `mul_add(zero, 2.0, 1.0)`
+┴
+warning: candidate expression for `mul_add()`
+│  → <root>/test_mul_add_candidates_runtime.gpex:8:13
 │    ¦ var _both = 1.0 * zero + zero * 2.0;
 │    ¦             ^^^^^^^^^^^^^^^^^^^^^^^
 ├─ hint: replace with `mul_add(1.0, zero, zero * 2.0)`
 ┴
 warning: candidate expression for `mul_add()`
-│  → <root>/test_mul_add_candidates_runtime.gpex:8:18
+│  → <root>/test_mul_add_candidates_runtime.gpex:9:18
 │    ¦ var _multiline = - // ignored in replacement
 │    ¦                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦     zero * 1.0 + 2.0;

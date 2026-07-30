@@ -1,6 +1,8 @@
 const _LEFT = 1.0 * 2.0 + 3.0;
 const _RIGHT = 1.0 + 2.0 * 3.0;
 const _EXPLICIT = __add__(__mul__(1.0, 2.0), 3.0);
+const _PARENTHESES_LEFT = (1.0 * 2.0) + 3.0;
+const _PARENTHESES_RIGHT = 1.0 + (2.0 * 3.0);
 const _BOTH = 1.0 * 2.0 + 3.0 * -4.0;
 const _MULTILINE = - // ignored in replacement
     1.0 * 2.0 + 3.0;
