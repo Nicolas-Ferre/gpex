@@ -1,0 +1,10 @@
+error: expected `f32` literal, `u32` literal, `i32` literal, `true`, `false`, `?`, identifier, `-`, `!` or `(`
+│  → <root>/test_empty.gpex:1:15
+│    ¦ var _value = ();
+│    ¦               ^
+┴
+error: expected `.`, `+`, `-`, `*`, `/`, `%`, `==`, `!=`, `<=`, `<`, `>=`, `>`, `&&`, `||` or `)`
+│  → <root>/test_unclosed.gpex:1:16
+│    ¦ var _value = (1;
+│    ¦                ^
+┴

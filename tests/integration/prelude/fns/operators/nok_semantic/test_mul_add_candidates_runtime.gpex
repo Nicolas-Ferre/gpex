@@ -3,6 +3,8 @@ var zero = 0.0;
 var _left = 1.0 * zero + 2.0;
 var _right = 1.0 + zero * 2.0;
 var _explicit = __add__(__mul__(1.0, zero), 2.0);
+var _parentheses_left = (1.0 * zero) + 2.0;
+var _parentheses_right = 1.0 + (zero * 2.0);
 var _both = 1.0 * zero + zero * 2.0;
 var _multiline = - // ignored in replacement
     zero * 1.0 + 2.0;

@@ -10,7 +10,8 @@ pub(crate) fn is_expr_ref(expr: &Expr, state: &State<'_>) -> Option<bool> {
         | Expr::I32Literal(_)
         | Expr::BoolLiteral(_)
         | Expr::Wildcard(_)
-        | Expr::Call(_) => Some(false),
+        | Expr::Call(_)
+        | Expr::Parenthesized(_) => Some(false),
         Expr::Ident(ident) => is_ident_ref(ident, state),
     }
 }

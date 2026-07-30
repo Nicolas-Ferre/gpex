@@ -18,6 +18,7 @@ pub(super) fn transpile_expr(expr: &Expr, state: &mut TranspileState<'_, '_>) {
         match expr {
             Expr::Call(child) => transpile_call(child, state),
             Expr::Ident(child) => transpile_ident(child, state),
+            Expr::Parenthesized(parenthesized) => transpile_expr(&parenthesized.value, state),
             Expr::F32Literal(_)
             | Expr::U32Literal(_)
             | Expr::I32Literal(_)

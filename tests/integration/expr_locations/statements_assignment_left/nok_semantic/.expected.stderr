@@ -79,6 +79,11 @@ error: expression is not a reference
 │    ¦     ^^^^^
 ┴
 error: expression is not a reference
+│  → <root>/test_form_parentheses.gpex:4:5
+│    ¦     (value) = 1;
+│    ¦     ^^^^^^^
+┴
+error: expression is not a reference
 │  → <root>/test_form_typeref.gpex:2:5
 │    ¦     i32 = u32;
 │    ¦     ^^^

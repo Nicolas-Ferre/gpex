@@ -86,6 +86,7 @@ pub(crate) fn expr_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item>
         Expr::Wildcard(_) => Type::Unknown,
         Expr::Call(call) => source_type(call.id, &call.args, state),
         Expr::Ident(ident) => source_type(ident.id, &[], state),
+        Expr::Parenthesized(parenthesized) => expr_type(&parenthesized.value, state),
     }
 }
 

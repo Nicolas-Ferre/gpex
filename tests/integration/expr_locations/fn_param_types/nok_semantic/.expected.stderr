@@ -49,3 +49,9 @@ error: invalid wildcard expression
 │    ¦                         ^
 ├─ info: wildcards are only allowed as function parameter types
 ┴
+error: invalid wildcard expression
+│  → <root>/test_wildcard_parentheses.gpex:1:19
+│    ¦ fn _item(_value: (?)) {}
+│    ¦                   ^
+├─ info: wildcards are only allowed as function parameter types
+┴
