@@ -33,22 +33,10 @@ fn __gt__(_param1: i32, _param2: i32) -> i32 {
 fn __ge__(_param1: i32, _param2: i32) -> i32 {
     return 11;
 }
-fn __and__(_param1: i32, _param2: i32) -> i32 {
-    return 12;
-}
-fn __or__(_param1: i32, _param2: i32) -> i32 {
-    return 13;
-}
 
-fn __add__(_param1: bool, _param2: bool) -> bool {
-    return true;
+fn __eq__(param1: bool, _param2: bool) -> bool {
+    return param1;
 }
-
-fn __mul__(_param1: bool, _param2: bool) -> bool {
-    return false;
-}
-
-var _chain = true + false * true; // expected: true
 
 // =========================| `+` first |=========================
 
@@ -63,8 +51,6 @@ var _add_lt = 1 + 2 < 3; // expected: 8
 var _add_le = 1 + 2 <= 3; // expected: 9
 var _add_gt = 1 + 2 > 3; // expected: 10
 var _add_ge = 1 + 2 >= 3; // expected: 11
-var _add_and = 1 + 2 && 3; // expected: 12
-var _add_or = 1 + 2 || 3; // expected: 13
 
 // =========================| `-` first |=========================
 
@@ -79,8 +65,6 @@ var _sub_lt = 1 - 2 < 3; // expected: 8
 var _sub_le = 1 - 2 <= 3; // expected: 9
 var _sub_gt = 1 - 2 > 3; // expected: 10
 var _sub_ge = 1 - 2 >= 3; // expected: 11
-var _sub_and = 1 - 2 && 3; // expected: 12
-var _sub_or = 1 - 2 || 3; // expected: 13
 
 // =========================| `*` first |=========================
 
@@ -95,8 +79,6 @@ var _mul_lt = 1 * 2 < 3; // expected: 8
 var _mul_le = 1 * 2 <= 3; // expected: 9
 var _mul_gt = 1 * 2 > 3; // expected: 10
 var _mul_ge = 1 * 2 >= 3; // expected: 11
-var _mul_and = 1 * 2 && 3; // expected: 12
-var _mul_or = 1 * 2 || 3; // expected: 13
 
 // =========================| `/` first |=========================
 
@@ -111,8 +93,6 @@ var _div_lt = 1 / 2 < 3; // expected: 8
 var _div_le = 1 / 2 <= 3; // expected: 9
 var _div_gt = 1 / 2 > 3; // expected: 10
 var _div_ge = 1 / 2 >= 3; // expected: 11
-var _div_and = 1 / 2 && 3; // expected: 12
-var _div_or = 1 / 2 || 3; // expected: 13
 
 // =========================| `%` first |=========================
 
@@ -127,8 +107,6 @@ var _mod_lt = 1 % 2 < 3; // expected: 8
 var _mod_le = 1 % 2 <= 3; // expected: 9
 var _mod_gt = 1 % 2 > 3; // expected: 10
 var _mod_ge = 1 % 2 >= 3; // expected: 11
-var _mod_and = 1 % 2 && 3; // expected: 12
-var _mod_or = 1 % 2 || 3; // expected: 13
 
 // =========================| `==` first |=========================
 
@@ -143,8 +121,8 @@ var _eq_lt = 1 == 2 < 3; // expected: 8
 var _eq_le = 1 == 2 <= 3; // expected: 9
 var _eq_gt = 1 == 2 > 3; // expected: 10
 var _eq_ge = 1 == 2 >= 3; // expected: 11
-var _eq_and = 1 == 2 && 3; // expected: 12
-var _eq_or = 1 == 2 || 3; // expected: 13
+var _eq_and = true == true && false; // expected: false
+var _eq_or = false == false || true; // expected: true
 
 // =========================| `!=` first |=========================
 
@@ -159,8 +137,6 @@ var _ne_lt = 1 != 2 < 3; // expected: 8
 var _ne_le = 1 != 2 <= 3; // expected: 9
 var _ne_gt = 1 != 2 > 3; // expected: 10
 var _ne_ge = 1 != 2 >= 3; // expected: 11
-var _ne_and = 1 != 2 && 3; // expected: 12
-var _ne_or = 1 != 2 || 3; // expected: 13
 
 // =========================| `<` first |=========================
 
@@ -175,8 +151,6 @@ var _lt_lt = 1 < 2 < 3; // expected: 8
 var _lt_le = 1 < 2 <= 3; // expected: 9
 var _lt_gt = 1 < 2 > 3; // expected: 10
 var _lt_ge = 1 < 2 >= 3; // expected: 11
-var _lt_and = 1 < 2 && 3; // expected: 12
-var _lt_or = 1 < 2 || 3; // expected: 13
 
 // =========================| `<=` first |=========================
 
@@ -191,8 +165,6 @@ var _le_lt = 1 <= 2 < 3; // expected: 8
 var _le_le = 1 <= 2 <= 3; // expected: 9
 var _le_gt = 1 <= 2 > 3; // expected: 10
 var _le_ge = 1 <= 2 >= 3; // expected: 11
-var _le_and = 1 <= 2 && 3; // expected: 12
-var _le_or = 1 <= 2 || 3; // expected: 13
 
 // =========================| `>` first |=========================
 
@@ -207,8 +179,6 @@ var _gt_lt = 1 > 2 < 3; // expected: 8
 var _gt_le = 1 > 2 <= 3; // expected: 9
 var _gt_gt = 1 > 2 > 3; // expected: 10
 var _gt_ge = 1 > 2 >= 3; // expected: 11
-var _gt_and = 1 > 2 && 3; // expected: 12
-var _gt_or = 1 > 2 || 3; // expected: 13
 
 // =========================| `>=` first |=========================
 
@@ -223,40 +193,18 @@ var _ge_lt = 1 >= 2 < 3; // expected: 8
 var _ge_le = 1 >= 2 <= 3; // expected: 9
 var _ge_gt = 1 >= 2 > 3; // expected: 10
 var _ge_ge = 1 >= 2 >= 3; // expected: 11
-var _ge_and = 1 >= 2 && 3; // expected: 12
-var _ge_or = 1 >= 2 || 3; // expected: 13
 
 // =========================| `&&` first |=========================
 
-var _and_add = 1 && 2 + 3; // expected: 12
-var _and_sub = 1 && 2 - 3; // expected: 12
-var _and_mul = 1 && 2 * 3; // expected: 12
-var _and_div = 1 && 2 / 3; // expected: 12
-var _and_mod = 1 && 2 % 3; // expected: 12
-var _and_eq = 1 && 2 == 3; // expected: 12
-var _and_ne = 1 && 2 != 3; // expected: 12
-var _and_lt = 1 && 2 < 3; // expected: 12
-var _and_le = 1 && 2 <= 3; // expected: 12
-var _and_gt = 1 && 2 > 3; // expected: 12
-var _and_ge = 1 && 2 >= 3; // expected: 12
-var _and_and = 1 && 2 && 3; // expected: 12
-var _and_or = 1 && 2 || 3; // expected: 13
+var _and_eq = false && true == true; // expected: false
+var _and_and = false && true && true; // expected: false
+var _and_or = false && true || true; // expected: true
 
 // =========================| `||` first |=========================
 
-var _or_add = 1 || 2 + 3; // expected: 13
-var _or_sub = 1 || 2 - 3; // expected: 13
-var _or_mul = 1 || 2 * 3; // expected: 13
-var _or_div = 1 || 2 / 3; // expected: 13
-var _or_mod = 1 || 2 % 3; // expected: 13
-var _or_eq = 1 || 2 == 3; // expected: 13
-var _or_ne = 1 || 2 != 3; // expected: 13
-var _or_lt = 1 || 2 < 3; // expected: 13
-var _or_le = 1 || 2 <= 3; // expected: 13
-var _or_gt = 1 || 2 > 3; // expected: 13
-var _or_ge = 1 || 2 >= 3; // expected: 13
-var _or_and = 1 || 2 && 3; // expected: 13
-var _or_or = 1 || 2 || 3; // expected: 13
+var _or_eq = true || false == false; // expected: true
+var _or_and = false || true && true; // expected: true
+var _or_or = false || true || true; // expected: true
 
 // =========================| Parentheses |=========================
 

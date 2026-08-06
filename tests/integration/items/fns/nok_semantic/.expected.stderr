@@ -58,15 +58,15 @@ error: `__ge__(i32, i32, i32)` binary operator function must have exactly two pa
 │    ¦ fn __ge__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-error: `__and__(i32, i32, i32)` binary operator function must have exactly two parameters
+error: forbidden custom logical operator outside prelude
 │  → <root>/test_operator_binary_param_count_extra.gpex:45:4
 │    ¦ fn __and__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
-│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦    ^^^^^^^
 ┴
-error: `__or__(i32, i32, i32)` binary operator function must have exactly two parameters
+error: forbidden custom logical operator outside prelude
 │  → <root>/test_operator_binary_param_count_extra.gpex:49:4
 │    ¦ fn __or__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
-│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦    ^^^^^^
 ┴
 error: `__add__(i32)` binary operator function must have exactly two parameters
 │  → <root>/test_operator_binary_param_count_missing.gpex:1:4
@@ -123,15 +123,15 @@ error: `__ge__(i32)` binary operator function must have exactly two parameters
 │    ¦ fn __ge__(_param: i32) -> i32 {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-error: `__and__(i32)` binary operator function must have exactly two parameters
+error: forbidden custom logical operator outside prelude
 │  → <root>/test_operator_binary_param_count_missing.gpex:45:4
 │    ¦ fn __and__(_param: i32) -> i32 {
-│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦    ^^^^^^^
 ┴
-error: `__or__(i32)` binary operator function must have exactly two parameters
+error: forbidden custom logical operator outside prelude
 │  → <root>/test_operator_binary_param_count_missing.gpex:49:4
 │    ¦ fn __or__(_param: i32) -> i32 {
-│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦    ^^^^^^
 ┴
 error: `__add__(i32, i32)` binary operator function without return type
 │  → <root>/test_operator_binary_return_type_missing.gpex:1:4
@@ -188,15 +188,15 @@ error: `__ge__(i32, i32)` binary operator function without return type
 │    ¦ fn __ge__(_param1: i32, _param2: i32) {
 │    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
-error: `__and__(i32, i32)` binary operator function without return type
+error: forbidden custom logical operator outside prelude
 │  → <root>/test_operator_binary_return_type_missing.gpex:45:4
 │    ¦ fn __and__(_param1: i32, _param2: i32) {
-│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦    ^^^^^^^
 ┴
-error: `__or__(i32, i32)` binary operator function without return type
+error: forbidden custom logical operator outside prelude
 │  → <root>/test_operator_binary_return_type_missing.gpex:49:4
 │    ¦ fn __or__(_param1: i32, _param2: i32) {
-│    ¦    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦    ^^^^^^
 ┴
 error: `__neg__(i32, i32)` unary operator function must have exactly one parameter
 │  → <root>/test_operator_unary_param_count_extra.gpex:1:4

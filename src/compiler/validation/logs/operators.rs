@@ -2,6 +2,15 @@ use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::Span;
 use crate::{Log, LogLevel};
 
+pub(crate) fn custom_logical_operator(fn_name_span: Span, state: &ValidateState<'_, '_>) -> Log {
+    Log {
+        level: LogLevel::Error,
+        msg: "forbidden custom logical operator outside prelude".into(),
+        location: Some(state.span_location(fn_name_span)),
+        inner: vec![],
+    }
+}
+
 pub(crate) fn unary_operator_param_count(
     fn_key: &str,
     fn_signature_span: Span,
