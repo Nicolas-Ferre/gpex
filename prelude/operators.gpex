@@ -189,6 +189,8 @@ pub const fn __ge__(
 
 /// Returns whether `left` and `right` are both true.
 ///
+/// This operator cannot be customized outside the prelude.
+///
 /// # Examples
 ///
 /// ```gpex
@@ -197,6 +199,8 @@ pub const fn __ge__(
 pub const fn __and__(left: bool, right: bool) -> bool = intrinsic;
 
 /// Returns whether `left` or `right` is true.
+///
+/// This operator cannot be customized outside the prelude.
 ///
 /// # Examples
 ///

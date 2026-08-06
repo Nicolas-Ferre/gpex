@@ -2,9 +2,10 @@ use crate::compiler::dependencies;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs as parsing_exprs;
-use crate::compiler::parsing::exprs::BINARY_FN_NAMES;
 use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
+use crate::compiler::parsing::exprs::{BINARY_AND_FN_NAME, BINARY_FN_NAMES, BINARY_OR_FN_NAME};
 use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::prelude;
 use crate::compiler::queries;
 use crate::compiler::types::{self, Type};
 use crate::compiler::validation::items::{params, statements};
@@ -22,6 +23,7 @@ pub(super) fn validate_fn<'item>(
     let mut dependencies = Dependencies::new();
     let dependency_result = dependencies::scan_fn(fn_, &mut dependencies, state.inner);
     items::validate_no_circular_dependencies(ref_, dependency_result, state)?;
+    validate_no_custom_logical_operator(fn_, state)?;
     items::validate_intrinsic_location(ref_, intrinsic_span, state)?;
     state.with_param_constness(ParamConstness::ExplicitOnly, |state| {
         params::validate_params(&fn_.params, intrinsic_span.is_some(), state)?;
@@ -35,6 +37,24 @@ pub(super) fn validate_fn<'item>(
     validate_fn_name(fn_, state);
     items::validate_usage(ref_, state);
     Ok(())
+}
+
+// Type narrowing indexes the right operand using facts from the left operand. Supporting custom
+// logical operators would require retrying argument indexing without those facts on failure.
+fn validate_no_custom_logical_operator(
+    fn_: &FnDefinition,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    if prelude::is_prelude_file_index(fn_.name_span.file_index)
+        || !matches!(fn_.name.as_str(), BINARY_AND_FN_NAME | BINARY_OR_FN_NAME)
+    {
+        return Ok(());
+    }
+    state.add_log(logs::operators::custom_logical_operator(
+        fn_.name_span,
+        state,
+    ));
+    Err(ValidateError)
 }
 
 fn validate_fn_name(fn_: &FnDefinition, state: &mut ValidateState<'_, '_>) {
