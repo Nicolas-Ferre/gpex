@@ -11,6 +11,7 @@ use crate::compiler::parsing::symbols::{
     ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, EQUAL_SYMBOL, FN_KEYWORD,
     INTRINSIC_KEYWORD, PUB_KEYWORD, SEMICOLON_SYMBOL,
 };
+use crate::compiler::prelude;
 use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
@@ -87,7 +88,9 @@ impl FnDefinition {
     }
 
     pub(crate) fn intrinsic(&self) -> Option<IntrinsicFn> {
-        if !matches!(self.body, FnBody::Intrinsic(_)) {
+        if !matches!(self.body, FnBody::Intrinsic(_))
+            || !prelude::is_prelude_file_index(self.name_span.file_index)
+        {
             return None;
         }
         match self.name.as_str() {

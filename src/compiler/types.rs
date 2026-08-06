@@ -2,6 +2,7 @@ use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Arg;
+use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -85,7 +86,7 @@ pub(crate) fn expr_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item>
         Expr::BoolLiteral(_) => Type::Struct(state.search_prelude_type("bool")),
         Expr::Wildcard(_) => Type::Unknown,
         Expr::Call(call) => source_type(call.id, &call.args, state),
-        Expr::Ident(ident) => source_type(ident.id, &[], state),
+        Expr::Ident(ident) => ident_type(ident, state),
         Expr::Parenthesized(parenthesized) => expr_type(&parenthesized.value, state),
     }
 }
@@ -101,6 +102,42 @@ pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'it
         | ConstValue::Bool(_)
         | ConstValue::Unknown
         | ConstValue::RuntimeValue => Type::Unknown,
+    }
+}
+
+fn ident_type<'item>(ident: &Ident, state: &State<'item>) -> Type<'item> {
+    let Some(source) = state.sources.get(&ident.id).copied() else {
+        return Type::Unknown;
+    };
+    if let ItemRef::Param(param) = source {
+        param_ident_type(ident, param, state)
+    } else {
+        item_type(source, &[], state)
+    }
+}
+
+fn param_ident_type<'item>(
+    ident: &Ident,
+    param: &'item Param,
+    state: &State<'item>,
+) -> Type<'item> {
+    let declared_type = param_type(param, state);
+    let Some(facts) = state.expr_type_facts(ident.id) else {
+        return declared_type;
+    };
+    let mut included_types = facts.included_types.values().copied();
+    let Some(deduced_type) = included_types.next() else {
+        return declared_type;
+    };
+    if included_types.any(|type_| type_.id != deduced_type.id) {
+        return declared_type;
+    }
+    match declared_type {
+        Type::Struct(declared_type) if declared_type.id == deduced_type.id => {
+            Type::Struct(declared_type)
+        }
+        Type::Param(_) | Type::Wildcard(_) => Type::Struct(deduced_type),
+        Type::Struct(_) | Type::NoReturn | Type::Unknown => Type::Unknown,
     }
 }
 

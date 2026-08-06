@@ -16,7 +16,9 @@ pub(crate) struct State<'item> {
     pub(crate) candidate_sources: HashMap<u64, Vec<ItemRef<'item>>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
-    pub(crate) is_indexing_source_only: bool,
+    pub(crate) is_indexing_source_only: bool, // TODO: move to IndexState
+    type_fact_details: Vec<TypeFacts<'item>>,
+    type_facts: HashMap<u64, TypeFactsId>,
     scopes: RefCell<Vec<Scope<'item>>>,
     intrinsic_types: HashMap<u64, IntrinsicType>,
 }
@@ -30,8 +32,10 @@ impl<'item> State<'item> {
             candidate_sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
-            scopes: RefCell::default(),
             is_indexing_source_only: false,
+            type_fact_details: Vec::default(),
+            type_facts: HashMap::default(),
+            scopes: RefCell::default(),
             intrinsic_types: HashMap::default(),
         }
     }
@@ -46,6 +50,24 @@ impl<'item> State<'item> {
         ]
         .map(|(name, type_)| (self.search_prelude_type(name).id, type_))
         .into();
+    }
+
+    pub(crate) fn expr_type_facts(&self, node_id: u64) -> Option<&TypeFacts<'item>> {
+        self.type_facts.get(&node_id).map(|id| self.type_facts(*id))
+    }
+
+    pub(crate) fn type_facts(&self, id: TypeFactsId) -> &TypeFacts<'item> {
+        &self.type_fact_details[id.0]
+    }
+
+    pub(crate) fn add_type_facts(&mut self, facts: TypeFacts<'item>) -> TypeFactsId {
+        let id = TypeFactsId(self.type_fact_details.len());
+        self.type_fact_details.push(facts);
+        id
+    }
+
+    pub(crate) fn add_expr_type_facts(&mut self, node_id: u64, facts_id: TypeFactsId) {
+        self.type_facts.insert(node_id, facts_id);
     }
 
     pub(crate) fn search_prelude_type(&self, type_name: &str) -> &'item StructDefinition {
@@ -131,6 +153,20 @@ impl<'item> State<'item> {
 
     pub(crate) fn exit_scope(&self) {
         self.scopes.borrow_mut().pop();
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct TypeFactsId(usize);
+
+#[derive(Debug, Clone, Default)]
+pub(crate) struct TypeFacts<'item> {
+    pub(crate) included_types: HashMap<u64, &'item StructDefinition>,
+}
+
+impl<'item> TypeFacts<'item> {
+    pub(crate) fn add_included(&mut self, type_: &'item StructDefinition) {
+        self.included_types.entry(type_.id).or_insert(type_);
     }
 }
 

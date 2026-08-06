@@ -84,6 +84,9 @@ fn fn_call_value<'item>(
     state: &State<'item>,
 ) -> ConstValue<'item> {
     debug_assert_eq!(call.args.len(), source.params.params.len());
+    if let Some(value) = intrinsic::decisive_left_value(call, source, state) {
+        return value;
+    }
     if ItemRef::Fn(source).is_param_constness_ignored() {
         return intrinsic::call_value(call, source, state);
     }
