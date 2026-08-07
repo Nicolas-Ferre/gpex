@@ -149,7 +149,7 @@ fn item_type<'item>(item: ItemRef<'item>, args: &[Arg], state: &State<'item>) ->
         ItemRef::Const(const_) => expr_type(&const_.value, state),
         ItemRef::Struct(_) => Type::Struct(state.search_prelude_type("typeref")),
         ItemRef::Fn(fn_) => const_fn_type(fn_, args, state),
-        ItemRef::Param(param) => param_type(param, state),
+        ItemRef::Param(_) => unreachable!("param type should be calculated elsewhere"),
     }
 }
 
