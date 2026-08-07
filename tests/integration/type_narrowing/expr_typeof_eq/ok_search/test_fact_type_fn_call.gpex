@@ -1,0 +1,10 @@
+const fn type_() -> typeref {
+    return i32;
+}
+
+fn fn_(param: ?) -> bool {
+    return typeof(param) == type_() && param == 2;
+}
+
+var _result_i32 = fn_(2); // expected: true
+var _result_other = fn_(3u); // expected: false

@@ -1,4 +1,4 @@
-# Architecture
+# High level architecture
 
 The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 

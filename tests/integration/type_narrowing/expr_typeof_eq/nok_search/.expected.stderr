@@ -1,0 +1,76 @@
+error: `__eq__(typeof(param), i32)` item not found
+│  → <root>/test_fact_typeof_non_param.gpex:6:44
+│    ¦     return typeof(called(param)) == i32 && param == 0;
+│    ¦                                            ^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:104:14
+│    ¦ pub const fn __eq__(left: typeref, right: typeref) -> bool = intrinsic;
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:92:14
+│    ¦ pub const fn __eq__(
+│    ¦              ^^^^^^^
+│    ¦     left: ? require typeof(left).is_ordered(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> bool = intrinsic;
+│    ¦ ^^^^^^^^^
+┴
+error: `__eq__(typeof(param), i32)` item not found
+│  → <root>/test_fact_typeof_param_related.gpex:2:36
+│    ¦     return typeof(param) == i32 && related == 0;
+│    ¦                                    ^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:104:14
+│    ¦ pub const fn __eq__(left: typeref, right: typeref) -> bool = intrinsic;
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:92:14
+│    ¦ pub const fn __eq__(
+│    ¦              ^^^^^^^
+│    ¦     left: ? require typeof(left).is_ordered(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> bool = intrinsic;
+│    ¦ ^^^^^^^^^
+┴
+error: `__eq__(typeof(param), i32)` item not found
+│  → <root>/test_form_fact_and_unknown_or_usage.gpex:2:52
+│    ¦     return (typeof(param) == i32 && param == 0) || param == 0;
+│    ¦                                                    ^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:104:14
+│    ¦ pub const fn __eq__(left: typeref, right: typeref) -> bool = intrinsic;
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:92:14
+│    ¦ pub const fn __eq__(
+│    ¦              ^^^^^^^
+│    ¦     left: ? require typeof(left).is_ordered(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> bool = intrinsic;
+│    ¦ ^^^^^^^^^
+┴
+error: `__eq__(typeof(param), i32)` item not found
+│  → <root>/test_form_fact_or_other_and_usage.gpex:2:46
+│    ¦     return (typeof(param) == i32 || true) && param == 0;
+│    ¦                                              ^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:104:14
+│    ¦ pub const fn __eq__(left: typeref, right: typeref) -> bool = intrinsic;
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:92:14
+│    ¦ pub const fn __eq__(
+│    ¦              ^^^^^^^
+│    ¦     left: ? require typeof(left).is_ordered(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> bool = intrinsic;
+│    ¦ ^^^^^^^^^
+┴
