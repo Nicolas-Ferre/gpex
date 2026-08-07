@@ -112,7 +112,7 @@ impl FnDefinition {
             "mul_add" => Some(IntrinsicFn::MulAdd),
             "typeof" => Some(IntrinsicFn::Typeof),
             "sizeof" => Some(IntrinsicFn::Sizeof),
-            _ => None,
+            _ => unreachable!("unknown prelude intrinsic function name `{}`", self.name),
         }
     }
 
