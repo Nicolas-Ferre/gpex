@@ -103,25 +103,19 @@ fn equality_type_fact_from_exprs<'item>(
     type_expr: &Expr,
     state: &State<'item>,
 ) -> Option<TypeFact<'item>> {
-    let Expr::Call(typeof_call) = unwrap_parentheses(typeof_expr) else {
-        return None;
-    };
-    if !queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state) {
-        return None;
+    if let Expr::Call(typeof_call) = unwrap_parentheses(typeof_expr)
+        && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
+        && let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value)
+        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id)
+        && let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state)
+    {
+        Some(TypeFact {
+            item_id: param.id,
+            type_,
+        })
+    } else {
+        None
     }
-    let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value) else {
-        return None;
-    };
-    let Some(ItemRef::Param(param)) = state.sources.get(&ident.id) else {
-        return None;
-    };
-    let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state) else {
-        return None;
-    };
-    Some(TypeFact {
-        item_id: param.id,
-        type_,
-    })
 }
 
 fn unwrap_parentheses(expr: &Expr) -> &Expr {
