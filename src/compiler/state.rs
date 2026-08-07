@@ -6,7 +6,7 @@ use crate::compiler::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 use std::cell::RefCell;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 pub(crate) struct State<'item> {
@@ -164,12 +164,12 @@ pub(crate) struct TypeFactsId(usize);
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct TypeFacts<'item> {
-    pub(crate) included_types: HashMap<u64, &'item StructDefinition>,
+    pub(crate) included_types: HashSet<&'item StructDefinition>,
 }
 
 impl<'item> TypeFacts<'item> {
     pub(crate) fn add_included(&mut self, type_: &'item StructDefinition) {
-        self.included_types.entry(type_.id).or_insert(type_);
+        self.included_types.insert(type_);
     }
 }
 

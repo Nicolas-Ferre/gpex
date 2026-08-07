@@ -122,16 +122,14 @@ fn param_ident_type<'item>(
     state: &State<'item>,
 ) -> Type<'item> {
     let declared_type = param_type(param, state);
-    let Some(facts) = state.expr_type_facts(ident.id) else {
+    let Some(deduced_type) = state
+        .expr_type_facts(ident.id)
+        .filter(|facts| facts.included_types.len() == 1)
+        .and_then(|facts| facts.included_types.iter().next())
+        .copied()
+    else {
         return declared_type;
     };
-    let mut included_types = facts.included_types.values().copied();
-    let Some(deduced_type) = included_types.next() else {
-        return declared_type;
-    };
-    if included_types.any(|type_| type_.id != deduced_type.id) {
-        return declared_type;
-    }
     match declared_type {
         Type::Struct(declared_type) if declared_type.id == deduced_type.id => {
             Type::Struct(declared_type)
