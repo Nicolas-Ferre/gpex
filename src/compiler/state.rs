@@ -50,21 +50,12 @@ impl<'item> State<'item> {
         .into();
     }
 
-    pub(crate) fn set_expr_type_facts(
-        &mut self,
-        node_id: u64,
-        facts_id: Option<TypeFactsId>,
-    ) -> bool {
+    pub(crate) fn set_expr_type_facts(&mut self, node_id: u64, facts_id: TypeFactsId) -> bool {
         let previous_facts = self.expr_type_facts(node_id);
-        let new_facts = facts_id.map(|id| self.type_facts(id));
-        if previous_facts == new_facts {
+        if previous_facts == Some(self.type_facts(facts_id)) {
             return false;
         }
-        if let Some(facts_id) = facts_id {
-            self.type_facts.insert(node_id, facts_id);
-        } else {
-            self.type_facts.remove(&node_id);
-        }
+        self.type_facts.insert(node_id, facts_id);
         true
     }
 

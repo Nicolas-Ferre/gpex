@@ -185,7 +185,7 @@ impl<'state, 'item> IndexState<'state, 'item> {
         self.has_index_changed = true;
     }
 
-    fn set_expr_type_facts(&mut self, node_id: u64, facts_id: Option<TypeFactsId>) {
+    fn set_expr_type_facts(&mut self, node_id: u64, facts_id: TypeFactsId) {
         self.has_index_changed |= self.inner.set_expr_type_facts(node_id, facts_id);
     }
 }
