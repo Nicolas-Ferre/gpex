@@ -16,7 +16,6 @@ pub(crate) struct State<'item> {
     pub(crate) candidate_sources: HashMap<u64, Vec<ItemRef<'item>>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
-    pub(crate) is_indexing_source_only: bool, // TODO: move to IndexState
     type_fact_details: Vec<TypeFacts<'item>>,
     type_facts: HashMap<u64, TypeFactsId>,
     scopes: RefCell<Vec<Scope<'item>>>,
@@ -32,7 +31,6 @@ impl<'item> State<'item> {
             candidate_sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
-            is_indexing_source_only: false,
             type_fact_details: Vec::default(),
             type_facts: HashMap::default(),
             scopes: RefCell::default(),

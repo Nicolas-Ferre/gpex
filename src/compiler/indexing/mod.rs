@@ -79,7 +79,7 @@ fn index_consts_until_full_registration<'item>(
     modules: &'item [Module],
     state: &mut IndexState<'_, 'item>,
 ) {
-    state.inner.is_indexing_source_only = true;
+    state.is_indexing_source_only = true;
     // loop is used to support items referred in function signatures but defined later
     loop {
         let source_count = state.inner.sources.len();
@@ -90,7 +90,7 @@ fn index_consts_until_full_registration<'item>(
             break;
         }
     }
-    state.inner.is_indexing_source_only = false;
+    state.is_indexing_source_only = false;
     for module in modules {
         index_consts(module, state);
     }
@@ -159,6 +159,7 @@ fn index_statement_refs<'item>(statement: &'item Statement, state: &mut IndexSta
 struct IndexState<'state, 'item> {
     inner: &'state mut State<'item>,
     type_narrowing: TypeNarrowingState,
+    is_indexing_source_only: bool,
 }
 
 impl<'state, 'item> IndexState<'state, 'item> {
@@ -166,6 +167,7 @@ impl<'state, 'item> IndexState<'state, 'item> {
         Self {
             inner: state,
             type_narrowing: TypeNarrowingState::default(),
+            is_indexing_source_only: false,
         }
     }
 }

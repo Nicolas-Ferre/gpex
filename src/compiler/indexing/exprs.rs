@@ -24,7 +24,7 @@ pub(super) fn index_expr<'item>(expr: &'item Expr, state: &mut IndexState<'_, 'i
 
 // TODO: to be checked that there is no issue with function not yet indexed (possible case with type narrowing inside a require clause)
 pub(super) fn index_call<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
-    if state.inner.is_indexing_source_only && state.inner.sources.contains_key(&call.id) {
+    if state.is_indexing_source_only && state.inner.sources.contains_key(&call.id) {
         return;
     }
     if call.name == BINARY_AND_FN_NAME {
@@ -64,7 +64,7 @@ fn index_call_source<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>
 }
 
 fn index_ident<'item>(ident: &'item Ident, state: &mut IndexState<'_, 'item>) {
-    if state.inner.is_indexing_source_only && state.inner.sources.contains_key(&ident.id) {
+    if state.is_indexing_source_only && state.inner.sources.contains_key(&ident.id) {
         return;
     }
     let search_params = SearchParams {
@@ -147,7 +147,7 @@ fn index_call_candidates<'item>(
     candidates: Vec<ItemRef<'item>>,
     state: &mut IndexState<'_, 'item>,
 ) {
-    if state.inner.is_indexing_source_only {
+    if state.is_indexing_source_only {
         return;
     }
     if !candidates.is_empty() {
@@ -162,7 +162,7 @@ fn index_accessible_source<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     state.inner.sources.insert(node.id(), source);
-    if state.inner.is_indexing_source_only {
+    if state.is_indexing_source_only {
         return;
     }
     state
@@ -189,7 +189,7 @@ fn index_not_accessible_source<'item>(
     source: ItemRef<'item>,
     state: &mut IndexState<'_, 'item>,
 ) {
-    if state.inner.is_indexing_source_only {
+    if state.is_indexing_source_only {
         return;
     }
     state.inner.priv_sources.insert(node_id, source);
