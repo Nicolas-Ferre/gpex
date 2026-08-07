@@ -1,0 +1,15 @@
+const _RESULT = checked(1); // expected: true
+
+const fn checked(
+    value: const ? require typeof(value) == type_() && accepts(value)
+) -> bool {
+    return true;
+}
+
+const fn accepts(_value: const i32) -> bool {
+    return true;
+}
+
+const fn type_() -> typeref {
+    return i32;
+}

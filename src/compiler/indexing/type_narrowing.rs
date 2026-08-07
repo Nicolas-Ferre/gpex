@@ -32,14 +32,16 @@ pub(super) fn index_and_args<'item>(call: &'item Call, state: &mut IndexState<'_
 
 pub(super) fn index_ident<'item>(
     ident: &Ident,
-    source: ItemRef<'item>,
+    source: Option<ItemRef<'item>>,
     state: &mut IndexState<'_, 'item>,
 ) {
-    if let ItemRef::Param(param) = source
-        && let Some(facts_id) = state.type_narrowing.type_facts.get(&param.id).copied()
-    {
-        state.inner.add_expr_type_facts(ident.id, facts_id);
-    }
+    let facts_id = match source {
+        Some(ItemRef::Param(param)) => state.type_narrowing.type_facts.get(&param.id).copied(),
+        Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_)) | None => {
+            None
+        }
+    };
+    state.set_expr_type_facts(ident.id, facts_id);
 }
 
 fn add_type_facts<'item>(

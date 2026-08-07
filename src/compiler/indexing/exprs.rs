@@ -1,5 +1,5 @@
 use crate::compiler::indexing::{
-    CallSource, FN_CALL_SEARCH_CONFIG, IDENT_SEARCH_CONFIG, IndexState, type_narrowing,
+    CallSource, FN_CALL_SEARCH_CONFIG, IDENT_SEARCH_CONFIG, IndexPhase, IndexState, type_narrowing,
 };
 use crate::compiler::item_ref::{ArgsMatch, ItemRef};
 use crate::compiler::parsing::exprs::calls::Call;
@@ -22,11 +22,7 @@ pub(super) fn index_expr<'item>(expr: &'item Expr, state: &mut IndexState<'_, 'i
     }
 }
 
-// TODO: to be checked that there is no issue with function not yet indexed (possible case with type narrowing inside a require clause)
 pub(super) fn index_call<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
-    if state.is_indexing_source_only && state.inner.sources.contains_key(&call.id) {
-        return;
-    }
     if call.name == BINARY_AND_FN_NAME {
         type_narrowing::index_and_args(call, state);
     } else {
@@ -45,7 +41,10 @@ fn index_call_source<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>
         config: FN_CALL_SEARCH_CONFIG,
     };
     match search_accessible_call_source(call, search_params, state.inner) {
-        CallSource::Found(source) => index_accessible_source(&call, call.span, source, state),
+        CallSource::Found(source) => {
+            index_accessible_source(&call, call.span, source, state);
+            state.set_expr_source(call.id(), Some(source));
+        }
         CallSource::NotFound => {
             if let Some(source) =
                 search_not_accessible_call_source(call, search_params, state.inner)
@@ -55,18 +54,17 @@ fn index_call_source<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>
                 let candidates = search_candidate_call_sources(search_params, state.inner);
                 index_call_candidates(call.id, candidates, state);
             }
+            state.set_expr_source(call.id, None);
         }
         CallSource::Unknown => {
             let candidates = search_candidate_call_sources(search_params, state.inner);
             index_call_candidates(call.id, candidates, state);
+            state.set_expr_source(call.id, None);
         }
     }
 }
 
 fn index_ident<'item>(ident: &'item Ident, state: &mut IndexState<'_, 'item>) {
-    if state.is_indexing_source_only && state.inner.sources.contains_key(&ident.id) {
-        return;
-    }
     let search_params = SearchParams {
         key: &ident.slice,
         location: ident,
@@ -75,11 +73,15 @@ fn index_ident<'item>(ident: &'item Ident, state: &mut IndexState<'_, 'item>) {
     };
     let matching_value = search_accessible_ident_source(search_params, state.inner);
     if let Some(source) = matching_value {
-        type_narrowing::index_ident(ident, source, state);
         index_accessible_source(&ident, ident.span, source, state);
-    } else if let Some(source) = search_not_accessible_ident_source(search_params, state.inner) {
-        index_not_accessible_source(ident.id, source, state);
+        state.set_expr_source(ident.id(), Some(source));
+    } else {
+        if let Some(source) = search_not_accessible_ident_source(search_params, state.inner) {
+            index_not_accessible_source(ident.id, source, state);
+        }
+        state.set_expr_source(ident.id, None);
     }
+    type_narrowing::index_ident(ident, matching_value, state);
 }
 
 fn search_accessible_call_source<'item>(
@@ -147,7 +149,7 @@ fn index_call_candidates<'item>(
     candidates: Vec<ItemRef<'item>>,
     state: &mut IndexState<'_, 'item>,
 ) {
-    if state.is_indexing_source_only {
+    if state.phase == IndexPhase::Converging {
         return;
     }
     if !candidates.is_empty() {
@@ -161,8 +163,7 @@ fn index_accessible_source<'item>(
     source: ItemRef<'item>,
     state: &mut IndexState<'_, 'item>,
 ) {
-    state.inner.sources.insert(node.id(), source);
-    if state.is_indexing_source_only {
+    if state.phase == IndexPhase::Converging {
         return;
     }
     state
@@ -189,7 +190,7 @@ fn index_not_accessible_source<'item>(
     source: ItemRef<'item>,
     state: &mut IndexState<'_, 'item>,
 ) {
-    if state.is_indexing_source_only {
+    if state.phase == IndexPhase::Converging {
         return;
     }
     state.inner.priv_sources.insert(node_id, source);

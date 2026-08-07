@@ -8,7 +8,7 @@ use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::parsing::statements::Statement;
 use crate::compiler::prelude::PRELUDE_FILE_COUNT;
-use crate::compiler::state::State;
+use crate::compiler::state::{State, TypeFactsId};
 use crate::utils::indexing::SearchConfig;
 
 pub(crate) const FN_CALL_SEARCH_CONFIG: SearchConfig = SearchConfig {
@@ -79,18 +79,17 @@ fn index_consts_until_full_registration<'item>(
     modules: &'item [Module],
     state: &mut IndexState<'_, 'item>,
 ) {
-    state.is_indexing_source_only = true;
     // loop is used to support items referred in function signatures but defined later
     loop {
-        let source_count = state.inner.sources.len();
+        state.has_index_changed = false;
         for module in modules {
             index_consts(module, state);
         }
-        if state.inner.sources.len() == source_count {
+        if !state.has_index_changed {
             break;
         }
     }
-    state.is_indexing_source_only = false;
+    state.phase = IndexPhase::Final;
     for module in modules {
         index_consts(module, state);
     }
@@ -159,7 +158,8 @@ fn index_statement_refs<'item>(statement: &'item Statement, state: &mut IndexSta
 struct IndexState<'state, 'item> {
     inner: &'state mut State<'item>,
     type_narrowing: TypeNarrowingState,
-    is_indexing_source_only: bool,
+    phase: IndexPhase,
+    has_index_changed: bool,
 }
 
 impl<'state, 'item> IndexState<'state, 'item> {
@@ -167,9 +167,33 @@ impl<'state, 'item> IndexState<'state, 'item> {
         Self {
             inner: state,
             type_narrowing: TypeNarrowingState::default(),
-            is_indexing_source_only: false,
+            phase: IndexPhase::Converging,
+            has_index_changed: false,
         }
     }
+
+    fn set_expr_source(&mut self, node_id: u64, source: Option<ItemRef<'item>>) {
+        let previous_source = self.inner.sources.get(&node_id).copied();
+        if previous_source == source {
+            return;
+        }
+        if let Some(source) = source {
+            self.inner.sources.insert(node_id, source);
+        } else {
+            self.inner.sources.remove(&node_id);
+        }
+        self.has_index_changed = true;
+    }
+
+    fn set_expr_type_facts(&mut self, node_id: u64, facts_id: Option<TypeFactsId>) {
+        self.has_index_changed |= self.inner.set_expr_type_facts(node_id, facts_id);
+    }
+}
+
+#[derive(PartialEq, Eq)]
+enum IndexPhase {
+    Converging,
+    Final,
 }
 
 enum CallSource<'item> {

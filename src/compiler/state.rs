@@ -50,6 +50,24 @@ impl<'item> State<'item> {
         .into();
     }
 
+    pub(crate) fn set_expr_type_facts(
+        &mut self,
+        node_id: u64,
+        facts_id: Option<TypeFactsId>,
+    ) -> bool {
+        let previous_facts = self.expr_type_facts(node_id);
+        let new_facts = facts_id.map(|id| self.type_facts(id));
+        if previous_facts == new_facts {
+            return false;
+        }
+        if let Some(facts_id) = facts_id {
+            self.type_facts.insert(node_id, facts_id);
+        } else {
+            self.type_facts.remove(&node_id);
+        }
+        true
+    }
+
     pub(crate) fn expr_type_facts(&self, node_id: u64) -> Option<&TypeFacts<'item>> {
         self.type_facts.get(&node_id).map(|id| self.type_facts(*id))
     }
@@ -62,10 +80,6 @@ impl<'item> State<'item> {
         let id = TypeFactsId(self.type_fact_details.len());
         self.type_fact_details.push(facts);
         id
-    }
-
-    pub(crate) fn add_expr_type_facts(&mut self, node_id: u64, facts_id: TypeFactsId) {
-        self.type_facts.insert(node_id, facts_id);
     }
 
     pub(crate) fn search_prelude_type(&self, type_name: &str) -> &'item StructDefinition {
@@ -157,7 +171,7 @@ impl<'item> State<'item> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct TypeFactsId(usize);
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct TypeFacts<'item> {
     pub(crate) included_types: HashMap<u64, &'item StructDefinition>,
 }
