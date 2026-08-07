@@ -22,7 +22,8 @@ struct TypeFact<'item> {
 
 pub(super) fn index_and_args<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
     exprs::index_expr(&call.args[0].value, state);
-    let facts = type_facts(&call.args[0].value, state.inner);
+    let mut facts = HashMap::new();
+    collect_type_facts(&call.args[0].value, state.inner, &mut facts);
     let previous_facts = state.type_narrowing.type_facts.clone();
     add_type_facts(facts, state);
     exprs::index_expr(&call.args[1].value, state);
@@ -45,7 +46,6 @@ fn add_type_facts<'item>(
     included_item_types: HashMap<u64, Vec<&'item StructDefinition>>,
     state: &mut IndexState<'_, 'item>,
 ) {
-    // TODO: could it be simplified by mutating the fact instead of cloning it?
     for (item_id, included_types) in included_item_types {
         let mut facts = state
             .type_narrowing
@@ -61,29 +61,27 @@ fn add_type_facts<'item>(
     }
 }
 
-// TODO: Instead, collect in a hashmap passed as mut ref
-fn type_facts<'item>(
+fn collect_type_facts<'item>(
     expr: &'item Expr,
     state: &State<'item>,
-) -> HashMap<u64, Vec<&'item StructDefinition>> {
+    facts: &mut HashMap<u64, Vec<&'item StructDefinition>>,
+) {
     match expr {
-        Expr::Parenthesized(parenthesized) => type_facts(&parenthesized.value, state),
+        Expr::Parenthesized(parenthesized) => {
+            collect_type_facts(&parenthesized.value, state, facts);
+        }
         Expr::Call(call)
             if queries::calls::is_binary_intrinsic(call, BinaryIntrinsicFn::And, state) =>
         {
-            let mut facts = type_facts(&call.args[0].value, state);
-            for (item_id, included_types) in type_facts(&call.args[1].value, state) {
-                facts.entry(item_id).or_default().extend(included_types);
-            }
-            facts
+            collect_type_facts(&call.args[0].value, state, facts);
+            collect_type_facts(&call.args[1].value, state, facts);
         }
         Expr::Call(call)
             if queries::calls::is_binary_intrinsic(call, BinaryIntrinsicFn::Eq, state) =>
         {
-            equality_type_fact(call, state)
-                .map(|fact| (fact.item_id, vec![fact.type_]))
-                .into_iter()
-                .collect()
+            if let Some(fact) = equality_type_fact(call, state) {
+                facts.entry(fact.item_id).or_default().push(fact.type_);
+            }
         }
         Expr::F32Literal(_)
         | Expr::U32Literal(_)
@@ -91,7 +89,7 @@ fn type_facts<'item>(
         | Expr::BoolLiteral(_)
         | Expr::Wildcard(_)
         | Expr::Call(_)
-        | Expr::Ident(_) => HashMap::default(),
+        | Expr::Ident(_) => {}
     }
 }
 
