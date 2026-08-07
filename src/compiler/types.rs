@@ -131,11 +131,8 @@ fn param_ident_type<'item>(
         return declared_type;
     };
     match declared_type {
-        Type::Struct(declared_type) if declared_type.id == deduced_type.id => {
-            Type::Struct(declared_type)
-        }
         Type::Param(_) | Type::Wildcard(_) => Type::Struct(deduced_type),
-        Type::Struct(_) | Type::NoReturn | Type::Unknown => Type::Unknown,
+        Type::Struct(_) | Type::NoReturn | Type::Unknown => declared_type,
     }
 }
 
