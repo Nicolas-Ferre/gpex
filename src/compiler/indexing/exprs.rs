@@ -23,7 +23,7 @@ pub(super) fn index_expr<'item>(expr: &'item Expr, state: &mut IndexState<'_, 'i
 }
 
 pub(super) fn index_call<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
-    if call.name == BINARY_AND_FN_NAME {
+    if call.name == BINARY_AND_FN_NAME && call.args.len() == 2 {
         type_narrowing::index_and_args(call, state);
     } else {
         for arg in &call.args {

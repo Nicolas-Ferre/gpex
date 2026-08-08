@@ -1,3 +1,13 @@
+error: `__and__()` item not found
+│  → <root>/test_invalid_and_operator_call.gpex:1:15
+│    ¦ var _no_arg = __and__();
+│    ¦               ^^^^^^^^^
+┴
+error: `__and__(bool)` item not found
+│  → <root>/test_invalid_and_operator_call.gpex:2:16
+│    ¦ var _one_arg = __and__(true);
+│    ¦                ^^^^^^^^^^^^^
+┴
 error: `_called(u32, f32)` item not found
 │  → <root>/test_mismatching_dependent_type.gpex:1:13
 │    ¦ var _item = _called(0u, 0.0);
