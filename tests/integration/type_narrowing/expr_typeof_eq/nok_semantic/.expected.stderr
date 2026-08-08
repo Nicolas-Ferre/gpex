@@ -4,14 +4,14 @@ error: type fact leaving `typeof(param)` with no possible value
 │    ¦            ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_fact_contradiction_typeof_param_dependent.gpex:2:12
+│  → <root>/test_fact_contradiction_typeof_param_dependent.gpex:2:36
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && param == 0;
-│    ¦            ^^^^^^^^^^^^^^^^^^^^
+│    ¦                                    ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_fact_contradiction_typeof_param_wildcard.gpex:2:12
+│  → <root>/test_fact_contradiction_typeof_param_wildcard.gpex:2:36
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && param == 1;
-│    ¦            ^^^^^^^^^^^^^^^^^^^^
+│    ¦                                    ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `__eq__(typeof(param), i32)` item not found
 │  → <root>/test_fact_typeof_non_param.gpex:6:44
@@ -32,11 +32,6 @@ error: `__eq__(typeof(param), i32)` item not found
 │    ¦ ) -> bool = intrinsic;
 │    ¦ ^^^^^^^^^
 ┴
-error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_fact_typeof_param_related.gpex:2:12
-│    ¦     return typeof(param) == i32 && related == 0;
-│    ¦            ^^^^^^^^^^^^^^^^^^^^
-┴
 error: `__eq__(typeof(param), i32)` item not found
 │  → <root>/test_fact_typeof_param_related.gpex:2:36
 │    ¦     return typeof(param) == i32 && related == 0;
@@ -55,11 +50,6 @@ error: `__eq__(typeof(param), i32)` item not found
 │    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦ ) -> bool = intrinsic;
 │    ¦ ^^^^^^^^^
-┴
-error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_form_fact_and_unknown_or_usage.gpex:2:13
-│    ¦     return (typeof(param) == i32 && param == 0) || param == 0;
-│    ¦             ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `__eq__(typeof(param), i32)` item not found
 │  → <root>/test_form_fact_and_unknown_or_usage.gpex:2:52

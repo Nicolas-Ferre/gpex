@@ -74,7 +74,7 @@ fn constrain_type<'item>(
 ) -> TypeFacts<'item> {
     if matches!(previous_facts, Some(TypeFacts::Contradicted))
         || is_contradicted_type_fact(previous_facts, constrained_type)
-        || !is_same_type(declared_type, constrained_type)
+        || !is_compatible_type(declared_type, constrained_type)
     {
         TypeFacts::Contradicted
     } else {
@@ -93,11 +93,12 @@ fn is_contradicted_type_fact(
     )
 }
 
-fn is_same_type(type_: Type<'_>, struct_: &StructDefinition) -> bool {
-    matches!(
-        type_,
-        Type::Struct(declared_type) if declared_type.id == struct_.id
-    )
+fn is_compatible_type(type_: Type<'_>, struct_: &StructDefinition) -> bool {
+    match type_ {
+        Type::Param(_) | Type::Wildcard(_) => true,
+        Type::Struct(declared_type) => declared_type.id == struct_.id,
+        Type::NoReturn | Type::Unknown => false,
+    }
 }
 
 fn collect_type_facts<'item>(
