@@ -7,7 +7,7 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::state::{State, TypeFacts};
+use crate::compiler::state::State;
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
@@ -125,12 +125,12 @@ fn param_ident_type<'item>(
     let Some(facts) = state.expr_type_facts(ident.id) else {
         return declared_type;
     };
-    match (declared_type, facts) {
-        (_, TypeFacts::Contradicted) => Type::Unknown,
-        (Type::Param(_) | Type::Wildcard(_), TypeFacts::Constrained(type_)) => Type::Struct(type_),
-        (Type::Struct(_) | Type::NoReturn | Type::Unknown, TypeFacts::Constrained(_)) => {
-            declared_type
-        }
+    if facts.is_type_contradicted(declared_type) {
+        return Type::Unknown;
+    }
+    match (declared_type, facts.required_type()) {
+        (Type::Param(_) | Type::Wildcard(_), Some(type_)) => Type::Struct(type_),
+        (Type::Struct(_) | Type::NoReturn | Type::Unknown, _) | (_, None) => declared_type,
     }
 }
 

@@ -6,7 +6,7 @@ use crate::compiler::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 use std::cell::RefCell;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 #[derive(Debug)]
@@ -173,10 +173,32 @@ impl<'item> State<'item> {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum TypeFacts<'item> {
-    Constrained(&'item StructDefinition),
-    Contradicted,
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub(crate) struct TypeFacts<'item> {
+    required_types: HashSet<&'item StructDefinition>,
+}
+
+impl<'item> TypeFacts<'item> {
+    pub(crate) fn required_type(&self) -> Option<&'item StructDefinition> {
+        (self.required_types.len() == 1)
+            .then(|| self.required_types.iter().next().copied())
+            .flatten()
+    }
+
+    pub(crate) fn is_type_contradicted(&self, declared_type: Type<'item>) -> bool {
+        match declared_type {
+            Type::Param(_) | Type::Wildcard(_) => self.required_types.len() > 1,
+            Type::Struct(declared_type) => self
+                .required_types
+                .iter()
+                .any(|required_type| required_type.id != declared_type.id),
+            Type::NoReturn | Type::Unknown => !self.required_types.is_empty(),
+        }
+    }
+
+    pub(crate) fn add_required_type(&mut self, type_: &'item StructDefinition) {
+        self.required_types.insert(type_);
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

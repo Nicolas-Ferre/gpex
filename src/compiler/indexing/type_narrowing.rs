@@ -9,7 +9,7 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::queries;
 use crate::compiler::state::{State, TypeFacts};
-use crate::compiler::types::{self, Type};
+use crate::compiler::types;
 use crate::utils::parsing::span::Span;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -53,52 +53,24 @@ pub(super) fn index_ident<'item>(
 fn add_type_fact<'item>(fact: TypeFact<'item>, state: &mut IndexState<'_, 'item>) {
     let item_id = fact.param.id;
     let item_type = types::param_type(fact.param, state.inner);
-    let previous_facts = state.type_narrowing.type_facts.get(&item_id).cloned();
-    let new_facts = constrain_type(previous_facts.as_deref(), item_type, fact.type_);
-    let is_newly_contradicted = !matches!(previous_facts.as_deref(), Some(TypeFacts::Contradicted))
-        && matches!(new_facts, TypeFacts::Contradicted);
-    let contradicted_type_name_span = is_newly_contradicted.then_some(fact.type_name_span);
+    let mut facts = state
+        .type_narrowing
+        .type_facts
+        .get(&item_id)
+        .map(|facts| facts.as_ref().clone())
+        .unwrap_or_default();
+    let was_type_contradicted = facts.is_type_contradicted(item_type);
+    facts.add_required_type(fact.type_);
+    let is_type_contradicted = facts.is_type_contradicted(item_type);
+    let is_fact_newly_contradicted = !was_type_contradicted && is_type_contradicted;
+    let contradicted_type_name_span = is_fact_newly_contradicted.then_some(fact.type_name_span);
     state
         .inner
         .set_contradicted_type_name_span(fact.condition_node_id, contradicted_type_name_span);
     state
         .type_narrowing
         .type_facts
-        .insert(item_id, Rc::new(new_facts));
-}
-
-fn constrain_type<'item>(
-    previous_facts: Option<&TypeFacts<'item>>,
-    declared_type: Type<'item>,
-    constrained_type: &'item StructDefinition,
-) -> TypeFacts<'item> {
-    if matches!(previous_facts, Some(TypeFacts::Contradicted))
-        || is_contradicted_type_fact(previous_facts, constrained_type)
-        || !is_compatible_type(declared_type, constrained_type)
-    {
-        TypeFacts::Contradicted
-    } else {
-        TypeFacts::Constrained(constrained_type)
-    }
-}
-
-fn is_contradicted_type_fact(
-    facts: Option<&TypeFacts<'_>>,
-    constrained_type: &StructDefinition,
-) -> bool {
-    matches!(
-        facts,
-        Some(TypeFacts::Constrained(previous_type))
-            if previous_type.id != constrained_type.id
-    )
-}
-
-fn is_compatible_type(type_: Type<'_>, struct_: &StructDefinition) -> bool {
-    match type_ {
-        Type::Param(_) | Type::Wildcard(_) => true,
-        Type::Struct(declared_type) => declared_type.id == struct_.id,
-        Type::NoReturn | Type::Unknown => false,
-    }
+        .insert(item_id, Rc::new(facts));
 }
 
 fn collect_type_facts<'item>(
