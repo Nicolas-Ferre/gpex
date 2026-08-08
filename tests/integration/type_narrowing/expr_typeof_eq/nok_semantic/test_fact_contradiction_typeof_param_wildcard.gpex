@@ -1,6 +1,3 @@
 fn fn_(param: ?) -> bool {
     return typeof(param) == i32 && typeof(param) == u32 && param == 1;
 }
-
-var _result_i32 = fn_(0);
-var _result_other = fn_(0u);

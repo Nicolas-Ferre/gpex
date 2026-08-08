@@ -1,0 +1,3 @@
+fn fn_(param: i32) -> bool {
+    return typeof(param) == u32 && param == 1;
+}

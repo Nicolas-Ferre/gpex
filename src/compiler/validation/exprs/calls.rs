@@ -41,6 +41,13 @@ pub(crate) fn validate_call(
     if is_error_detected {
         return Err(ValidateError);
     }
+    if let Some(type_name_span) = state.inner.contradicted_type_name_spans(call.id) {
+        let type_name = state.context.slice(type_name_span);
+        state.add_log(logs::exprs::contradicted_type_fact(
+            type_name, call.span, state,
+        ));
+        return Err(ValidateError);
+    }
     let displayed_key = key_rendering::call_key(call, state.inner)?;
     let source =
         exprs::validate_source(source, call, call.span, &call.key(), &displayed_key, state)?;

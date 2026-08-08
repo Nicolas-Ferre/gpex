@@ -7,7 +7,7 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::state::State;
+use crate::compiler::state::{State, TypeFacts};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
@@ -122,17 +122,15 @@ fn param_ident_type<'item>(
     state: &State<'item>,
 ) -> Type<'item> {
     let declared_type = param_type(param, state);
-    let Some(deduced_type) = state
-        .expr_type_facts(ident.id)
-        .filter(|facts| facts.included_types.len() == 1)
-        .and_then(|facts| facts.included_types.iter().next())
-        .copied()
-    else {
+    let Some(facts) = state.expr_type_facts(ident.id) else {
         return declared_type;
     };
-    match declared_type {
-        Type::Param(_) | Type::Wildcard(_) => Type::Struct(deduced_type),
-        Type::Struct(_) | Type::NoReturn | Type::Unknown => declared_type,
+    match (declared_type, facts) {
+        (_, TypeFacts::Contradicted) => Type::Unknown,
+        (Type::Param(_) | Type::Wildcard(_), TypeFacts::Constrained(type_)) => Type::Struct(type_),
+        (Type::Struct(_) | Type::NoReturn | Type::Unknown, TypeFacts::Constrained(_)) => {
+            declared_type
+        }
     }
 }
 
