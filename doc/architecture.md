@@ -1,4 +1,4 @@
-# High level architecture
+# High-level architecture
 
 The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 
@@ -22,7 +22,7 @@ Key directories and files:
     - `parsing/`: AST definitions and parsing: modules, imports, items (functions, variables,
       structs, ...), expressions, statements. This layer also defines utility methods run on AST
       nodes.
-    - `indexing/`: Symbol table construction (imports, item references, ...).
+    - `indexing/`: Symbol table construction (imports, item references, type-fact inference, ...).
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...).
     - `validation/logs/`: Construction of user-facing compiler errors, warnings, and hints.

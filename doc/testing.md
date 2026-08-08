@@ -72,7 +72,7 @@ The following test domains are defined:
 - `tests/integration/logs/`: tests are organized per compiler log rendering behavior.
 - `tests/integration/prelude/`: tests are organized per built-in prelude item kind.
 - `tests/integration/type_narrowing/`: tests are organized by narrowing context and mechanism. Type
-  narrowing corresponds to path-local type facts inferred from compile time conditions.
+  narrowing corresponds to path-local type facts inferred from compile-time conditions.
 
 ### Test cases
 
