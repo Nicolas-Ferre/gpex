@@ -3,13 +3,13 @@ use crate::utils::parsing::span::Span;
 use crate::{Log, LogInner, LogLevel};
 
 pub(crate) fn contradicted_type_fact(
-    type_name: &str,
+    fact_subject: &str,
     fact_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
     Log {
         level: LogLevel::Error,
-        msg: format!("type fact leaving `{type_name}` with no possible value"),
+        msg: format!("type fact leaving `{fact_subject}` with no possible value"),
         location: Some(state.span_location(fact_span)),
         inner: vec![],
     }

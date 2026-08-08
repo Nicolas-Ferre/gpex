@@ -41,10 +41,12 @@ pub(crate) fn validate_call(
     if is_error_detected {
         return Err(ValidateError);
     }
-    if let Some(type_name_span) = state.inner.contradicted_type_name_spans(call.id) {
-        let type_name = state.context.slice(type_name_span);
+    if let Some(fact_subject_span) = state.inner.contradicted_type_fact_subject_span(call.id) {
+        let fact_subject = state.context.slice(fact_subject_span);
         state.add_log(logs::exprs::contradicted_type_fact(
-            type_name, call.span, state,
+            fact_subject,
+            call.span,
+            state,
         ));
         return Err(ValidateError);
     }

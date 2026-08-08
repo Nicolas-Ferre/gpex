@@ -18,7 +18,7 @@ pub(crate) struct State<'item> {
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
     type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
-    contradicted_type_name_spans: HashMap<u64, Span>,
+    contradicted_type_fact_subject_spans: HashMap<u64, Span>,
     scopes: RefCell<Vec<Scope<'item>>>,
     intrinsic_types: HashMap<u64, IntrinsicType>,
 }
@@ -33,7 +33,7 @@ impl<'item> State<'item> {
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
             type_facts: HashMap::default(),
-            contradicted_type_name_spans: HashMap::default(),
+            contradicted_type_fact_subject_spans: HashMap::default(),
             scopes: RefCell::default(),
             intrinsic_types: HashMap::default(),
         }
@@ -68,22 +68,26 @@ impl<'item> State<'item> {
         self.type_facts.get(&node_id).map(AsRef::as_ref)
     }
 
-    pub(crate) fn contradicted_type_name_spans(&self, condition_node_id: u64) -> Option<Span> {
-        self.contradicted_type_name_spans
+    pub(crate) fn contradicted_type_fact_subject_span(
+        &self,
+        condition_node_id: u64,
+    ) -> Option<Span> {
+        self.contradicted_type_fact_subject_spans
             .get(&condition_node_id)
             .copied()
     }
 
-    pub(crate) fn set_contradicted_type_name_span(
+    pub(crate) fn set_contradicted_type_fact_subject_span(
         &mut self,
         condition_node_id: u64,
-        type_name_span: Option<Span>,
+        fact_subject_span: Option<Span>,
     ) {
-        if let Some(type_name_span) = type_name_span {
-            self.contradicted_type_name_spans
-                .insert(condition_node_id, type_name_span);
+        if let Some(fact_subject_span) = fact_subject_span {
+            self.contradicted_type_fact_subject_spans
+                .insert(condition_node_id, fact_subject_span);
         } else {
-            self.contradicted_type_name_spans.remove(&condition_node_id);
+            self.contradicted_type_fact_subject_spans
+                .remove(&condition_node_id);
         }
     }
 

@@ -23,7 +23,7 @@ struct TypeFact<'item> {
     param: &'item Param,
     type_: &'item StructDefinition,
     condition_node_id: u64,
-    type_name_span: Span,
+    subject_span: Span,
 }
 
 pub(super) fn index_and_args<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
@@ -63,10 +63,12 @@ fn add_type_fact<'item>(fact: TypeFact<'item>, state: &mut IndexState<'_, 'item>
     facts.add_required_type(fact.type_);
     let is_type_contradicted = facts.is_type_contradicted(item_type);
     let is_fact_newly_contradicted = !was_type_contradicted && is_type_contradicted;
-    let contradicted_type_name_span = is_fact_newly_contradicted.then_some(fact.type_name_span);
-    state
-        .inner
-        .set_contradicted_type_name_span(fact.condition_node_id, contradicted_type_name_span);
+    let contradicted_type_fact_subject_span =
+        is_fact_newly_contradicted.then_some(fact.subject_span);
+    state.inner.set_contradicted_type_fact_subject_span(
+        fact.condition_node_id,
+        contradicted_type_fact_subject_span,
+    );
     state
         .type_narrowing
         .type_facts
@@ -125,7 +127,7 @@ fn equality_type_fact_from_exprs<'item>(
             param,
             type_,
             condition_node_id,
-            type_name_span: typeof_expr.span(),
+            subject_span: typeof_expr.span(),
         })
     } else {
         None
