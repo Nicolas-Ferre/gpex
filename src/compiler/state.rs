@@ -7,6 +7,7 @@ use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams,
 use crate::utils::parsing::span::Span;
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub(crate) struct State<'item> {
@@ -16,8 +17,7 @@ pub(crate) struct State<'item> {
     pub(crate) candidate_sources: HashMap<u64, Vec<ItemRef<'item>>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
-    type_fact_details: Vec<TypeFacts<'item>>,
-    type_facts: HashMap<u64, TypeFactsId>,
+    type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
     scopes: RefCell<Vec<Scope<'item>>>,
     intrinsic_types: HashMap<u64, IntrinsicType>,
 }
@@ -31,7 +31,6 @@ impl<'item> State<'item> {
             candidate_sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
-            type_fact_details: Vec::default(),
             type_facts: HashMap::default(),
             scopes: RefCell::default(),
             intrinsic_types: HashMap::default(),
@@ -50,27 +49,21 @@ impl<'item> State<'item> {
         .into();
     }
 
-    pub(crate) fn set_expr_type_facts(&mut self, node_id: u64, facts_id: TypeFactsId) -> bool {
+    pub(crate) fn set_expr_type_facts(
+        &mut self,
+        node_id: u64,
+        facts: Rc<TypeFacts<'item>>,
+    ) -> bool {
         let previous_facts = self.expr_type_facts(node_id);
-        if previous_facts == Some(self.type_facts(facts_id)) {
+        if previous_facts == Some(facts.as_ref()) {
             return false;
         }
-        self.type_facts.insert(node_id, facts_id);
+        self.type_facts.insert(node_id, facts);
         true
     }
 
     pub(crate) fn expr_type_facts(&self, node_id: u64) -> Option<&TypeFacts<'item>> {
-        self.type_facts.get(&node_id).map(|id| self.type_facts(*id))
-    }
-
-    pub(crate) fn type_facts(&self, id: TypeFactsId) -> &TypeFacts<'item> {
-        &self.type_fact_details[id.0]
-    }
-
-    pub(crate) fn add_type_facts(&mut self, facts: TypeFacts<'item>) -> TypeFactsId {
-        let id = TypeFactsId(self.type_fact_details.len());
-        self.type_fact_details.push(facts);
-        id
+        self.type_facts.get(&node_id).map(AsRef::as_ref)
     }
 
     pub(crate) fn search_prelude_type(&self, type_name: &str) -> &'item StructDefinition {
@@ -158,9 +151,6 @@ impl<'item> State<'item> {
         self.scopes.borrow_mut().pop();
     }
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct TypeFactsId(usize);
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct TypeFacts<'item> {

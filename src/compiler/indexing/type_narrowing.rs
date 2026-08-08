@@ -7,12 +7,13 @@ use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::queries;
-use crate::compiler::state::{State, TypeFactsId};
+use crate::compiler::state::{State, TypeFacts};
 use std::collections::HashMap;
+use std::rc::Rc;
 
 #[derive(Default)]
-pub(super) struct TypeNarrowingState {
-    type_facts: HashMap<u64, TypeFactsId>,
+pub(super) struct TypeNarrowingState<'item> {
+    type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
 }
 
 struct TypeFact<'item> {
@@ -36,9 +37,9 @@ pub(super) fn index_ident<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if let ItemRef::Param(param) = source
-        && let Some(facts_id) = state.type_narrowing.type_facts.get(&param.id).copied()
+        && let Some(facts) = state.type_narrowing.type_facts.get(&param.id).cloned()
     {
-        state.set_expr_type_facts(ident.id, facts_id);
+        state.set_expr_type_facts(ident.id, facts);
     }
 }
 
@@ -51,13 +52,15 @@ fn add_type_facts<'item>(
             .type_narrowing
             .type_facts
             .get(&item_id)
-            .map(|id| state.inner.type_facts(*id).clone())
+            .map(|facts| facts.as_ref().clone())
             .unwrap_or_default();
         for included_type in included_types {
             facts.add_included(included_type);
         }
-        let facts_id = state.inner.add_type_facts(facts);
-        state.type_narrowing.type_facts.insert(item_id, facts_id);
+        state
+            .type_narrowing
+            .type_facts
+            .insert(item_id, Rc::new(facts));
     }
 }
 
