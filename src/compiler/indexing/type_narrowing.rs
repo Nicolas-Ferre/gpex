@@ -62,9 +62,9 @@ fn add_type_fact<'item>(fact: TypeFact<'item>, state: &mut IndexState<'_, 'item>
     let was_type_contradicted = facts.is_type_contradicted(item_type);
     facts.add_required_type(fact.type_);
     let is_type_contradicted = facts.is_type_contradicted(item_type);
-    let is_fact_newly_contradicted = !was_type_contradicted && is_type_contradicted;
+    let is_type_newly_contradicted = !was_type_contradicted && is_type_contradicted;
     let contradicted_type_fact_subject_span =
-        is_fact_newly_contradicted.then_some(fact.subject_span);
+        is_type_newly_contradicted.then_some(fact.subject_span);
     state.inner.set_contradicted_type_fact_subject_span(
         fact.condition_node_id,
         contradicted_type_fact_subject_span,
