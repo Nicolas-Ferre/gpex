@@ -28,7 +28,7 @@ struct TypeFact<'item> {
 
 pub(super) fn index_and_args<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
     exprs::index_expr(&call.args[0].value, state);
-    let mut facts = Vec::new();
+    let mut facts = vec![];
     collect_type_facts(&call.args[0].value, state.inner, &mut facts);
     let previous_facts = state.type_narrowing.type_facts.clone();
     for fact in facts {

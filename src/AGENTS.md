@@ -9,6 +9,5 @@
   `crate::module::Type`)
 - Functions must always be qualified with their parent module.
 - Don't define structs in the middle of standalone functions.
-- Favor mutable methods (`&mut self`) before their corresponding immutable ones (`&self`).
 - Avoid wrapper types for light operations.
 - Keep context-specific equality logic local to the operation that needs it.
