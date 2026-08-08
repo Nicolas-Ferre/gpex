@@ -1,0 +1,4 @@
+var _no_arg = __and__();
+var _one_arg = __and__(true);
+
+// This test ensures type narrowing works correctly when calling && with an argument count other than two.

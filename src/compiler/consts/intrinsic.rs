@@ -33,6 +33,24 @@ pub(super) fn call_value<'item>(
     }
 }
 
+pub(super) fn decisive_left_value<'item>(
+    call: &Call,
+    source: &FnDefinition,
+    state: &State<'item>,
+) -> Option<ConstValue<'item>> {
+    let intrinsic = source.intrinsic()?;
+    let left = super::expr_value(&call.args.first()?.value, state);
+    match (intrinsic, left) {
+        (IntrinsicFn::Binary(BinaryIntrinsicFn::And), ConstValue::Bool(false)) => {
+            Some(ConstValue::Bool(false))
+        }
+        (IntrinsicFn::Binary(BinaryIntrinsicFn::Or), ConstValue::Bool(true)) => {
+            Some(ConstValue::Bool(true))
+        }
+        _ => None,
+    }
+}
+
 fn fn_binary_value<'item>(
     source: &'item FnDefinition,
     fn_: BinaryIntrinsicFn,

@@ -2,6 +2,7 @@ use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Arg;
+use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -85,7 +86,7 @@ pub(crate) fn expr_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item>
         Expr::BoolLiteral(_) => Type::Struct(state.search_prelude_type("bool")),
         Expr::Wildcard(_) => Type::Unknown,
         Expr::Call(call) => source_type(call.id, &call.args, state),
-        Expr::Ident(ident) => source_type(ident.id, &[], state),
+        Expr::Ident(ident) => ident_type(ident, state),
         Expr::Parenthesized(parenthesized) => expr_type(&parenthesized.value, state),
     }
 }
@@ -104,6 +105,37 @@ pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'it
     }
 }
 
+fn ident_type<'item>(ident: &Ident, state: &State<'item>) -> Type<'item> {
+    let Some(source) = state.sources.get(&ident.id).copied() else {
+        return Type::Unknown;
+    };
+    if let ItemRef::Param(param) = source {
+        param_ident_type(ident, param, state)
+    } else {
+        item_type(source, &[], state)
+    }
+}
+
+fn param_ident_type<'item>(
+    ident: &Ident,
+    param: &'item Param,
+    state: &State<'item>,
+) -> Type<'item> {
+    let declared_type = param_type(param, state);
+    let Some(deduced_type) = state
+        .expr_type_facts(ident.id)
+        .filter(|facts| facts.included_types.len() == 1)
+        .and_then(|facts| facts.included_types.iter().next())
+        .copied()
+    else {
+        return declared_type;
+    };
+    match declared_type {
+        Type::Param(_) | Type::Wildcard(_) => Type::Struct(deduced_type),
+        Type::Struct(_) | Type::NoReturn | Type::Unknown => declared_type,
+    }
+}
+
 fn source_type<'item>(node_id: u64, args: &[Arg], state: &State<'item>) -> Type<'item> {
     match state.sources.get(&node_id).copied() {
         Some(source) => item_type(source, args, state),
@@ -117,7 +149,7 @@ fn item_type<'item>(item: ItemRef<'item>, args: &[Arg], state: &State<'item>) ->
         ItemRef::Const(const_) => expr_type(&const_.value, state),
         ItemRef::Struct(_) => Type::Struct(state.search_prelude_type("typeref")),
         ItemRef::Fn(fn_) => const_fn_type(fn_, args, state),
-        ItemRef::Param(param) => param_type(param, state),
+        ItemRef::Param(_) => unreachable!("param type should be calculated elsewhere"),
     }
 }
 

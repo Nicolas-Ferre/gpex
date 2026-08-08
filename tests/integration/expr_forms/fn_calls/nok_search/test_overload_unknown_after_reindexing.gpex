@@ -1,0 +1,17 @@
+const _RESULT = narrowed(1);
+
+const fn selected(_value: const ?) -> bool {
+    return true;
+}
+
+const fn selected(_value: const i32 require invalid) -> bool {
+    return true;
+}
+
+const fn narrowed(param: const ?) -> bool {
+    return typeof(param) == type_() && selected(param);
+}
+
+const fn type_() -> typeref {
+    return i32;
+}

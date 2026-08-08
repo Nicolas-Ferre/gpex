@@ -1,13 +1,20 @@
 use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::items::fns::IntrinsicFn;
+use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::state::State;
 
 pub(crate) fn is_intrinsic(call: &Call, fn_: IntrinsicFn, state: &State<'_>) -> bool {
     matches!(
         state.sources.get(&call.id),
         Some(ItemRef::Fn(source)) if source.intrinsic() == Some(fn_)
+    )
+}
+
+pub(crate) fn is_binary_intrinsic(call: &Call, fn_: BinaryIntrinsicFn, state: &State<'_>) -> bool {
+    matches!(
+        state.sources.get(&call.id),
+        Some(ItemRef::Fn(source)) if source.intrinsic() == Some(IntrinsicFn::Binary(fn_))
     )
 }
 

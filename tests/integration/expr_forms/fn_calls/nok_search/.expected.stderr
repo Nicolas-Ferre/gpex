@@ -1,3 +1,13 @@
+error: `__and__()` item not found
+│  → <root>/test_invalid_and_operator_call.gpex:1:15
+│    ¦ var _no_arg = __and__();
+│    ¦               ^^^^^^^^^
+┴
+error: `__and__(bool)` item not found
+│  → <root>/test_invalid_and_operator_call.gpex:2:16
+│    ¦ var _one_arg = __and__(true);
+│    ¦                ^^^^^^^^^^^^^
+┴
 error: `_called(u32, f32)` item not found
 │  → <root>/test_mismatching_dependent_type.gpex:1:13
 │    ¦ var _item = _called(0u, 0.0);
@@ -29,4 +39,28 @@ error: `unknown` item not found
 │  → <root>/test_no_return_type_as_fn_call_arg.gpex:1:35
 │    ¦ const fn unknown_return_type() -> unknown {
 │    ¦                                   ^^^^^^^
+┴
+error: `invalid` item not found
+│  → <root>/test_overload_unknown_after_reindexing.gpex:7:45
+│    ¦ const fn selected(_value: const i32 require invalid) -> bool {
+│    ¦                                             ^^^^^^^
+┴
+error: `selected(i32)` item not found
+│  → <root>/test_overload_unknown_after_reindexing.gpex:12:40
+│    ¦     return typeof(param) == type_() && selected(param);
+│    ¦                                        ^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/test_overload_unknown_after_reindexing.gpex:7:10
+│    ¦ const fn selected(_value: const i32 require invalid) -> bool {
+│    ¦          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <root>/test_overload_unknown_after_reindexing.gpex:3:10
+│    ¦ const fn selected(_value: const ?) -> bool {
+│    ¦          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
+warning: `selected(?)` item unused
+│  → <root>/test_overload_unknown_after_reindexing.gpex:3:10
+│    ¦ const fn selected(_value: const ?) -> bool {
+│    ¦          ^^^^^^^^
+├─ hint: replace with `_selected`
 ┴

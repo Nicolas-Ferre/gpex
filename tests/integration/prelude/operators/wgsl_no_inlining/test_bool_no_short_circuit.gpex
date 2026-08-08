@@ -1,0 +1,4 @@
+var right = true;
+
+var _and = true && right; // expected: true
+var _or = false || right; // expected: true
