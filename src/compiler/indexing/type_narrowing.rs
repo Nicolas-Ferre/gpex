@@ -5,9 +5,12 @@ use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
+use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::queries;
 use crate::compiler::state::{State, TypeFacts};
+use crate::compiler::types;
+use crate::utils::parsing::span::Span;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -17,16 +20,20 @@ pub(super) struct TypeNarrowingState<'item> {
 }
 
 struct TypeFact<'item> {
-    item_id: u64,
+    param: &'item Param,
     type_: &'item StructDefinition,
+    condition_node_id: u64,
+    subject_span: Span,
 }
 
 pub(super) fn index_and_args<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
     exprs::index_expr(&call.args[0].value, state);
-    let mut facts = HashMap::new();
+    let mut facts = vec![];
     collect_type_facts(&call.args[0].value, state.inner, &mut facts);
     let previous_facts = state.type_narrowing.type_facts.clone();
-    add_type_facts(facts, state);
+    for fact in facts {
+        add_type_fact(fact, state);
+    }
     exprs::index_expr(&call.args[1].value, state);
     state.type_narrowing.type_facts = previous_facts;
 }
@@ -43,31 +50,35 @@ pub(super) fn index_ident<'item>(
     }
 }
 
-fn add_type_facts<'item>(
-    included_item_types: HashMap<u64, Vec<&'item StructDefinition>>,
-    state: &mut IndexState<'_, 'item>,
-) {
-    for (item_id, included_types) in included_item_types {
-        let mut facts = state
-            .type_narrowing
-            .type_facts
-            .get(&item_id)
-            .map(|facts| facts.as_ref().clone())
-            .unwrap_or_default();
-        for included_type in included_types {
-            facts.add_included(included_type);
-        }
-        state
-            .type_narrowing
-            .type_facts
-            .insert(item_id, Rc::new(facts));
-    }
+fn add_type_fact<'item>(fact: TypeFact<'item>, state: &mut IndexState<'_, 'item>) {
+    let item_id = fact.param.id;
+    let item_type = types::param_type(fact.param, state.inner);
+    let mut facts = state
+        .type_narrowing
+        .type_facts
+        .get(&item_id)
+        .map(|facts| facts.as_ref().clone())
+        .unwrap_or_default();
+    let was_type_contradicted = facts.is_type_contradicted(item_type);
+    facts.add_required_type(fact.type_);
+    let is_type_contradicted = facts.is_type_contradicted(item_type);
+    let is_type_newly_contradicted = !was_type_contradicted && is_type_contradicted;
+    let contradicted_type_fact_subject_span =
+        is_type_newly_contradicted.then_some(fact.subject_span);
+    state.inner.set_contradicted_type_fact_subject_span(
+        fact.condition_node_id,
+        contradicted_type_fact_subject_span,
+    );
+    state
+        .type_narrowing
+        .type_facts
+        .insert(item_id, Rc::new(facts));
 }
 
 fn collect_type_facts<'item>(
     expr: &'item Expr,
     state: &State<'item>,
-    facts: &mut HashMap<u64, Vec<&'item StructDefinition>>,
+    facts: &mut Vec<TypeFact<'item>>,
 ) {
     match expr {
         Expr::Parenthesized(parenthesized) => {
@@ -82,9 +93,7 @@ fn collect_type_facts<'item>(
         Expr::Call(call)
             if queries::calls::is_binary_intrinsic(call, BinaryIntrinsicFn::Eq, state) =>
         {
-            if let Some(fact) = equality_type_fact(call, state) {
-                facts.entry(fact.item_id).or_default().push(fact.type_);
-            }
+            facts.extend(equality_type_fact(call, state));
         }
         Expr::F32Literal(_)
         | Expr::U32Literal(_)
@@ -97,11 +106,13 @@ fn collect_type_facts<'item>(
 }
 
 fn equality_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
-    equality_type_fact_from_exprs(&call.args[0].value, &call.args[1].value, state)
-        .or_else(|| equality_type_fact_from_exprs(&call.args[1].value, &call.args[0].value, state))
+    equality_type_fact_from_exprs(call.id, &call.args[0].value, &call.args[1].value, state).or_else(
+        || equality_type_fact_from_exprs(call.id, &call.args[1].value, &call.args[0].value, state),
+    )
 }
 
 fn equality_type_fact_from_exprs<'item>(
+    condition_node_id: u64,
     typeof_expr: &Expr,
     type_expr: &Expr,
     state: &State<'item>,
@@ -109,12 +120,14 @@ fn equality_type_fact_from_exprs<'item>(
     if let Expr::Call(typeof_call) = unwrap_parentheses(typeof_expr)
         && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
         && let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value)
-        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id)
+        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
         && let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state)
     {
         Some(TypeFact {
-            item_id: param.id,
+            param,
             type_,
+            condition_node_id,
+            subject_span: typeof_expr.span(),
         })
     } else {
         None

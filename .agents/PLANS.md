@@ -40,24 +40,18 @@ Be complete, but avoid duplicated/unnecessary tests.
 Remain aligned with existing tests.
 Prioritize adding straightforward tests.
 
-#### Acceptance criteria
+#### Steps
 
-- Task is implemented as expected.
-- All necessary Markdown files are up-to-date.
-- All relevant root and nested `AGENTS.md` files are respected.
-- Tests are passing.
-- Fast linters are passing.
+- Implement previously described changes.
+- Update all necessary Markdown files.
+- Adapt changes to respect all root and nested AGENTS.md files.
+- Ensure tests are passing.
+- Ensure fast linters are passing.
 
 #### Assumptions
 
 - `<any useful assumption>`
 
-#### Risks / unknowns
+#### Risks / limitations / unknowns
 
 - `<concrete technical risk>` or `none`
-
-#### Open questions
-
-- Unresolved technical decisions.
-- Any point not clearly defined.
-- Assumptions that need confirmation before implementation.

@@ -2,6 +2,19 @@ use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::Span;
 use crate::{Log, LogInner, LogLevel};
 
+pub(crate) fn contradicted_type_fact(
+    fact_subject: &str,
+    fact_span: Span,
+    state: &ValidateState<'_, '_>,
+) -> Log {
+    Log {
+        level: LogLevel::Error,
+        msg: format!("type fact leaving `{fact_subject}` with no possible value"),
+        location: Some(state.span_location(fact_span)),
+        inner: vec![],
+    }
+}
+
 pub(crate) fn invalid_type(
     actual_type: &str,
     actual_span: Span,

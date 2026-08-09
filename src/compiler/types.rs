@@ -122,17 +122,15 @@ fn param_ident_type<'item>(
     state: &State<'item>,
 ) -> Type<'item> {
     let declared_type = param_type(param, state);
-    let Some(deduced_type) = state
-        .expr_type_facts(ident.id)
-        .filter(|facts| facts.included_types.len() == 1)
-        .and_then(|facts| facts.included_types.iter().next())
-        .copied()
-    else {
+    let Some(facts) = state.expr_type_facts(ident.id) else {
         return declared_type;
     };
-    match declared_type {
-        Type::Param(_) | Type::Wildcard(_) => Type::Struct(deduced_type),
-        Type::Struct(_) | Type::NoReturn | Type::Unknown => declared_type,
+    if facts.is_type_contradicted(declared_type) {
+        return Type::Unknown;
+    }
+    match (declared_type, facts.required_type()) {
+        (Type::Param(_) | Type::Wildcard(_), Some(type_)) => Type::Struct(type_),
+        (Type::Struct(_) | Type::NoReturn | Type::Unknown, _) | (_, None) => declared_type,
     }
 }
 

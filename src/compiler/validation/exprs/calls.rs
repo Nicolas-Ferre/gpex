@@ -41,6 +41,7 @@ pub(crate) fn validate_call(
     if is_error_detected {
         return Err(ValidateError);
     }
+    validate_contradicted_fact(call, state)?;
     let displayed_key = key_rendering::call_key(call, state.inner)?;
     let source =
         exprs::validate_source(source, call, call.span, &call.key(), &displayed_key, state)?;
@@ -63,6 +64,23 @@ pub(crate) fn validate_call(
     }
     validate_mul_add_candidate(call, state);
     Ok(())
+}
+
+fn validate_contradicted_fact(
+    call: &Call,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
+    if let Some(fact_subject_span) = state.inner.contradicted_type_fact_subject_span(call.id) {
+        let fact_subject = state.context.slice(fact_subject_span);
+        state.add_log(logs::exprs::contradicted_type_fact(
+            fact_subject,
+            call.span,
+            state,
+        ));
+        Err(ValidateError)
+    } else {
+        Ok(())
+    }
 }
 
 fn validate_arg_name(
