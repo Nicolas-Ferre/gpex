@@ -5,6 +5,8 @@ fn fn_(left: ?, right: ?) -> bool {
         && right == 2u;
 }
 
-var _result_i32_u32 = fn_(1, 2u); // expected: true
-var _result_other_u32 = fn_(3u, 2u); // expected: false
-var _result_i32_other = fn_(1, 4); // expected: false
+var _result_i32_one_u32_two = fn_(1, 2u); // expected: true
+var _result_i32_not_one_u32_two = fn_(2, 2u); // expected: false
+var _result_i32_one_u32_not_two = fn_(1, 3u); // expected: false
+var _result_not_i32_u32 = fn_(1u, 2u); // expected: false
+var _result_i32_not_u32 = fn_(1, 2); // expected: false

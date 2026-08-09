@@ -1,6 +1,7 @@
 fn fn_(param: ?) -> bool {
-    return typeof(param) != i32 || param == 2;
+    return typeof(param) != i32 || param == 1;
 }
 
-var _result_i32 = fn_(2); // expected: true
-var _result_other = fn_(3u); // expected: true
+var _result_i32_one = fn_(1); // expected: true
+var _result_i32_not_one = fn_(2); // expected: false
+var _result_not_i32 = fn_(1u); // expected: true
