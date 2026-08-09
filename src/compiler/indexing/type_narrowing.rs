@@ -26,10 +26,21 @@ struct TypeFact<'item> {
     subject_span: Span,
 }
 
-pub(super) fn index_and_args<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
+pub(super) fn index_logical_operation_args<'item>(
+    call: &'item Call,
+    logical_operator: BinaryIntrinsicFn,
+    comparison_operator: BinaryIntrinsicFn,
+    state: &mut IndexState<'_, 'item>,
+) {
     exprs::index_expr(&call.args[0].value, state);
     let mut facts = vec![];
-    collect_type_facts(&call.args[0].value, state.inner, &mut facts);
+    collect_type_facts(
+        &call.args[0].value,
+        logical_operator,
+        comparison_operator,
+        state.inner,
+        &mut facts,
+    );
     let previous_facts = state.type_narrowing.type_facts.clone();
     for fact in facts {
         add_type_fact(fact, state);
@@ -77,23 +88,36 @@ fn add_type_fact<'item>(fact: TypeFact<'item>, state: &mut IndexState<'_, 'item>
 
 fn collect_type_facts<'item>(
     expr: &'item Expr,
+    logical_operator: BinaryIntrinsicFn,
+    comparison_operator: BinaryIntrinsicFn,
     state: &State<'item>,
     facts: &mut Vec<TypeFact<'item>>,
 ) {
     match expr {
         Expr::Parenthesized(parenthesized) => {
-            collect_type_facts(&parenthesized.value, state, facts);
+            collect_type_facts(
+                &parenthesized.value,
+                logical_operator,
+                comparison_operator,
+                state,
+                facts,
+            );
+        }
+        Expr::Call(call) if queries::calls::is_binary_intrinsic(call, logical_operator, state) => {
+            for arg in &call.args {
+                collect_type_facts(
+                    &arg.value,
+                    logical_operator,
+                    comparison_operator,
+                    state,
+                    facts,
+                );
+            }
         }
         Expr::Call(call)
-            if queries::calls::is_binary_intrinsic(call, BinaryIntrinsicFn::And, state) =>
+            if queries::calls::is_binary_intrinsic(call, comparison_operator, state) =>
         {
-            collect_type_facts(&call.args[0].value, state, facts);
-            collect_type_facts(&call.args[1].value, state, facts);
-        }
-        Expr::Call(call)
-            if queries::calls::is_binary_intrinsic(call, BinaryIntrinsicFn::Eq, state) =>
-        {
-            facts.extend(equality_type_fact(call, state));
+            facts.extend(comparison_type_fact(call, state));
         }
         Expr::F32Literal(_)
         | Expr::U32Literal(_)
@@ -105,13 +129,14 @@ fn collect_type_facts<'item>(
     }
 }
 
-fn equality_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
-    equality_type_fact_from_exprs(call.id, &call.args[0].value, &call.args[1].value, state).or_else(
-        || equality_type_fact_from_exprs(call.id, &call.args[1].value, &call.args[0].value, state),
-    )
+fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
+    let left_arg = &call.args[0].value;
+    let right_arg = &call.args[1].value;
+    comparison_type_fact_from_exprs(call.id, left_arg, right_arg, state)
+        .or_else(|| comparison_type_fact_from_exprs(call.id, right_arg, left_arg, state))
 }
 
-fn equality_type_fact_from_exprs<'item>(
+fn comparison_type_fact_from_exprs<'item>(
     condition_node_id: u64,
     typeof_expr: &Expr,
     type_expr: &Expr,

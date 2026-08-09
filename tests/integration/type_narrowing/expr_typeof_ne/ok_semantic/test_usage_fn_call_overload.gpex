@@ -1,0 +1,14 @@
+fn called(_param: ?) -> bool {
+    return false;
+}
+
+fn called(param: i32) -> bool {
+    return param == 1;
+}
+
+fn fn_(param: ?) -> bool {
+    return typeof(param) != i32 || called(param);
+}
+
+var _result_i32 = fn_(1); // expected: true
+var _result_other = fn_(2u); // expected: true

@@ -1,0 +1,7 @@
+fn called(param: ?) -> typeof(param) {
+    return param;
+}
+
+fn _fn(param: ?) -> bool {
+    return typeof(called(param)) != i32 || param == 0;
+}

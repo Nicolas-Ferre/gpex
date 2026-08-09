@@ -1,0 +1,8 @@
+fn fn_(left: ?, right: ?) -> bool {
+    return (typeof(left) != i32)
+        || ((typeof(right) != u32) || left + 1 == 2 || right + 1u == 3u);
+}
+
+var _result_i32_u32 = fn_(1, 2u); // expected: true
+var _result_other_u32 = fn_(3u, 2u); // expected: true
+var _result_i32_other = fn_(1, 4); // expected: true

@@ -1,0 +1,8 @@
+const TYPE_ = i32;
+
+fn fn_(param: ?) -> bool {
+    return typeof(param) != TYPE_ || param == 1;
+}
+
+var _result_i32 = fn_(1); // expected: true
+var _result_other = fn_(2u); // expected: true
