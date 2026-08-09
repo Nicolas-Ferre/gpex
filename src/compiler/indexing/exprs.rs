@@ -1,10 +1,11 @@
+use crate::compiler::indexing::type_narrowing::LogicalTypeNarrowing;
 use crate::compiler::indexing::{
     CallSource, FN_CALL_SEARCH_CONFIG, IDENT_SEARCH_CONFIG, IndexPhase, IndexState, type_narrowing,
 };
 use crate::compiler::item_ref::{ArgsMatch, ItemRef};
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::exprs::{BINARY_AND_FN_NAME, Expr};
+use crate::compiler::parsing::exprs::{BINARY_AND_FN_NAME, BINARY_OR_FN_NAME, Expr};
 use crate::compiler::state::State;
 use crate::utils::indexing::{NodeRef, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
@@ -24,7 +25,9 @@ pub(super) fn index_expr<'item>(expr: &'item Expr, state: &mut IndexState<'_, 'i
 
 pub(super) fn index_call<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
     if call.name == BINARY_AND_FN_NAME && call.args.len() == 2 {
-        type_narrowing::index_and_args(call, state);
+        type_narrowing::index_logical_operation_args(call, LogicalTypeNarrowing::And, state);
+    } else if call.name == BINARY_OR_FN_NAME && call.args.len() == 2 {
+        type_narrowing::index_logical_operation_args(call, LogicalTypeNarrowing::Or, state);
     } else {
         for arg in &call.args {
             index_expr(&arg.value, state); // no-fn-check (recursivity)

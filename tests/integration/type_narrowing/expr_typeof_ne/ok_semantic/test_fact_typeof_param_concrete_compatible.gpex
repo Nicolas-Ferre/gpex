@@ -1,5 +1,5 @@
 fn fn_(param: i32) -> bool {
-    return typeof(param) == i32 && param == 1;
+    return typeof(param) != i32 || param == 1;
 }
 
 var _result_i32_one = fn_(1); // expected: true

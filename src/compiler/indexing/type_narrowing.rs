@@ -14,6 +14,28 @@ use crate::utils::parsing::span::Span;
 use std::collections::HashMap;
 use std::rc::Rc;
 
+#[derive(Clone, Copy)]
+pub(super) enum LogicalTypeNarrowing {
+    And,
+    Or,
+}
+
+impl LogicalTypeNarrowing {
+    pub(super) fn logical_operator(self) -> BinaryIntrinsicFn {
+        match self {
+            Self::And => BinaryIntrinsicFn::And,
+            Self::Or => BinaryIntrinsicFn::Or,
+        }
+    }
+
+    pub(super) fn comparison_operator(self) -> BinaryIntrinsicFn {
+        match self {
+            Self::And => BinaryIntrinsicFn::Eq,
+            Self::Or => BinaryIntrinsicFn::Ne,
+        }
+    }
+}
+
 #[derive(Default)]
 pub(super) struct TypeNarrowingState<'item> {
     type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
@@ -26,10 +48,14 @@ struct TypeFact<'item> {
     subject_span: Span,
 }
 
-pub(super) fn index_and_args<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>) {
+pub(super) fn index_logical_operation_args<'item>(
+    call: &'item Call,
+    narrowing: LogicalTypeNarrowing,
+    state: &mut IndexState<'_, 'item>,
+) {
     exprs::index_expr(&call.args[0].value, state);
     let mut facts = vec![];
-    collect_type_facts(&call.args[0].value, state.inner, &mut facts);
+    collect_type_facts(&call.args[0].value, narrowing, state.inner, &mut facts);
     let previous_facts = state.type_narrowing.type_facts.clone();
     for fact in facts {
         add_type_fact(fact, state);
@@ -77,23 +103,29 @@ fn add_type_fact<'item>(fact: TypeFact<'item>, state: &mut IndexState<'_, 'item>
 
 fn collect_type_facts<'item>(
     expr: &'item Expr,
+    narrowing: LogicalTypeNarrowing,
     state: &State<'item>,
     facts: &mut Vec<TypeFact<'item>>,
 ) {
     match expr {
         Expr::Parenthesized(parenthesized) => {
-            collect_type_facts(&parenthesized.value, state, facts);
+            collect_type_facts(&parenthesized.value, narrowing, state, facts);
         }
         Expr::Call(call)
-            if queries::calls::is_binary_intrinsic(call, BinaryIntrinsicFn::And, state) =>
+            if queries::calls::is_binary_intrinsic(call, narrowing.logical_operator(), state) =>
         {
-            collect_type_facts(&call.args[0].value, state, facts);
-            collect_type_facts(&call.args[1].value, state, facts);
+            for arg in &call.args {
+                collect_type_facts(&arg.value, narrowing, state, facts);
+            }
         }
         Expr::Call(call)
-            if queries::calls::is_binary_intrinsic(call, BinaryIntrinsicFn::Eq, state) =>
+            if queries::calls::is_binary_intrinsic(
+                call,
+                narrowing.comparison_operator(),
+                state,
+            ) =>
         {
-            facts.extend(equality_type_fact(call, state));
+            facts.extend(comparison_type_fact(call, state));
         }
         Expr::F32Literal(_)
         | Expr::U32Literal(_)
@@ -105,13 +137,14 @@ fn collect_type_facts<'item>(
     }
 }
 
-fn equality_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
-    equality_type_fact_from_exprs(call.id, &call.args[0].value, &call.args[1].value, state).or_else(
-        || equality_type_fact_from_exprs(call.id, &call.args[1].value, &call.args[0].value, state),
-    )
+fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
+    let left_arg = &call.args[0].value;
+    let right_arg = &call.args[1].value;
+    comparison_type_fact_from_exprs(call.id, left_arg, right_arg, state)
+        .or_else(|| comparison_type_fact_from_exprs(call.id, right_arg, left_arg, state))
 }
 
-fn equality_type_fact_from_exprs<'item>(
+fn comparison_type_fact_from_exprs<'item>(
     condition_node_id: u64,
     typeof_expr: &Expr,
     type_expr: &Expr,

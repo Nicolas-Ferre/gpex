@@ -1,0 +1,12 @@
+fn fn_(left: ?, right: ?) -> bool {
+    return typeof(left) != i32
+        || typeof(right) != u32
+        || left == 1
+        || right == 2u;
+}
+
+var _result_i32_one_u32_not_two = fn_(1, 3u); // expected: true
+var _result_i32_not_one_u32_two = fn_(2, 2u); // expected: true
+var _result_i32_not_one_u32_not_two = fn_(2, 3u); // expected: false
+var _result_not_i32_u32 = fn_(1u, 2u); // expected: true
+var _result_i32_not_u32 = fn_(1, 2); // expected: true
