@@ -1,15 +1,19 @@
 use crate::compiler::validation::ValidateState;
 use crate::utils::parsing::span::Span;
 use crate::{Log, LogInner, LogLevel};
+use itertools::Itertools;
 
-pub(crate) fn contradicted_type_fact(
-    fact_subject: &str,
+pub(crate) fn contradicted_type_fact<'subject>(
+    fact_subjects: impl Iterator<Item = &'subject str>,
     fact_span: Span,
     state: &ValidateState<'_, '_>,
 ) -> Log {
+    let fact_subjects = fact_subjects
+        .map(|subject| format!("`{subject}`"))
+        .join(" and ");
     Log {
         level: LogLevel::Error,
-        msg: format!("type fact leaving `{fact_subject}` with no possible value"),
+        msg: format!("type fact leaving {fact_subjects} with no possible value"),
         location: Some(state.span_location(fact_span)),
         inner: vec![],
     }

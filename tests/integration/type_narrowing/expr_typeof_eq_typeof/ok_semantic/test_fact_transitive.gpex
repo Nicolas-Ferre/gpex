@@ -1,0 +1,10 @@
+fn fn_(left: ?, middle: ?, right: ?) -> bool {
+    return typeof(left) == typeof(middle)
+        && typeof(middle) == typeof(right)
+        && typeof(left) == i32
+        && left + middle + right == 6;
+}
+
+var _result_i32_six = fn_(1, 2, 3); // expected: true
+var _result_i32_not_six = fn_(1, 2, 4); // expected: false
+var _result_not_i32 = fn_(1u, 2u, 3u); // expected: false

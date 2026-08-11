@@ -1,3 +1,6 @@
+mod facts;
+
+use self::facts::{ConcreteTypeFact, RelationTypeFact, TypeFact};
 use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::indexing::{IndexState, exprs};
 use crate::compiler::item_ref::ItemRef;
@@ -6,11 +9,8 @@ use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::queries;
 use crate::compiler::state::{State, TypeFacts};
-use crate::compiler::types;
-use crate::utils::parsing::span::Span;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -41,13 +41,6 @@ pub(super) struct TypeNarrowingState<'item> {
     type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
 }
 
-struct TypeFact<'item> {
-    param: &'item Param,
-    type_: &'item StructDefinition,
-    condition_node_id: u64,
-    subject_span: Span,
-}
-
 pub(super) fn index_logical_operation_args<'item>(
     call: &'item Call,
     narrowing: LogicalTypeNarrowing,
@@ -58,7 +51,7 @@ pub(super) fn index_logical_operation_args<'item>(
     collect_type_facts(&call.args[0].value, narrowing, state.inner, &mut facts);
     let previous_facts = state.type_narrowing.type_facts.clone();
     for fact in facts {
-        add_type_fact(fact, state);
+        fact.add(state);
     }
     exprs::index_expr(&call.args[1].value, state);
     state.type_narrowing.type_facts = previous_facts;
@@ -76,31 +69,6 @@ pub(super) fn index_ident<'item>(
     }
 }
 
-fn add_type_fact<'item>(fact: TypeFact<'item>, state: &mut IndexState<'_, 'item>) {
-    let item_id = fact.param.id;
-    let item_type = types::param_type(fact.param, state.inner);
-    let mut facts = state
-        .type_narrowing
-        .type_facts
-        .get(&item_id)
-        .map(|facts| facts.as_ref().clone())
-        .unwrap_or_default();
-    let was_type_contradicted = facts.is_type_contradicted(item_type);
-    facts.add_required_type(fact.type_);
-    let is_type_contradicted = facts.is_type_contradicted(item_type);
-    let is_type_newly_contradicted = !was_type_contradicted && is_type_contradicted;
-    let contradicted_type_fact_subject_span =
-        is_type_newly_contradicted.then_some(fact.subject_span);
-    state.inner.set_contradicted_type_fact_subject_span(
-        fact.condition_node_id,
-        contradicted_type_fact_subject_span,
-    );
-    state
-        .type_narrowing
-        .type_facts
-        .insert(item_id, Rc::new(facts));
-}
-
 fn collect_type_facts<'item>(
     expr: &'item Expr,
     narrowing: LogicalTypeNarrowing,
@@ -111,20 +79,12 @@ fn collect_type_facts<'item>(
         Expr::Parenthesized(parenthesized) => {
             collect_type_facts(&parenthesized.value, narrowing, state, facts);
         }
-        Expr::Call(call)
-            if queries::calls::is_binary_intrinsic(call, narrowing.logical_operator(), state) =>
-        {
+        Expr::Call(call) if is_logical_operator(call, narrowing, state) => {
             for arg in &call.args {
                 collect_type_facts(&arg.value, narrowing, state, facts);
             }
         }
-        Expr::Call(call)
-            if queries::calls::is_binary_intrinsic(
-                call,
-                narrowing.comparison_operator(),
-                state,
-            ) =>
-        {
+        Expr::Call(call) if is_comparison_operator(call, narrowing, state) => {
             facts.extend(comparison_type_fact(call, state));
         }
         Expr::F32Literal(_)
@@ -137,33 +97,66 @@ fn collect_type_facts<'item>(
     }
 }
 
+fn is_logical_operator(call: &Call, narrowing: LogicalTypeNarrowing, state: &State<'_>) -> bool {
+    queries::calls::is_binary_intrinsic(call, narrowing.logical_operator(), state)
+}
+
+fn is_comparison_operator(call: &Call, narrowing: LogicalTypeNarrowing, state: &State<'_>) -> bool {
+    queries::calls::is_binary_intrinsic(call, narrowing.comparison_operator(), state)
+}
+
 fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
-    comparison_type_fact_from_exprs(call.id, left_arg, right_arg, state)
-        .or_else(|| comparison_type_fact_from_exprs(call.id, right_arg, left_arg, state))
+    match (
+        typeof_param(left_arg, state),
+        typeof_param(right_arg, state),
+    ) {
+        (Some(left_param), Some(right_param)) => Some(TypeFact::Relation(RelationTypeFact {
+            params: [left_param, right_param],
+            condition_node_id: call.id,
+            subject_spans: [left_arg.span(), right_arg.span()],
+        })),
+        (Some(param), None) => concrete_type_fact(call.id, param, left_arg, right_arg, state),
+        (None, Some(param)) => concrete_type_fact(call.id, param, right_arg, left_arg, state),
+        (None, None) => None,
+    }
 }
 
-fn comparison_type_fact_from_exprs<'item>(
+fn concrete_type_fact<'item>(
     condition_node_id: u64,
+    param: &'item Param,
     typeof_expr: &Expr,
     type_expr: &Expr,
     state: &State<'item>,
 ) -> Option<TypeFact<'item>> {
-    if let Expr::Call(typeof_call) = unwrap_parentheses(typeof_expr)
-        && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
-        && let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value)
-        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
-        && let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state)
-    {
-        Some(TypeFact {
+    if let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state) {
+        Some(TypeFact::Concrete(ConcreteTypeFact {
             param,
             type_,
             condition_node_id,
             subject_span: typeof_expr.span(),
-        })
+        }))
     } else {
         None
+    }
+}
+
+fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
+    let Expr::Call(typeof_call) = unwrap_parentheses(expr) else {
+        return None;
+    };
+    if !queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state) {
+        return None;
+    }
+    let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value) else {
+        return None;
+    };
+    match state.sources.get(&ident.id).copied() {
+        Some(ItemRef::Param(param)) => Some(param),
+        Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_)) | None => {
+            None
+        }
     }
 }
 

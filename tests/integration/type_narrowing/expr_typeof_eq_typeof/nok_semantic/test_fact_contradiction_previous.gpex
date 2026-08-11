@@ -1,0 +1,6 @@
+fn _fn(left: ?, right: ?) -> bool {
+    return typeof(left) == i32
+        && typeof(right) == u32
+        && typeof(left) == typeof(right)
+        && true;
+}

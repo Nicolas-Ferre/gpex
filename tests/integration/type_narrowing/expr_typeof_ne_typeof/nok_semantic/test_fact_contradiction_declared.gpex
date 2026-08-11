@@ -1,0 +1,3 @@
+fn _fn(left: i32, right: u32) -> bool {
+    return typeof(left) != typeof(right) || false;
+}
