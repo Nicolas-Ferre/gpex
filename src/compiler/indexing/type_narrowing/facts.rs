@@ -93,7 +93,7 @@ impl<'item> RelationTypeFact<'item> {
         facts: &TypeFacts<'item>,
         state: &mut IndexState<'_, 'item>,
     ) {
-        let is_new_contradiction = self.is_new_contradiction(previous_facts, facts, state);
+        let is_new_contradiction = self.is_new_contradiction(previous_facts, facts, state); // no-fn-check (false positive)
         let subject_spans = is_new_contradiction.then(|| self.subject_spans.into_iter().collect());
         state
             .inner
