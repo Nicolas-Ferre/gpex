@@ -70,10 +70,12 @@ fn validate_contradicted_fact(
     call: &Call,
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    if let Some(fact_subject_span) = state.inner.contradicted_type_fact_subject_span(call.id) {
-        let fact_subject = state.context.slice(fact_subject_span);
+    if let Some(fact_subject_spans) = state.inner.contradicted_type_fact_subject_spans(call.id) {
+        let fact_subjects = fact_subject_spans
+            .iter()
+            .map(|span| state.context.slice(*span));
         state.add_log(logs::exprs::contradicted_type_fact(
-            fact_subject,
+            fact_subjects,
             call.span,
             state,
         ));

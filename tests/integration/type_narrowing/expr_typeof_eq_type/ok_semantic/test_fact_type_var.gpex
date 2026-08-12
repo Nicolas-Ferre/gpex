@@ -1,0 +1,5 @@
+var type_ = i32;
+
+fn _fn(param: ?) -> bool {
+    return typeof(param) == type_ && true;
+}

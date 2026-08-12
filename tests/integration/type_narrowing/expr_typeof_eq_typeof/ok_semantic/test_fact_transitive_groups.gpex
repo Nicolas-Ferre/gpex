@@ -1,0 +1,11 @@
+fn fn_(first: ?, second: ?, third: ?, fourth: ?) -> bool {
+    return typeof(first) == typeof(second)
+        && typeof(third) == typeof(fourth)
+        && typeof(second) == typeof(third)
+        && typeof(first) == i32
+        && first + second + third + fourth == 10;
+}
+
+var _result_i32_ten = fn_(1, 2, 3, 4); // expected: true
+var _result_i32_not_ten = fn_(1, 2, 3, 5); // expected: false
+var _result_not_i32 = fn_(1u, 2u, 3u, 4u); // expected: false

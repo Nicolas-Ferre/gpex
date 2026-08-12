@@ -18,7 +18,7 @@ pub(crate) struct State<'item> {
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
     type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
-    contradicted_type_fact_subject_spans: HashMap<u64, Span>,
+    contradicted_type_fact_subject_spans: HashMap<u64, Vec<Span>>,
     scopes: RefCell<Vec<Scope<'item>>>,
     intrinsic_types: HashMap<u64, IntrinsicType>,
 }
@@ -68,23 +68,23 @@ impl<'item> State<'item> {
         self.type_facts.get(&node_id).map(AsRef::as_ref)
     }
 
-    pub(crate) fn contradicted_type_fact_subject_span(
+    pub(crate) fn contradicted_type_fact_subject_spans(
         &self,
         condition_node_id: u64,
-    ) -> Option<Span> {
+    ) -> Option<&[Span]> {
         self.contradicted_type_fact_subject_spans
             .get(&condition_node_id)
-            .copied()
+            .map(Vec::as_slice)
     }
 
-    pub(crate) fn set_contradicted_type_fact_subject_span(
+    pub(crate) fn set_contradicted_type_fact_subject_spans(
         &mut self,
         condition_node_id: u64,
-        fact_subject_span: Option<Span>,
+        fact_subject_spans: Option<Vec<Span>>,
     ) {
-        if let Some(fact_subject_span) = fact_subject_span {
+        if let Some(fact_subject_spans) = fact_subject_spans {
             self.contradicted_type_fact_subject_spans
-                .insert(condition_node_id, fact_subject_span);
+                .insert(condition_node_id, fact_subject_spans);
         } else {
             self.contradicted_type_fact_subject_spans
                 .remove(&condition_node_id);
@@ -202,6 +202,10 @@ impl<'item> TypeFacts<'item> {
 
     pub(crate) fn add_required_type(&mut self, type_: &'item StructDefinition) {
         self.required_types.insert(type_);
+    }
+
+    pub(crate) fn add_required_types(&mut self, other: &Self) {
+        self.required_types.extend(&other.required_types);
     }
 }
 
