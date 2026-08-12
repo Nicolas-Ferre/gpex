@@ -47,8 +47,8 @@ impl<'item> ConcreteTypeFact<'item> {
         facts: &TypeFacts<'item>,
         state: &mut IndexState<'_, 'item>,
     ) {
-        let is_newly_contracted = self.is_new_contradiction(previous_facts, facts, state);
-        let subject_spans = is_newly_contracted.then(|| vec![self.subject_span]);
+        let is_new_contradiction = self.is_new_contradiction(previous_facts, facts, state);
+        let subject_spans = is_new_contradiction.then(|| vec![self.subject_span]);
         state
             .inner
             .set_contradicted_type_fact_subject_spans(self.condition_node_id, subject_spans);
