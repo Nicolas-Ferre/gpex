@@ -46,7 +46,7 @@ See `doc/testing.md`.
       <brief details and snippets about second answer>
       3. **<third answer>**
       <brief details and snippets about third answer>
-    
+
       Please choose option 1, 2, or 3.
       ```
     - Questions must be as straightforward, easy to read and easy to understand as possible.

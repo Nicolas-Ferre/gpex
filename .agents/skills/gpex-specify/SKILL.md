@@ -55,5 +55,3 @@ Verbosity should be limited at maximum to ease reading. Avoid AI marks such as e
 Minimize the changes in case the issue is already well described, and avoid unnecessary rephrasing.
 The number of bullets must be as small as possible: if multiple related bullets can be merged in a
 simple bullet without losing information, please do it.
-
-
