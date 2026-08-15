@@ -1,0 +1,10 @@
+error: type fact leaving `typeof(param)` with no possible value
+│  → <root>/test_invalid_expr_fact_contradiction.gpex:2:36
+│    ¦     return typeof(param) == i32 && typeof(param) == u32 && unknown();
+│    ¦                                    ^^^^^^^^^^^^^^^^^^^^
+┴
+error: `unknown()` item not found
+│  → <root>/test_invalid_expr_fact_contradiction.gpex:2:60
+│    ¦     return typeof(param) == i32 && typeof(param) == u32 && unknown();
+│    ¦                                                            ^^^^^^^^^
+┴

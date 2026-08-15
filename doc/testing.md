@@ -71,8 +71,14 @@ The following test domains are defined:
 - `tests/integration/items/`: tests are organized per item (variable, constant, function, ...)
 - `tests/integration/logs/`: tests are organized per compiler log rendering behavior.
 - `tests/integration/prelude/`: tests are organized per built-in prelude item kind.
-- `tests/integration/type_narrowing/`: tests are organized by narrowing context and mechanism. Type
-  narrowing corresponds to path-local type facts inferred from compile-time conditions.
+- `tests/integration/type_narrowing/`: tests are organized per narrowing form and concept, using the
+  naming convention `{operator}_{location}{optional sub-category}`:
+    - operator: type narrowing condition operator, e.g. `eq` (equal) and `ne` (not equal)
+    - location: tested location in the type narrowing expression (e.g. `fact` for the type fact
+      condition, and `usage` for the expression after the type fact)
+    - optional sub-category:
+        - `*_form_{left_operand}_{right_operand}` for tests related to a form of type fact
+        - `*_operand_{type}` for tests related to a specific type of operand in a type fact
 
 ### Test cases
 
