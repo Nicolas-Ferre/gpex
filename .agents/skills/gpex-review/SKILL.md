@@ -1,0 +1,62 @@
+---
+name: gpex-review
+description: Perform extensive code review of the current branch.
+---
+
+## Preconditions
+
+- If in plan mode, stop and ask to exit plan mode.
+
+## Task
+
+Review the changes of the current branch (compared to `main` branch).
+
+## Workflow
+
+- Run the sub-agents defined after.
+- Once all sub-agents are done, list only the found issues the following way:
+  ```markdown
+  1. [<subagent name>] **<first finding>**
+     <brief details and short snippet(s) of the proposed fix>
+  2. [<subagent name>] **<second finding>**
+     <brief details and short snippet(s) of the proposed fix>
+     ...
+  ```
+- Don't hesitate to illustrate the findings with snippets to make it easier to understand.
+
+## Sub-agents
+
+### Bug detection
+
+- Check all bugs related to the current branch changes.
+- Do not miss any bug.
+- If needed, bugs can be tested in `tmp/main.gpex`.
+
+### Architecture review
+
+Challenge the architecture and verify whether:
+
+- the solution is future-proof and will not cause issue with future changes in the project
+- the solution generalize well and avoid uncovered edge cases
+- the solution is not unnecessarily complicated
+
+### Tests review
+
+Check for missing tests, for example related to:
+
+- An uncovered code branch
+- An uncovered case specified in the GitHub issue and related to the current changes
+- An existing test that doesn't follow general conventions defined in documentation and AGENTS.md
+  files
+
+### Code quality check
+
+Check local code quality issues, such as:
+
+- readability/maintainability issues
+- inconsistent styling
+- bad practices
+- performance improvements
+- not followed conventions defined in AGENTS.md files
+- not up-to-date documentation
+- typos or weird formulations

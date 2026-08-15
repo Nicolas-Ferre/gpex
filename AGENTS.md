@@ -32,16 +32,31 @@ See `doc/testing.md`.
 
 ## Rules to absolutely respect
 
-- Don't use any skill automatically, except if explicitly stated
 - Always keep `README.md`, `AGENTS.md` and `doc/*.md` files up-to-date
 - Take into account all `AGENTS.md` files within the path of a modified file. For example, the file
   `./a/b/c.rs` should respect `./AGENTS.md`, `./a/AGENTS.md` and `./a/b/AGENTS.md` if they exist.
-- Plans must follow `.agents/PLANS.md`
-- Follow explicit and implicit conventions already existing in the codebase
-- New item names should be aligned with other existing items.
+- Never use the question tool, always ask them in Markdown:
+    - Ask them one-by-one.
+    - Display them using the following template:
+      ```
+      Question: **<the question>**
+      1. **<first answer>**
+      <brief details and snippets about first answer>
+      2. **<second answer>**
+      <brief details and snippets about second answer>
+      3. **<third answer>**
+      <brief details and snippets about third answer>
+    
+      Please choose option 1, 2, or 3.
+      ```
+    - Questions must be as straightforward, easy to read and easy to understand as possible.
+    - Illustrate each answer choice with a code snippet whenever possible to facilitate comparison
+      of answers.
 
 ## General coding guidelines
 
+- Follow explicit and implicit conventions already existing in the codebase
+- New item names should be aligned with other existing items.
 - For boolean variables and functions returning booleans:
     - Name should start with `is_`, `are_`, `has_` or `have_`.
     - Noun is placed before the adjective (e.g. `is_user_connected` instead of
