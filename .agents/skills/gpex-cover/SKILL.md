@@ -26,4 +26,6 @@ Run these steps in order:
     - Else continue.
 4. Simplify the found example at maximum.
 5. Create the same test in the most appropriate place in `tests/integration/`.
-6. Rollback the panic.
+6. Run the tests to ensure panic is reached.
+7. Rollback the panic.
+8. Run the tests to ensure they are now passing.
