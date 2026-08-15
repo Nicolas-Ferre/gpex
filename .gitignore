@@ -11,4 +11,7 @@ Cargo.lock
 .DS_Store
 .codex
 .claude
-.agents/skills
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/gpex-*/
