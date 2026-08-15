@@ -44,8 +44,8 @@ The subagents must return the full list of findings.
 
 Challenge the architecture and verify whether:
 
-- the solution is future-proof and will not cause issue with future changes in the project
-- the solution generalize well and avoid uncovered edge cases
+- the solution is future-proof and will not cause issues with future changes in the project
+- the solution generalizes well and avoids uncovered edge cases
 - the solution is not unnecessarily complicated
 
 ### Tests review
@@ -65,6 +65,6 @@ Check local code quality issues, such as:
 - inconsistent styling
 - bad practices
 - performance improvements
-- not followed conventions defined in AGENTS.md files
+- not followed conventions defined in `AGENTS.md` files
 - not up-to-date documentation
 - typos or weird formulations

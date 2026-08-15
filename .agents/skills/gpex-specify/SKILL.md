@@ -49,9 +49,9 @@ Short description of the issue with only the general idea of the issue.
   The entire "Steps" section can be skipped if the issue has only one trivial step.
 ````
 
-An example of description is available in `<specify skill folder>/resources/example.md`.
+An example of description is available in `resources/example.md`.
 
-Verbosity should be limited at maximum to ease reading. Avoid AI marks such as em-dash (`—`).
+Verbosity should be kept to a minimum to ease reading. Avoid AI marks such as em-dash (`—`).
 Minimize the changes in case the issue is already well described, and avoid unnecessary rephrasing.
 The number of bullets must be as small as possible: if multiple related bullets can be merged in a
 simple bullet without losing information, please do it.

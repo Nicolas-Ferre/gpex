@@ -15,7 +15,7 @@ Increase the test coverage for the provided code branch.
 
 Run these steps in order:
 
-1. Replace the branch by a panic.
+1. Replace the branch with a panic.
 2. Run the existing tests:
     - If a test panics, then restore the branch and stop, the branch is already covered.
     - Else continue.
@@ -27,5 +27,5 @@ Run these steps in order:
 4. Simplify the found example at maximum.
 5. Create the same test in the most appropriate place in `tests/integration/`.
 6. Run the tests to ensure panic is reached.
-7. Rollback the panic.
+7. Roll back the panic.
 8. Run the tests to ensure they are now passing.
