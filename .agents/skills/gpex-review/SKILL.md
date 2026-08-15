@@ -13,18 +13,24 @@ Review the changes of the current branch (compared to `main` branch).
 
 ## Workflow
 
-- Run the sub-agents defined after.
-- Once all sub-agents are done, list only the found issues the following way:
-  ```markdown
-  1. [<subagent name>] **<first finding>**
-     <brief details and short snippet(s) of the proposed fix>
-  2. [<subagent name>] **<second finding>**
-     <brief details and short snippet(s) of the proposed fix>
-     ...
-  ```
-- Don't hesitate to illustrate the findings with snippets to make it easier to understand.
+Run these steps in order:
+
+1. Run the sub-agents defined later.
+2. Once all sub-agents are done, list only the found issues the following way:
+
+```markdown
+1. [<subagent name>] **<first finding>**
+   <brief details and short snippet(s) of the proposed fix>
+2. [<subagent name>] **<second finding>**
+   <brief details and short snippet(s) of the proposed fix>
+   ...
+```
+
+Don't hesitate to illustrate the findings with snippets to make it easier to understand.
 
 ## Sub-agents
+
+Each subsection corresponds to a sub-agent to run during review.
 
 ### Bug detection
 

@@ -44,10 +44,9 @@ See `doc/testing.md`.
       <brief details and snippets about first answer>
       2. **<second answer>**
       <brief details and snippets about second answer>
-      3. **<third answer>**
-      <brief details and snippets about third answer>
+      ...
 
-      Please choose option 1, 2, or 3.
+      Please choose option 1, 2, or ...
       ```
     - Questions must be as straightforward, easy to read and easy to understand as possible.
     - Illustrate each answer choice with a code snippet whenever possible to facilitate comparison

@@ -13,11 +13,17 @@ Increase the test coverage for the provided code branch.
 
 ## Workflow
 
-- Replace the branch by a panic.
-- Ensure that tests are not panicking, else it means the branch is already covered.
-- In `tmp/`, create an example that triggers the panic. You can run
-  `cargo run --bin gpex -- compile tmp/` to verify if the panic is triggered.
-- If the branch is unreachable, just say it. Never modify production code.
-- Simplify the example at maximum.
-- Create the same test in the most appropriate place in `tests/integration/`.
-- Rollback the panic.
+Run these steps in order:
+
+1. Replace the branch by a panic.
+2. Run the existing tests:
+    - If a test panics, then restore the branch and stop, the branch is already covered.
+    - Else continue.
+3. In `tmp/`, create an example that triggers the panic. You can run
+   `cargo run --bin gpex -- compile tmp/ tmp/out.json` to verify if the panic is triggered.
+    - If the branch is unreachable, then restore the branch and stop. Don't try to modify the
+      production code to make the branch reachable.
+    - Else continue.
+4. Simplify the found example at maximum.
+5. Create the same test in the most appropriate place in `tests/integration/`.
+6. Rollback the panic.
