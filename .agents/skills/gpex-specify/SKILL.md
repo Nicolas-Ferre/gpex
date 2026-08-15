@@ -34,7 +34,7 @@ Short description of the issue with only the general idea of the issue.
 - A bullet list of important information about the aspect.
 
 ```zig,gpex
-// One example that demonstrate the aspect. Keep it as minimal as possible.
+// One example that demonstrates the aspect. Keep it as minimal as possible.
 ```
 
 ### Other aspect
@@ -43,10 +43,10 @@ Short description of the issue with only the general idea of the issue.
 
 ## Steps
 
-- A bullet list of PRs descriptions for each implementation step (make it as much as possible
-  granular, but each step must be end-to-end testable and isolated, so they will be be generally
-  transversal). Names should be short but contain enough the context to be unique across the
-  repository. The entire "Steps" section can be skipped if the issue has only one trivial step.
+- A bullet list of PR descriptions for each implementation step (make it as granular as possible,
+  but each step must be end-to-end testable and isolated, so they will generally be transversal).
+  Names should be short but contain enough context to be unique across the repository.
+  The entire "Steps" section can be skipped if the issue has only one trivial step.
 ````
 
 An example of description is available in `<specify skill folder>/resources/example.md`.

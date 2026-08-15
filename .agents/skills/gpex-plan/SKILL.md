@@ -1,7 +1,6 @@
 ---
 name: gpex-plan
 description: Define all necessary open points to plan a change.
-disable-model-invocation: true
 ---
 
 ## Preconditions
@@ -10,7 +9,7 @@ disable-model-invocation: true
 
 ## Task
 
-Perform technical design of the solution by asking all necessary question to ensure alignment
+Perform technical design of the solution by asking all necessary questions to ensure alignment
 on the following:
 
 - Scope of the task

@@ -32,6 +32,8 @@ Don't hesitate to illustrate the findings with snippets to make it easier to und
 
 Each subsection corresponds to a sub-agent to run during review.
 
+The subagents must return the full list of findings.
+
 ### Bug detection
 
 - Check all bugs related to the current branch changes.

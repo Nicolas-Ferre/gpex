@@ -55,7 +55,7 @@ var _error = identity(variable); // compilation error because runtime value is n
 
 ### `typeof` function
 
-- `typeof(_)` accept any valid expression, including runtime values.
+- `typeof(_)` accepts any valid expression, including runtime values.
 - `typeof(_)` returns the expression type as a constant `typeref` value.
 
 ## Steps
