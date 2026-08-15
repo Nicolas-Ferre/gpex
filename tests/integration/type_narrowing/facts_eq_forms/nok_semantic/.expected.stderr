@@ -36,3 +36,8 @@ error: `__eq__(typeof(param), i32)` item not found
 │    ¦ ) -> bool = intrinsic;
 │    ¦ ^^^^^^^^^
 ┴
+error: type fact leaving `typeof(param)` with no possible value
+│  → <root>/test_operands_reversed.gpex:2:12
+│    ¦     return u32 == typeof(param) && param == 0;
+│    ¦            ^^^^^^^^^^^^^^^^^^^^
+┴
