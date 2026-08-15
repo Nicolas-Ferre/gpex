@@ -1,15 +1,15 @@
 error: type fact leaving `typeof(left)` and `typeof(right)` with no possible value
-│  → <root>/test_fact_contradiction_declared.gpex:2:12
+│  → <root>/test_contradiction_declared.gpex:2:12
 │    ¦     return typeof(left) != typeof(right) || false;
 │    ¦            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(left)` and `typeof(right)` with no possible value
-│  → <root>/test_fact_contradiction_previous.gpex:4:12
+│  → <root>/test_contradiction_previous.gpex:4:12
 │    ¦         || typeof(left) != typeof(right)
 │    ¦            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `__eq__(typeof(right), i32)` item not found
-│  → <root>/test_fact_out_of_scope.gpex:4:12
+│  → <root>/test_out_of_scope.gpex:4:12
 │    ¦         || right == 0;
 │    ¦            ^^^^^^^^^^
 ├─ info: similar candidate
