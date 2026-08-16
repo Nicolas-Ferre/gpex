@@ -1,0 +1,7 @@
+fn fn_(type_: const typeref, value: type_) -> bool {
+    return ((type_)) != i32 || value == 1;
+}
+
+var _result_i32_one = fn_(i32, 1); // expected: true
+var _result_i32_not_one = fn_(i32, 2); // expected: false
+var _result_not_i32 = fn_(u32, 1u); // expected: true

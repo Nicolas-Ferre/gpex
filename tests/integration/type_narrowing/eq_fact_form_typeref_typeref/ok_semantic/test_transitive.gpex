@@ -1,0 +1,17 @@
+fn fn_(
+    left_type: const typeref,
+    left: left_type,
+    middle_type: const typeref,
+    middle: middle_type,
+    right_type: const typeref,
+    right: right_type,
+) -> bool {
+    return left_type == middle_type
+        && middle_type == right_type
+        && left_type == i32
+        && left + middle + right == 6;
+}
+
+var _result_i32_six = fn_(i32, 1, i32, 2, i32, 3); // expected: true
+var _result_i32_not_six = fn_(i32, 1, i32, 2, i32, 4); // expected: false
+var _result_not_i32 = fn_(u32, 1u, u32, 2u, u32, 3u); // expected: false

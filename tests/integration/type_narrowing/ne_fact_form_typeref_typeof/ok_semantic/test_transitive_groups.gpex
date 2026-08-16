@@ -1,0 +1,11 @@
+fn fn_(type_: const typeref, first: type_, second: ?, third: ?, fourth: ?) -> bool {
+    return type_ != typeof(second)
+        || typeof(third) != typeof(fourth)
+        || typeof(second) != typeof(third)
+        || type_ != i32
+        || first + second + third + fourth == 10;
+}
+
+var _result_i32_ten = fn_(i32, 1, 2, 3, 4); // expected: true
+var _result_i32_not_ten = fn_(i32, 1, 2, 3, 5); // expected: false
+var _result_not_i32 = fn_(u32, 1u, 2u, 3u, 4u); // expected: true

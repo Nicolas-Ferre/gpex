@@ -1,0 +1,15 @@
+fn called(_param: ?) -> bool {
+    return false;
+}
+
+fn called(param: i32) -> bool {
+    return param == 1;
+}
+
+fn fn_(type_: const typeref, param: type_) -> bool {
+    return type_ == i32 && called(param);
+}
+
+var _result_i32_one = fn_(i32, 1); // expected: true
+var _result_i32_not_one = fn_(i32, 2); // expected: false
+var _result_not_i32 = fn_(u32, 1u); // expected: false

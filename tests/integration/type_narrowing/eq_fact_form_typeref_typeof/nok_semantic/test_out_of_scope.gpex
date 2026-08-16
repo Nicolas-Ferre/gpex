@@ -1,0 +1,5 @@
+fn _fn(type_: const typeref, value: type_, right: ?) -> bool {
+    return type_ == i32
+        && (type_ == typeof(right) && right == 0 || true)
+        && value + right == 0;
+}
