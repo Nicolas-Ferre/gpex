@@ -118,8 +118,12 @@ fn index_not_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'it
 }
 
 fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
+    state.type_narrowing.reset_function();
     for param in &fn_.params.params {
         exprs::index_expr(&param.type_, state);
+        state
+            .type_narrowing
+            .register_direct_dependency(param, state.inner);
         if let Some(requirement) = &param.requirement {
             exprs::index_expr(&requirement.condition, state);
         }
@@ -137,6 +141,12 @@ fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<
 }
 
 fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
+    state.type_narrowing.reset_function();
+    for param in &fn_.params.params {
+        state
+            .type_narrowing
+            .register_direct_dependency(param, state.inner);
+    }
     if fn_.const_keyword_span.is_none()
         && let FnBody::Statements(body) = &fn_.body
     {

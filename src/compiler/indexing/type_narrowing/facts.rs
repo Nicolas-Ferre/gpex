@@ -1,8 +1,9 @@
+use super::is_const_typeref_param;
 use crate::compiler::indexing::IndexState;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::state::TypeFacts;
-use crate::compiler::types;
+use crate::compiler::types::{self, Type};
 use crate::utils::parsing::span::Span;
 use std::rc::Rc;
 
@@ -60,7 +61,7 @@ impl<'item> ConcreteTypeFact<'item> {
         facts: &TypeFacts<'item>,
         state: &IndexState<'_, 'item>,
     ) -> bool {
-        let param_type = types::param_type(self.param, state.inner);
+        let param_type = fact_param_type(self.param, state);
         let was_contradicted = previous_facts.is_type_contradicted(param_type);
         let is_contradicted = facts.is_type_contradicted(param_type);
         !was_contradicted && is_contradicted
@@ -109,7 +110,7 @@ impl<'item> RelationTypeFact<'item> {
         let mut was_contradicted = false;
         let mut is_contradicted = false;
         for (&param, previous_facts) in self.params.iter().zip(previous_facts) {
-            let param_type = types::param_type(param, state.inner);
+            let param_type = fact_param_type(param, state);
             was_contradicted |= previous_facts.is_type_contradicted(param_type);
             is_contradicted |= facts.is_type_contradicted(param_type);
         }
@@ -125,11 +126,24 @@ fn type_facts<'item>(param: &'item Param, state: &IndexState<'_, 'item>) -> Rc<T
         .cloned()
         .unwrap_or_else(|| {
             let mut facts = TypeFacts::default();
-            if let Some(type_) = types::param_type(param, state.inner).struct_ref() {
+            // TODO: just understand why is_const_typeref_param is needed
+            if !is_const_typeref_param(param, state.inner)
+                && let Some(type_) = types::param_type(param, state.inner).struct_ref()
+            {
                 facts.add_required_type(type_);
             }
             Rc::new(facts)
         })
+}
+
+// TODO: just understand why is_const_typeref_param is needed
+// TODO: maybe function name to rename to be less misleading
+fn fact_param_type<'item>(param: &'item Param, state: &IndexState<'_, 'item>) -> Type<'item> {
+    if is_const_typeref_param(param, state.inner) {
+        Type::Param(param)
+    } else {
+        types::param_type(param, state.inner)
+    }
 }
 
 fn merge_type_fact_groups<'item>(
