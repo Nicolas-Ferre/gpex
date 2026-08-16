@@ -39,46 +39,36 @@ impl LogicalTypeNarrowing {
 
 #[derive(Default)]
 pub(super) struct TypeNarrowingState<'item> {
-    type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
-    // TODO: find better name
-    // TODO: to be seen if really needed
-    direct_dependencies: HashMap<u64, Vec<&'item Param>>,
+    type_facts: HashMap<TypeFactSubject<'item>, Rc<TypeFacts<'item>>>,
 }
 
-impl<'item> TypeNarrowingState<'item> {
-    pub(super) fn reset_function(&mut self) {
+impl TypeNarrowingState<'_> {
+    pub(super) fn reset_fn(&mut self) {
         self.type_facts.clear();
-        self.direct_dependencies.clear();
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+pub(super) enum TypeFactSubject<'item> {
+    Param(&'item Param),
+    TypeParam(&'item Param),
+}
+
+impl<'item> TypeFactSubject<'item> {
+    fn from_param(param: &'item Param, state: &State<'item>) -> Self {
+        match types::param_type(param, state) {
+            Type::Param(type_param) => Self::TypeParam(type_param),
+            Type::Struct(_) | Type::Wildcard(_) | Type::NoReturn | Type::Unknown => {
+                Self::Param(param)
+            }
+        }
     }
 
-    pub(super) fn register_direct_dependency(&mut self, param: &'item Param, state: &State<'item>) {
-        // TODO: replace by unique if statement
-        let ConstValue::Param(type_param) = consts::expr_value(&param.type_, state) else {
-            return;
-        };
-        let Expr::Ident(type_ident) = unwrap_parentheses(&param.type_) else {
-            return;
-        };
-        // TODO: just understand below if condition
-        if state.sources.get(&type_ident.id) != Some(&ItemRef::Param(type_param)) {
-            return;
+    fn type_(self, state: &State<'item>) -> Type<'item> {
+        match self {
+            Self::Param(param) => types::param_type(param, state),
+            Self::TypeParam(param) => Type::Param(param),
         }
-        if !is_const_typeref_param(type_param, state) {
-            return;
-        }
-        self.direct_dependencies
-            .entry(type_param.id)
-            .or_default()
-            .push(param);
-        // TODO: does it make sense to retrieve existing facts for the param considering is has just been defined?
-        let facts = self
-            .type_facts
-            .get(&type_param.id)
-            .cloned()
-            .unwrap_or_default();
-        // TODO: to be seen if the 2 entries added in type_facts are needed in practice
-        self.type_facts.insert(type_param.id, facts.clone());
-        self.type_facts.insert(param.id, facts);
     }
 }
 
@@ -104,8 +94,11 @@ pub(super) fn index_ident<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if let ItemRef::Param(param) = source
-        && !is_const_typeref_param(param, state.inner) // TODO: just understand why this is necessary
-        && let Some(facts) = state.type_narrowing.type_facts.get(&param.id).cloned()
+        && let Some(facts) = state
+            .type_narrowing
+            .type_facts
+            .get(&TypeFactSubject::from_param(param, state.inner))
+            .cloned()
     {
         state.set_expr_type_facts(ident.id, facts);
     }
@@ -158,42 +151,42 @@ fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Optio
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
     match (
-        narrowing_param(left_arg, state),
-        narrowing_param(right_arg, state),
+        narrowing_subject(left_arg, state),
+        narrowing_subject(right_arg, state),
     ) {
-        (Some(left_param), Some(right_param)) => Some(TypeFact::Relation(RelationTypeFact {
-            params: [left_param, right_param],
+        (Some(left_subject), Some(right_subject)) => Some(TypeFact::Relation(RelationTypeFact {
+            subjects: [left_subject, right_subject],
             condition_node_id: call.id,
             subject_spans: [left_arg.span(), right_arg.span()],
         })),
-        (Some(param), None) => concrete_type_fact(call.id, param, left_arg, right_arg, state),
-        (None, Some(param)) => concrete_type_fact(call.id, param, right_arg, left_arg, state),
+        (Some(subject), None) => concrete_type_fact(call.id, subject, left_arg, right_arg, state),
+        (None, Some(subject)) => concrete_type_fact(call.id, subject, right_arg, left_arg, state),
         (None, None) => None,
     }
 }
 
 fn concrete_type_fact<'item>(
     condition_node_id: u64,
-    param: &'item Param,
-    typeof_expr: &Expr, // TODO: should this param name be generalized too?
+    subject: TypeFactSubject<'item>,
+    subject_expr: &Expr,
     type_expr: &Expr,
     state: &State<'item>,
 ) -> Option<TypeFact<'item>> {
     if let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state) {
         Some(TypeFact::Concrete(ConcreteTypeFact {
-            param,
+            subject,
             type_,
             condition_node_id,
-            subject_span: typeof_expr.span(),
+            subject_span: subject_expr.span(),
         }))
     } else {
         None
     }
 }
 
-fn narrowing_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
+fn narrowing_subject<'item>(expr: &Expr, state: &State<'item>) -> Option<TypeFactSubject<'item>> {
     if let Some(param) = typeof_param(expr, state) {
-        return Some(param);
+        return Some(TypeFactSubject::from_param(param, state));
     }
     // TODO: replace by unique if statement
     let Expr::Ident(ident) = unwrap_parentheses(expr) else {
@@ -202,7 +195,7 @@ fn narrowing_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Pa
     let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied() else {
         return None;
     };
-    is_const_typeref_param(param, state).then_some(param)
+    is_const_typeref_param(param, state).then_some(TypeFactSubject::TypeParam(param))
 }
 
 fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
