@@ -98,7 +98,7 @@ pub(super) fn index_ident<'item>(
         && let Some(facts) = state
             .type_narrowing
             .type_facts
-            .get(&TypeFactSubject::from_param(param, state.inner))
+            .get(&TypeFactSubject::from_param(param, state.inner)) // no-fn-check (false positive)
             .cloned()
     {
         state.set_expr_type_facts(ident.id, facts);
