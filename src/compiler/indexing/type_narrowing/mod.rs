@@ -10,6 +10,7 @@ use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::queries;
+use crate::compiler::queries::params;
 use crate::compiler::state::{State, TypeFacts};
 use crate::compiler::types::{self, Type};
 use std::collections::HashMap;
@@ -55,7 +56,7 @@ pub(super) enum TypeFactSubject<'item> {
 }
 
 impl<'item> TypeFactSubject<'item> {
-    fn from_param(param: &'item Param, state: &State<'item>) -> Self {
+    pub(crate) fn from_param(param: &'item Param, state: &State<'item>) -> Self {
         match types::param_type(param, state) {
             Type::Param(type_param) => Self::TypeParam(type_param),
             Type::Struct(_) | Type::Wildcard(_) | Type::NoReturn | Type::Unknown => {
@@ -102,13 +103,6 @@ pub(super) fn index_ident<'item>(
     {
         state.set_expr_type_facts(ident.id, facts);
     }
-}
-
-// TODO: move in queries module
-// TODO: use is_intrinsic_type is possible
-pub(super) fn is_const_typeref_param<'item>(param: &'item Param, state: &State<'item>) -> bool {
-    param.const_mark_span().is_some()
-        && types::param_type(param, state) == Type::Struct(state.search_prelude_type("typeref"))
 }
 
 fn collect_type_facts<'item>(
@@ -195,7 +189,7 @@ fn narrowing_subject<'item>(expr: &Expr, state: &State<'item>) -> Option<TypeFac
     let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied() else {
         return None;
     };
-    is_const_typeref_param(param, state).then_some(TypeFactSubject::TypeParam(param))
+    params::is_const_typeref(param, state).then_some(TypeFactSubject::TypeParam(param))
 }
 
 fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
