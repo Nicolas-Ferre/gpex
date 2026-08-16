@@ -34,7 +34,6 @@ pub fn compile_program(
     let modules = parsing::parse(root_path, &files)?;
     let mut state = State::new(files.len());
     indexing::index_modules(&modules, &mut state);
-    state.init_cache();
     let errors = validation::validate_modules(
         root_path,
         &files,

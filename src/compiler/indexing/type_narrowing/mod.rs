@@ -182,32 +182,24 @@ fn narrowing_subject<'item>(expr: &Expr, state: &State<'item>) -> Option<TypeFac
     if let Some(param) = typeof_param(expr, state) {
         return Some(TypeFactSubject::from_param(param, state));
     }
-    // TODO: replace by unique if statement
-    let Expr::Ident(ident) = unwrap_parentheses(expr) else {
-        return None;
-    };
-    let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied() else {
-        return None;
-    };
-    params::is_const_typeref(param, state).then_some(TypeFactSubject::TypeParam(param))
+    if let Expr::Ident(ident) = unwrap_parentheses(expr)
+        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
+    {
+        params::is_const_typeref(param, state).then_some(TypeFactSubject::TypeParam(param))
+    } else {
+        None
+    }
 }
 
 fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
-    // TODO: replace by unique if statement
-    let Expr::Call(typeof_call) = unwrap_parentheses(expr) else {
-        return None;
-    };
-    if !queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state) {
-        return None;
-    }
-    let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value) else {
-        return None;
-    };
-    match state.sources.get(&ident.id).copied() {
-        Some(ItemRef::Param(param)) => Some(param),
-        Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_)) | None => {
-            None
-        }
+    if let Expr::Call(typeof_call) = unwrap_parentheses(expr)
+        && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
+        && let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value)
+        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
+    {
+        Some(param)
+    } else {
+        None
     }
 }
 
