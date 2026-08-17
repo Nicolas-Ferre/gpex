@@ -191,13 +191,18 @@ impl<'item> TypeFacts<'item> {
 
     pub(crate) fn is_type_contradicted(&self, declared_type: Type<'item>) -> bool {
         match declared_type {
-            Type::Param(_) | Type::Wildcard(_) => self.required_types.len() > 1,
+            Type::Param(_) | Type::Wildcard(_) => self.is_contradicted(),
             Type::Struct(declared_type) => self
                 .required_types
                 .iter()
                 .any(|required_type| required_type.id != declared_type.id),
             Type::NoReturn | Type::Unknown => !self.required_types.is_empty(),
         }
+    }
+
+    // TODO: does it make sense to rename to "is_contradicting?"
+    pub(crate) fn is_contradicted(&self) -> bool {
+        self.required_types.len() > 1
     }
 
     pub(crate) fn add_required_type(&mut self, type_: &'item StructDefinition) {

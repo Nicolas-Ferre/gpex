@@ -119,7 +119,6 @@ fn index_not_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'it
 }
 
 fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    state.type_narrowing.reset_fn();
     for param in &fn_.params.params {
         exprs::index_expr(&param.type_, state);
         if let Some(requirement) = &param.requirement {
@@ -139,7 +138,6 @@ fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<
 }
 
 fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    state.type_narrowing.reset_fn();
     if fn_.const_keyword_span.is_none()
         && let FnBody::Statements(body) = &fn_.body
     {

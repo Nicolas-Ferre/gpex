@@ -1,6 +1,6 @@
 mod facts;
 
-use self::facts::{ConcreteTypeFact, RelationTypeFact, TypeFact};
+use self::facts::{TypeFact, TypeFactOperand};
 use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::indexing::{IndexState, exprs};
 use crate::compiler::item_ref::ItemRef;
@@ -40,37 +40,7 @@ impl LogicalTypeNarrowing {
 
 #[derive(Default)]
 pub(super) struct TypeNarrowingState<'item> {
-    type_facts: HashMap<TypeFactSubject<'item>, Rc<TypeFacts<'item>>>,
-}
-
-impl TypeNarrowingState<'_> {
-    pub(super) fn reset_fn(&mut self) {
-        self.type_facts.clear();
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub(super) enum TypeFactSubject<'item> {
-    Param(&'item Param),
-    TypeParam(&'item Param),
-}
-
-impl<'item> TypeFactSubject<'item> {
-    pub(crate) fn from_param(param: &'item Param, state: &State<'item>) -> Self {
-        match types::param_type(param, state) {
-            Type::Param(type_param) => Self::TypeParam(type_param),
-            Type::Struct(_) | Type::Wildcard(_) | Type::NoReturn | Type::Unknown => {
-                Self::Param(param)
-            }
-        }
-    }
-
-    fn type_(self, state: &State<'item>) -> Type<'item> {
-        match self {
-            Self::Param(param) => types::param_type(param, state),
-            Self::TypeParam(param) => Type::Param(param),
-        }
-    }
+    type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
 }
 
 pub(super) fn index_logical_operation_args<'item>(
@@ -95,11 +65,8 @@ pub(super) fn index_ident<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if let ItemRef::Param(param) = source
-        && let Some(facts) = state
-            .type_narrowing
-            .type_facts
-            .get(&TypeFactSubject::from_param(param, state.inner)) // no-fn-check (false positive)
-            .cloned()
+        && let Some(fact_param) = type_fact_param(param, state.inner)
+        && let Some(facts) = state.type_narrowing.type_facts.get(&fact_param.id).cloned()
     {
         state.set_expr_type_facts(ident.id, facts);
     }
@@ -145,49 +112,69 @@ fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Optio
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
     match (
-        narrowing_subject(left_arg, state),
-        narrowing_subject(right_arg, state),
+        type_fact_operand_subject(left_arg, state),
+        type_fact_operand_subject(right_arg, state),
     ) {
-        (Some(left_subject), Some(right_subject)) => Some(TypeFact::Relation(RelationTypeFact {
-            subjects: [left_subject, right_subject],
+        (Some(left), Some(right)) => Some(TypeFact {
+            operands: [left, right],
             condition_node_id: call.id,
-            subject_spans: [left_arg.span(), right_arg.span()],
-        })),
-        (Some(subject), None) => concrete_type_fact(call.id, subject, left_arg, right_arg, state),
-        (None, Some(subject)) => concrete_type_fact(call.id, subject, right_arg, left_arg, state),
+            subject_spans: [Some(left_arg.span()), Some(right_arg.span())],
+        }),
+        (Some(left), None) => concrete_type_fact(call.id, left, left_arg, right_arg, state),
+        (None, Some(right)) => concrete_type_fact(call.id, right, right_arg, left_arg, state),
         (None, None) => None,
     }
 }
 
 fn concrete_type_fact<'item>(
     condition_node_id: u64,
-    subject: TypeFactSubject<'item>,
+    subject: TypeFactOperand<'item>,
     subject_expr: &Expr,
     type_expr: &Expr,
     state: &State<'item>,
 ) -> Option<TypeFact<'item>> {
     if let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state) {
-        Some(TypeFact::Concrete(ConcreteTypeFact {
-            subject,
-            type_,
+        Some(TypeFact {
+            operands: [subject, TypeFactOperand::Concrete(type_)],
             condition_node_id,
-            subject_span: subject_expr.span(),
-        }))
+            subject_spans: [Some(subject_expr.span()), None],
+        })
     } else {
         None
     }
 }
 
-fn narrowing_subject<'item>(expr: &Expr, state: &State<'item>) -> Option<TypeFactSubject<'item>> {
-    if let Some(param) = typeof_param(expr, state) {
-        return Some(TypeFactSubject::from_param(param, state));
+fn type_fact_operand_subject<'item>(
+    operand: &Expr,
+    state: &State<'item>,
+) -> Option<TypeFactOperand<'item>> {
+    if let Some(param) = typeof_param(operand, state) {
+        return Some(param_type_operand(param, state));
     }
-    if let Expr::Ident(ident) = unwrap_parentheses(expr)
+    if let Expr::Ident(ident) = unwrap_parentheses(operand)
         && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
+        && params::is_const_typeref(param, state)
     {
-        params::is_const_typeref(param, state).then_some(TypeFactSubject::TypeParam(param))
+        Some(TypeFactOperand::Param(param))
     } else {
         None
+    }
+}
+
+// TODO: define as TypeFactOperand associated method
+fn param_type_operand<'item>(param: &'item Param, state: &State<'item>) -> TypeFactOperand<'item> {
+    match types::param_type(param, state) {
+        Type::Struct(type_) => TypeFactOperand::Concrete(type_),
+        Type::Param(type_param) => TypeFactOperand::Param(type_param),
+        Type::Wildcard(_) | Type::NoReturn | Type::Unknown => TypeFactOperand::Param(param),
+    }
+}
+
+fn type_fact_param<'item>(param: &'item Param, state: &State<'item>) -> Option<&'item Param> {
+    match types::param_type(param, state) {
+        Type::Param(type_param) => Some(type_param),
+        Type::Wildcard(_) => Some(param),
+        Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
     }
 }
 
