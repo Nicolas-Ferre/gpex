@@ -62,3 +62,4 @@ See `doc/testing.md`.
       `is_connected_user`).
     - Avoid including a negation in the name (e.g. avoid `is_not_active`,
       `is_disconnected`, ...).
+- Functions/methods should be separated by one blank line.

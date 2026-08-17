@@ -43,6 +43,12 @@ pub(super) struct TypeNarrowingState<'item> {
     type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
 }
 
+impl<'item> TypeNarrowingState<'item> {
+    fn type_facts(&self, param: &Param) -> Rc<TypeFacts<'item>> {
+        self.type_facts.get(&param.id).cloned().unwrap_or_default()
+    }
+}
+
 pub(super) fn index_logical_operation_args<'item>(
     call: &'item Call,
     narrowing: LogicalTypeNarrowing,
@@ -149,7 +155,7 @@ fn type_fact_operand_subject<'item>(
     state: &State<'item>,
 ) -> Option<TypeFactOperand<'item>> {
     if let Some(param) = typeof_param(operand, state) {
-        return Some(param_type_operand(param, state));
+        return Some(TypeFactOperand::from_param(param, state));
     }
     if let Expr::Ident(ident) = unwrap_parentheses(operand)
         && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
@@ -158,15 +164,6 @@ fn type_fact_operand_subject<'item>(
         Some(TypeFactOperand::Param(param))
     } else {
         None
-    }
-}
-
-// TODO: define as TypeFactOperand associated method
-fn param_type_operand<'item>(param: &'item Param, state: &State<'item>) -> TypeFactOperand<'item> {
-    match types::param_type(param, state) {
-        Type::Struct(type_) => TypeFactOperand::Concrete(type_),
-        Type::Param(type_param) => TypeFactOperand::Param(type_param),
-        Type::Wildcard(_) | Type::NoReturn | Type::Unknown => TypeFactOperand::Param(param),
     }
 }
 
