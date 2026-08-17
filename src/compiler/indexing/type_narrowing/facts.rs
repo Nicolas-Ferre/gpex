@@ -81,13 +81,13 @@ impl<'item> TypeFact<'item> {
     }
 
     fn merge_type_fact_groups(
-        previous_facts: &[Rc<TypeFacts<'item>>],
+        all_previous_facts: &[Rc<TypeFacts<'item>>],
         facts: Rc<TypeFacts<'item>>,
         params: &[&Param],
         state: &mut IndexState<'_, 'item>,
     ) {
         for other_facts in state.type_narrowing.type_facts.values_mut() {
-            if previous_facts
+            if all_previous_facts
                 .iter()
                 .any(|previous_facts| Rc::ptr_eq(other_facts, previous_facts))
             {

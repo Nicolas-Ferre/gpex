@@ -1,0 +1,5 @@
+fn fn_(type_: typeref) -> bool {
+    return type_ == i32 && type_ == u32;
+}
+
+var _result = fn_(i32); // expected: false
