@@ -10,8 +10,7 @@ use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::queries;
-use crate::compiler::queries::params;
-use crate::compiler::state::{State, TypeFacts};
+use crate::compiler::state::{IntrinsicType, State, TypeFacts};
 use crate::compiler::types::{self, Type};
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -47,6 +46,11 @@ impl<'item> TypeNarrowingState<'item> {
     fn type_facts(&self, param: &Param) -> Rc<TypeFacts<'item>> {
         self.type_facts.get(&param.id).cloned().unwrap_or_default()
     }
+}
+
+struct ResolvedTypeFactOperand<'item> {
+    operand: TypeFactOperand<'item>,
+    is_subject: bool,
 }
 
 pub(super) fn index_logical_operation_args<'item>(
@@ -117,56 +121,47 @@ fn is_comparison_operator(call: &Call, narrowing: LogicalTypeNarrowing, state: &
 fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
-    let left_subject = type_fact_operand_subject(left_arg, state);
-    let right_subject = type_fact_operand_subject(right_arg, state);
-    if left_subject.is_none() && right_subject.is_none() {
+    let left_operand = resolve_type_fact_operand(left_arg, state)?;
+    let right_operand = resolve_type_fact_operand(right_arg, state)?;
+    if !left_operand.is_subject && !right_operand.is_subject {
         return None;
     }
-    let left_operand = left_subject.or_else(|| type_fact_operand_value(left_arg, state))?;
-    let right_operand = right_subject.or_else(|| type_fact_operand_value(right_arg, state))?;
     Some(TypeFact {
-        operands: [left_operand, right_operand],
+        operands: [left_operand.operand, right_operand.operand],
         condition_node_id: call.id,
         subject_spans: [
-            left_subject.map(|_| left_arg.span()),
-            right_subject.map(|_| right_arg.span()),
+            left_operand.is_subject.then(|| left_arg.span()),
+            right_operand.is_subject.then(|| right_arg.span()),
         ],
     })
 }
 
-fn type_fact_operand_value<'item>(
+fn resolve_type_fact_operand<'item>(
     operand: &Expr,
     state: &State<'item>,
-) -> Option<TypeFactOperand<'item>> {
-    match consts::expr_value(operand, state) {
-        ConstValue::TypeRef(type_) => Some(TypeFactOperand::Concrete(type_)),
-        ConstValue::Param(param) | ConstValue::WildcardType(param) => {
-            Some(TypeFactOperand::Param(param))
-        }
+) -> Option<ResolvedTypeFactOperand<'item>> {
+    if let Some(param) = typeof_param(operand, state) {
+        return Some(ResolvedTypeFactOperand {
+            operand: TypeFactOperand::from_param(param, state),
+            is_subject: true,
+        });
+    }
+    let resolved_operand = match consts::expr_value(operand, state) {
+        ConstValue::TypeRef(type_) => TypeFactOperand::Concrete(type_),
+        ConstValue::Param(param) | ConstValue::WildcardType(param) => TypeFactOperand::Param(param),
         ConstValue::I32(_)
         | ConstValue::U32(_)
         | ConstValue::F32(_)
         | ConstValue::Bool(_)
         | ConstValue::Unknown
-        | ConstValue::RuntimeValue => None,
-    }
-}
-
-fn type_fact_operand_subject<'item>(
-    operand: &Expr,
-    state: &State<'item>,
-) -> Option<TypeFactOperand<'item>> {
-    if let Some(param) = typeof_param(operand, state) {
-        return Some(TypeFactOperand::from_param(param, state));
-    }
-    if let Expr::Ident(ident) = unwrap_parentheses(operand)
-        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
-        && params::is_const_typeref(param, state)
-    {
-        Some(TypeFactOperand::Param(param))
-    } else {
-        None
-    }
+        | ConstValue::RuntimeValue => return None,
+    };
+    Some(ResolvedTypeFactOperand {
+        operand: resolved_operand,
+        is_subject: !is_typeof_expr(operand, state)
+            && matches!(resolved_operand, TypeFactOperand::Param(_))
+            && state.is_intrinsic_type(types::expr_type(operand, state), IntrinsicType::Typeref),
+    })
 }
 
 fn type_fact_param<'item>(param: &'item Param, state: &State<'item>) -> Option<&'item Param> {
@@ -175,6 +170,13 @@ fn type_fact_param<'item>(param: &'item Param, state: &State<'item>) -> Option<&
         Type::Wildcard(_) => Some(param),
         Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
     }
+}
+
+fn is_typeof_expr(expr: &Expr, state: &State<'_>) -> bool {
+    let Expr::Call(call) = unwrap_parentheses(expr) else {
+        return false;
+    };
+    queries::calls::is_intrinsic(call, IntrinsicFn::Typeof, state)
 }
 
 fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
