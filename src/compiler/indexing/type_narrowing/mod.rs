@@ -11,7 +11,7 @@ use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::queries;
 use crate::compiler::state::{IntrinsicType, State, TypeFacts};
-use crate::compiler::types::{self, Type};
+use crate::compiler::types;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -75,7 +75,7 @@ pub(super) fn index_ident<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if let ItemRef::Param(param) = source
-        && let Some(fact_param) = type_fact_param(param, state.inner)
+        && let Some(fact_param) = facts::type_fact_param(types::param_type(param, state.inner))
         && let Some(facts) = state.type_narrowing.type_facts.get(&fact_param.id).cloned()
     {
         state.set_expr_type_facts(ident.id, facts);
@@ -162,14 +162,6 @@ fn resolve_type_fact_operand<'item>(
             && matches!(resolved_operand, TypeFactOperand::Param(_))
             && state.is_intrinsic_type(types::expr_type(operand, state), IntrinsicType::Typeref),
     })
-}
-
-fn type_fact_param<'item>(param: &'item Param, state: &State<'item>) -> Option<&'item Param> {
-    match types::param_type(param, state) {
-        Type::Param(type_param) => Some(type_param),
-        Type::Wildcard(_) => Some(param),
-        Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
-    }
 }
 
 fn is_typeof_expr(expr: &Expr, state: &State<'_>) -> bool {

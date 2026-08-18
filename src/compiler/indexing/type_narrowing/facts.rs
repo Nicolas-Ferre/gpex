@@ -14,11 +14,23 @@ pub(super) enum TypeFactOperand<'item> {
 
 impl<'item> TypeFactOperand<'item> {
     pub(super) fn from_param(param: &'item Param, state: &State<'item>) -> Self {
-        match types::param_type(param, state) {
-            Type::Struct(type_) => Self::Concrete(type_),
-            Type::Param(type_param) => Self::Param(type_param),
-            Type::Wildcard(_) | Type::NoReturn | Type::Unknown => Self::Param(param),
+        let type_ = types::param_type(param, state);
+        if let Some(type_param) = type_fact_param(type_) {
+            Self::Param(type_param)
+        } else {
+            match type_ {
+                Type::Struct(type_) => Self::Concrete(type_),
+                Type::NoReturn | Type::Unknown => Self::Param(param),
+                Type::Param(_) | Type::Wildcard(_) => unreachable!("parameter type handled above"),
+            }
         }
+    }
+}
+
+pub(super) fn type_fact_param(type_: Type<'_>) -> Option<&Param> {
+    match type_ {
+        Type::Param(type_param) | Type::Wildcard(type_param) => Some(type_param),
+        Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
     }
 }
 

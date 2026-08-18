@@ -1,3 +1,0 @@
-fn _fn(param: ?, related: typeof(param)) -> bool {
-    return typeof(param) != i32 || related == 0;
-}
