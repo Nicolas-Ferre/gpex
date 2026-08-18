@@ -1,7 +1,3 @@
-fn fn_(type_: const typeref, value: type_) -> bool {
-    return type_ == i32 && typeof(type_) == f32 && value == 1;
+fn _fn(type_: const typeref, value: type_) -> bool {
+    return type_ == i32 && typeof(type_) == f32 && value == 0;
 }
-
-var _result_i32_one = fn_(i32, 1); // expected: true
-var _result_i32_not_one = fn_(i32, 2); // expected: false
-var _result_not_i32 = fn_(u32, 1u); // expected: false

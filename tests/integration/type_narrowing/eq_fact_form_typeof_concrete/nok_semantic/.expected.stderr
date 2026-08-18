@@ -58,6 +58,6 @@ error: type fact leaving `typeof(param)` with no possible value
 ┴
 error: type fact leaving `typeof(type_)` with no possible value
 │  → <root>/test_param_type.gpex:2:28
-│    ¦     return type_ == i32 && typeof(type_) == f32 && value == 1;
+│    ¦     return type_ == i32 && typeof(type_) == f32 && value == 0;
 │    ¦                            ^^^^^^^^^^^^^^^^^^^^
 ┴
