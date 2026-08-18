@@ -117,36 +117,38 @@ fn is_comparison_operator(call: &Call, narrowing: LogicalTypeNarrowing, state: &
 fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
-    match (
-        type_fact_operand_subject(left_arg, state),
-        type_fact_operand_subject(right_arg, state),
-    ) {
-        (Some(left), Some(right)) => Some(TypeFact {
-            operands: [left, right],
-            condition_node_id: call.id,
-            subject_spans: [Some(left_arg.span()), Some(right_arg.span())],
-        }),
-        (Some(left), None) => concrete_type_fact(call.id, left, left_arg, right_arg, state),
-        (None, Some(right)) => concrete_type_fact(call.id, right, right_arg, left_arg, state),
-        (None, None) => None,
+    let left_subject = type_fact_operand_subject(left_arg, state);
+    let right_subject = type_fact_operand_subject(right_arg, state);
+    if left_subject.is_none() && right_subject.is_none() {
+        return None;
     }
+    let left_operand = left_subject.or_else(|| type_fact_operand_value(left_arg, state))?;
+    let right_operand = right_subject.or_else(|| type_fact_operand_value(right_arg, state))?;
+    Some(TypeFact {
+        operands: [left_operand, right_operand],
+        condition_node_id: call.id,
+        subject_spans: [
+            left_subject.map(|_| left_arg.span()),
+            right_subject.map(|_| right_arg.span()),
+        ],
+    })
 }
 
-fn concrete_type_fact<'item>(
-    condition_node_id: u64,
-    subject: TypeFactOperand<'item>,
-    subject_expr: &Expr,
-    type_expr: &Expr,
+fn type_fact_operand_value<'item>(
+    operand: &Expr,
     state: &State<'item>,
-) -> Option<TypeFact<'item>> {
-    if let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state) {
-        Some(TypeFact {
-            operands: [subject, TypeFactOperand::Concrete(type_)],
-            condition_node_id,
-            subject_spans: [Some(subject_expr.span()), None],
-        })
-    } else {
-        None
+) -> Option<TypeFactOperand<'item>> {
+    match consts::expr_value(operand, state) {
+        ConstValue::TypeRef(type_) => Some(TypeFactOperand::Concrete(type_)),
+        ConstValue::Param(param) | ConstValue::WildcardType(param) => {
+            Some(TypeFactOperand::Param(param))
+        }
+        ConstValue::I32(_)
+        | ConstValue::U32(_)
+        | ConstValue::F32(_)
+        | ConstValue::Bool(_)
+        | ConstValue::Unknown
+        | ConstValue::RuntimeValue => None,
     }
 }
 
