@@ -39,7 +39,7 @@ impl<'item> State<'item> {
         }
     }
 
-    pub(crate) fn init_cache(&mut self) {
+    pub(crate) fn init_intrinsic_types(&mut self) {
         self.intrinsic_types = [
             ("i32", IntrinsicType::I32),
             ("u32", IntrinsicType::U32),

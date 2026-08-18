@@ -1,6 +1,6 @@
 fn fn_(
     type_: const typeref,
-    value: const ? require type_ == i32 && typeof(value) == type_,
+    value: const ? require type_ == i32 && typeof(value) == type_ && value == 1,
 ) -> bool {
     return typeof(value) == i32;
 }

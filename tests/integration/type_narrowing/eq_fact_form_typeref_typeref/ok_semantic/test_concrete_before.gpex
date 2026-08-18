@@ -1,4 +1,9 @@
-fn fn_(left_type: const typeref, left: left_type, right_type: const typeref, right: right_type) -> bool {
+fn fn_(
+    left_type: const typeref,
+    left: left_type,
+    right_type: const typeref,
+    right: right_type,
+) -> bool {
     return left_type == i32 && left_type == right_type && left + right == 3;
 }
 
