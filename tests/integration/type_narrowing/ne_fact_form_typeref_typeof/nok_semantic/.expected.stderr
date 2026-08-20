@@ -1,0 +1,25 @@
+error: type fact leaving `type_` and `typeof(right)` with no possible value
+│  → <root>/test_contradiction_declared.gpex:2:28
+│    ¦     return type_ != i32 || type_ != typeof(right) || false;
+│    ¦                            ^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: type fact leaving `type_` and `typeof(right)` with no possible value
+│  → <root>/test_contradiction_previous.gpex:4:12
+│    ¦         || type_ != typeof(right)
+│    ¦            ^^^^^^^^^^^^^^^^^^^^^^
+┴
+error: `__add__(i32, typeof(right))` item not found
+│  → <root>/test_out_of_scope.gpex:4:12
+│    ¦         || value + right == 0;
+│    ¦            ^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:12:14
+│    ¦ pub const fn __add__(
+│    ¦              ^^^^^^^^
+│    ¦     left: ? require typeof(left).is_numeric(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> typeof(left) = intrinsic;
+│    ¦ ^^^^^^^^^^^^^^^^^
+┴

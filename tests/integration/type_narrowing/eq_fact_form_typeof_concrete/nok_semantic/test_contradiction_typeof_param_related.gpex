@@ -1,6 +1,3 @@
 fn fn_(param: ?, related: typeof(param)) -> bool {
     return typeof(param) == i32 && typeof(related) == u32 && param == 0;
 }
-
-var _result_i32 = fn_(1, 0); // expected: false
-var _result_u32 = fn_(2u, 0u); // expected: false

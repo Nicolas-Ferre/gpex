@@ -1,0 +1,12 @@
+fn fn_(
+    left_type: const typeref,
+    left: left_type,
+    right_type: const typeref,
+    right: right_type,
+) -> bool {
+    return left_type == i32 && left_type == right_type && left + right == 3;
+}
+
+var _result_i32_three = fn_(i32, 1, i32, 2); // expected: true
+var _result_i32_not_three = fn_(i32, 1, i32, 3); // expected: false
+var _result_not_i32 = fn_(u32, 1u, u32, 2u); // expected: false

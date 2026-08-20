@@ -39,7 +39,7 @@ impl<'item> State<'item> {
         }
     }
 
-    pub(crate) fn init_cache(&mut self) {
+    pub(crate) fn init_intrinsic_types(&mut self) {
         self.intrinsic_types = [
             ("i32", IntrinsicType::I32),
             ("u32", IntrinsicType::U32),
@@ -191,13 +191,17 @@ impl<'item> TypeFacts<'item> {
 
     pub(crate) fn is_type_contradicted(&self, declared_type: Type<'item>) -> bool {
         match declared_type {
-            Type::Param(_) | Type::Wildcard(_) => self.required_types.len() > 1,
+            Type::Param(_) | Type::Wildcard(_) => self.has_contradiction(),
             Type::Struct(declared_type) => self
                 .required_types
                 .iter()
                 .any(|required_type| required_type.id != declared_type.id),
             Type::NoReturn | Type::Unknown => !self.required_types.is_empty(),
         }
+    }
+
+    pub(crate) fn has_contradiction(&self) -> bool {
+        self.required_types.len() > 1
     }
 
     pub(crate) fn add_required_type(&mut self, type_: &'item StructDefinition) {

@@ -1,0 +1,20 @@
+fn fn_(
+    first_type: const typeref,
+    first: first_type,
+    second_type: const typeref,
+    second: second_type,
+    third_type: const typeref,
+    third: third_type,
+    fourth_type: const typeref,
+    fourth: fourth_type,
+) -> bool {
+    return first_type != second_type
+        || third_type != fourth_type
+        || second_type != third_type
+        || first_type != i32
+        || first + second + third + fourth == 10;
+}
+
+var _result_i32_ten = fn_(i32, 1, i32, 2, i32, 3, i32, 4); // expected: true
+var _result_i32_not_ten = fn_(i32, 1, i32, 2, i32, 3, i32, 5); // expected: false
+var _result_not_i32 = fn_(u32, 1u, u32, 2u, u32, 3u, u32, 4u); // expected: true

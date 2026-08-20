@@ -1,2 +1,3 @@
 var value = 0;
-var _result = typeof(value) == i32 && true;
+
+var _result = typeof(value) == i32 && true; // expected: true

@@ -30,6 +30,7 @@ pub(crate) fn index_modules<'item>(modules: &'item [Module], state: &mut State<'
     for module in modules {
         index_module_items(module, &mut state);
     }
+    state.inner.init_intrinsic_types();
     index_consts_until_full_registration(modules, &mut state);
     for module in modules {
         index_not_consts(module, &mut state);

@@ -8,3 +8,8 @@ error: `unknown()` item not found
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && unknown();
 │    ¦                                                            ^^^^^^^^^
 ┴
+error: `invalid` item not found
+│  → <root>/test_invalid_expr_param_value.gpex:5:19
+│    ¦ var _result = fn_(invalid);
+│    ¦                   ^^^^^^^
+┴

@@ -1,6 +1,6 @@
 mod facts;
 
-use self::facts::{ConcreteTypeFact, RelationTypeFact, TypeFact};
+use self::facts::{TypeFact, TypeFactOperand};
 use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::indexing::{IndexState, exprs};
 use crate::compiler::item_ref::ItemRef;
@@ -10,7 +10,8 @@ use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::queries;
-use crate::compiler::state::{State, TypeFacts};
+use crate::compiler::state::{IntrinsicType, State, TypeFacts};
+use crate::compiler::types;
 use std::collections::HashMap;
 use std::rc::Rc;
 
@@ -41,6 +42,17 @@ pub(super) struct TypeNarrowingState<'item> {
     type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
 }
 
+impl<'item> TypeNarrowingState<'item> {
+    fn type_facts(&self, param: &Param) -> Rc<TypeFacts<'item>> {
+        self.type_facts.get(&param.id).cloned().unwrap_or_default()
+    }
+}
+
+struct ResolvedTypeFactOperand<'item> {
+    operand: TypeFactOperand<'item>,
+    is_subject: bool,
+}
+
 pub(super) fn index_logical_operation_args<'item>(
     call: &'item Call,
     narrowing: LogicalTypeNarrowing,
@@ -63,7 +75,8 @@ pub(super) fn index_ident<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if let ItemRef::Param(param) = source
-        && let Some(facts) = state.type_narrowing.type_facts.get(&param.id).cloned()
+        && let Some(fact_param) = facts::type_fact_param(types::param_type(param, state.inner))
+        && let Some(facts) = state.type_narrowing.type_facts.get(&fact_param.id).cloned()
     {
         state.set_expr_type_facts(ident.id, facts);
     }
@@ -108,55 +121,65 @@ fn is_comparison_operator(call: &Call, narrowing: LogicalTypeNarrowing, state: &
 fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
-    match (
-        typeof_param(left_arg, state),
-        typeof_param(right_arg, state),
-    ) {
-        (Some(left_param), Some(right_param)) => Some(TypeFact::Relation(RelationTypeFact {
-            params: [left_param, right_param],
-            condition_node_id: call.id,
-            subject_spans: [left_arg.span(), right_arg.span()],
-        })),
-        (Some(param), None) => concrete_type_fact(call.id, param, left_arg, right_arg, state),
-        (None, Some(param)) => concrete_type_fact(call.id, param, right_arg, left_arg, state),
-        (None, None) => None,
+    let left_operand = resolve_type_fact_operand(left_arg, state)?;
+    let right_operand = resolve_type_fact_operand(right_arg, state)?;
+    if !left_operand.is_subject && !right_operand.is_subject {
+        return None;
     }
+    Some(TypeFact {
+        operands: [left_operand.operand, right_operand.operand],
+        condition_node_id: call.id,
+        subject_spans: [
+            left_operand.is_subject.then(|| left_arg.span()),
+            right_operand.is_subject.then(|| right_arg.span()),
+        ],
+    })
 }
 
-fn concrete_type_fact<'item>(
-    condition_node_id: u64,
-    param: &'item Param,
-    typeof_expr: &Expr,
-    type_expr: &Expr,
+fn resolve_type_fact_operand<'item>(
+    operand: &Expr,
     state: &State<'item>,
-) -> Option<TypeFact<'item>> {
-    if let ConstValue::TypeRef(type_) = consts::expr_value(type_expr, state) {
-        Some(TypeFact::Concrete(ConcreteTypeFact {
-            param,
-            type_,
-            condition_node_id,
-            subject_span: typeof_expr.span(),
-        }))
-    } else {
-        None
+) -> Option<ResolvedTypeFactOperand<'item>> {
+    if let Some(param) = typeof_param(operand, state) {
+        return Some(ResolvedTypeFactOperand {
+            operand: TypeFactOperand::from_param(param, state),
+            is_subject: true,
+        });
     }
+    let resolved_operand = match consts::expr_value(operand, state) {
+        ConstValue::TypeRef(type_) => TypeFactOperand::Concrete(type_),
+        ConstValue::Param(param) | ConstValue::WildcardType(param) => TypeFactOperand::Param(param),
+        ConstValue::I32(_)
+        | ConstValue::U32(_)
+        | ConstValue::F32(_)
+        | ConstValue::Bool(_)
+        | ConstValue::Unknown
+        | ConstValue::RuntimeValue => return None,
+    };
+    Some(ResolvedTypeFactOperand {
+        operand: resolved_operand,
+        is_subject: !is_typeof_expr(operand, state)
+            && matches!(resolved_operand, TypeFactOperand::Param(_))
+            && state.is_intrinsic_type(types::expr_type(operand, state), IntrinsicType::Typeref),
+    })
+}
+
+fn is_typeof_expr(expr: &Expr, state: &State<'_>) -> bool {
+    let Expr::Call(call) = unwrap_parentheses(expr) else {
+        return false;
+    };
+    queries::calls::is_intrinsic(call, IntrinsicFn::Typeof, state)
 }
 
 fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
-    let Expr::Call(typeof_call) = unwrap_parentheses(expr) else {
-        return None;
-    };
-    if !queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state) {
-        return None;
-    }
-    let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value) else {
-        return None;
-    };
-    match state.sources.get(&ident.id).copied() {
-        Some(ItemRef::Param(param)) => Some(param),
-        Some(ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_)) | None => {
-            None
-        }
+    if let Expr::Call(typeof_call) = unwrap_parentheses(expr)
+        && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
+        && let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value)
+        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
+    {
+        Some(param)
+    } else {
+        None
     }
 }
 

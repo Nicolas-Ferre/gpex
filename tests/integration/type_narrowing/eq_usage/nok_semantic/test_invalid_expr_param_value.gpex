@@ -1,0 +1,5 @@
+pub fn fn_(param: const ? require typeof(param) == i32 && param == 0) -> i32 {
+    return 0;
+}
+
+var _result = fn_(invalid);
