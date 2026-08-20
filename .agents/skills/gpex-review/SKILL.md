@@ -15,30 +15,30 @@ Review the changes of the current branch (compared to `main` branch).
 
 Run these steps in order:
 
-1. Run the sub-agents defined later.
-2. Once all sub-agents are done, list only the found issues the following way:
+1. Run each step defined later one after the other.
+2. Once all steps are done, list only the found issues the following way:
 
 ```markdown
-1. [<subagent name>] **<first finding>**
+1. [<step name>] **<first finding>**
    <brief details and short snippet(s) of the proposed fix>
-2. [<subagent name>] **<second finding>**
+2. [<step name>] **<second finding>**
    <brief details and short snippet(s) of the proposed fix>
    ...
 ```
 
 Don't hesitate to illustrate the findings with snippets to make it easier to understand.
 
-## Sub-agents
+## Review steps
 
-Each subsection corresponds to a sub-agent to run during review.
+Each subsection corresponds to a step to run during review.
 
-The subagents must return the full list of findings.
+The steps must return the full list of findings.
 
 ### Bug detection
 
 - Check all bugs related to the current branch changes.
 - Do not miss any bug.
-- If needed, bugs can be tested in `tmp/main.gpex`.
+- If needed, bugs can be tested in `./tmp/main.gpex`.
 
 ### Architecture review
 
