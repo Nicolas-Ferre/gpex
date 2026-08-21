@@ -204,8 +204,8 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
     }
 }
 
-fn replace_paths_in_logs(logs: &str, gpex_file_path: &Path) -> String {
-    logs.replace(&gpex_file_path.display().to_string(), "<root>")
+fn replace_paths_in_logs(logs: &str, root_path: &Path) -> String {
+    logs.replace(&root_path.display().to_string(), "<root>")
         .replace(env!("CARGO_MANIFEST_DIR"), "<project>")
 }
 
