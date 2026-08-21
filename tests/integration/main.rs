@@ -63,7 +63,7 @@ fn collect_case_dirs(
         } else if has_gpex_file(&root_path)? {
             let dir_name = path_file_name(&root_path);
             return Err(format!(
-                "Test directory should have 'ok_', 'wgsl_' or 'nok_' prefix: {dir_name}"
+                "test directory should have 'ok_', 'wgsl_' or 'nok_' prefix: {dir_name}"
             )
             .into());
         } else {
@@ -141,11 +141,13 @@ fn warning_ignore_paths(path: &Path) -> Result<Vec<PathBuf>, Failed> {
 }
 
 fn check_path_is_file(path: &Path, relative_path: PathBuf) -> Result<PathBuf, Failed> {
-    if path.join(&relative_path).is_file() {
+    if relative_path.extension() == Some(OsStr::new(GPEX_EXT))
+        && path.join(&relative_path).is_file()
+    {
         Ok(relative_path)
     } else {
         Err(format!(
-            "warning ignore entry does not identify an existing .gpex file: {}",
+            "entry in .warningignore file not identifying an existing .gpex file: {}",
             relative_path.display()
         )
         .into())
@@ -154,15 +156,16 @@ fn check_path_is_file(path: &Path, relative_path: PathBuf) -> Result<PathBuf, Fa
 
 fn compile_ok_case(path: &Path, warning_ignored_paths: &[PathBuf]) -> Result<Program, Failed> {
     let (program, logs) = convert_gpex_result(gpex::compile_program(path, false))?;
-    let unexpected_logs = logs
+    let merged_logs = logs
         .into_iter()
         .filter(|log| !is_ignored_warning(log, path, warning_ignored_paths))
         .map(|log| log.to_string())
         .join("");
-    if unexpected_logs.is_empty() {
+    if merged_logs.is_empty() {
         Ok(program)
     } else {
-        Err((String::from("Unexpected compiler logs:\n") + &unexpected_logs).into())
+        let cleaned_logs = replace_paths_in_logs(&merged_logs, path);
+        Err((String::from("unexpected compiler logs:\n") + &cleaned_logs).into())
     }
 }
 
@@ -187,12 +190,8 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
     if logs.is_empty() {
         Err("no compiler log returned".into())
     } else {
-        let actual = logs
-            .iter()
-            .map(Log::to_string)
-            .join("")
-            .replace(&path.display().to_string(), "<root>")
-            .replace(env!("CARGO_MANIFEST_DIR"), "<project>");
+        let merged_logs = &logs.iter().map(Log::to_string).join("");
+        let actual = replace_paths_in_logs(merged_logs, path);
         let expected_path = path.join(".expected.stderr");
         if expected_path.exists() {
             let expected = fs::read_to_string(&expected_path)?;
@@ -205,10 +204,15 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
     }
 }
 
+fn replace_paths_in_logs(logs: &str, gpex_file_path: &Path) -> String {
+    logs.replace(&gpex_file_path.display().to_string(), "<root>")
+        .replace(env!("CARGO_MANIFEST_DIR"), "<project>")
+}
+
 fn convert_gpex_result<T>(result: Result<T, Vec<Log>>) -> Result<T, Failed> {
     match result {
         Ok(output) => Ok(output),
-        Err(logs) => Err((String::from("Compilation failed:\n")
+        Err(logs) => Err((String::from("compilation failed:\n")
             + &logs.iter().map(ToString::to_string).join(""))
             .into()),
     }
