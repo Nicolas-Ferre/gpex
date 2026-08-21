@@ -136,18 +136,18 @@ fn warning_ignore_paths(path: &Path) -> Result<Vec<PathBuf>, Failed> {
         .map(str::trim)
         .filter(|line| !line.is_empty())
         .map(PathBuf::from)
-        .map(|relative_path| check_path_is_file(path, relative_path))
+        .map(|relative_path| validate_warning_ignored_path(path, relative_path))
         .collect()
 }
 
-fn check_path_is_file(path: &Path, relative_path: PathBuf) -> Result<PathBuf, Failed> {
+fn validate_warning_ignored_path(path: &Path, relative_path: PathBuf) -> Result<PathBuf, Failed> {
     if relative_path.extension() == Some(OsStr::new(GPEX_EXT))
         && path.join(&relative_path).is_file()
     {
         Ok(relative_path)
     } else {
         Err(format!(
-            "entry in .warningsignore file not identifying an existing .gpex file: {}",
+            "entry in .warningsignore does not identify an existing .gpex file: {}",
             relative_path.display()
         )
         .into())
@@ -190,8 +190,8 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
     if logs.is_empty() {
         Err("no compiler log returned".into())
     } else {
-        let merged_logs = &logs.iter().map(Log::to_string).join("");
-        let actual = replace_paths_in_logs(merged_logs, path);
+        let merged_logs = logs.iter().map(Log::to_string).join("");
+        let actual = replace_paths_in_logs(&merged_logs, path);
         let expected_path = path.join(".expected.stderr");
         if expected_path.exists() {
             let expected = fs::read_to_string(&expected_path)?;
