@@ -147,7 +147,7 @@ fn check_path_is_file(path: &Path, relative_path: PathBuf) -> Result<PathBuf, Fa
         Ok(relative_path)
     } else {
         Err(format!(
-            "entry in .warningignore file not identifying an existing .gpex file: {}",
+            "entry in .warningsignore file not identifying an existing .gpex file: {}",
             relative_path.display()
         )
         .into())
