@@ -26,8 +26,8 @@ These directories are tested the following way:
 
 - Compile the directory.
 - Verify the compilation succeeded.
-- Verify no compiler warning was produced, unless a `.allow_warnings` file exists in the test
-  directory.
+- Verify no compiler warning was produced, unless the relative path of the warning's `.gpex` file is
+  listed in a `.warningsignore` file in the test directory. Note that wildcards are unsupported.
 - Run the program.
 - Verify that expected values of variables match actual values stored on GPU.
   Expected values can be indicated for variables and constants in `.gpex` files using the following

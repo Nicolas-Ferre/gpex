@@ -19,3 +19,10 @@ on the following:
 - Test coverage and location
 
 Follow instructions from `AGENTS.md` for how questions are displayed and using which method.
+
+The plan must include the following explicit final steps:
+
+- Ensure conventions defined in all `AGENTS.md` files are respected, and adapt changes if this is
+  not the case.
+- Ensure tests are passing: `cargo test --no-fail-fast`
+- Ensure linters are passing: `bash .github/scripts/run_all_lints.sh`

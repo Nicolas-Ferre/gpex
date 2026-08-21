@@ -106,12 +106,9 @@ fn run_case(path: &Path, case_kind: CaseKind, runtime: Arc<Runtime>) -> Result<(
 }
 
 async fn run_ok_cases(path: &Path, is_wgsl_check_enabled: bool) -> Result<(), Failed> {
-    let is_warning_treated_as_error = !path.join(".allow_warnings").exists();
+    let warning_ignore_paths = warning_ignore_paths(path)?;
     let generated_path = generate_case(path)?;
-    let (program, _) = convert_gpex_result(gpex::compile_program(
-        &generated_path,
-        is_warning_treated_as_error,
-    ))?;
+    let program = compile_ok_case(&generated_path, &warning_ignore_paths)?;
     let expected_values = expected_values(&generated_path, &generated_path)?;
     let frame_count = expected_values
         .iter()
@@ -127,6 +124,62 @@ async fn run_ok_cases(path: &Path, is_wgsl_check_enabled: bool) -> Result<(), Fa
         check_wgsl_output(path, runner.program())?;
     }
     Ok(())
+}
+
+fn warning_ignore_paths(path: &Path) -> Result<Vec<PathBuf>, Failed> {
+    let ignore_path = path.join(".warningsignore");
+    if !ignore_path.exists() {
+        return Ok(vec![]);
+    }
+    fs::read_to_string(&ignore_path)?
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .map(PathBuf::from)
+        .map(|relative_path| check_path_is_file(path, relative_path))
+        .collect()
+}
+
+fn check_path_is_file(path: &Path, relative_path: PathBuf) -> Result<PathBuf, Failed> {
+    if path.join(&relative_path).is_file() {
+        Ok(relative_path)
+    } else {
+        Err(format!(
+            "warning ignore entry does not identify an existing .gpex file: {}",
+            relative_path.display()
+        )
+        .into())
+    }
+}
+
+fn compile_ok_case(path: &Path, warning_ignored_paths: &[PathBuf]) -> Result<Program, Failed> {
+    let (program, logs) = convert_gpex_result(gpex::compile_program(path, false))?;
+    let unexpected_logs = logs
+        .into_iter()
+        .filter(|log| !is_ignored_warning(log, path, warning_ignored_paths))
+        .map(|log| log.to_string())
+        .join("");
+    if unexpected_logs.is_empty() {
+        Ok(program)
+    } else {
+        Err((String::from("Unexpected compiler logs:\n") + &unexpected_logs).into())
+    }
+}
+
+fn is_ignored_warning(log: &Log, root_path: &Path, ignored_paths: &[PathBuf]) -> bool {
+    if log.level != gpex::LogLevel::Warning {
+        return false;
+    }
+    let Some(location) = log.location.as_ref() else {
+        return false;
+    };
+    let relative_path = location
+        .path
+        .strip_prefix(root_path)
+        .unwrap_or(location.path.as_path());
+    ignored_paths
+        .iter()
+        .any(|ignored_path| ignored_path == relative_path)
 }
 
 fn run_nok_cases(path: &Path) -> Result<(), Failed> {
