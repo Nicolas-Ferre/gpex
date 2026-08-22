@@ -7,7 +7,8 @@ VISIBILITY_REGEX='(pub([[:space:]]*\([^)]*\))?[[:space:]]+)?'
 MODIFIER_REGEX='(async[[:space:]]+|unsafe[[:space:]]+|const[[:space:]]+|default[[:space:]]+|extern[[:space:]]+)*'
 ITEM_START_REGEX="^[[:space:]]*${VISIBILITY_REGEX}${MODIFIER_REGEX}(fn|struct|enum|trait|impl|const|static|type|union)([[:space:]]|<)|^[[:space:]]*${VISIBILITY_REGEX}mod[[:space:]]+[a-zA-Z0-9_]+[[:space:]]*\{|^[[:space:]]*(macro_rules![[:space:]]+|macro[[:space:]])"
 GROUPED_ITEM_REGEX="^[[:space:]]*${VISIBILITY_REGEX}(use[[:space:]]|mod[[:space:]]+[a-zA-Z0-9_]+[[:space:]]*;)"
-SPECIAL_ITEM_REGEX="^[[:space:]]*${VISIBILITY_REGEX}(const|type)[[:space:]]+[a-zA-Z_]"
+CONST_ITEM_REGEX="^[[:space:]]*${VISIBILITY_REGEX}const[[:space:]]+[a-zA-Z_]"
+TYPE_ITEM_REGEX="^[[:space:]]*${VISIBILITY_REGEX}type[[:space:]]+[a-zA-Z_]"
 PREAMBLE_REGEX="^[[:space:]]*(#\[|///|//!|//)"
 EMPTY_REGEX="^[[:space:]]*$"
 FUNCTION_START_REGEX="^[[:space:]]*${VISIBILITY_REGEX}${MODIFIER_REGEX}fn([[:space:]]|<)"
@@ -37,7 +38,8 @@ consume_function_scope_line() {
         fi
         return 0
     fi
-    if [[ -n $function_end && $line != "$function_end" ]]; then
+    local function_end_regex="^${function_end}[[:space:]]*(//.*)?$"
+    if [[ -n $function_end && ! $line =~ $function_end_regex ]]; then
         return 0
     fi
     if [[ -n $function_end ]]; then
@@ -56,8 +58,12 @@ record_preamble() {
 
 get_item_kind() {
     local item_kind=other
-    if ! [[ $line =~ $FUNCTION_START_REGEX ]] && [[ $line =~ $SPECIAL_ITEM_REGEX ]]; then
-        item_kind=${BASH_REMATCH[3]}
+    if [[ $line =~ $GROUPED_ITEM_REGEX ]]; then
+        item_kind="grouped"
+    elif ! [[ $line =~ $FUNCTION_START_REGEX ]] && [[ $line =~ $CONST_ITEM_REGEX ]]; then
+        item_kind="const"
+    elif ! [[ $line =~ $FUNCTION_START_REGEX ]] && [[ $line =~ $TYPE_ITEM_REGEX ]]; then
+        item_kind="type"
     fi
     printf '%s\n' "$item_kind"
 }
@@ -76,7 +82,8 @@ check_item_separation() {
     current_item_kind=$(get_item_kind)
     last_item_kind=${last_item_kinds[$indent_length]-}
     if [[ -n $last_item_kind && ! ($current_item_kind == "$last_item_kind" &&
-        ($current_item_kind == const || $current_item_kind == type)) &&
+        ($current_item_kind == const || $current_item_kind == type ||
+        $current_item_kind == grouped)) &&
         ! $separator_line =~ $EMPTY_REGEX ]]; then
         echo "$file:$violation_line: items should be separated by an empty line"
         exit_code=1
@@ -100,8 +107,7 @@ process_item_line() {
     if [[ $line =~ $PREAMBLE_REGEX ]]; then
         record_preamble
     elif [[ $line =~ $GROUPED_ITEM_REGEX ]]; then
-        last_item_kinds[indent_length]=other
-        reset_preamble
+        check_item_separation
     elif [[ $line =~ $ITEM_START_REGEX ]]; then
         check_item_separation
         start_function_scope
