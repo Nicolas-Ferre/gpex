@@ -15,6 +15,7 @@ EXCLUSION_REGEX="no-fn-check"
 IMPL_BLOCK_START_REGEX="^impl([[:space:]<]|$)"
 TRAIT_IMPL_BLOCK_START_REGEX="^impl.*[[:space:]]for[[:space:]]"
 IMPL_BLOCK_END_REGEX="^}"
+EMPTY_IMPL_BLOCK_REGEX="^impl.*\{\}[[:space:]]*$"
 FUNCTION_DEFINITION_START_REGEX="^([[:space:]]*)(.*)fn[[:space:]]([a-zA-Z0-9_]+)[^;]*$"
 FUNCTION_END="}"
 FUNCTION_CALL_REGEX="([a-zA-Z_][a-zA-Z0-9_]*)[<(]"
@@ -123,6 +124,10 @@ while read -r -d '' file; do
         if [[ $line =~ $TRAIT_IMPL_BLOCK_START_REGEX ]]; then
             is_in_trait_impl_block=true
         elif [[ $line =~ $IMPL_BLOCK_END_REGEX ]]; then
+            is_in_impl_block=false
+            is_in_trait_impl_block=false
+        fi
+        if [[ $line =~ $EMPTY_IMPL_BLOCK_REGEX ]]; then
             is_in_impl_block=false
             is_in_trait_impl_block=false
         fi
