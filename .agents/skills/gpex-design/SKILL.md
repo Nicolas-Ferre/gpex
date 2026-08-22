@@ -1,6 +1,6 @@
 ---
 name: gpex-design
-description: Define all necessary open points to design a change.
+description: Resolve all the open questions needed to design a change.
 ---
 
 ## Preconditions
