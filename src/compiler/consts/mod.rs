@@ -13,6 +13,36 @@ use crate::compiler::state::State;
 use crate::compiler::types;
 use std::hash::{Hash, Hasher};
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub(crate) enum ConstValue<'item> {
+    TypeRef(&'item StructDefinition),
+    Param(&'item Param),
+    WildcardType(&'item Param),
+    I32(i32),
+    U32(u32),
+    F32(HashableF32),
+    Bool(bool),
+    Unknown,
+    RuntimeValue,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct HashableF32(pub(crate) f32);
+
+impl PartialEq for HashableF32 {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.to_bits() == other.0.to_bits()
+    }
+}
+
+impl Eq for HashableF32 {}
+
+impl Hash for HashableF32 {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.to_bits().hash(state);
+    }
+}
+
 pub(crate) fn expr_value<'item>(expr: &Expr, state: &State<'item>) -> ConstValue<'item> {
     match expr {
         Expr::F32Literal(literal) => f32_literal_value(literal),
@@ -184,35 +214,5 @@ fn param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
             ItemRef::Var(_) | ItemRef::Const(_) | ItemRef::Struct(_) | ItemRef::Fn(_) => None,
             ItemRef::Param(param) => Some(param),
         },
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) enum ConstValue<'item> {
-    TypeRef(&'item StructDefinition),
-    Param(&'item Param),
-    WildcardType(&'item Param),
-    I32(i32),
-    U32(u32),
-    F32(HashableF32),
-    Bool(bool),
-    Unknown,
-    RuntimeValue,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub(crate) struct HashableF32(pub(crate) f32);
-
-impl PartialEq for HashableF32 {
-    fn eq(&self, other: &Self) -> bool {
-        self.0.to_bits() == other.0.to_bits()
-    }
-}
-
-impl Eq for HashableF32 {}
-
-impl Hash for HashableF32 {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.to_bits().hash(state);
     }
 }

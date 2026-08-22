@@ -27,13 +27,6 @@ impl<'item> TypeFactOperand<'item> {
     }
 }
 
-pub(super) fn type_fact_param(type_: Type<'_>) -> Option<&Param> {
-    match type_ {
-        Type::Param(type_param) | Type::Wildcard(type_param) => Some(type_param),
-        Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
-    }
-}
-
 pub(super) struct TypeFact<'item> {
     pub(super) operands: [TypeFactOperand<'item>; 2],
     pub(super) condition_node_id: u64,
@@ -112,5 +105,12 @@ impl<'item> TypeFact<'item> {
                 .type_facts
                 .insert(param.id, facts.clone());
         }
+    }
+}
+
+pub(super) fn type_fact_param(type_: Type<'_>) -> Option<&Param> {
+    match type_ {
+        Type::Param(type_param) | Type::Wildcard(type_param) => Some(type_param),
+        Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
     }
 }

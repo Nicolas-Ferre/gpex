@@ -21,6 +21,53 @@ const IDENT_SEARCH_CONFIG: SearchConfig = SearchConfig {
     can_be_parent_node: false,
 };
 
+struct IndexState<'state, 'item> {
+    inner: &'state mut State<'item>,
+    type_narrowing: TypeNarrowingState<'item>,
+    phase: IndexPhase,
+    has_index_changed: bool,
+}
+
+impl<'state, 'item> IndexState<'state, 'item> {
+    fn new(state: &'state mut State<'item>) -> Self {
+        Self {
+            inner: state,
+            type_narrowing: TypeNarrowingState::default(),
+            phase: IndexPhase::Converging,
+            has_index_changed: false,
+        }
+    }
+
+    fn set_expr_source(&mut self, node_id: u64, source: Option<ItemRef<'item>>) {
+        let previous_source = self.inner.sources.get(&node_id).copied();
+        if previous_source == source {
+            return;
+        }
+        if let Some(source) = source {
+            self.inner.sources.insert(node_id, source);
+        } else {
+            self.inner.sources.remove(&node_id);
+        }
+        self.has_index_changed = true;
+    }
+
+    fn set_expr_type_facts(&mut self, node_id: u64, facts: Rc<TypeFacts<'item>>) {
+        self.has_index_changed |= self.inner.set_expr_type_facts(node_id, facts);
+    }
+}
+
+#[derive(PartialEq, Eq)]
+enum IndexPhase {
+    Converging,
+    Final,
+}
+
+enum CallSource<'item> {
+    Found(ItemRef<'item>),
+    NotFound,
+    Unknown,
+}
+
 pub(crate) fn index_modules<'item>(modules: &'item [Module], state: &mut State<'item>) {
     let mut state = IndexState::new(state);
     for module in modules {
@@ -155,51 +202,4 @@ fn index_statement_refs<'item>(statement: &'item Statement, state: &mut IndexSta
             exprs::index_expr(&assignment.value, state);
         }
     }
-}
-
-struct IndexState<'state, 'item> {
-    inner: &'state mut State<'item>,
-    type_narrowing: TypeNarrowingState<'item>,
-    phase: IndexPhase,
-    has_index_changed: bool,
-}
-
-impl<'state, 'item> IndexState<'state, 'item> {
-    fn new(state: &'state mut State<'item>) -> Self {
-        Self {
-            inner: state,
-            type_narrowing: TypeNarrowingState::default(),
-            phase: IndexPhase::Converging,
-            has_index_changed: false,
-        }
-    }
-
-    fn set_expr_source(&mut self, node_id: u64, source: Option<ItemRef<'item>>) {
-        let previous_source = self.inner.sources.get(&node_id).copied();
-        if previous_source == source {
-            return;
-        }
-        if let Some(source) = source {
-            self.inner.sources.insert(node_id, source);
-        } else {
-            self.inner.sources.remove(&node_id);
-        }
-        self.has_index_changed = true;
-    }
-
-    fn set_expr_type_facts(&mut self, node_id: u64, facts: Rc<TypeFacts<'item>>) {
-        self.has_index_changed |= self.inner.set_expr_type_facts(node_id, facts);
-    }
-}
-
-#[derive(PartialEq, Eq)]
-enum IndexPhase {
-    Converging,
-    Final,
-}
-
-enum CallSource<'item> {
-    Found(ItemRef<'item>),
-    NotFound,
-    Unknown,
 }

@@ -11,6 +11,40 @@ use crate::compiler::state::State;
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
+#[derive(Debug, Clone, Copy)]
+#[derive_where(PartialEq)]
+pub(crate) enum Type<'item> {
+    Struct(&'item StructDefinition),
+    Param(&'item Param),
+    Wildcard(&'item Param),
+    NoReturn,
+    #[derive_where(incomparable)]
+    Unknown,
+}
+
+impl<'item> Type<'item> {
+    pub(crate) fn is_comparable(self) -> bool {
+        matches!(self, Self::Struct(_) | Self::Param(_) | Self::Wildcard(_))
+    }
+
+    pub(crate) fn name(self) -> Result<String, ValidateError> {
+        match self {
+            Type::Struct(struct_) => Ok(struct_.name.clone()),
+            Type::Param(param) => Ok(param.name.clone()),
+            Type::Wildcard(param) => Ok(format!("typeof({})", param.name)),
+            Type::NoReturn | Type::Unknown => Err(ValidateError),
+        }
+    }
+
+    pub(crate) fn struct_ref(self) -> Option<&'item StructDefinition> {
+        if let Self::Struct(struct_) = self {
+            Some(struct_)
+        } else {
+            None
+        }
+    }
+}
+
 pub(crate) fn var_type<'item>(var: &VarDefinition, state: &State<'item>) -> Type<'item> {
     expr_type(&var.default_value, state)
 }
@@ -148,39 +182,5 @@ fn item_type<'item>(item: ItemRef<'item>, args: &[Arg], state: &State<'item>) ->
         ItemRef::Struct(_) => Type::Struct(state.search_prelude_type("typeref")),
         ItemRef::Fn(fn_) => const_fn_type(fn_, args, state),
         ItemRef::Param(_) => unreachable!("param type should be calculated elsewhere"),
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-#[derive_where(PartialEq)]
-pub(crate) enum Type<'item> {
-    Struct(&'item StructDefinition),
-    Param(&'item Param),
-    Wildcard(&'item Param),
-    NoReturn,
-    #[derive_where(incomparable)]
-    Unknown,
-}
-
-impl<'item> Type<'item> {
-    pub(crate) fn is_comparable(self) -> bool {
-        matches!(self, Self::Struct(_) | Self::Param(_) | Self::Wildcard(_))
-    }
-
-    pub(crate) fn name(self) -> Result<String, ValidateError> {
-        match self {
-            Type::Struct(struct_) => Ok(struct_.name.clone()),
-            Type::Param(param) => Ok(param.name.clone()),
-            Type::Wildcard(param) => Ok(format!("typeof({})", param.name)),
-            Type::NoReturn | Type::Unknown => Err(ValidateError),
-        }
-    }
-
-    pub(crate) fn struct_ref(self) -> Option<&'item StructDefinition> {
-        if let Self::Struct(struct_) = self {
-            Some(struct_)
-        } else {
-            None
-        }
     }
 }
