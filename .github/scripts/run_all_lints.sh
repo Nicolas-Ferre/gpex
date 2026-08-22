@@ -32,9 +32,8 @@ start() {
 
 mkdir -p target/lints
 
-cargo fmt -- --check
-shfmt --indent 4 -l .github/scripts/*.sh
-
+start cargo fmt -- --check
+start shfmt --indent 4 -l .github/scripts/*.sh
 start git diff --check
 start shellcheck .github/scripts/*.sh --shell bash --severity style --external-sources
 start bash .github/scripts/check_file_line_count.sh

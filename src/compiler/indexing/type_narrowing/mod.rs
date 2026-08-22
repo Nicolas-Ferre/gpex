@@ -22,14 +22,14 @@ pub(super) enum LogicalTypeNarrowing {
 }
 
 impl LogicalTypeNarrowing {
-    pub(super) fn logical_operator(self) -> BinaryIntrinsicFn {
+    fn logical_operator(self) -> BinaryIntrinsicFn {
         match self {
             Self::And => BinaryIntrinsicFn::And,
             Self::Or => BinaryIntrinsicFn::Or,
         }
     }
 
-    pub(super) fn comparison_operator(self) -> BinaryIntrinsicFn {
+    fn comparison_operator(self) -> BinaryIntrinsicFn {
         match self {
             Self::And => BinaryIntrinsicFn::Eq,
             Self::Or => BinaryIntrinsicFn::Ne,
