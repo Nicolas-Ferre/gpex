@@ -1,3 +1,7 @@
+mod many;
+
+pub(crate) use many::SeparatorParser;
+
 use crate::utils::parsing::error::ParseError;
 use crate::utils::reading::ReadFile;
 use std::path::Path;
@@ -112,42 +116,7 @@ impl<'config> ParseContext<'config> {
         separator_parser: SeparatorParser<'config>,
         stop_excluded_parser: impl Fn(&mut Self) -> ParserResult<'config, ()>,
     ) -> Result<Vec<T>, ParseError<'config>> {
-        let initial_context = self.clone();
-        let mut items = vec![
-            match self.parse_first_item(&item_parser, &stop_excluded_parser) {
-                ParseManyStepResult::Item(item) => item,
-                ParseManyStepResult::End => return Ok(vec![]),
-                ParseManyStepResult::Error(error) => {
-                    *self = initial_context;
-                    return Err(error);
-                }
-            },
-        ];
-        loop {
-            match self.parse_separator(separator_parser, &stop_excluded_parser) {
-                ParseManyStepResult::Item(()) => {}
-                ParseManyStepResult::End => break Ok(items),
-                ParseManyStepResult::Error(error) => {
-                    *self = initial_context;
-                    break Err(error);
-                }
-            }
-            items.push(
-                match self.parse_next_item(&item_parser, separator_parser, &stop_excluded_parser) {
-                    ParseManyStepResult::Item(item) => item,
-                    ParseManyStepResult::End => break Ok(items),
-                    ParseManyStepResult::Error(error) => {
-                        if matches!(separator_parser, SeparatorParser::MaybeTrailing(_))
-                            && stop_excluded_parser(&mut self.clone()).is_ok()
-                        {
-                            break Ok(items);
-                        }
-                        *self = initial_context;
-                        break Err(error);
-                    }
-                },
-            );
-        }
+        many::parse(self, item_parser, separator_parser, stop_excluded_parser)
     }
 
     pub(super) fn parse_whitespaces_and_comments(&mut self) {
@@ -176,90 +145,8 @@ impl<'config> ParseContext<'config> {
         }
     }
 
-    fn parse_first_item<T>(
-        &mut self,
-        item_parser: impl Fn(&mut Self) -> ParserResult<'config, T>,
-        stop_excluded_parser: impl Fn(&mut Self) -> ParserResult<'config, ()>,
-    ) -> ParseManyStepResult<'config, T> {
-        let previous_context = self.clone();
-        let item_error = match item_parser(self) {
-            Ok(item) => return ParseManyStepResult::Item(item),
-            Err(item_error) => item_error,
-        };
-        *self = previous_context;
-        match stop_excluded_parser(&mut self.clone()) {
-            Ok(()) => ParseManyStepResult::End,
-            Err(stop_error) => {
-                ParseManyStepResult::Error(ParseError::merge(&[item_error, stop_error]))
-            }
-        }
-    }
-
-    fn parse_separator(
-        &mut self,
-        separator_parser: SeparatorParser<'config>,
-        stop_excluded_parser: impl Fn(&mut Self) -> ParserResult<'config, ()>,
-    ) -> ParseManyStepResult<'config, ()> {
-        let Some(separator_parser) = separator_parser.parser() else {
-            return ParseManyStepResult::Item(());
-        };
-        let previous_context = self.clone();
-        let Err(separator_error) = separator_parser(self) else {
-            return ParseManyStepResult::Item(());
-        };
-        *self = previous_context;
-        if let Err(stop_error) = stop_excluded_parser(&mut self.clone()) {
-            ParseManyStepResult::Error(ParseError::merge(&[separator_error, stop_error]))
-        } else {
-            ParseManyStepResult::End
-        }
-    }
-
-    fn parse_next_item<T>(
-        &mut self,
-        item_parser: impl Fn(&mut Self) -> ParserResult<'config, T>,
-        separator_parser: SeparatorParser<'config>,
-        stop_excluded_parser: impl Fn(&mut Self) -> ParserResult<'config, ()>,
-    ) -> ParseManyStepResult<'config, T> {
-        let previous_context = self.clone();
-        let item_error = match item_parser(self) {
-            Ok(item) => return ParseManyStepResult::Item(item),
-            Err(error) => error,
-        };
-        *self = previous_context;
-        match stop_excluded_parser(&mut self.clone()) {
-            Ok(()) if separator_parser.parser().is_some() => ParseManyStepResult::Error(item_error),
-            Ok(()) => ParseManyStepResult::End,
-            Err(_) => ParseManyStepResult::Error(item_error),
-        }
-    }
-
     fn parse_whitespaces(&mut self) {
         let trimmed_code = self.remaining_code().trim_start(); // no-fn-check (recursivity)
         self.offset += self.remaining_code().len() - trimmed_code.len(); // no-fn-check (recursivity)
     }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub(crate) enum SeparatorParser<'context> {
-    None,
-    NotTrailing(Parser<'context, ()>),
-    MaybeTrailing(Parser<'context, ()>),
-}
-
-impl<'context> SeparatorParser<'context> {
-    fn parser(self) -> Option<Parser<'context, ()>> {
-        match self {
-            SeparatorParser::None => None,
-            SeparatorParser::NotTrailing(parser) | SeparatorParser::MaybeTrailing(parser) => {
-                Some(parser)
-            }
-        }
-    }
-}
-
-enum ParseManyStepResult<'config, T> {
-    Item(T),
-    End,
-    Error(ParseError<'config>),
 }

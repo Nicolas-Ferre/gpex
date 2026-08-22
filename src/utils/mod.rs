@@ -4,6 +4,7 @@ pub(crate) mod endianness;
 pub(crate) mod formatting;
 pub(crate) mod indexing;
 pub(crate) mod logs;
+pub(crate) mod math;
 pub(crate) mod parsing;
 pub(crate) mod reading;
 pub(crate) mod validation;

@@ -17,6 +17,19 @@ pub(crate) fn validate_call(
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     let source = state.inner.sources.get(&call.id).copied();
+    validate_args(call, source, state)?;
+    validate_contradicted_fact(call, state)?;
+    let displayed_key = key_rendering::call_key(call, state.inner)?;
+    let source =
+        exprs::validate_source(source, call, call.span, &call.key(), &displayed_key, state)?;
+    validate_resolved_call(call, source, state)
+}
+
+fn validate_args(
+    call: &Call,
+    source: Option<ItemRef<'_>>,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
     let is_constness_ignored = source.is_some_and(ItemRef::is_param_constness_ignored);
     let mut is_error_detected = false;
     for (index, arg) in call.args.iter().enumerate() {
@@ -39,12 +52,17 @@ pub(crate) fn validate_call(
         });
     }
     if is_error_detected {
-        return Err(ValidateError);
+        Err(ValidateError)
+    } else {
+        Ok(())
     }
-    validate_contradicted_fact(call, state)?;
-    let displayed_key = key_rendering::call_key(call, state.inner)?;
-    let source =
-        exprs::validate_source(source, call, call.span, &call.key(), &displayed_key, state)?;
+}
+
+fn validate_resolved_call(
+    call: &Call,
+    source: ItemRef<'_>,
+    state: &mut ValidateState<'_, '_>,
+) -> Result<(), ValidateError> {
     for (arg, param) in call.args.iter().zip(&source.params().params) {
         // Error is ignored because it is isolated from other errors
         _ = validate_arg_name(arg, param, state);

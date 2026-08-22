@@ -57,13 +57,7 @@ impl FnDefinition {
             let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
             let params = ParamGroup::parse(context)?;
             let (arrow_span, return_type, signature_end_span) =
-                if let Ok(arrow_span) = Span::parse_symbol(context, ARROW_SYMBOL) {
-                    let expr = Expr::parse(context, Self::parse_return_type_stop)?;
-                    let span = expr.span();
-                    (Some(arrow_span), Some(expr), span)
-                } else {
-                    (None, None, params.span)
-                };
+                Self::parse_return_type(context, &params)?;
             let body =
                 context.parse_any(&[&Self::parse_body_statements, &Self::parse_intrinsic])?;
             Ok(Self {
@@ -121,6 +115,18 @@ impl FnDefinition {
             .params
             .iter()
             .any(|param| param.requirement.is_some())
+    }
+
+    fn parse_return_type<'context>(
+        context: &mut ParseContext<'context>,
+        params: &ParamGroup,
+    ) -> Result<(Option<Span>, Option<Expr>, Span), ParseError<'context>> {
+        let Ok(arrow_span) = Span::parse_symbol(context, ARROW_SYMBOL) else {
+            return Ok((None, None, params.span));
+        };
+        let expr = Expr::parse(context, Self::parse_return_type_stop)?;
+        let span = expr.span();
+        Ok((Some(arrow_span), Some(expr), span))
     }
 
     fn parse_return_type_stop<'context>(

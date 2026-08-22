@@ -94,16 +94,7 @@ impl ImportSegment {
         for &segment in segments {
             match segment {
                 Self::Name(span) => path.push(span_props.slice(span)),
-                Self::Parent(_) => {
-                    if parent_segment_count < path.iter().count()
-                        && let Some(parent) = path.parent()
-                    {
-                        path = parent.to_path_buf();
-                    } else {
-                        path.push("..");
-                        parent_segment_count += 1;
-                    }
-                }
+                Self::Parent(_) => Self::push_parent(&mut path, &mut parent_segment_count),
             }
         }
         path.with_extension(EXT)
@@ -112,5 +103,16 @@ impl ImportSegment {
     pub(crate) fn span(self) -> Span {
         let (Self::Name(span) | Self::Parent(span)) = self;
         span
+    }
+
+    fn push_parent(path: &mut PathBuf, parent_segment_count: &mut usize) {
+        if *parent_segment_count < path.iter().count()
+            && let Some(parent) = path.parent()
+        {
+            *path = parent.to_path_buf();
+        } else {
+            path.push("..");
+            *parent_segment_count += 1;
+        }
     }
 }

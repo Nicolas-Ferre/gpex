@@ -1,3 +1,4 @@
+mod buffers;
 mod exprs;
 mod intrinsic;
 mod items;
@@ -10,8 +11,8 @@ use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::state::State;
-use crate::compiler::types;
 use crate::utils::dependencies::Dependencies;
+use crate::utils::math;
 use crate::utils::reading::ReadFile;
 use itertools::Itertools;
 use petgraph::graphmap::DiGraphMap;
@@ -83,75 +84,17 @@ pub(crate) fn transpile<'item>(
     let mut state = TranspileState::new(state);
     let init_shader = transpile_init(modules, &mut state);
     let update_shader = transpile_repeats(modules, &mut state);
-    let mut offset = 0;
-    let variables: Vec<_> = sorted_global_vars_for_definition(modules);
-    let buffer_alignment = main_buffer_alignment(&variables, &state);
-    let fields = variables
-        .iter()
-        .enumerate()
-        .map(|(index, var)| {
-            let dot_path = &files[var.name_span.file_index].dot_path;
-            let path = format!("{}:{}", dot_path, var.name);
-            let type_ = types::var_type(var, state.inner)
-                .struct_ref()
-                .unwrap_or_else(|| unreachable!("variable type should be validated before"));
-            let field = BufferField {
-                type_id: type_.id,
-                size: type_.size(),
-                offset,
-            };
-            offset = main_buffer_next_field_offset(&variables, index, offset, type_, &state);
-            (path, field)
-        })
-        .collect::<HashMap<_, _>>();
+    let vars: Vec<_> = sorted_global_vars_for_definition(modules);
+    let buffer_alignment = buffers::main_buffer_alignment(&vars, &state);
+    let (fields, buffer_size) = buffers::main_buffer_fields(files, &vars, &state);
     Program {
         type_paths: type_paths(&state),
         buffer: Buffer {
-            size: round_up(buffer_alignment, offset),
+            size: math::round_up(buffer_alignment, buffer_size),
             fields,
         },
         init_shader,
         update_shader,
-    }
-}
-
-fn main_buffer_next_field_offset(
-    fields: &[&VarDefinition],
-    current_field_index: usize,
-    current_field_offset: u32,
-    current_field_type: &StructDefinition,
-    state: &TranspileState<'_, '_>,
-) -> u32 {
-    if let Some(next_var) = fields.get(current_field_index + 1) {
-        let next_var_type = types::var_type(next_var, state.inner)
-            .struct_ref()
-            .unwrap_or_else(|| unreachable!("variable type should be validated before"));
-        round_up(
-            next_var_type.alignment(),
-            current_field_offset + current_field_type.size(),
-        )
-    } else {
-        current_field_offset + current_field_type.size()
-    }
-}
-
-fn main_buffer_alignment(vars: &[&VarDefinition], state: &TranspileState<'_, '_>) -> u32 {
-    vars.iter()
-        .map(|var| {
-            types::var_type(var, state.inner)
-                .struct_ref()
-                .unwrap_or_else(|| unreachable!("variable type should be validated before"))
-                .alignment()
-        })
-        .max()
-        .unwrap_or(0)
-}
-
-fn round_up(rounded_to: u32, value: u32) -> u32 {
-    if rounded_to == 0 {
-        0
-    } else {
-        value.div_ceil(rounded_to) * rounded_to
     }
 }
 
