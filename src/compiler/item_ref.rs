@@ -95,7 +95,6 @@ impl<'item> ItemRef<'item> {
         }
     }
 
-    #[expect(clippy::excessive_nesting)] // scope cleanup adds one level around existing matching logic
     pub(crate) fn args_match(self, args: &[Arg], state: &State<'item>) -> ArgsMatch {
         let params = self.params();
         state.in_scope(|state| {
