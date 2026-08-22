@@ -155,7 +155,7 @@ jobs:
         run: curl -sS https://webi.sh/shfmt | sh; source ~/.config/envman/PATH.env
       - name: Check encoding
         run: isutf8 -- **/*
-      - name: Run all linters
+      - name: Run custom linters
         run: bash .github/scripts/run_all_lints.sh
       - name: Generate documentation
         run: cargo doc --no-deps

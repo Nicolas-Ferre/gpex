@@ -18,9 +18,9 @@ See `doc/testing.md`.
 - To run to validate implementations:
     - `cargo test --no-fail-fast`: run tests
     - `cargo clippy --all-targets --no-deps -- -D warnings`: run Clippy
-    - `bash .github/scripts/run_all_lints.sh --fast`: run fast linters
+    - `bash .github/scripts/run_all_lints.sh --fast`: run the fast custom linters
 - To run at the end of a full task only:
-    - `bash .github/scripts/run_all_lints.sh`: run all linters, including slower ones
+    - `bash .github/scripts/run_all_lints.sh`: run all custom linters, including slower ones
 - To run when checking a specific GPEx program:
     - `cargo run -- compile <source-dir> <output-file>`: compile a GPEx program.
     - `cargo run -- run <source-dir>`: compile and continuously execute a program on the GPU.
@@ -64,4 +64,3 @@ See `doc/testing.md`.
       `is_connected_user`).
     - Avoid including a negation in the name (e.g. avoid `is_not_active`,
       `is_disconnected`, ...).
-- Functions/methods should be separated by one blank line.
