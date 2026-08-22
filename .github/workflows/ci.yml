@@ -179,6 +179,8 @@ jobs:
         run: bash .github/scripts/check_function_call_order.sh
       - name: Detect incorrect function visibility ordering
         run: bash .github/scripts/check_function_visibility_order.sh
+      - name: Detect missing empty lines between Rust items
+        run: bash .github/scripts/check_item_separation.sh
       - name: Generate documentation
         run: cargo doc --no-deps
         env:
