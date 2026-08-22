@@ -32,17 +32,17 @@ start() {
 
 mkdir -p target/lints
 
-cargo fmt
-shfmt --indent 4 -w .github/scripts/*.sh
+cargo fmt -- --check
+shfmt --indent 4 -l .github/scripts/*.sh
 
 start git diff --check
 start shellcheck .github/scripts/*.sh --shell bash --severity style --external-sources
-start cargo clippy --all-targets --no-deps -- -D warnings
 start bash .github/scripts/check_impl_order.sh
 start bash .github/scripts/check_function_body_empty_lines.sh
 start bash .github/scripts/check_mod_location.sh
 start bash .github/scripts/check_function_call_order.sh
 start bash .github/scripts/check_function_visibility_order.sh
+start bash .github/scripts/check_item_separation.sh
 
 if [[ $is_fast == false ]]; then
     start bash .github/scripts/check_line_endings.sh

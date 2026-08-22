@@ -151,34 +151,12 @@ jobs:
           cache-bin: false
       - name: Install dependencies
         run: sudo apt update && sudo apt install -y moreutils shellcheck
-      - name: Lint Bash scripts
-        run: shellcheck .github/scripts/*.sh --shell bash --severity style --external-sources
       - name: Install shfmt
         run: curl -sS https://webi.sh/shfmt | sh; source ~/.config/envman/PATH.env
-      - name: Check Bash script formatting
-        run: shfmt --indent 4 -l .github/scripts/*.sh
-      - name: Run Rust code formatting
-        run: cargo fmt -- --check
       - name: Check encoding
         run: isutf8 -- **/*
-      - name: Detect line endings different than '\n'
-        run: bash .github/scripts/check_line_endings.sh
-      - name: Detect TODOs
-        run: bash .github/scripts/check_todos.sh
-      - name: Check file paths
-        run: bash .github/scripts/check_file_paths.sh
-      - name: Check Rust identifiers
-        run: bash .github/scripts/check_identifiers.sh
-      - name: Detect incorrect impl block ordering
-        run: bash .github/scripts/check_impl_order.sh
-      - name: Detect disallowed empty lines in function bodies
-        run: bash .github/scripts/check_function_body_empty_lines.sh
-      - name: Detect inline mod statements that are not at the top of a file
-        run: bash .github/scripts/check_mod_location.sh
-      - name: Detect function called after their definition
-        run: bash .github/scripts/check_function_call_order.sh
-      - name: Detect incorrect function visibility ordering
-        run: bash .github/scripts/check_function_visibility_order.sh
+      - name: Run custom linters
+        run: bash .github/scripts/run_all_lints.sh
       - name: Generate documentation
         run: cargo doc --no-deps
         env:
