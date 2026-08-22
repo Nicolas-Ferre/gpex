@@ -136,8 +136,7 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
         .then(|| ignored_name_replacement(name))
         .flatten();
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
-        #[expect(clippy::unnecessary_to_owned)] // needed to avoid borrow checker error
-        log_unused(item, &name.to_string(), name_span, is_operator_fn, state);
+        log_unused(item, name_span, is_operator_fn, state);
     } else if item.is_pub() && is_unused_lint_ignored {
         log_pub_with_ignored_name(item, ignored_name_replacement.as_deref(), name_span, state);
     } else if let Some(ref_span) = ref_span
@@ -155,11 +154,11 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
 
 fn log_unused<'item>(
     item: ItemRef<'item>,
-    name: &str,
     name_span: Span,
     is_operator_fn: bool,
     state: &mut ValidateState<'_, 'item>,
 ) {
+    let name = state.context.slice(name_span);
     let displayed_key = item.displayed_key(state.inner);
     let replacement = (!is_operator_fn).then(|| format!("_{name}"));
     state.add_log(logs::items::unused(
