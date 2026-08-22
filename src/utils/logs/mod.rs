@@ -1,12 +1,12 @@
+mod location;
+
+pub use location::LogLocation;
+
 use owo_colors::colors::{Blue, Green, Red, Yellow};
 use owo_colors::{Color, OwoColorize, Stream};
 use std::fmt::{Display, Formatter};
 use std::io;
 use std::path::{Path, PathBuf};
-
-mod location;
-
-pub use location::LogLocation;
 
 /// A compilation log.
 #[derive(Debug)]

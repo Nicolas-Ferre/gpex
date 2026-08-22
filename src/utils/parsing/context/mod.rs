@@ -1,10 +1,10 @@
-use crate::utils::parsing::error::ParseError;
-use crate::utils::reading::ReadFile;
-use std::path::Path;
-
 mod many;
 
 pub(crate) use many::SeparatorParser;
+
+use crate::utils::parsing::error::ParseError;
+use crate::utils::reading::ReadFile;
+use std::path::Path;
 
 pub(crate) type ParserResult<'context, T> = Result<T, ParseError<'context>>;
 pub(crate) type Parser<'context, T> = fn(&mut ParseContext<'context>) -> ParserResult<'context, T>;
