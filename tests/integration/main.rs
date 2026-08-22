@@ -238,29 +238,38 @@ fn generate_case_dir(dir_path: &Path) -> Result<(), Failed> {
         if file_type.is_dir() {
             generate_case_dir(&path)?;
         } else if path.extension() == Some(OsStr::new(GPEX_EXT)) {
-            let code = fs::read_to_string(&path)?;
-            let code = expected_const_regex.replace_all(&code, |caps: &Captures<'_>| {
-                let const_name = caps[1].strip_prefix("_").unwrap_or(&caps[1]);
-                format!(
-                    "const {} = {};\npub var {}_const = {}; // expected: {}",
-                    const_name,
-                    &caps[2],
-                    const_name.to_lowercase(),
-                    const_name,
-                    &caps[3],
-                )
-            });
-            assert_eq!(
-                code.matches(EXPECTED_PATTERN).count(),
-                expected_var_regex.captures_iter(&code).count(),
-                "some of the expected values are ignored in '{}'",
-                path.display()
-            );
-            let generated_path = env::temp_dir().join(path);
-            fs::create_dir_all(path_parent(&generated_path))?;
-            fs::write(&generated_path, code.as_ref())?;
+            generate_case_file(&path, &expected_const_regex, &expected_var_regex)?;
         }
     }
+    Ok(())
+}
+
+fn generate_case_file(
+    path: &Path,
+    expected_const_regex: &Regex,
+    expected_var_regex: &Regex,
+) -> Result<(), Failed> {
+    let code = fs::read_to_string(path)?;
+    let code = expected_const_regex.replace_all(&code, |caps: &Captures<'_>| {
+        let const_name = caps[1].strip_prefix('_').unwrap_or(&caps[1]);
+        format!(
+            "const {} = {};\npub var {}_const = {}; // expected: {}",
+            const_name,
+            &caps[2],
+            const_name.to_lowercase(),
+            const_name,
+            &caps[3],
+        )
+    });
+    assert_eq!(
+        code.matches(EXPECTED_PATTERN).count(),
+        expected_var_regex.captures_iter(&code).count(),
+        "some of the expected values are ignored in '{}'",
+        path.display()
+    );
+    let generated_path = env::temp_dir().join(path);
+    fs::create_dir_all(path_parent(&generated_path))?;
+    fs::write(&generated_path, code.as_ref())?;
     Ok(())
 }
 

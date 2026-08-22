@@ -98,21 +98,16 @@ impl<'item> ItemRef<'item> {
     pub(crate) fn args_match(self, args: &[Arg], state: &State<'item>) -> ArgsMatch {
         let params = self.params();
         state.in_scope(|state| {
-            let mut result = ArgsMatch::Matching;
-            for (param, arg) in params.params.iter().zip(args) {
-                let (param_type, arg_type) = types::bind_param_to_arg(param, arg, state);
-                for param_match in [
-                    Self::arg_match(param_type, arg_type),
-                    Self::requirement_match(param, state),
-                ] {
-                    match param_match {
-                        ArgsMatch::Matching => {}
-                        ArgsMatch::NotMatching => return ArgsMatch::NotMatching,
-                        ArgsMatch::Unknown => result = ArgsMatch::Unknown,
-                    }
-                }
-            }
-            result
+            params
+                .params
+                .iter()
+                .zip(args)
+                .try_fold(ArgsMatch::Matching, |result, (param, arg)| {
+                    let (param_type, arg_type) = types::bind_param_to_arg(param, arg, state);
+                    let param_match = Self::param_match(param_type, arg_type, param, state);
+                    ArgsMatch::try_combine(result, param_match)
+                })
+                .unwrap_or(ArgsMatch::NotMatching)
         })
     }
 
@@ -147,6 +142,19 @@ impl<'item> ItemRef<'item> {
             Self::Fn(fn_) => fn_.const_keyword_span.is_some(),
             Self::Param(param) => are_params_const || param.const_mark_span().is_some(),
         }
+    }
+
+    fn param_match(
+        param_type: Type<'_>,
+        arg_type: Type<'_>,
+        param: &Param,
+        state: &State<'item>,
+    ) -> ArgsMatch {
+        let arg_match = Self::arg_match(param_type, arg_type);
+        if arg_match == ArgsMatch::NotMatching {
+            return ArgsMatch::NotMatching;
+        }
+        ArgsMatch::combine([arg_match, Self::requirement_match(param, state)])
     }
 
     fn arg_match(param_type: Type<'_>, arg_type: Type<'_>) -> ArgsMatch {
@@ -184,4 +192,23 @@ pub(crate) enum ArgsMatch {
     Matching,
     NotMatching,
     Unknown,
+}
+
+impl ArgsMatch {
+    fn try_combine(result: Self, next: Self) -> Result<Self, Self> {
+        match next {
+            Self::NotMatching => Err(Self::NotMatching),
+            Self::Matching | Self::Unknown => Ok(Self::combine([result, next])),
+        }
+    }
+
+    fn combine(matches: [Self; 2]) -> Self {
+        if matches.contains(&Self::NotMatching) {
+            Self::NotMatching
+        } else if matches.contains(&Self::Unknown) {
+            Self::Unknown
+        } else {
+            Self::Matching
+        }
+    }
 }

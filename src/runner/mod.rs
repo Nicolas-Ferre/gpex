@@ -90,24 +90,7 @@ impl Runner {
                 field.offset.into(),
                 field.size.into(),
             );
-            Some(match self.program.type_paths[&field.type_id].as_str() {
-                "i32" => GpuValue::I32(i32::from_ne_bytes([
-                    buffer[0], buffer[1], buffer[2], buffer[3],
-                ])),
-                "u32" => GpuValue::U32(u32::from_ne_bytes([
-                    buffer[0], buffer[1], buffer[2], buffer[3],
-                ])),
-                "f32" => GpuValue::F32(f32::from_ne_bytes([
-                    buffer[0], buffer[1], buffer[2], buffer[3],
-                ])),
-                "bool" => GpuValue::Bool(
-                    u32::from_ne_bytes([buffer[0], buffer[1], buffer[2], buffer[3]]) != 0,
-                ),
-                "typeref" => GpuValue::TypeRef(
-                    self.program.type_paths[&endianness::from_portable_u32x2(&buffer)].clone(),
-                ),
-                _ => unreachable!("unrecognized GPU type"),
-            })
+            Some(self.gpu_value(self.program.type_paths[&field.type_id].as_str(), &buffer))
         } else {
             None
         }
@@ -127,6 +110,20 @@ impl Runner {
             shader.run(&mut pass);
         }
         self.queue.submit(Some(encoder.finish()));
+    }
+
+    fn gpu_value(&self, type_path: &str, buffer: &[u8]) -> GpuValue {
+        let bytes = [buffer[0], buffer[1], buffer[2], buffer[3]];
+        match type_path {
+            "i32" => GpuValue::I32(i32::from_ne_bytes(bytes)),
+            "u32" => GpuValue::U32(u32::from_ne_bytes(bytes)),
+            "f32" => GpuValue::F32(f32::from_ne_bytes(bytes)),
+            "bool" => GpuValue::Bool(u32::from_ne_bytes(bytes) != 0),
+            "typeref" => GpuValue::TypeRef(
+                self.program.type_paths[&endianness::from_portable_u32x2(buffer)].clone(),
+            ),
+            _ => unreachable!("unrecognized GPU type"),
+        }
     }
 }
 

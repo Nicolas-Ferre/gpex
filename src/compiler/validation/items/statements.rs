@@ -1,4 +1,4 @@
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
+use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
 use crate::compiler::refs;
 use crate::compiler::types;
@@ -13,6 +13,15 @@ pub(super) fn validate_fn_statements<'item>(
     let FnBody::Statements(body) = &fn_.body else {
         return Ok(());
     };
+    validate_all_statements(body, fn_, state)?;
+    validate_fn_return(body, fn_, state)
+}
+
+fn validate_all_statements<'item>(
+    body: &FnStatementsBody,
+    fn_: &'item FnDefinition,
+    state: &mut ValidateState<'_, 'item>,
+) -> Result<(), ValidateError> {
     let mut is_error_detected = false;
     state.with_const_mark_span(fn_.const_keyword_span, |state| {
         for (index, statement) in body.statements.iter().enumerate() {
@@ -34,8 +43,17 @@ pub(super) fn validate_fn_statements<'item>(
         }
     });
     if is_error_detected {
-        return Err(ValidateError);
+        Err(ValidateError)
+    } else {
+        Ok(())
     }
+}
+
+fn validate_fn_return<'item>(
+    body: &FnStatementsBody,
+    fn_: &'item FnDefinition,
+    state: &mut ValidateState<'_, 'item>,
+) -> Result<(), ValidateError> {
     if let Some(return_type) = &fn_.return_type {
         let previous_statement_span = body
             .statements
@@ -56,14 +74,14 @@ pub(super) fn validate_fn_statements<'item>(
             Some(return_type.span()),
             expected_type,
             state,
-        )?;
+        )
     } else {
         validate_disallowed_returns(&body.statements, fn_, state)?;
         if body.statements.is_empty() {
             state.add_log(logs::statements::empty_block(body.body_span, state));
         }
+        Ok(())
     }
-    Ok(())
 }
 
 fn validate_statement(

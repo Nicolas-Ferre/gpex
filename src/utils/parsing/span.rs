@@ -105,19 +105,23 @@ impl Span {
         let mut len = 0;
         for part in pattern.parts {
             let code = context.code_from(context.offset + len);
-            if code.is_empty() && part.min_count > 0 {
+            len += Self::pattern_part_len(code, part)?;
+        }
+        Ok(len)
+    }
+
+    fn pattern_part_len(code: &str, part: &PatternPart) -> Result<usize, ()> {
+        if code.is_empty() && part.min_count > 0 {
+            return Err(());
+        }
+        let mut len = 0;
+        for (index, char) in code.chars().enumerate().take(part.max_count) {
+            if (part.is_valid_char)(char) {
+                len += char.len_utf8();
+            } else if index >= part.min_count {
+                break;
+            } else {
                 return Err(());
-            }
-            for (index, char) in code.chars().enumerate() {
-                if index >= part.max_count {
-                    break;
-                } else if (part.is_valid_char)(char) {
-                    len += char.len_utf8();
-                } else if index >= part.min_count {
-                    break;
-                } else {
-                    return Err(());
-                }
             }
         }
         Ok(len)

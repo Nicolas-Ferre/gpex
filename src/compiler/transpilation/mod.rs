@@ -83,10 +83,27 @@ pub(crate) fn transpile<'item>(
     let mut state = TranspileState::new(state);
     let init_shader = transpile_init(modules, &mut state);
     let update_shader = transpile_repeats(modules, &mut state);
+    let vars: Vec<_> = sorted_global_vars_for_definition(modules);
+    let buffer_alignment = main_buffer_alignment(&vars, &state);
+    let (fields, buffer_size) = main_buffer_fields(files, &vars, &state);
+    Program {
+        type_paths: type_paths(&state),
+        buffer: Buffer {
+            size: round_up(buffer_alignment, buffer_size),
+            fields,
+        },
+        init_shader,
+        update_shader,
+    }
+}
+
+fn main_buffer_fields(
+    files: &[ReadFile],
+    vars: &[&VarDefinition],
+    state: &TranspileState<'_, '_>,
+) -> (HashMap<String, BufferField>, u32) {
     let mut offset = 0;
-    let variables: Vec<_> = sorted_global_vars_for_definition(modules);
-    let buffer_alignment = main_buffer_alignment(&variables, &state);
-    let fields = variables
+    let fields = vars
         .iter()
         .enumerate()
         .map(|(index, var)| {
@@ -100,19 +117,11 @@ pub(crate) fn transpile<'item>(
                 size: type_.size(),
                 offset,
             };
-            offset = main_buffer_next_field_offset(&variables, index, offset, type_, &state);
+            offset = main_buffer_next_field_offset(vars, index, offset, type_, state);
             (path, field)
         })
         .collect::<HashMap<_, _>>();
-    Program {
-        type_paths: type_paths(&state),
-        buffer: Buffer {
-            size: round_up(buffer_alignment, offset),
-            fields,
-        },
-        init_shader,
-        update_shader,
-    }
+    (fields, offset)
 }
 
 fn main_buffer_next_field_offset(

@@ -102,24 +102,31 @@ fn fn_call_value<'item>(
             )
         })
         .collect::<Vec<_>>();
-    state.in_scope(|state_| {
-        for (param, arg_value, arg_type) in param_args {
-            if matches!(param.type_, Expr::Wildcard(_)) {
-                state_.add_wildcard_type(param.id, arg_type);
-            }
-            match arg_value {
-                ConstValue::TypeRef(_)
-                | ConstValue::Param(_)
-                | ConstValue::WildcardType(_)
-                | ConstValue::I32(_)
-                | ConstValue::U32(_)
-                | ConstValue::F32(_)
-                | ConstValue::Bool(_) => state_.add_const_value(param.id, arg_value),
-                ConstValue::Unknown | ConstValue::RuntimeValue => return arg_value,
-            }
+    state.in_scope(|state| fn_value_with_bound_args(call, source, param_args, state))
+}
+
+fn fn_value_with_bound_args<'item>(
+    call: &Call,
+    source: &'item FnDefinition,
+    param_args: Vec<(&Param, ConstValue<'item>, types::Type<'item>)>,
+    state: &State<'item>,
+) -> ConstValue<'item> {
+    for (param, arg_value, arg_type) in param_args {
+        if matches!(param.type_, Expr::Wildcard(_)) {
+            state.add_wildcard_type(param.id, arg_type);
         }
-        fn_value(call, source, state_)
-    })
+        match arg_value {
+            ConstValue::TypeRef(_)
+            | ConstValue::Param(_)
+            | ConstValue::WildcardType(_)
+            | ConstValue::I32(_)
+            | ConstValue::U32(_)
+            | ConstValue::F32(_)
+            | ConstValue::Bool(_) => state.add_const_value(param.id, arg_value),
+            ConstValue::Unknown | ConstValue::RuntimeValue => return arg_value,
+        }
+    }
+    fn_value(call, source, state)
 }
 
 fn fn_value<'item>(

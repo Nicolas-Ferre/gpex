@@ -136,34 +136,70 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
         .then(|| ignored_name_replacement(name))
         .flatten();
     if !item.is_pub() && ref_span.is_none() && !is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(state.inner);
-        let replacement = (!is_operator_fn).then(|| format!("_{name}"));
-        state.add_log(logs::items::unused(
-            &displayed_key,
-            replacement.as_deref(),
-            name_span,
-            state,
-        ));
+        #[expect(clippy::unnecessary_to_owned)] // needed to avoid borrow checker error
+        log_unused(item, &name.to_string(), name_span, is_operator_fn, state);
     } else if item.is_pub() && is_unused_lint_ignored {
-        let displayed_key = item.displayed_key(state.inner);
-        state.add_log(logs::items::pub_with_ignored_name(
-            &displayed_key,
-            ignored_name_replacement.as_deref(),
-            name_span,
-            state,
-        ));
+        log_pub_with_ignored_name(item, ignored_name_replacement.as_deref(), name_span, state);
     } else if let Some(ref_span) = ref_span
         && is_unused_lint_ignored
     {
-        let displayed_key = item.displayed_key(state.inner);
-        state.add_log(logs::items::used_with_ignored_name(
-            &displayed_key,
+        log_used_with_ignored_name(
+            item,
             ignored_name_replacement.as_deref(),
             name_span,
             ref_span,
             state,
-        ));
+        );
     }
+}
+
+fn log_unused<'item>(
+    item: ItemRef<'item>,
+    name: &str,
+    name_span: Span,
+    is_operator_fn: bool,
+    state: &mut ValidateState<'_, 'item>,
+) {
+    let displayed_key = item.displayed_key(state.inner);
+    let replacement = (!is_operator_fn).then(|| format!("_{name}"));
+    state.add_log(logs::items::unused(
+        &displayed_key,
+        replacement.as_deref(),
+        name_span,
+        state,
+    ));
+}
+
+fn log_pub_with_ignored_name<'item>(
+    item: ItemRef<'item>,
+    replacement: Option<&str>,
+    name_span: Span,
+    state: &mut ValidateState<'_, 'item>,
+) {
+    let displayed_key = item.displayed_key(state.inner);
+    state.add_log(logs::items::pub_with_ignored_name(
+        &displayed_key,
+        replacement,
+        name_span,
+        state,
+    ));
+}
+
+fn log_used_with_ignored_name<'item>(
+    item: ItemRef<'item>,
+    replacement: Option<&str>,
+    name_span: Span,
+    ref_span: Span,
+    state: &mut ValidateState<'_, 'item>,
+) {
+    let displayed_key = item.displayed_key(state.inner);
+    state.add_log(logs::items::used_with_ignored_name(
+        &displayed_key,
+        replacement,
+        name_span,
+        ref_span,
+        state,
+    ));
 }
 
 fn ignored_name_replacement(item_name: &str) -> Option<String> {
