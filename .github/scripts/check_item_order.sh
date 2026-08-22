@@ -12,22 +12,20 @@ STATIC_REGEX="^${VISIBILITY_REGEX}static[[:space:]]+(mut[[:space:]]+)?[a-zA-Z_]"
 TYPE_REGEX="^${VISIBILITY_REGEX}(unsafe[[:space:]]+)?(type|struct|enum|union|trait)([[:space:]]|<)"
 IMPL_REGEX="^(unsafe[[:space:]]+)?impl([[:space:]]|<)"
 FUNCTION_REGEX="^${VISIBILITY_REGEX}${FUNCTION_MODIFIER_REGEX}fn([[:space:]]|<)"
-ITEM_KINDS=("module" "use" "const" "static" "type" "impl" "free function")
+ITEM_KINDS=("module" "use" "const" "static" "type/impl" "free function")
 
 get_item_rank() {
     if [[ $line =~ $MOD_REGEX ]]; then
         echo 0
     elif [[ $line =~ $USE_REGEX ]]; then
         echo 1
-    elif [[ $line =~ $FUNCTION_REGEX ]]; then
-        echo 6
     elif [[ $line =~ $CONST_REGEX ]]; then
         echo 2
     elif [[ $line =~ $STATIC_REGEX ]]; then
         echo 3
-    elif [[ $line =~ $TYPE_REGEX ]]; then
+    elif [[ $line =~ $TYPE_REGEX || $line =~ $IMPL_REGEX ]]; then
         echo 4
-    elif [[ $line =~ $IMPL_REGEX ]]; then
+    elif [[ $line =~ $FUNCTION_REGEX ]]; then
         echo 5
     fi
 }
