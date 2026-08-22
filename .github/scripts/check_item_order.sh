@@ -5,7 +5,7 @@ set -euo pipefail
 
 VISIBILITY_REGEX='(pub(\([^)]*\))?[[:space:]]+)?'
 FUNCTION_MODIFIER_REGEX='((async|unsafe|const|default)[[:space:]]+|extern([[:space:]]+"[^"]*")?[[:space:]]+)*'
-MOD_REGEX="^${VISIBILITY_REGEX}mod[[:space:]]+"
+MOD_REGEX="^${VISIBILITY_REGEX}mod[[:space:]]+[a-zA-Z0-9_]+;"
 USE_REGEX="^${VISIBILITY_REGEX}use[[:space:]]+"
 CONST_REGEX="^${VISIBILITY_REGEX}const[[:space:]]+[a-zA-Z_]"
 STATIC_REGEX="^${VISIBILITY_REGEX}static[[:space:]]+(mut[[:space:]]+)?[a-zA-Z_]"
