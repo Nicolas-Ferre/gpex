@@ -14,7 +14,7 @@ IGNORED_FUNCTIONS=(
 EXCLUSION_REGEX="no-fn-check"
 IMPL_BLOCK_START_REGEX="^impl([[:space:]<]|$)"
 TRAIT_IMPL_BLOCK_START_REGEX="^impl.*[[:space:]]for[[:space:]]"
-TRAIT_IMPL_BLOCK_END_REGEX="^}"
+IMPL_BLOCK_END_REGEX="^}"
 FUNCTION_DEFINITION_START_REGEX="^([[:space:]]*)(.*)fn[[:space:]]([a-zA-Z0-9_]+)[^;]*$"
 FUNCTION_END="}"
 FUNCTION_CALL_REGEX="([a-zA-Z_][a-zA-Z0-9_]*)[<(]"
@@ -42,25 +42,25 @@ check_function_call() {
 
 is_function_defined() {
     local function_name="$1"
-    in_array "$function_name" "${defined_pub_functions[@]-}" \
-        || in_array "$function_name" "${defined_priv_functions[@]-}" \
-        || is_current_method_defined "$function_name"
+    in_array "$function_name" "${defined_pub_functions[@]-}" ||
+        in_array "$function_name" "${defined_priv_functions[@]-}" ||
+        is_current_method_defined "$function_name"
 }
 
 is_private_function_defined() {
     local function_name="$1"
-    in_array "$function_name" "${defined_priv_functions[@]-}" \
-        || is_current_private_method_defined "$function_name"
+    in_array "$function_name" "${defined_priv_functions[@]-}" ||
+        is_current_private_method_defined "$function_name"
 }
 
 is_current_method_defined() {
-    [[ $is_current_function_in_impl == true && $is_current_function_in_trait_impl == false ]] \
-        && (in_array "$1" "${defined_pub_methods[@]-}" || in_array "$1" "${defined_priv_methods[@]-}")
+    [[ $is_current_function_in_impl == true && $is_current_function_in_trait_impl == false ]] &&
+        (in_array "$1" "${defined_pub_methods[@]-}" || in_array "$1" "${defined_priv_methods[@]-}")
 }
 
 is_current_private_method_defined() {
-    [[ $is_current_function_in_impl == true && $is_current_function_in_trait_impl == false ]] \
-        && in_array "$1" "${defined_priv_methods[@]-}"
+    [[ $is_current_function_in_impl == true && $is_current_function_in_trait_impl == false ]] &&
+        in_array "$1" "${defined_priv_methods[@]-}"
 }
 
 is_current_function_pub() {
@@ -122,7 +122,7 @@ while read -r -d '' file; do
         fi
         if [[ $line =~ $TRAIT_IMPL_BLOCK_START_REGEX ]]; then
             is_in_trait_impl_block=true
-        elif [[ $line =~ $TRAIT_IMPL_BLOCK_END_REGEX ]]; then
+        elif [[ $line =~ $IMPL_BLOCK_END_REGEX ]]; then
             is_in_impl_block=false
             is_in_trait_impl_block=false
         fi
