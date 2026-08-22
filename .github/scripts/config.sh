@@ -1,4 +1,4 @@
-export MAX_RUST_FILE_LINE_COUNT=293
+export MAX_RUST_FILE_LINE_COUNT=250
 
 # General rule: if acronym is not idiomatic in Rust or plural doesn't seem natural, then don't use it.
 export FORBIDDEN_WORDS=(
