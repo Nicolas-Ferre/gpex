@@ -9,7 +9,7 @@ pub(crate) enum SeparatorParser<'context> {
 }
 
 impl<'context> SeparatorParser<'context> {
-    pub(super) fn parser(self) -> Option<Parser<'context, ()>> {
+    fn parser(self) -> Option<Parser<'context, ()>> {
         match self {
             SeparatorParser::None => None,
             SeparatorParser::NotTrailing(parser) | SeparatorParser::MaybeTrailing(parser) => {

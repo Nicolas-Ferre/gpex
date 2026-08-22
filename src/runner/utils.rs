@@ -59,22 +59,6 @@ pub(crate) async fn create_device(adapter: &Adapter) -> Result<(Device, Queue), 
     // coverage: on
 }
 
-pub(crate) fn create_buffer(device: &Device, label: &str, size: u64) -> Option<Buffer> {
-    (size > 0).then(|| {
-        device.create_buffer(&BufferDescriptor {
-            label: Some(label),
-            size,
-            usage: BufferUsages::STORAGE
-                | BufferUsages::COPY_SRC
-                | BufferUsages::COPY_DST
-                | BufferUsages::UNIFORM
-                | BufferUsages::VERTEX
-                | BufferUsages::INDEX,
-            mapped_at_creation: false,
-        })
-    })
-}
-
 pub(crate) fn create_bind_group_layout(
     device: &Device,
     stages: ShaderStages,
@@ -104,7 +88,7 @@ pub(crate) fn read_buffer(
     offset: u64,
     size: u64,
 ) -> Vec<u8> {
-    let read_buffer = device.create_buffer(/* no-fn-check */ &BufferDescriptor {
+    let read_buffer = device.create_buffer(&BufferDescriptor {
         label: Some("gpex:buffer:storage_read"),
         size,
         usage: BufferUsages::MAP_READ | BufferUsages::COPY_DST,
@@ -128,6 +112,22 @@ pub(crate) fn read_buffer(
     drop(view);
     read_buffer.unmap();
     content
+}
+
+pub(crate) fn create_buffer(device: &Device, label: &str, size: u64) -> Option<Buffer> {
+    (size > 0).then(|| {
+        device.create_buffer(&BufferDescriptor {
+            label: Some(label),
+            size,
+            usage: BufferUsages::STORAGE
+                | BufferUsages::COPY_SRC
+                | BufferUsages::COPY_DST
+                | BufferUsages::UNIFORM
+                | BufferUsages::VERTEX
+                | BufferUsages::INDEX,
+            mapped_at_creation: false,
+        })
+    })
 }
 
 pub(crate) fn create_encoder(device: &Device) -> CommandEncoder {

@@ -47,7 +47,7 @@ fn validate_args(
         };
         state.with_param_constness(param_constness, |state| {
             state.with_const_mark_span(const_mark_span, |state| {
-                is_error_detected |= exprs::validate_expr(&arg.value, state).is_err(); // no-fn-check (recursivity)
+                is_error_detected |= exprs::validate_expr(&arg.value, state).is_err();
             });
         });
     }
