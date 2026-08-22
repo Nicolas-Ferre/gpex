@@ -5,7 +5,7 @@ set -euo pipefail
 
 VISIBILITY_REGEX='(pub(\([^)]*\))?[[:space:]]+)?'
 FUNCTION_MODIFIER_REGEX='((async|unsafe|const|default)[[:space:]]+|extern([[:space:]]+"[^"]*")?[[:space:]]+)*'
-MOD_REGEX="^${VISIBILITY_REGEX}mod[[:space:]]+[a-zA-Z0-9_]+;"
+MOD_REGEX="^${VISIBILITY_REGEX}mod[[:space:]]+(r#)?[a-zA-Z_][a-zA-Z0-9_]*;"
 USE_REGEX="^${VISIBILITY_REGEX}use[[:space:]]+"
 CONST_REGEX="^${VISIBILITY_REGEX}const[[:space:]]+[a-zA-Z_]"
 STATIC_REGEX="^${VISIBILITY_REGEX}static[[:space:]]+(mut[[:space:]]+)?[a-zA-Z_]"
@@ -14,19 +14,20 @@ IMPL_REGEX="^(unsafe[[:space:]]+)?impl([[:space:]]|<)"
 FUNCTION_REGEX="^${VISIBILITY_REGEX}${FUNCTION_MODIFIER_REGEX}fn([[:space:]]|<)"
 ITEM_KINDS=("module" "use" "const" "static" "type/impl" "free function")
 
-get_item_rank() {
+compute_item_rank() {
+    item_rank=""
     if [[ $line =~ $MOD_REGEX ]]; then
-        echo 0
+        item_rank=0
     elif [[ $line =~ $USE_REGEX ]]; then
-        echo 1
-    elif [[ $line =~ $CONST_REGEX ]]; then
-        echo 2
-    elif [[ $line =~ $STATIC_REGEX ]]; then
-        echo 3
-    elif [[ $line =~ $TYPE_REGEX || $line =~ $IMPL_REGEX ]]; then
-        echo 4
+        item_rank=1
     elif [[ $line =~ $FUNCTION_REGEX ]]; then
-        echo 5
+        item_rank=5 # avoids misclassifying `const fn` items
+    elif [[ $line =~ $CONST_REGEX ]]; then
+        item_rank=2
+    elif [[ $line =~ $STATIC_REGEX ]]; then
+        item_rank=3
+    elif [[ $line =~ $TYPE_REGEX || $line =~ $IMPL_REGEX ]]; then
+        item_rank=4
     fi
 }
 
@@ -36,7 +37,7 @@ while read -r -d '' file; do
     line_number=0
     while IFS= read -r line; do
         line_number=$((line_number + 1))
-        item_rank=$(get_item_rank)
+        compute_item_rank
         if [[ -z $item_rank ]]; then
             continue
         fi
