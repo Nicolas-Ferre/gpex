@@ -1,0 +1,7 @@
+fn fn_(param: ?, related: typeof(param)) -> bool {
+    return typeof(related) != i32 || param + related == 3;
+}
+
+var _result_i32_three = fn_(1, 2); // expected: true
+var _result_i32_not_three = fn_(1, 3); // expected: false
+var _result_not_i32 = fn_(1u, 2u); // expected: true
