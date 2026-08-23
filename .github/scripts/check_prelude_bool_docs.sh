@@ -2,12 +2,13 @@
 set -euo pipefail
 
 FUNCTION_START_REGEX='^(pub[[:space:]]+)?(const[[:space:]]+)?fn[[:space:]]'
-BOOL_INTRINSIC_END_REGEX='->[[:space:]]*bool[[:space:]]*=[[:space:]]*intrinsic;'
+BOOL_RETURN_REGEX='->[[:space:]]*bool([[:space:]]*=[[:space:]]*intrinsic;|[[:space:]]*\{)'
 
 check_function() {
-    if [[ $function_signature =~ $BOOL_INTRINSIC_END_REGEX ]] &&
+    if [[ $function_signature =~ $BOOL_RETURN_REGEX ]] &&
+        [[ -n $function_first_prose_line ]] &&
         [[ $function_first_prose_line != "Returns whether "* ]]; then
-        echo "$file:$function_start_line: boolean-returning intrinsic function docstring should start with \`Returns whether ...\`"
+        echo "$file:$function_start_line: boolean-returning function docstring should start with \`Returns whether ...\`"
         exit_code=1
     fi
     function_signature=""
@@ -27,7 +28,7 @@ while read -r -d '' file; do
         line_number=$((line_number + 1))
         if [[ -n $function_signature ]]; then
             function_signature+=" $line"
-            if [[ $line == *";"* ]]; then
+            if [[ $line == *";"* || $line == *"{"* ]]; then
                 check_function
             fi
             continue
@@ -48,7 +49,7 @@ while read -r -d '' file; do
             function_signature=$line
             function_first_prose_line=$pending_first_prose_line
             function_start_line=$line_number
-            if [[ $line == *";"* ]]; then
+            if [[ $line == *";"* || $line == *"{"* ]]; then
                 check_function
             fi
         fi

@@ -9,7 +9,6 @@ reset_docstring() {
     is_in_gpex_block=false
     has_expected_result=false
     missing_result_lines=()
-    missing_result_count=0
 }
 
 exit_code=0
@@ -32,7 +31,6 @@ while read -r -d '' file; do
             elif [[ $is_in_gpex_block == true && $doc_line == '```' ]]; then
                 if [[ $has_expected_result == false ]]; then
                     missing_result_lines+=("$gpex_block_start_line")
-                    missing_result_count=$((missing_result_count + 1))
                 fi
                 is_in_gpex_block=false
             elif [[ $is_in_gpex_block == true && $doc_line =~ $EXPECTED_RESULT_REGEX ]]; then
@@ -41,9 +39,9 @@ while read -r -d '' file; do
             continue
         fi
         if [[ $line =~ $FUNCTION_START_REGEX ]]; then
-            if ((missing_result_count > 0)); then
+            if ((${#missing_result_lines[@]} > 0)); then
                 for missing_result_line in "${missing_result_lines[@]}"; do
-                    echo "$file:$missing_result_line: prelude function \`gpex\` example should include an inline expected-result comment"
+                    echo "$file:$missing_result_line: GPEx example for a prelude function should include an inline expected-result comment"
                     exit_code=1
                 done
             fi
