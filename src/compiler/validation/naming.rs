@@ -104,7 +104,7 @@ pub(super) fn make_keyword_safe(name: &mut String) {
     }
 }
 
-#[allow(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+#[expect(clippy::wildcard_enum_match_arm, reason = "opt-in is preferred here")]
 fn case_label(case: Case<'_>) -> &'static str {
     match case {
         Case::Snake => "snake_case",

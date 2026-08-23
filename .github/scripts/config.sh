@@ -1,6 +1,11 @@
 export MAX_RUST_FILE_LINE_COUNT=250
 
 # shellcheck disable=SC2034 # used by scripts sourcing this file
+export EXCLUDED_TEST_DIR_PATHS=(
+    "tests/integration/items/programs/wgsl_empty"
+)
+
+# shellcheck disable=SC2034 # used by scripts sourcing this file
 export EXCLUDED_FUNCTIONS=()
 # shellcheck disable=SC2034 # used by scripts sourcing this file
 export EXCLUDED_TYPE_PATHS=(

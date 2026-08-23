@@ -49,6 +49,7 @@ start bash .github/scripts/check_prelude_bool_docs.sh
 start bash .github/scripts/check_prelude_example_results.sh
 start bash .github/scripts/check_prelude_param_docs.sh
 start bash .github/scripts/check_validation_log_order.sh
+start bash .github/scripts/check_test_entrypoints.sh
 
 if [[ $is_fast == false ]]; then
     start bash .github/scripts/check_line_endings.sh

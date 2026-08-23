@@ -187,7 +187,7 @@ fn wgsl_binary_operator(fn_: BinaryIntrinsicFn) -> &'static str {
     }
 }
 
-#[expect(clippy::wildcard_enum_match_arm)]
+#[expect(clippy::wildcard_enum_match_arm, reason = "opt-in is preferred here")]
 fn wgsl_comparison_to_negation_operator(fn_: BinaryIntrinsicFn) -> &'static str {
     match fn_ {
         BinaryIntrinsicFn::Eq => "",
