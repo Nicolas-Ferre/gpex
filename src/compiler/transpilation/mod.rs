@@ -58,6 +58,16 @@ pub struct BufferField {
     pub offset: u32,
 }
 
+#[derive(Debug, Clone)]
+#[derive_where::derive_where(PartialEq, Eq, Hash)]
+pub(crate) struct SpecializedFn<'item> {
+    fn_: &'item FnDefinition,
+    const_param_values: Vec<ConstValue<'item>>,
+    wildcard_param_types: Vec<&'item StructDefinition>,
+    #[derive_where(skip)]
+    fn_body: &'item FnStatementsBody,
+}
+
 struct TranspileState<'state, 'item> {
     inner: &'state State<'item>,
     shader: String,
@@ -74,16 +84,6 @@ impl<'state, 'item> TranspileState<'state, 'item> {
             transpiled_specialized_fn_indexes: HashSet::new(),
         }
     }
-}
-
-#[derive(Debug, Clone)]
-#[derive_where::derive_where(PartialEq, Eq, Hash)]
-pub(crate) struct SpecializedFn<'item> {
-    fn_: &'item FnDefinition,
-    const_param_values: Vec<ConstValue<'item>>,
-    wildcard_param_types: Vec<&'item StructDefinition>,
-    #[derive_where(skip)]
-    fn_body: &'item FnStatementsBody,
 }
 
 pub(crate) fn transpile<'item>(

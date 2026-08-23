@@ -13,9 +13,11 @@ TYPE_REGEX="^${VISIBILITY_REGEX}(unsafe[[:space:]]+)?(type|struct|enum|union|tra
 IMPL_REGEX="^(unsafe[[:space:]]+)?impl([[:space:]]|<)"
 FUNCTION_REGEX="^${VISIBILITY_REGEX}${FUNCTION_MODIFIER_REGEX}fn([[:space:]]|<)"
 ITEM_KINDS=("module" "use" "const" "static" "type/impl" "free function")
+VISIBILITY_KINDS=("pub" "pub(crate)" "pub(super)" "pub(<other>)" "private")
 
 compute_item_rank() {
     item_rank=""
+    has_visibility_order=true
     if [[ $line =~ $MOD_REGEX ]]; then
         item_rank=0
     elif [[ $line =~ $USE_REGEX ]]; then
@@ -28,12 +30,30 @@ compute_item_rank() {
         item_rank=3
     elif [[ $line =~ $TYPE_REGEX || $line =~ $IMPL_REGEX ]]; then
         item_rank=4
+        if [[ $line =~ $IMPL_REGEX ]]; then
+            has_visibility_order=false
+        fi
+    fi
+}
+
+compute_visibility_rank() {
+    if [[ $line =~ ^pub[[:space:]] ]]; then
+        visibility_rank=0
+    elif [[ $line =~ ^pub\(crate\)[[:space:]] ]]; then
+        visibility_rank=1
+    elif [[ $line =~ ^pub\(super\)[[:space:]] ]]; then
+        visibility_rank=2
+    elif [[ $line =~ ^pub\([^)]+\)[[:space:]] ]]; then
+        visibility_rank=3
+    else
+        visibility_rank=4
     fi
 }
 
 exit_code=0
 while read -r -d '' file; do
     highest_rank=-1
+    highest_visibility_ranks=(-1 -1 -1 -1 -1 -1)
     line_number=0
     while IFS= read -r line; do
         line_number=$((line_number + 1))
@@ -46,6 +66,17 @@ while read -r -d '' file; do
             exit_code=1
         elif ((item_rank > highest_rank)); then
             highest_rank=$item_rank
+        fi
+        if [[ $has_visibility_order == false ]]; then
+            continue
+        fi
+        compute_visibility_rank
+        highest_visibility_rank=${highest_visibility_ranks[item_rank]}
+        if ((visibility_rank < highest_visibility_rank)); then
+            echo "$file:$line_number: ${VISIBILITY_KINDS[visibility_rank]} ${ITEM_KINDS[item_rank]} items should be defined before ${VISIBILITY_KINDS[highest_visibility_rank]} ${ITEM_KINDS[item_rank]} items"
+            exit_code=1
+        elif ((visibility_rank > highest_visibility_rank)); then
+            highest_visibility_ranks[item_rank]=$visibility_rank
         fi
     done <"$file"
 done < <(find src/ tests/ -type f -name "*.rs" -print0)
