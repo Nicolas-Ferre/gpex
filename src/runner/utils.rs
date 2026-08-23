@@ -1,12 +1,12 @@
 use crate::{Log, LogLevel};
 use wgpu::{
-    Adapter, BackendOptions, Backends, BindGroupLayout, BindGroupLayoutEntry, BindingType, Buffer,
-    BufferBindingType, BufferDescriptor, BufferUsages, CommandEncoder, CommandEncoderDescriptor,
-    ComputePass, ComputePassDescriptor, ComputePipeline, ComputePipelineDescriptor, Device,
-    DeviceDescriptor, ExperimentalFeatures, Features, Instance, InstanceDescriptor, InstanceFlags,
-    Limits, MapMode, MemoryBudgetThresholds, MemoryHints, PipelineCompilationOptions,
-    PipelineLayoutDescriptor, PollType, PowerPreference, Queue, RequestAdapterOptions,
-    ShaderModuleDescriptor, ShaderStages, Trace,
+    Adapter, BackendOptions, Backends, BindGroupLayout, BindGroupLayoutDescriptor,
+    BindGroupLayoutEntry, BindingType, Buffer, BufferBindingType, BufferDescriptor, BufferUsages,
+    CommandEncoder, CommandEncoderDescriptor, ComputePass, ComputePassDescriptor, ComputePipeline,
+    ComputePipelineDescriptor, Device, DeviceDescriptor, ExperimentalFeatures, Features, Instance,
+    InstanceDescriptor, InstanceFlags, Limits, MapMode, MemoryBudgetThresholds, MemoryHints,
+    PipelineCompilationOptions, PipelineLayoutDescriptor, PollType, PowerPreference, Queue,
+    RequestAdapterOptions, ShaderModuleDescriptor, ShaderSource, ShaderStages, Trace,
 };
 
 pub(crate) fn create_instance() -> Instance {
@@ -64,7 +64,7 @@ pub(crate) fn create_bind_group_layout(
     stages: ShaderStages,
     storage_count: u32,
 ) -> BindGroupLayout {
-    device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+    device.create_bind_group_layout(&BindGroupLayoutDescriptor {
         label: Some("gpex:bind_group_layout"),
         entries: &(0..storage_count)
             .map(|binding| BindGroupLayoutEntry {
@@ -157,7 +157,7 @@ pub(crate) fn create_compute_pipeline(
         })),
         module: &device.create_shader_module(ShaderModuleDescriptor {
             label: Some("gpex:shader_module"),
-            source: wgpu::ShaderSource::Wgsl(code.into()),
+            source: ShaderSource::Wgsl(code.into()),
         }),
         entry_point: None,
         compilation_options: PipelineCompilationOptions::default(),

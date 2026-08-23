@@ -1,10 +1,11 @@
 use itertools::Itertools;
 use owo_colors::colors::xterm::LightGray;
+use std::fmt;
 use std::fmt::Formatter;
 use std::ops::Range;
 use std::path::PathBuf;
 
-use super::{LogLevel, fmt_colored, fmt_italic};
+use super::LogLevel;
 
 const TAB_WIDTH: usize = 4;
 
@@ -20,21 +21,21 @@ pub struct LogLocation {
 }
 
 impl LogLocation {
-    pub(super) fn fmt(&self, formatter: &mut Formatter<'_>, level: LogLevel) -> std::fmt::Result {
+    pub(super) fn fmt(&self, formatter: &mut Formatter<'_>, level: LogLevel) -> fmt::Result {
         let start = self.line_column(self.span.start);
         let end = self.line_column(self.span.end);
         let rendered_lines = self.rendered_lines(start, end);
         let location = format!("{}:{}:{}\n", self.path.display(), start.line, start.column);
         write!(formatter, "│  → ")?;
-        fmt_italic(formatter, &location)?;
+        super::fmt_italic(formatter, &location)?;
         for (line_number, line) in rendered_lines {
             let displayed_line = Self::displayed_line(line);
             let span_spaces = " ".repeat(Self::line_span_offset(start, line_number, line));
             let span_underline = "^".repeat(Self::line_span_len(start, end, line_number, line));
             write!(formatter, "│    ")?;
-            fmt_colored::<LightGray>(formatter, &format!("¦ {displayed_line}\n"))?;
+            super::fmt_colored::<LightGray>(formatter, &format!("¦ {displayed_line}\n"))?;
             write!(formatter, "│    ")?;
-            fmt_colored::<LightGray>(formatter, "¦ ")?;
+            super::fmt_colored::<LightGray>(formatter, "¦ ")?;
             level.fmt_colored(formatter, &format!("{span_spaces}{span_underline}\n"))?;
         }
         Ok(())

@@ -58,6 +58,11 @@ See `doc/testing.md`.
 
 - Follow explicit and implicit conventions already existing in the codebase
 - New item names should be aligned with other existing items.
+- Rust type names must be imported and used without their parent module qualification.
+- Cross-module Rust free functions must be called through their parent module. Local functions,
+  methods and associated functions are excluded from this rule.
+- Qualification lint exceptions are configured with `EXCLUDED_FUNCTIONS` and
+  `EXCLUDED_TYPE_PATHS` in `.github/scripts/config.sh`.
 - For boolean variables and functions returning booleans:
     - Name should start with `is_`, `are_`, `has_` or `have_`.
     - Noun is placed before the adjective (e.g. `is_user_connected` instead of

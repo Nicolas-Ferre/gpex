@@ -1,11 +1,11 @@
 use crate::files;
-use gpex::Log;
+use gpex::{Log, LogLevel};
 use libtest_mimic::Failed;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 pub(crate) fn is_ignored_warning(log: &Log, root_path: &Path, ignored_paths: &[PathBuf]) -> bool {
-    if log.level != gpex::LogLevel::Warning {
+    if log.level != LogLevel::Warning {
         return false;
     }
     let Some(location) = log.location.as_ref() else {
