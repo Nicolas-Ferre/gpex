@@ -12,12 +12,13 @@ use gpex::{Log, Program, Runner};
 use itertools::Itertools;
 use libtest_mimic::{Arguments, Failed, Trial};
 use pretty_assertions::assert_eq;
+use std::error::Error;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::{env, fs};
 use tokio::runtime::Runtime;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     owo_colors::set_override(false);
     let runtime = Arc::new(Runtime::new()?);
     let args = Arguments::from_args();
@@ -30,7 +31,7 @@ fn collect_case_dirs(
     path: &Path,
     runtime: &Arc<Runtime>,
     trials: &mut Vec<Trial>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<(), Box<dyn Error>> {
     for root_entry in fs::read_dir(path)? {
         let root_entry = root_entry?;
         let root_path = root_entry.path();

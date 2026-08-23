@@ -10,7 +10,7 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
 use crate::compiler::state::State;
-use crate::compiler::types;
+use crate::compiler::types::{self, Type};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -138,7 +138,7 @@ fn fn_call_value<'item>(
 fn fn_value_with_bound_args<'item>(
     call: &Call,
     source: &'item FnDefinition,
-    param_args: Vec<(&Param, ConstValue<'item>, types::Type<'item>)>,
+    param_args: Vec<(&Param, ConstValue<'item>, Type<'item>)>,
     state: &State<'item>,
 ) -> ConstValue<'item> {
     for (param, arg_value, arg_type) in param_args {

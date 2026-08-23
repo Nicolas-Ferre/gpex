@@ -5,8 +5,8 @@ pub use location::LogLocation;
 use owo_colors::colors::{Blue, Green, Red, Yellow};
 use owo_colors::{Color, OwoColorize, Stream};
 use std::fmt::{Display, Formatter};
-use std::io;
 use std::path::{Path, PathBuf};
+use std::{fmt, io};
 
 /// A compilation log.
 #[derive(Debug)]
@@ -22,7 +22,7 @@ pub struct Log {
 }
 
 impl Display for Log {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         writeln!(formatter, "{}: {}", self.level, self.msg)?;
         if let Some(location) = &self.location {
             location.fmt(formatter, self.level)?;
@@ -69,7 +69,7 @@ pub struct LogInner {
 }
 
 impl Display for LogInner {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         writeln!(formatter, "├─ {}: {}", self.level, self.msg)?;
         if let Some(location) = &self.location {
             location.fmt(formatter, self.level)?;
@@ -92,13 +92,13 @@ pub enum LogLevel {
 }
 
 impl Display for LogLevel {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         self.fmt_colored(formatter, self.label())
     }
 }
 
 impl LogLevel {
-    fn fmt_colored(self, formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
+    fn fmt_colored(self, formatter: &mut Formatter<'_>, string: &str) -> fmt::Result {
         match self {
             Self::Error => fmt_colored::<Red>(formatter, string),
             Self::Warning => fmt_colored::<Yellow>(formatter, string),
@@ -117,7 +117,7 @@ impl LogLevel {
     }
 }
 
-fn fmt_colored<C: Color>(formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
+fn fmt_colored<C: Color>(formatter: &mut Formatter<'_>, string: &str) -> fmt::Result {
     write!(
         formatter,
         "{}",
@@ -125,7 +125,7 @@ fn fmt_colored<C: Color>(formatter: &mut Formatter<'_>, string: &str) -> std::fm
     )
 }
 
-fn fmt_italic(formatter: &mut Formatter<'_>, string: &str) -> std::fmt::Result {
+fn fmt_italic(formatter: &mut Formatter<'_>, string: &str) -> fmt::Result {
     write!(
         formatter,
         "{}",

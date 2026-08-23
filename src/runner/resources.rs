@@ -1,6 +1,7 @@
 use crate::runner::utils;
 use wgpu::{
-    BindGroup, BindGroupLayout, Buffer, ComputePass, ComputePipeline, Device, ShaderStages,
+    BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, Buffer, ComputePass,
+    ComputePipeline, Device, ShaderStages,
 };
 
 #[derive(Debug)]
@@ -30,10 +31,10 @@ impl ComputeShader {
     }
 
     fn create_bind_group(device: &Device, layout: &BindGroupLayout, buffer: &Buffer) -> BindGroup {
-        device.create_bind_group(&wgpu::BindGroupDescriptor {
+        device.create_bind_group(&BindGroupDescriptor {
             label: Some("gpex:bind_group"),
             layout,
-            entries: &[wgpu::BindGroupEntry {
+            entries: &[BindGroupEntry {
                 binding: 0,
                 resource: buffer.as_entire_binding(),
             }],

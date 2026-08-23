@@ -40,6 +40,7 @@ start bash .github/scripts/check_file_line_count.sh
 start bash .github/scripts/check_impl_order.sh
 start bash .github/scripts/check_function_body_empty_lines.sh
 start bash .github/scripts/check_function_call_order.sh
+start bash .github/scripts/check_item_qualifications.sh
 start bash .github/scripts/check_item_order.sh
 start bash .github/scripts/check_item_separation.sh
 

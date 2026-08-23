@@ -7,8 +7,8 @@ use crate::runner::resources::ComputeShader;
 use crate::utils::{endianness, formatting};
 use crate::{Log, LogLevel};
 use std::fmt::{Display, Formatter};
-use std::fs;
 use std::path::Path;
+use std::{fmt, fs};
 use wgpu::{Buffer, Device, Queue};
 
 /// A `GPEx` program runner.
@@ -125,7 +125,7 @@ pub enum GpuValue {
 }
 
 impl Display for GpuValue {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Self::TypeRef(path) => write!(formatter, "{path}"),
             Self::I32(value) => write!(formatter, "{value}"),
