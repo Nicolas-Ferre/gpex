@@ -16,7 +16,7 @@ fn save_and_load_program() -> Result<(), Vec<Log>> {
 }
 
 #[test]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "acceptable in tests")]
 fn save_in_non_existing_dir() -> Result<(), Vec<Log>> {
     owo_colors::set_override(false);
     let (program, _) = gpex::compile_program(Path::new("tests/lib/valid"), false)?;
@@ -35,7 +35,7 @@ fn save_in_non_existing_dir() -> Result<(), Vec<Log>> {
 }
 
 #[test]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "acceptable in tests")]
 fn load_non_existing_file() {
     owo_colors::set_override(false);
     let result = gpex::load_compiled(Path::new("tests/missing/out.json"));
@@ -52,7 +52,7 @@ fn load_non_existing_file() {
 }
 
 #[test]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "acceptable in tests")]
 fn load_invalid_file() {
     owo_colors::set_override(false);
     let result = gpex::load_compiled(Path::new("tests/lib/main.rs"));

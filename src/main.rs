@@ -1,5 +1,5 @@
 //! CLI of `GPEx` language.
-#![expect(clippy::print_stdout)] // needed to display messages
+#![expect(clippy::print_stdout, reason = "needed to display messages")]
 
 // coverage: off (difficult to test)
 

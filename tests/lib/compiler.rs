@@ -22,7 +22,7 @@ fn compile_with_warning() -> Result<(), Vec<Log>> {
 }
 
 #[test]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "acceptable in tests")]
 fn compile_with_warning_as_error() {
     let result = gpex::compile_program(Path::new("tests/lib/warning"), true);
     let errors = result.expect_err("compilation should generate logs");
@@ -31,7 +31,7 @@ fn compile_with_warning_as_error() {
 }
 
 #[test]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "acceptable in tests")]
 fn compile_with_error() {
     let result = gpex::compile_program(Path::new("tests/lib/error"), false);
     let errors = result.expect_err("compilation should generate logs");
@@ -40,7 +40,7 @@ fn compile_with_error() {
 }
 
 #[test]
-#[expect(clippy::expect_used)]
+#[expect(clippy::expect_used, reason = "acceptable in tests")]
 fn compile_missing_dir() {
     owo_colors::set_override(false);
     let result = gpex::compile_program(Path::new("tests/lib/missing"), false);

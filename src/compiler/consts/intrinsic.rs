@@ -1,4 +1,4 @@
-#![expect(clippy::wildcard_enum_match_arm)] // opt-in is preferred
+#![expect(clippy::wildcard_enum_match_arm, reason = "opt-in is preferred here")]
 
 use crate::compiler::consts::{ConstValue, HashableF32};
 use crate::compiler::parsing::exprs::calls::Call;
@@ -120,7 +120,7 @@ fn fn_binary_u32_value<'item>(left: u32, right: u32, fn_: BinaryIntrinsicFn) -> 
     }
 }
 
-#[expect(clippy::float_cmp)] // needed
+#[expect(clippy::float_cmp, reason = "same behavior as GPEx runtime")]
 fn fn_binary_f32_value<'item>(
     left: HashableF32,
     right: HashableF32,

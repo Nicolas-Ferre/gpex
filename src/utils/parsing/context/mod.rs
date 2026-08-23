@@ -92,7 +92,7 @@ impl<'config> ParseContext<'config> {
         }
     }
 
-    #[expect(clippy::type_complexity)] // dyn parser closure is only used here
+    #[expect(clippy::type_complexity, reason = "`dyn` closure is only used here")]
     pub(crate) fn parse_any<T>(
         &mut self,
         parsers: &[&dyn Fn(&mut Self) -> ParserResult<'config, T>],
