@@ -3,6 +3,9 @@ set -euo pipefail
 
 # It is considered that the analyzed code is compiling and formatted with Rustfmt.
 
+# shellcheck disable=SC1091
+source "$(dirname "$0")/utils.sh"
+
 VISIBILITY_REGEX='(pub(\([^)]*\))?[[:space:]]+)?'
 FUNCTION_MODIFIER_REGEX='((async|unsafe|const|default)[[:space:]]+|extern([[:space:]]+"[^"]*")?[[:space:]]+)*'
 MOD_REGEX="^${VISIBILITY_REGEX}mod[[:space:]]+(r#)?[a-zA-Z_][a-zA-Z0-9_]*;"
@@ -13,7 +16,6 @@ TYPE_REGEX="^${VISIBILITY_REGEX}(unsafe[[:space:]]+)?(type|struct|enum|union|tra
 IMPL_REGEX="^(unsafe[[:space:]]+)?impl([[:space:]]|<)"
 FUNCTION_REGEX="^${VISIBILITY_REGEX}${FUNCTION_MODIFIER_REGEX}fn([[:space:]]|<)"
 ITEM_KINDS=("module" "use" "const" "static" "type/impl" "free function")
-VISIBILITY_KINDS=("pub" "pub(crate)" "pub(super)" "pub(<other>)" "private")
 
 compute_item_rank() {
     item_rank=""
@@ -33,20 +35,6 @@ compute_item_rank() {
         if [[ $line =~ $IMPL_REGEX ]]; then
             has_visibility_order=false
         fi
-    fi
-}
-
-compute_visibility_rank() {
-    if [[ $line =~ ^pub[[:space:]] ]]; then
-        visibility_rank=0
-    elif [[ $line =~ ^pub\(crate\)[[:space:]] ]]; then
-        visibility_rank=1
-    elif [[ $line =~ ^pub\(super\)[[:space:]] ]]; then
-        visibility_rank=2
-    elif [[ $line =~ ^pub\([^)]+\)[[:space:]] ]]; then
-        visibility_rank=3
-    else
-        visibility_rank=4
     fi
 }
 
@@ -70,7 +58,7 @@ while read -r -d '' file; do
         if [[ $has_visibility_order == false ]]; then
             continue
         fi
-        compute_visibility_rank
+        visibility_rank=$(compute_visibility_rank "$line")
         highest_visibility_rank=${highest_visibility_ranks[item_rank]}
         if ((visibility_rank < highest_visibility_rank)); then
             echo "$file:$line_number: ${VISIBILITY_KINDS[visibility_rank]} ${ITEM_KINDS[item_rank]} items should be defined before ${VISIBILITY_KINDS[highest_visibility_rank]} ${ITEM_KINDS[item_rank]} items"
