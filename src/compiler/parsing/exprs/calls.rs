@@ -94,6 +94,10 @@ impl Call {
         })
     }
 
+    pub(crate) fn key(&self) -> String {
+        format!("{}({})", self.name, self.args.len())
+    }
+
     pub(super) fn from_binary(
         context: &mut ParseContext<'_>,
         left_operand: Expr,
@@ -136,10 +140,6 @@ impl Call {
             name: call.name,
             args,
         }
-    }
-
-    pub(crate) fn key(&self) -> String {
-        format!("{}({})", self.name, self.args.len())
     }
 }
 
