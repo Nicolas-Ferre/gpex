@@ -76,6 +76,16 @@ impl<'state, 'item> TranspileState<'state, 'item> {
     }
 }
 
+#[derive(Debug, Clone)]
+#[derive_where::derive_where(PartialEq, Eq, Hash)]
+pub(crate) struct SpecializedFn<'item> {
+    fn_: &'item FnDefinition,
+    const_param_values: Vec<ConstValue<'item>>,
+    wildcard_param_types: Vec<&'item StructDefinition>,
+    #[derive_where(skip)]
+    fn_body: &'item FnStatementsBody,
+}
+
 pub(crate) fn transpile<'item>(
     files: &[ReadFile],
     modules: &'item [Module],
@@ -216,14 +226,4 @@ fn sorted_global_vars_for_definition(modules: &[Module]) -> Vec<&VarDefinition> 
         .flat_map(Module::global_vars)
         .sorted_unstable_by_key(|var| var.id)
         .collect()
-}
-
-#[derive(Debug, Clone)]
-#[derive_where::derive_where(PartialEq, Eq, Hash)]
-pub(crate) struct SpecializedFn<'item> {
-    fn_: &'item FnDefinition,
-    const_param_values: Vec<ConstValue<'item>>,
-    wildcard_param_types: Vec<&'item StructDefinition>,
-    #[derive_where(skip)]
-    fn_body: &'item FnStatementsBody,
 }

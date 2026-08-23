@@ -46,10 +46,6 @@ pub(crate) const BINARY_FN_NAMES: &[&str] = &[
     BINARY_OR_FN_NAME,
 ];
 
-pub(crate) fn is_operator_fn_name(name: &str) -> bool {
-    BINARY_FN_NAMES.contains(&name) || calls::UNARY_FN_NAMES.contains(&name)
-}
-
 const OPERATOR_PRIORITIES: &[&[&str]] = &[
     &[STAR_SYMBOL.slice, SLASH_SYMBOL.slice, PERCENT_SYMBOL.slice],
     &[PLUS_SYMBOL.slice, HYPHEN_SYMBOL.slice],
@@ -233,4 +229,8 @@ impl Expr {
 struct BinaryRightPart {
     operator: Span,
     operand: Expr,
+}
+
+pub(crate) fn is_operator_fn_name(name: &str) -> bool {
+    BINARY_FN_NAMES.contains(&name) || calls::UNARY_FN_NAMES.contains(&name)
 }

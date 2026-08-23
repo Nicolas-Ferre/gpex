@@ -11,25 +11,6 @@ use std::fs;
 use std::path::Path;
 use wgpu::{Buffer, Device, Queue};
 
-/// Loads a compiled `GPEx` program.
-///
-/// # Errors
-///
-/// An error is returned in case the input file is not a valid compiled `GPEx` program.
-pub fn load_compiled(path: &Path) -> Result<Program, Vec<Log>> {
-    match fs::read_to_string(path) {
-        Ok(content) => Ok(serde_json::from_str(&content).map_err(|_| {
-            vec![Log {
-                level: LogLevel::Error,
-                msg: format!("invalid compiled program \"{}\"", path.display()),
-                location: None,
-                inner: vec![],
-            }]
-        })?),
-        Err(error) => Err(vec![Log::from_io_error(error, path, "cannot read")]),
-    }
-}
-
 /// A `GPEx` program runner.
 #[derive(Debug)]
 pub struct Runner {
@@ -160,5 +141,24 @@ impl Display for GpuValue {
                 }
             ),
         }
+    }
+}
+
+/// Loads a compiled `GPEx` program.
+///
+/// # Errors
+///
+/// An error is returned in case the input file is not a valid compiled `GPEx` program.
+pub fn load_compiled(path: &Path) -> Result<Program, Vec<Log>> {
+    match fs::read_to_string(path) {
+        Ok(content) => Ok(serde_json::from_str(&content).map_err(|_| {
+            vec![Log {
+                level: LogLevel::Error,
+                msg: format!("invalid compiled program \"{}\"", path.display()),
+                location: None,
+                inner: vec![],
+            }]
+        })?),
+        Err(error) => Err(vec![Log::from_io_error(error, path, "cannot read")]),
     }
 }
