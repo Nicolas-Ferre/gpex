@@ -3,16 +3,6 @@ use crate::utils::parsing::error::ParseError;
 use std::ops::Range;
 use std::path::Path;
 
-impl SpanProps for ParseContext<'_> {
-    fn slice(&self, span: Span) -> &str {
-        &self.files[span.file_index].content[span.start..span.end]
-    }
-
-    fn fs_path(&self, span: Span) -> &Path {
-        &self.files[span.file_index].fs_path
-    }
-}
-
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct Symbol {
     pub(crate) name: &'static str,

@@ -3,6 +3,7 @@ mod many;
 pub(crate) use many::SeparatorParser;
 
 use crate::utils::parsing::error::ParseError;
+use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::reading::ReadFile;
 use std::path::Path;
 
@@ -20,6 +21,16 @@ pub(crate) struct ParseContext<'config> {
     scope: Vec<u64>,
     next_id: u64,
     comment_prefix: &'config str,
+}
+
+impl SpanProps for ParseContext<'_> {
+    fn slice(&self, span: Span) -> &str {
+        &self.files[span.file_index].content[span.start..span.end]
+    }
+
+    fn fs_path(&self, span: Span) -> &Path {
+        &self.files[span.file_index].fs_path
+    }
 }
 
 impl<'config> ParseContext<'config> {
