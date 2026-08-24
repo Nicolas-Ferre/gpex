@@ -1,0 +1,4 @@
+fn _fn(
+    value: const ? require value == 0,
+    _other: ? require typeof(value) == i32,
+) {}

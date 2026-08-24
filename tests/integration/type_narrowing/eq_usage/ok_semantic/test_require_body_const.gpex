@@ -1,0 +1,5 @@
+const fn increment(value: const ? require typeof(value) == i32) -> i32 {
+    return value + 1;
+}
+
+const _RESULT_TWO = increment(1); // expected: 2

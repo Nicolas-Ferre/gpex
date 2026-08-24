@@ -1,0 +1,9 @@
+fn add(
+    left: ? require typeof(left) == i32,
+    middle: ? require typeof(middle) == typeof(left),
+    right: ? require typeof(right) == typeof(middle),
+) -> i32 {
+    return left + middle + right;
+}
+
+var _result_six = add(1, 2, 3); // expected: 6

@@ -1,0 +1,8 @@
+fn increment(
+    type_: const typeref require type_ == i32,
+    value: type_,
+) -> i32 {
+    return value + 1;
+}
+
+var _result_two = increment(i32, 1); // expected: 2

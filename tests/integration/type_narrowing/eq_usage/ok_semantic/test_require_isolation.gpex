@@ -1,0 +1,10 @@
+fn increment_i32(value: ? require typeof(value) == i32) -> i32 {
+    return value + 1;
+}
+
+fn increment_u32(value: ? require typeof(value) == u32) -> u32 {
+    return value + 1u;
+}
+
+var _result_i32_two = increment_i32(1); // expected: 2
+var _result_u32_three = increment_u32(2u); // expected: 3u

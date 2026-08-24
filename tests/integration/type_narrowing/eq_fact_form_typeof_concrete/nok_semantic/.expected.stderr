@@ -1,3 +1,13 @@
+error: type fact leaving `typeof(value)` with no possible value
+│  → <root>/test_contradiction_location_require_declared.gpex:1:27
+│    ¦ fn _fn(value: u32 require typeof(value) == i32) {}
+│    ¦                           ^^^^^^^^^^^^^^^^^^^^
+┴
+error: type fact leaving `typeof(value)` with no possible value
+│  → <root>/test_contradiction_location_require_previous.gpex:3:23
+│    ¦     _other: ? require typeof(value) == u32,
+│    ¦                       ^^^^^^^^^^^^^^^^^^^^
+┴
 error: type fact leaving `typeof(param)` with no possible value
 │  → <root>/test_contradiction_typeof_param_concrete.gpex:2:12
 │    ¦     return typeof(param) == u32 && param == 0;

@@ -1,0 +1,4 @@
+fn _fn(
+    value: ? require typeof(value) == i32,
+    _other: ? require typeof(value) == u32,
+) {}
