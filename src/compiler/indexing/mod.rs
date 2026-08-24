@@ -1,7 +1,7 @@
 mod exprs;
 mod type_narrowing;
 
-use self::type_narrowing::TypeNarrowingState;
+use self::type_narrowing::{LogicalTypeNarrowing, TypeNarrowingState};
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
@@ -165,29 +165,74 @@ fn index_not_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'it
     }
 }
 
+// TODO: Move functions-related functions to inner module fns.rs
+
 fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
+    type_narrowing::with_empty_type_facts(state, |state| {
+        index_fn_param_types(fn_, state);
+        index_fn_requirements(fn_, state);
+        // TODO: why resetting type facts for return type ?
+        type_narrowing::with_empty_type_facts(state, |state| {
+            index_fn_return_type(fn_, state);
+        });
+        if fn_.const_keyword_span.is_some() {
+            index_fn_body(fn_, state);
+        }
+    });
+}
+
+fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
+    if fn_.const_keyword_span.is_none() {
+        type_narrowing::with_empty_type_facts(state, |state| {
+            add_fn_requirement_type_facts(fn_, state);
+            index_fn_body(fn_, state);
+        });
+    }
+}
+
+fn index_fn_param_types<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
     for param in &fn_.params.params {
         exprs::index_expr(&param.type_, state);
+    }
+}
+
+// TODO: I wonder if there is a way to simplify this function and next one
+fn index_fn_requirements<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
+    for param in &fn_.params.params {
         if let Some(requirement) = &param.requirement {
             exprs::index_expr(&requirement.condition, state);
-        }
-    }
-    if let Some(return_type) = &fn_.return_type {
-        exprs::index_expr(return_type, state);
-    }
-    if fn_.const_keyword_span.is_some()
-        && let FnBody::Statements(body) = &fn_.body
-    {
-        for statement in &body.statements {
-            index_statement_refs(statement, state);
+            type_narrowing::add_expr_type_facts(
+                &requirement.condition,
+                LogicalTypeNarrowing::And,
+                state,
+            );
         }
     }
 }
 
-fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    if fn_.const_keyword_span.is_none()
-        && let FnBody::Statements(body) = &fn_.body
-    {
+fn add_fn_requirement_type_facts<'item>(
+    fn_: &'item FnDefinition,
+    state: &mut IndexState<'_, 'item>,
+) {
+    for param in &fn_.params.params {
+        if let Some(requirement) = &param.requirement {
+            type_narrowing::add_expr_type_facts(
+                &requirement.condition,
+                LogicalTypeNarrowing::And,
+                state,
+            );
+        }
+    }
+}
+
+fn index_fn_return_type<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
+    if let Some(return_type) = &fn_.return_type {
+        exprs::index_expr(return_type, state);
+    }
+}
+
+fn index_fn_body<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
+    if let FnBody::Statements(body) = &fn_.body {
         for statement in &body.statements {
             index_statement_refs(statement, state);
         }

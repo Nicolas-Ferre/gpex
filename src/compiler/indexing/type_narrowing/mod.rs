@@ -13,6 +13,7 @@ use crate::compiler::queries;
 use crate::compiler::state::{IntrinsicType, State, TypeFacts};
 use crate::compiler::types;
 use std::collections::HashMap;
+use std::mem;
 use std::rc::Rc;
 
 #[derive(Clone, Copy)]
@@ -53,20 +54,39 @@ struct ResolvedTypeFactOperand<'item> {
     is_subject: bool,
 }
 
+// TODO: can we replace it by a simple reset function? (in case we don't need to keep previous facts)
+pub(super) fn with_empty_type_facts<'state, 'item, O>(
+    state: &mut IndexState<'state, 'item>,
+    callback: impl FnOnce(&mut IndexState<'state, 'item>) -> O,
+) -> O {
+    let previous_facts = mem::take(&mut state.type_narrowing.type_facts);
+    let output = callback(state);
+    state.type_narrowing.type_facts = previous_facts;
+    output
+}
+
 pub(super) fn index_logical_operation_args<'item>(
     call: &'item Call,
     narrowing: LogicalTypeNarrowing,
     state: &mut IndexState<'_, 'item>,
 ) {
     exprs::index_expr(&call.args[0].value, state);
-    let mut facts = vec![];
-    collect_type_facts(&call.args[0].value, narrowing, state.inner, &mut facts);
     let previous_facts = state.type_narrowing.type_facts.clone();
+    add_expr_type_facts(&call.args[0].value, narrowing, state);
+    exprs::index_expr(&call.args[1].value, state);
+    state.type_narrowing.type_facts = previous_facts;
+}
+
+pub(super) fn add_expr_type_facts<'item>(
+    expr: &'item Expr,
+    narrowing: LogicalTypeNarrowing,
+    state: &mut IndexState<'_, 'item>,
+) {
+    let mut facts = vec![];
+    collect_type_facts(expr, narrowing, state.inner, &mut facts);
     for fact in facts {
         fact.add(state);
     }
-    exprs::index_expr(&call.args[1].value, state);
-    state.type_narrowing.type_facts = previous_facts;
 }
 
 pub(super) fn index_ident<'item>(
