@@ -1,10 +1,10 @@
 use super::operands::TypeFactOperand;
 use crate::compiler::indexing::IndexState;
+use crate::compiler::indexing::type_narrowing::NarrowedType;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::state::TypeFacts;
 use crate::utils::parsing::span::Span;
 use std::rc::Rc;
-use crate::compiler::indexing::type_narrowing::NarrowedType;
 
 pub(super) struct TypeFact<'item> {
     pub(super) operands: [TypeFactOperand<'item>; 2],

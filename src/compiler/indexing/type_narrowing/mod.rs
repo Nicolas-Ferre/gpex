@@ -14,7 +14,6 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::queries;
 use crate::compiler::state::{State, TypeFacts};
 use std::collections::HashMap;
-use std::mem;
 use std::rc::Rc;
 
 #[derive(Clone, Copy)]
@@ -45,6 +44,10 @@ pub(super) struct TypeNarrowingState<'item> {
 }
 
 impl<'item> TypeNarrowingState<'item> {
+    pub(crate) fn reset(&mut self) {
+        self.type_facts.clear();
+    }
+
     fn type_facts(&self, param: NarrowedType<'item>) -> Rc<TypeFacts<'item>> {
         self.type_facts.get(&param).cloned().unwrap_or_default()
     }
@@ -54,17 +57,6 @@ impl<'item> TypeNarrowingState<'item> {
 enum NarrowedType<'item> {
     Wildcard(&'item Param),
     Referenced(&'item Param),
-}
-
-// TODO: can we replace it by a simple reset function? (in case we don't need to keep previous facts)
-pub(super) fn with_empty_type_facts<'state, 'item, O>(
-    state: &mut IndexState<'state, 'item>,
-    callback: impl FnOnce(&mut IndexState<'state, 'item>) -> O,
-) -> O {
-    let previous_facts = mem::take(&mut state.type_narrowing.type_facts);
-    let output = callback(state);
-    state.type_narrowing.type_facts = previous_facts;
-    output
 }
 
 pub(super) fn index_logical_operation_args<'item>(

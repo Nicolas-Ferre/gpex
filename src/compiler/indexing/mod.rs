@@ -168,21 +168,19 @@ fn index_not_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'it
 // TODO: Move functions-related functions to inner module fns.rs
 
 fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    type_narrowing::with_empty_type_facts(state, |state| {
-        index_fn_params(fn_, state);
-        index_fn_return_type(fn_, state);
-        if fn_.const_keyword_span.is_some() {
-            index_fn_body(fn_, state);
-        }
-    });
+    state.type_narrowing.reset();
+    index_fn_params(fn_, state);
+    index_fn_return_type(fn_, state);
+    if fn_.const_keyword_span.is_some() {
+        index_fn_body(fn_, state);
+    }
 }
 
 fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
     if fn_.const_keyword_span.is_none() {
-        type_narrowing::with_empty_type_facts(state, |state| {
-            add_fn_requirement_type_facts(fn_, state);
-            index_fn_body(fn_, state);
-        });
+        state.type_narrowing.reset();
+        add_fn_requirement_type_facts(fn_, state);
+        index_fn_body(fn_, state);
     }
 }
 
