@@ -1,17 +1,18 @@
 mod facts;
+mod operands;
 
-use self::facts::{TypeFact, TypeFactOperand, TypeFactParam};
-use crate::compiler::consts::{self, ConstValue};
+use self::facts::TypeFact;
+use self::operands::TypeFactOperand;
+use crate::compiler::indexing::type_narrowing::operands::ResolvedTypeFactOperand;
 use crate::compiler::indexing::{IndexState, exprs};
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
+use crate::compiler::parsing::items::fns::BinaryIntrinsicFn;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::queries;
-use crate::compiler::state::{IntrinsicType, State, TypeFacts};
-use crate::compiler::types;
+use crate::compiler::state::{State, TypeFacts};
 use std::collections::HashMap;
 use std::mem;
 use std::rc::Rc;
@@ -40,18 +41,19 @@ impl LogicalTypeNarrowing {
 
 #[derive(Default)]
 pub(super) struct TypeNarrowingState<'item> {
-    type_facts: HashMap<TypeFactParam<'item>, Rc<TypeFacts<'item>>>,
+    type_facts: HashMap<NarrowedType<'item>, Rc<TypeFacts<'item>>>,
 }
 
 impl<'item> TypeNarrowingState<'item> {
-    fn type_facts(&self, param: TypeFactParam<'item>) -> Rc<TypeFacts<'item>> {
+    fn type_facts(&self, param: NarrowedType<'item>) -> Rc<TypeFacts<'item>> {
         self.type_facts.get(&param).cloned().unwrap_or_default()
     }
 }
 
-struct ResolvedTypeFactOperand<'item> {
-    operand: TypeFactOperand<'item>,
-    is_subject: bool,
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+enum NarrowedType<'item> {
+    Wildcard(&'item Param),
+    Referenced(&'item Param),
 }
 
 // TODO: can we replace it by a simple reset function? (in case we don't need to keep previous facts)
@@ -95,8 +97,8 @@ pub(super) fn index_ident<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if let ItemRef::Param(param) = source
-        && let Some(fact_param) = TypeFactOperand::from_param(param, state.inner).param()
-        && let Some(facts) = state.type_narrowing.type_facts.get(&fact_param).cloned()
+        && let Some(type_) = TypeFactOperand::from_param(param, state.inner).narrowed_type()
+        && let Some(facts) = state.type_narrowing.type_facts.get(&type_).cloned()
     {
         state.set_expr_type_facts(ident.id, facts);
     }
@@ -141,8 +143,8 @@ fn is_comparison_operator(call: &Call, narrowing: LogicalTypeNarrowing, state: &
 fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
-    let left_operand = resolve_type_fact_operand(left_arg, state)?;
-    let right_operand = resolve_type_fact_operand(right_arg, state)?;
+    let left_operand = ResolvedTypeFactOperand::resolve(left_arg, state)?;
+    let right_operand = ResolvedTypeFactOperand::resolve(right_arg, state)?;
     if !left_operand.is_subject && !right_operand.is_subject {
         return None;
     }
@@ -154,65 +156,4 @@ fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Optio
             right_operand.is_subject.then(|| right_arg.span()),
         ],
     })
-}
-
-fn resolve_type_fact_operand<'item>(
-    operand: &Expr,
-    state: &State<'item>,
-) -> Option<ResolvedTypeFactOperand<'item>> {
-    if let Some(param) = typeof_param(operand, state) {
-        return Some(ResolvedTypeFactOperand {
-            operand: TypeFactOperand::from_param(param, state),
-            is_subject: true,
-        });
-    }
-    let resolved_operand = match consts::expr_value(operand, state) {
-        ConstValue::TypeRef(type_) => TypeFactOperand::Concrete(type_),
-        ConstValue::Param(param) => TypeFactOperand::Param(TypeFactParam::ReferencedType(param)),
-        ConstValue::WildcardType(param) => TypeFactOperand::Param(TypeFactParam::WildcardType(param)),
-        ConstValue::I32(_)
-        | ConstValue::U32(_)
-        | ConstValue::F32(_)
-        | ConstValue::Bool(_)
-        | ConstValue::Unknown
-        | ConstValue::RuntimeValue => return None,
-    };
-    Some(ResolvedTypeFactOperand {
-        operand: resolved_operand,
-        is_subject: !is_typeof_expr(operand, state)
-            && matches!(resolved_operand, TypeFactOperand::Param(_))
-            && state.is_intrinsic_type(types::expr_type(operand, state), IntrinsicType::Typeref),
-    })
-}
-
-fn is_typeof_expr(expr: &Expr, state: &State<'_>) -> bool {
-    let Expr::Call(call) = unwrap_parentheses(expr) else {
-        return false;
-    };
-    queries::calls::is_intrinsic(call, IntrinsicFn::Typeof, state)
-}
-
-fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
-    if let Expr::Call(typeof_call) = unwrap_parentheses(expr)
-        && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
-        && let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value)
-        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
-    {
-        Some(param)
-    } else {
-        None
-    }
-}
-
-fn unwrap_parentheses(expr: &Expr) -> &Expr {
-    match expr {
-        Expr::Parenthesized(parenthesized) => unwrap_parentheses(&parenthesized.value),
-        Expr::F32Literal(_)
-        | Expr::U32Literal(_)
-        | Expr::I32Literal(_)
-        | Expr::BoolLiteral(_)
-        | Expr::Wildcard(_)
-        | Expr::Call(_)
-        | Expr::Ident(_) => expr,
-    }
 }

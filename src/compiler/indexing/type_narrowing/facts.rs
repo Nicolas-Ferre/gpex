@@ -1,40 +1,10 @@
+use super::operands::TypeFactOperand;
 use crate::compiler::indexing::IndexState;
-use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::state::{State, TypeFacts};
-use crate::compiler::types::{self, Type};
+use crate::compiler::state::TypeFacts;
 use crate::utils::parsing::span::Span;
 use std::rc::Rc;
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub(super) enum TypeFactParam<'item> {
-    WildcardType(&'item Param),
-    ReferencedType(&'item Param),
-}
-
-#[derive(Clone, Copy)]
-pub(super) enum TypeFactOperand<'item> {
-    Concrete(&'item StructDefinition),
-    Param(TypeFactParam<'item>),
-}
-
-impl<'item> TypeFactOperand<'item> {
-    pub(super) fn from_param(param: &'item Param, state: &State<'item>) -> Self {
-        match types::param_type(param, state) {
-            Type::Struct(type_) => Self::Concrete(type_),
-            Type::Param(type_param) => Self::Param(TypeFactParam::ReferencedType(type_param)),
-            Type::Wildcard(type_param) => Self::Param(TypeFactParam::WildcardType(type_param)),
-            Type::NoReturn | Type::Unknown => Self::Param(TypeFactParam::WildcardType(param)),
-        }
-    }
-
-    pub(super) fn param(self) -> Option<TypeFactParam<'item>> {
-        match self {
-            Self::Param(param) => Some(param),
-            Self::Concrete(_) => None,
-        }
-    }
-}
+use crate::compiler::indexing::type_narrowing::NarrowedType;
 
 pub(super) struct TypeFact<'item> {
     pub(super) operands: [TypeFactOperand<'item>; 2],
@@ -49,13 +19,13 @@ impl<'item> TypeFact<'item> {
     }
 
     fn add_fact_in_state(&self, state: &mut IndexState<'_, 'item>) -> bool {
-        use TypeFactOperand::{Concrete, Param};
+        use TypeFactOperand::{Concrete, Dynamic};
         match self.operands {
             [Concrete(left), Concrete(right)] => left.id != right.id,
-            [Param(param), Concrete(type_)] | [Concrete(type_), Param(param)] => {
+            [Dynamic(param), Concrete(type_)] | [Concrete(type_), Dynamic(param)] => {
                 Self::add_required_type(param, type_, state)
             }
-            [Param(left), Param(right)] => Self::merge_params([left, right], state),
+            [Dynamic(left), Dynamic(right)] => Self::merge_params([left, right], state),
         }
     }
 
@@ -72,7 +42,7 @@ impl<'item> TypeFact<'item> {
     }
 
     fn add_required_type(
-        param: TypeFactParam<'item>,
+        param: NarrowedType<'item>,
         type_: &'item StructDefinition,
         state: &mut IndexState<'_, 'item>,
     ) -> bool {
@@ -84,7 +54,7 @@ impl<'item> TypeFact<'item> {
         is_new_contradiction
     }
 
-    fn merge_params(params: [TypeFactParam<'item>; 2], state: &mut IndexState<'_, 'item>) -> bool {
+    fn merge_params(params: [NarrowedType<'item>; 2], state: &mut IndexState<'_, 'item>) -> bool {
         let previous_facts = params.map(|param| state.type_narrowing.type_facts(param));
         let mut facts = previous_facts[0].as_ref().clone();
         facts.add_required_types(&previous_facts[1]);
@@ -97,7 +67,7 @@ impl<'item> TypeFact<'item> {
     fn merge_type_fact_groups(
         all_previous_facts: &[Rc<TypeFacts<'item>>],
         facts: Rc<TypeFacts<'item>>,
-        params: &[TypeFactParam<'item>],
+        params: &[NarrowedType<'item>],
         state: &mut IndexState<'_, 'item>,
     ) {
         for other_facts in state.type_narrowing.type_facts.values_mut() {
