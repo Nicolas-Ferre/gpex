@@ -6,23 +6,50 @@ use crate::compiler::types::{self, Type};
 use crate::utils::parsing::span::Span;
 use std::rc::Rc;
 
+// TODO: simplify with an enum (and pass &Param as variant to make it more explicit)
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+pub(super) struct TypeFactParam {
+    param_id: u64,
+    kind: TypeFactParamKind,
+}
+
+impl TypeFactParam {
+    // TODO: rename "runtime" by something more understandable?
+    pub(super) fn runtime_type(param: &Param) -> Self {
+        Self {
+            param_id: param.id,
+            kind: TypeFactParamKind::RuntimeType,
+        }
+    }
+
+    pub(super) fn type_ref(param: &Param) -> Self {
+        Self {
+            param_id: param.id,
+            kind: TypeFactParamKind::TypeRefValue,
+        }
+    }
+}
+
 #[derive(Clone, Copy)]
 pub(super) enum TypeFactOperand<'item> {
     Concrete(&'item StructDefinition),
-    Param(&'item Param),
+    Param(TypeFactParam),
 }
 
 impl<'item> TypeFactOperand<'item> {
     pub(super) fn from_param(param: &'item Param, state: &State<'item>) -> Self {
-        let type_ = types::param_type(param, state);
-        if let Some(type_param) = type_fact_param(type_) {
-            Self::Param(type_param)
-        } else {
-            match type_ {
-                Type::Struct(type_) => Self::Concrete(type_),
-                Type::NoReturn | Type::Unknown => Self::Param(param),
-                Type::Param(_) | Type::Wildcard(_) => unreachable!("parameter type handled above"),
-            }
+        match types::param_type(param, state) {
+            Type::Struct(type_) => Self::Concrete(type_),
+            Type::Param(type_param) => Self::Param(TypeFactParam::type_ref(type_param)),
+            Type::Wildcard(type_param) => Self::Param(TypeFactParam::runtime_type(type_param)),
+            Type::NoReturn | Type::Unknown => Self::Param(TypeFactParam::runtime_type(param)),
+        }
+    }
+
+    pub(super) fn param(self) -> Option<TypeFactParam> {
+        match self {
+            Self::Param(param) => Some(param),
+            Self::Concrete(_) => None,
         }
     }
 }
@@ -63,7 +90,7 @@ impl<'item> TypeFact<'item> {
     }
 
     fn add_required_type(
-        param: &'item Param,
+        param: TypeFactParam,
         type_: &'item StructDefinition,
         state: &mut IndexState<'_, 'item>,
     ) -> bool {
@@ -75,7 +102,7 @@ impl<'item> TypeFact<'item> {
         is_new_contradiction
     }
 
-    fn merge_params(params: [&'item Param; 2], state: &mut IndexState<'_, 'item>) -> bool {
+    fn merge_params(params: [TypeFactParam; 2], state: &mut IndexState<'_, 'item>) -> bool {
         let previous_facts = params.map(|param| state.type_narrowing.type_facts(param));
         let mut facts = previous_facts[0].as_ref().clone();
         facts.add_required_types(&previous_facts[1]);
@@ -88,7 +115,7 @@ impl<'item> TypeFact<'item> {
     fn merge_type_fact_groups(
         all_previous_facts: &[Rc<TypeFacts<'item>>],
         facts: Rc<TypeFacts<'item>>,
-        params: &[&Param],
+        params: &[TypeFactParam],
         state: &mut IndexState<'_, 'item>,
     ) {
         for other_facts in state.type_narrowing.type_facts.values_mut() {
@@ -103,14 +130,13 @@ impl<'item> TypeFact<'item> {
             state
                 .type_narrowing
                 .type_facts
-                .insert(param.id, facts.clone());
+                .insert(*param, facts.clone());
         }
     }
 }
 
-pub(super) fn type_fact_param(type_: Type<'_>) -> Option<&Param> {
-    match type_ {
-        Type::Param(type_param) | Type::Wildcard(type_param) => Some(type_param),
-        Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
-    }
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+enum TypeFactParamKind {
+    RuntimeType,
+    TypeRefValue,
 }

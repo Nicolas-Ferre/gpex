@@ -1,6 +1,6 @@
 mod facts;
 
-use self::facts::{TypeFact, TypeFactOperand};
+use self::facts::{TypeFact, TypeFactOperand, TypeFactParam};
 use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::indexing::{IndexState, exprs};
 use crate::compiler::item_ref::ItemRef;
@@ -40,12 +40,12 @@ impl LogicalTypeNarrowing {
 
 #[derive(Default)]
 pub(super) struct TypeNarrowingState<'item> {
-    type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
+    type_facts: HashMap<TypeFactParam, Rc<TypeFacts<'item>>>,
 }
 
 impl<'item> TypeNarrowingState<'item> {
-    fn type_facts(&self, param: &Param) -> Rc<TypeFacts<'item>> {
-        self.type_facts.get(&param.id).cloned().unwrap_or_default()
+    fn type_facts(&self, param: TypeFactParam) -> Rc<TypeFacts<'item>> {
+        self.type_facts.get(&param).cloned().unwrap_or_default()
     }
 }
 
@@ -95,8 +95,8 @@ pub(super) fn index_ident<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if let ItemRef::Param(param) = source
-        && let Some(fact_param) = facts::type_fact_param(types::param_type(param, state.inner))
-        && let Some(facts) = state.type_narrowing.type_facts.get(&fact_param.id).cloned()
+        && let Some(fact_param) = TypeFactOperand::from_param(param, state.inner).param()
+        && let Some(facts) = state.type_narrowing.type_facts.get(&fact_param).cloned()
     {
         state.set_expr_type_facts(ident.id, facts);
     }
@@ -168,7 +168,10 @@ fn resolve_type_fact_operand<'item>(
     }
     let resolved_operand = match consts::expr_value(operand, state) {
         ConstValue::TypeRef(type_) => TypeFactOperand::Concrete(type_),
-        ConstValue::Param(param) | ConstValue::WildcardType(param) => TypeFactOperand::Param(param),
+        ConstValue::Param(param) => TypeFactOperand::Param(TypeFactParam::type_ref(param)),
+        ConstValue::WildcardType(param) => {
+            TypeFactOperand::Param(TypeFactParam::runtime_type(param))
+        }
         ConstValue::I32(_)
         | ConstValue::U32(_)
         | ConstValue::F32(_)
