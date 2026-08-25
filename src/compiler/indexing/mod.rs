@@ -1,12 +1,11 @@
 mod exprs;
+mod fns;
 mod type_narrowing;
 
-use self::type_narrowing::{LogicalTypeNarrowing, TypeNarrowingState};
+use self::type_narrowing::TypeNarrowingState;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::Item;
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::parsing::statements::Statement;
 use crate::compiler::prelude::PRELUDE_FILE_COUNT;
 use crate::compiler::state::{State, TypeFacts};
 use crate::utils::indexing::SearchConfig;
@@ -148,7 +147,7 @@ fn index_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'item>)
     for item in &module.items {
         match item {
             Item::Const(item) => exprs::index_expr(&item.value, state),
-            Item::Fn(item) => index_fn_const_parts(item, state),
+            Item::Fn(item) => fns::index_fn_const_parts(item, state),
             Item::Import(_) | Item::Var(_) | Item::Struct(_) | Item::Repeat(_) => (),
         }
     }
@@ -159,80 +158,8 @@ fn index_not_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'it
         match item {
             Item::Import(_) | Item::Struct(_) | Item::Const(_) => (),
             Item::Var(item) => exprs::index_expr(&item.default_value, state),
-            Item::Fn(item) => index_fn_not_const_parts(item, state),
+            Item::Fn(item) => fns::index_fn_not_const_parts(item, state),
             Item::Repeat(item) => exprs::index_call(&item.call, state),
-        }
-    }
-}
-
-// TODO: Move functions-related functions to inner module fns.rs
-
-fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    state.type_narrowing.reset();
-    index_fn_params(fn_, state);
-    index_fn_return_type(fn_, state);
-    if fn_.const_keyword_span.is_some() {
-        index_fn_body(fn_, state);
-    }
-}
-
-fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    if fn_.const_keyword_span.is_none() {
-        state.type_narrowing.reset();
-        add_fn_requirement_type_facts(fn_, state);
-        index_fn_body(fn_, state);
-    }
-}
-
-fn index_fn_params<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    for param in &fn_.params.params {
-        exprs::index_expr(&param.type_, state);
-        if let Some(requirement) = &param.requirement {
-            exprs::index_expr(&requirement.condition, state);
-            type_narrowing::add_expr_type_facts(
-                &requirement.condition,
-                LogicalTypeNarrowing::And,
-                state,
-            );
-        }
-    }
-}
-
-fn add_fn_requirement_type_facts<'item>(
-    fn_: &'item FnDefinition,
-    state: &mut IndexState<'_, 'item>,
-) {
-    for param in &fn_.params.params {
-        if let Some(requirement) = &param.requirement {
-            type_narrowing::add_expr_type_facts(
-                &requirement.condition,
-                LogicalTypeNarrowing::And,
-                state,
-            );
-        }
-    }
-}
-
-fn index_fn_return_type<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    if let Some(return_type) = &fn_.return_type {
-        exprs::index_expr(return_type, state);
-    }
-}
-
-fn index_fn_body<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    if let FnBody::Statements(body) = &fn_.body {
-        for statement in &body.statements {
-            index_statement_refs(statement, state);
-        }
-    }
-}
-
-fn index_statement_refs<'item>(statement: &'item Statement, state: &mut IndexState<'_, 'item>) {
-    match statement {
-        Statement::Return(return_) => exprs::index_expr(&return_.value, state),
-        Statement::Assignment(assignment) => {
-            exprs::index_expr(&assignment.assigned, state);
-            exprs::index_expr(&assignment.value, state);
         }
     }
 }
