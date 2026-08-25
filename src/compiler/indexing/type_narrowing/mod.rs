@@ -40,11 +40,11 @@ impl LogicalTypeNarrowing {
 
 #[derive(Default)]
 pub(super) struct TypeNarrowingState<'item> {
-    type_facts: HashMap<TypeFactParam, Rc<TypeFacts<'item>>>,
+    type_facts: HashMap<TypeFactParam<'item>, Rc<TypeFacts<'item>>>,
 }
 
 impl<'item> TypeNarrowingState<'item> {
-    fn type_facts(&self, param: TypeFactParam) -> Rc<TypeFacts<'item>> {
+    fn type_facts(&self, param: TypeFactParam<'item>) -> Rc<TypeFacts<'item>> {
         self.type_facts.get(&param).cloned().unwrap_or_default()
     }
 }
@@ -168,10 +168,8 @@ fn resolve_type_fact_operand<'item>(
     }
     let resolved_operand = match consts::expr_value(operand, state) {
         ConstValue::TypeRef(type_) => TypeFactOperand::Concrete(type_),
-        ConstValue::Param(param) => TypeFactOperand::Param(TypeFactParam::type_ref(param)),
-        ConstValue::WildcardType(param) => {
-            TypeFactOperand::Param(TypeFactParam::runtime_type(param))
-        }
+        ConstValue::Param(param) => TypeFactOperand::Param(TypeFactParam::ReferencedType(param)),
+        ConstValue::WildcardType(param) => TypeFactOperand::Param(TypeFactParam::WildcardType(param)),
         ConstValue::I32(_)
         | ConstValue::U32(_)
         | ConstValue::F32(_)
