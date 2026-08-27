@@ -1,10 +1,10 @@
 error: type fact leaving `left_type` and `right_type` with no possible value
-│  → <root>/test_contradiction_previous.gpex:4:12
+│  → <root>/test_expr_contradiction_previous.gpex:4:12
 │    ¦         && left_type == right_type
 │    ¦            ^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `__add__(i32, right_type)` item not found
-│  → <root>/test_out_of_scope.gpex:9:12
+│  → <root>/test_expr_out_of_scope.gpex:9:12
 │    ¦         && left + right == 0;
 │    ¦            ^^^^^^^^^^^^
 ├─ info: similar candidate

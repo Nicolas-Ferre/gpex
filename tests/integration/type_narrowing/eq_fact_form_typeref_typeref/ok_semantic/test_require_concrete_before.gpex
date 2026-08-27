@@ -1,0 +1,10 @@
+fn add(
+    left_type: const typeref require left_type == i32,
+    right_type: const typeref require right_type == left_type,
+    left: left_type,
+    right: right_type,
+) -> i32 {
+    return left + right;
+}
+
+var _result_three = add(i32, i32, 1, 2); // expected: 3

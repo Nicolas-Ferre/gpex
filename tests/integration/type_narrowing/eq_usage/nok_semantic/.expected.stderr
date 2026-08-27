@@ -1,17 +1,12 @@
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_invalid_expr_fact_contradiction.gpex:2:36
+│  → <root>/test_expr_invalid_expr_fact_contradiction.gpex:2:36
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && unknown();
 │    ¦                                    ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `unknown()` item not found
-│  → <root>/test_invalid_expr_fact_contradiction.gpex:2:60
+│  → <root>/test_expr_invalid_expr_fact_contradiction.gpex:2:60
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && unknown();
 │    ¦                                                            ^^^^^^^^^
-┴
-error: `invalid` item not found
-│  → <root>/test_invalid_expr_param_value.gpex:5:19
-│    ¦ var _result = fn_(invalid);
-│    ¦                   ^^^^^^^
 ┴
 error: `__eq__(typeof(value), i32)` item not found
 │  → <root>/test_require_fact_after_usage_next_require.gpex:2:28
@@ -50,6 +45,11 @@ error: `__eq__(typeof(value), i32)` item not found
 │    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦ ) -> bool = intrinsic;
 │    ¦ ^^^^^^^^^
+┴
+error: `invalid` item not found
+│  → <root>/test_require_invalid_expr_param_value.gpex:5:19
+│    ¦ var _result = fn_(invalid);
+│    ¦                   ^^^^^^^
 ┴
 error: expression with invalid type `typeof(value)`
 │  → <root>/test_require_or.gpex:2:12

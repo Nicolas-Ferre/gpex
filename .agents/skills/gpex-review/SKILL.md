@@ -6,7 +6,6 @@ description: Perform extensive code review of the current branch.
 ## Preconditions
 
 - If in plan mode, stop and ask to exit plan mode.
-- Do not run this skill if not explicitly requested by the user.
 
 ## Task
 

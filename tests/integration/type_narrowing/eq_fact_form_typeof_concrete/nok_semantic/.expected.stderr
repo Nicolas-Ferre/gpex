@@ -1,35 +1,25 @@
-error: type fact leaving `typeof(value)` with no possible value
-│  → <root>/test_contradiction_location_require_declared.gpex:1:27
-│    ¦ fn _fn(value: u32 require typeof(value) == i32) {}
-│    ¦                           ^^^^^^^^^^^^^^^^^^^^
-┴
-error: type fact leaving `typeof(value)` with no possible value
-│  → <root>/test_contradiction_location_require_previous.gpex:3:23
-│    ¦     _other: ? require typeof(value) == u32,
-│    ¦                       ^^^^^^^^^^^^^^^^^^^^
-┴
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_contradiction_typeof_param_concrete.gpex:2:12
+│  → <root>/test_expr_contradiction_typeof_param_concrete.gpex:2:12
 │    ¦     return typeof(param) == u32 && param == 0;
 │    ¦            ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_contradiction_typeof_param_dependent.gpex:2:36
+│  → <root>/test_expr_contradiction_typeof_param_dependent.gpex:2:36
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && param == 0;
 │    ¦                                    ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(related)` with no possible value
-│  → <root>/test_contradiction_typeof_param_related.gpex:2:36
+│  → <root>/test_expr_contradiction_typeof_param_related.gpex:2:36
 │    ¦     return typeof(param) == i32 && typeof(related) == u32 && param == 0;
 │    ¦                                    ^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_contradiction_typeof_param_wildcard.gpex:2:36
+│  → <root>/test_expr_contradiction_typeof_param_wildcard.gpex:2:36
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && typeof(param) == f32 && param == 0;
 │    ¦                                    ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `__eq__(typeof(param), i32)` item not found
-│  → <root>/test_fact_and_unknown_or_usage.gpex:2:52
+│  → <root>/test_expr_fact_and_unknown_or_usage.gpex:2:52
 │    ¦     return (typeof(param) == i32 && param == 0) || param == 0;
 │    ¦                                                    ^^^^^^^^^^
 ├─ info: similar candidate
@@ -48,7 +38,7 @@ error: `__eq__(typeof(param), i32)` item not found
 │    ¦ ^^^^^^^^^
 ┴
 error: `__eq__(typeof(param), i32)` item not found
-│  → <root>/test_fact_or_other_and_usage.gpex:2:46
+│  → <root>/test_expr_fact_or_other_and_usage.gpex:2:46
 │    ¦     return (typeof(param) == i32 || true) && param == 0;
 │    ¦                                              ^^^^^^^^^^
 ├─ info: similar candidate
@@ -67,12 +57,22 @@ error: `__eq__(typeof(param), i32)` item not found
 │    ¦ ^^^^^^^^^
 ┴
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_operands_reversed.gpex:2:12
+│  → <root>/test_expr_operands_reversed.gpex:2:12
 │    ¦     return u32 == typeof(param) && param == 0;
 │    ¦            ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(type_)` with no possible value
-│  → <root>/test_param_type.gpex:2:28
+│  → <root>/test_expr_param_type.gpex:2:28
 │    ¦     return type_ == i32 && typeof(type_) == f32 && value == 0;
 │    ¦                            ^^^^^^^^^^^^^^^^^^^^
+┴
+error: type fact leaving `typeof(value)` with no possible value
+│  → <root>/test_require_contradiction_declared.gpex:1:27
+│    ¦ fn _fn(value: u32 require typeof(value) == i32) {}
+│    ¦                           ^^^^^^^^^^^^^^^^^^^^
+┴
+error: type fact leaving `typeof(value)` with no possible value
+│  → <root>/test_require_contradiction_previous.gpex:3:23
+│    ¦     _other: ? require typeof(value) == u32,
+│    ¦                       ^^^^^^^^^^^^^^^^^^^^
 ┴

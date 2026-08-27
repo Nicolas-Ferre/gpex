@@ -34,6 +34,7 @@ See `doc/testing.md`.
 ## Rules to absolutely respect
 
 - Build plans using `gpex-plan` skill.
+- Do not run `gpex-review` skill except if explicitly mentioned.
 - Always keep `README.md`, `AGENTS.md` and `doc/*.md` files up-to-date
 - Take into account all `AGENTS.md` files within the path of a modified file. For example, the file
   `./a/b/c.rs` should respect `./AGENTS.md`, `./a/AGENTS.md` and `./a/b/AGENTS.md` if they exist.
