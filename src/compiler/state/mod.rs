@@ -58,14 +58,8 @@ impl<'item> State<'item> {
         &mut self,
         node_id: u64,
         context: Rc<TypeFactContext<'item>>,
-    ) -> bool {
-        let previous_context = self.type_fact_contexts.get(&node_id).map(AsRef::as_ref);
-        if previous_context == Some(context.as_ref()) {
-            false
-        } else {
-            self.type_fact_contexts.insert(node_id, context);
-            true
-        }
+    ) {
+        self.type_fact_contexts.insert(node_id, context);
     }
 
     pub(crate) fn expr_type_facts(

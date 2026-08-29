@@ -56,10 +56,6 @@ impl<'state, 'item> IndexState<'state, 'item> {
         }
         self.has_index_changed = true;
     }
-
-    fn set_expr_type_fact_context(&mut self, node_id: u64, context: Rc<TypeFactContext<'item>>) {
-        self.has_index_changed |= self.inner.set_expr_type_fact_context(node_id, context);
-    }
 }
 
 #[derive(PartialEq, Eq)]

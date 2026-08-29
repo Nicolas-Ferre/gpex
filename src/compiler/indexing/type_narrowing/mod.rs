@@ -58,7 +58,9 @@ pub(super) fn add_expr_type_facts<'item>(
 }
 
 pub(super) fn index_ident(ident: &Ident, state: &mut IndexState<'_, '_>) {
-    state.set_expr_type_fact_context(ident.id, state.type_fact_context.clone());
+    state
+        .inner
+        .set_expr_type_fact_context(ident.id, state.type_fact_context.clone());
 }
 
 fn collect_type_facts<'item>(
