@@ -172,7 +172,7 @@ fn type_with_facts<'item>(type_: Type<'item>, facts: Option<&TypeFacts<'item>>) 
     let Some(facts) = facts else {
         return type_;
     };
-    if facts.is_type_contradicted(type_) {
+    if facts.has_contradiction() {
         return Type::Unknown;
     }
     match (type_, facts.required_type()) {
