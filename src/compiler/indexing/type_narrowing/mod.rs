@@ -10,8 +10,6 @@ use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::BinaryIntrinsicFn;
 use crate::compiler::queries;
 use crate::compiler::state::State;
-use crate::compiler::state::type_facts::{TypeFactContext, TypeFactSubject, TypeFacts};
-use std::rc::Rc;
 
 #[derive(Clone, Copy)]
 pub(super) enum LogicalTypeNarrowing {
@@ -35,32 +33,16 @@ impl LogicalTypeNarrowing {
     }
 }
 
-// TODO: flatten?
-#[derive(Default)]
-pub(super) struct TypeNarrowingState<'item> {
-    type_facts: Rc<TypeFactContext<'item>>,
-}
-
-impl<'item> TypeNarrowingState<'item> {
-    pub(crate) fn reset(&mut self) {
-        self.type_facts = Rc::default();
-    }
-
-    fn type_facts(&self, subject: TypeFactSubject<'item>) -> Rc<TypeFacts<'item>> {
-        self.type_facts.get(&subject).cloned().unwrap_or_default()
-    }
-}
-
 pub(super) fn index_logical_operation_args<'item>(
     call: &'item Call,
     narrowing: LogicalTypeNarrowing,
     state: &mut IndexState<'_, 'item>,
 ) {
     exprs::index_expr(&call.args[0].value, state);
-    let previous_facts = state.type_narrowing.type_facts.clone();
+    let previous_facts = state.type_fact_context.clone();
     add_expr_type_facts(&call.args[0].value, narrowing, state);
     exprs::index_expr(&call.args[1].value, state);
-    state.type_narrowing.type_facts = previous_facts;
+    state.type_fact_context = previous_facts;
 }
 
 pub(super) fn add_expr_type_facts<'item>(
@@ -76,8 +58,7 @@ pub(super) fn add_expr_type_facts<'item>(
 }
 
 pub(super) fn index_ident(ident: &Ident, state: &mut IndexState<'_, '_>) {
-    let context = (!state.type_narrowing.type_facts.is_empty())
-        .then(|| state.type_narrowing.type_facts.clone());
+    let context = (!state.type_fact_context.is_empty()).then(|| state.type_fact_context.clone());
     state.set_expr_type_fact_context(ident.id, context);
 }
 

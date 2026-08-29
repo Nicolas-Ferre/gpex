@@ -2,12 +2,13 @@ use crate::compiler::indexing::type_narrowing::LogicalTypeNarrowing;
 use crate::compiler::indexing::{IndexState, exprs, type_narrowing};
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::statements::Statement;
+use std::rc::Rc;
 
 pub(super) fn index_fn_const_parts<'item>(
     fn_: &'item FnDefinition,
     state: &mut IndexState<'_, 'item>,
 ) {
-    state.type_narrowing.reset();
+    state.type_fact_context = Rc::default();
     index_fn_params(fn_, state);
     index_fn_return_type(fn_, state);
     if fn_.const_keyword_span.is_some() {
@@ -20,7 +21,7 @@ pub(super) fn index_fn_not_const_parts<'item>(
     state: &mut IndexState<'_, 'item>,
 ) {
     if fn_.const_keyword_span.is_none() {
-        state.type_narrowing.reset();
+        state.type_fact_context = Rc::default();
         add_fn_requirement_type_facts(fn_, state);
         index_fn_body(fn_, state);
     }

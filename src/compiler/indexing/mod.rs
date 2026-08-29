@@ -2,15 +2,14 @@ mod exprs;
 mod fns;
 mod type_narrowing;
 
-use self::type_narrowing::TypeNarrowingState;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::prelude::PRELUDE_FILE_COUNT;
 use crate::compiler::state::State;
+use crate::compiler::state::type_facts::{TypeFactContext, TypeFactSubject, TypeFacts};
 use crate::utils::indexing::SearchConfig;
 use std::rc::Rc;
-use crate::compiler::state::type_facts::TypeFactContext;
 
 pub(crate) const FN_CALL_SEARCH_CONFIG: SearchConfig = SearchConfig {
     can_be_after: true,
@@ -23,7 +22,7 @@ const IDENT_SEARCH_CONFIG: SearchConfig = SearchConfig {
 
 struct IndexState<'state, 'item> {
     inner: &'state mut State<'item>,
-    type_narrowing: TypeNarrowingState<'item>,
+    type_fact_context: Rc<TypeFactContext<'item>>,
     phase: IndexPhase,
     has_index_changed: bool,
 }
@@ -32,10 +31,17 @@ impl<'state, 'item> IndexState<'state, 'item> {
     fn new(state: &'state mut State<'item>) -> Self {
         Self {
             inner: state,
-            type_narrowing: TypeNarrowingState::default(),
+            type_fact_context: Rc::default(),
             phase: IndexPhase::Converging,
             has_index_changed: false,
         }
+    }
+
+    fn type_facts(&self, subject: TypeFactSubject<'item>) -> Rc<TypeFacts<'item>> {
+        self.type_fact_context
+            .get(&subject)
+            .cloned()
+            .unwrap_or_default()
     }
 
     fn set_expr_source(&mut self, node_id: u64, source: Option<ItemRef<'item>>) {

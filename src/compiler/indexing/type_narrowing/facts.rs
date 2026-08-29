@@ -45,7 +45,7 @@ impl<'item> TypeFact<'item> {
         type_: &'item StructDefinition,
         state: &mut IndexState<'_, 'item>,
     ) -> bool {
-        let previous_facts = state.type_narrowing.type_facts(subject);
+        let previous_facts = state.type_facts(subject);
         let mut facts = previous_facts.as_ref().clone();
         facts.add_required_type(type_);
         let is_new_contradiction = !previous_facts.has_contradiction() && facts.has_contradiction();
@@ -57,7 +57,7 @@ impl<'item> TypeFact<'item> {
         subjects: [TypeFactSubject<'item>; 2],
         state: &mut IndexState<'_, 'item>,
     ) -> bool {
-        let previous_facts = subjects.map(|subject| state.type_narrowing.type_facts(subject));
+        let previous_facts = subjects.map(|subject| state.type_facts(subject));
         let mut facts = previous_facts[0].as_ref().clone();
         facts.add_required_types(&previous_facts[1]);
         let was_contradicted = previous_facts.iter().any(|facts| facts.has_contradiction());
@@ -72,7 +72,8 @@ impl<'item> TypeFact<'item> {
         subjects: &[TypeFactSubject<'item>],
         state: &mut IndexState<'_, 'item>,
     ) {
-        let type_facts = Rc::make_mut(&mut state.type_narrowing.type_facts);
+        // TODO: ensure this is ok
+        let type_facts = Rc::make_mut(&mut state.type_fact_context);
         for other_facts in type_facts.values_mut() {
             if all_previous_facts
                 .iter()
