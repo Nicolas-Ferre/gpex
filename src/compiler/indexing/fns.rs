@@ -1,6 +1,7 @@
 use crate::compiler::indexing::type_narrowing::LogicalTypeNarrowing;
 use crate::compiler::indexing::{IndexState, exprs, type_narrowing};
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
+use crate::compiler::parsing::items::params::ParamRequirement;
 use crate::compiler::parsing::statements::Statement;
 use std::rc::Rc;
 
@@ -32,11 +33,7 @@ fn index_fn_params<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, '
         exprs::index_expr(&param.type_, state);
         if let Some(requirement) = &param.requirement {
             exprs::index_expr(&requirement.condition, state);
-            type_narrowing::add_expr_type_facts(
-                &requirement.condition,
-                LogicalTypeNarrowing::And,
-                state,
-            );
+            add_param_requirement_type_facts(requirement, state);
         }
     }
 }
@@ -47,13 +44,16 @@ fn add_fn_requirement_type_facts<'item>(
 ) {
     for param in &fn_.params.params {
         if let Some(requirement) = &param.requirement {
-            type_narrowing::add_expr_type_facts(
-                &requirement.condition,
-                LogicalTypeNarrowing::And,
-                state,
-            );
+            add_param_requirement_type_facts(requirement, state);
         }
     }
+}
+
+fn add_param_requirement_type_facts<'item>(
+    requirement: &'item ParamRequirement,
+    state: &mut IndexState<'_, 'item>,
+) {
+    type_narrowing::add_expr_type_facts(&requirement.condition, LogicalTypeNarrowing::And, state);
 }
 
 fn index_fn_return_type<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {

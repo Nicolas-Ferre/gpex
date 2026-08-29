@@ -16,7 +16,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 Key directories and files:
 
 - `src/compiler/`: Compilation pipeline orchestration and definition of each pipeline stage:
-    - `state.rs`: Shared post-parse compiler state used by indexing, validation, value resolution,
+    - `state/`: Shared post-parse compiler state used by indexing, validation, value resolution,
       dependency analysis, and transpilation.
     - `item_ref.rs`: Shared item-reference representation used across compiler passes.
     - `parsing/`: AST definitions and parsing: modules, imports, items (functions, variables,

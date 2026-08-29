@@ -59,7 +59,11 @@ impl<'item> State<'item> {
         node_id: u64,
         context: Rc<TypeFactContext<'item>>,
     ) {
-        self.type_fact_contexts.insert(node_id, context);
+        if context.is_empty() {
+            self.type_fact_contexts.remove(&node_id);
+        } else {
+            self.type_fact_contexts.insert(node_id, context);
+        }
     }
 
     pub(crate) fn expr_type_facts(

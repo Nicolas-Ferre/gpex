@@ -47,34 +47,21 @@ impl<'item> ResolvedTypeFactOperand<'item> {
     }
 
     fn is_typeof_expr(expr: &Expr, state: &State<'_>) -> bool {
-        let Expr::Call(call) = Self::unwrap_parentheses(expr) else {
+        let Expr::Call(call) = expr.unparenthesized() else {
             return false;
         };
         queries::calls::is_intrinsic(call, IntrinsicFn::Typeof, state)
     }
 
     fn typeof_param(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
-        if let Expr::Call(typeof_call) = Self::unwrap_parentheses(expr)
+        if let Expr::Call(typeof_call) = expr.unparenthesized()
             && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
-            && let Expr::Ident(ident) = Self::unwrap_parentheses(&typeof_call.args[0].value)
+            && let Expr::Ident(ident) = typeof_call.args[0].value.unparenthesized()
             && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
         {
             Some(param)
         } else {
             None
-        }
-    }
-
-    fn unwrap_parentheses(expr: &Expr) -> &Expr {
-        match expr {
-            Expr::Parenthesized(parenthesized) => Self::unwrap_parentheses(&parenthesized.value),
-            Expr::F32Literal(_)
-            | Expr::U32Literal(_)
-            | Expr::I32Literal(_)
-            | Expr::BoolLiteral(_)
-            | Expr::Wildcard(_)
-            | Expr::Call(_)
-            | Expr::Ident(_) => expr,
         }
     }
 }
@@ -89,9 +76,9 @@ impl<'item> TypeFactOperand<'item> {
     pub(super) fn from_param(param: &'item Param, state: &State<'item>) -> Self {
         match types::param_type(param, state) {
             Type::Struct(type_) => Self::Concrete(type_),
-            Type::Param(type_param) => Self::Dynamic(TypeFactSubject::Referenced(type_param)),
-            Type::Wildcard(type_param) => Self::Dynamic(TypeFactSubject::Wildcard(type_param)),
-            Type::NoReturn | Type::Unknown => Self::Dynamic(TypeFactSubject::Wildcard(param)),
+            type_ @ (Type::Param(_) | Type::Wildcard(_) | Type::NoReturn | Type::Unknown) => {
+                Self::Dynamic(TypeFactSubject::from_param_type(param, type_))
+            }
         }
     }
 }

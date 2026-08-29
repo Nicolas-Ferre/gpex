@@ -20,6 +20,15 @@ impl<'item> TypeFactSubject<'item> {
             Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
         }
     }
+
+    pub(crate) fn from_param_type(param: &'item Param, type_: Type<'item>) -> Self {
+        match type_ {
+            Type::Param(type_param) => Self::Referenced(type_param),
+            Type::Wildcard(type_param) => Self::Wildcard(type_param),
+            Type::NoReturn | Type::Unknown => Self::Wildcard(param),
+            Type::Struct(_) => unreachable!(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
