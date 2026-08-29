@@ -21,10 +21,10 @@ impl<'item> TypeFact<'item> {
         use TypeFactOperand::{Concrete, Dynamic};
         match self.operands {
             [Concrete(left), Concrete(right)] => left.id != right.id,
-            [Dynamic(param), Concrete(type_)] | [Concrete(type_), Dynamic(param)] => {
-                Self::add_required_type(param, type_, state)
+            [Dynamic(subject), Concrete(type_)] | [Concrete(type_), Dynamic(subject)] => {
+                Self::add_required_type(subject, type_, state)
             }
-            [Dynamic(left), Dynamic(right)] => Self::merge_params([left, right], state),
+            [Dynamic(left), Dynamic(right)] => Self::merge_subjects([left, right], state),
         }
     }
 
@@ -53,7 +53,7 @@ impl<'item> TypeFact<'item> {
         is_new_contradiction
     }
 
-    fn merge_params(
+    fn merge_subjects(
         subjects: [TypeFactSubject<'item>; 2],
         state: &mut IndexState<'_, 'item>,
     ) -> bool {
