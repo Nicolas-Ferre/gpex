@@ -1,0 +1,5 @@
+fn identity(value: ? require typeof(value) == i32) -> i32 {
+    return value;
+}
+
+var _result_one = identity(1); // expected: 1
