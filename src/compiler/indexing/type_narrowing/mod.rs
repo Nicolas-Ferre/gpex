@@ -2,18 +2,15 @@ mod facts;
 mod operands;
 
 use self::facts::TypeFact;
-use self::operands::TypeFactOperand;
 use crate::compiler::indexing::type_narrowing::operands::ResolvedTypeFactOperand;
 use crate::compiler::indexing::{IndexState, exprs};
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
 use crate::compiler::parsing::items::fns::BinaryIntrinsicFn;
-use crate::compiler::parsing::items::params::Param;
 use crate::compiler::queries;
-use crate::compiler::state::{State, TypeFacts};
-use std::collections::HashMap;
+use crate::compiler::state::State;
+use crate::compiler::state::type_facts::{TypeFactContext, TypeFactSubject, TypeFacts};
 use std::rc::Rc;
 
 #[derive(Clone, Copy)]
@@ -38,25 +35,20 @@ impl LogicalTypeNarrowing {
     }
 }
 
+// TODO: flatten?
 #[derive(Default)]
 pub(super) struct TypeNarrowingState<'item> {
-    type_facts: HashMap<NarrowedType<'item>, Rc<TypeFacts<'item>>>,
+    type_facts: Rc<TypeFactContext<'item>>,
 }
 
 impl<'item> TypeNarrowingState<'item> {
     pub(crate) fn reset(&mut self) {
-        self.type_facts.clear();
+        self.type_facts = Rc::default();
     }
 
-    fn type_facts(&self, param: NarrowedType<'item>) -> Rc<TypeFacts<'item>> {
-        self.type_facts.get(&param).cloned().unwrap_or_default()
+    fn type_facts(&self, subject: TypeFactSubject<'item>) -> Rc<TypeFacts<'item>> {
+        self.type_facts.get(&subject).cloned().unwrap_or_default()
     }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-enum NarrowedType<'item> {
-    Wildcard(&'item Param),
-    Referenced(&'item Param),
 }
 
 pub(super) fn index_logical_operation_args<'item>(
@@ -83,17 +75,10 @@ pub(super) fn add_expr_type_facts<'item>(
     }
 }
 
-pub(super) fn index_ident<'item>(
-    ident: &Ident,
-    source: ItemRef<'item>,
-    state: &mut IndexState<'_, 'item>,
-) {
-    if let ItemRef::Param(param) = source
-        && let Some(type_) = TypeFactOperand::from_param(param, state.inner).narrowed_type()
-        && let Some(facts) = state.type_narrowing.type_facts.get(&type_).cloned()
-    {
-        state.set_expr_type_facts(ident.id, facts);
-    }
+pub(super) fn index_ident(ident: &Ident, state: &mut IndexState<'_, '_>) {
+    let context = (!state.type_narrowing.type_facts.is_empty())
+        .then(|| state.type_narrowing.type_facts.clone());
+    state.set_expr_type_fact_context(ident.id, context);
 }
 
 fn collect_type_facts<'item>(

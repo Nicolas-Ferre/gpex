@@ -7,9 +7,10 @@ use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::modules::Module;
 use crate::compiler::prelude::PRELUDE_FILE_COUNT;
-use crate::compiler::state::{State, TypeFacts};
+use crate::compiler::state::State;
 use crate::utils::indexing::SearchConfig;
 use std::rc::Rc;
+use crate::compiler::state::type_facts::TypeFactContext;
 
 pub(crate) const FN_CALL_SEARCH_CONFIG: SearchConfig = SearchConfig {
     can_be_after: true,
@@ -50,8 +51,12 @@ impl<'state, 'item> IndexState<'state, 'item> {
         self.has_index_changed = true;
     }
 
-    fn set_expr_type_facts(&mut self, node_id: u64, facts: Rc<TypeFacts<'item>>) {
-        self.has_index_changed |= self.inner.set_expr_type_facts(node_id, facts);
+    fn set_expr_type_fact_context(
+        &mut self,
+        node_id: u64,
+        context: Option<Rc<TypeFactContext<'item>>>,
+    ) {
+        self.has_index_changed |= self.inner.set_expr_type_fact_context(node_id, context);
     }
 }
 

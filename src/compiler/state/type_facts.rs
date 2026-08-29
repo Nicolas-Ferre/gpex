@@ -1,0 +1,59 @@
+use crate::compiler::parsing::items::params::Param;
+use crate::compiler::parsing::items::types::StructDefinition;
+use crate::compiler::types::Type;
+use std::collections::{HashMap, HashSet};
+use std::rc::Rc;
+
+pub(crate) type TypeFactContext<'item> = HashMap<TypeFactSubject<'item>, Rc<TypeFacts<'item>>>;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub(crate) enum TypeFactSubject<'item> {
+    Wildcard(&'item Param),
+    Referenced(&'item Param),
+}
+
+impl<'item> TypeFactSubject<'item> {
+    pub(crate) fn from_type(type_: Type<'item>) -> Option<Self> {
+        match type_ {
+            Type::Param(param) => Some(Self::Referenced(param)),
+            Type::Wildcard(param) => Some(Self::Wildcard(param)),
+            Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub(crate) struct TypeFacts<'item> {
+    required_types: HashSet<&'item StructDefinition>,
+}
+
+impl<'item> TypeFacts<'item> {
+    pub(crate) fn required_type(&self) -> Option<&'item StructDefinition> {
+        (self.required_types.len() == 1)
+            .then(|| self.required_types.iter().next().copied())
+            .flatten()
+    }
+
+    pub(crate) fn is_type_contradicted(&self, declared_type: Type<'item>) -> bool {
+        match declared_type {
+            Type::Param(_) | Type::Wildcard(_) => self.has_contradiction(),
+            Type::Struct(declared_type) => self
+                .required_types
+                .iter()
+                .any(|required_type| required_type.id != declared_type.id),
+            Type::NoReturn | Type::Unknown => !self.required_types.is_empty(),
+        }
+    }
+
+    pub(crate) fn has_contradiction(&self) -> bool {
+        self.required_types.len() > 1
+    }
+
+    pub(crate) fn add_required_type(&mut self, type_: &'item StructDefinition) {
+        self.required_types.insert(type_);
+    }
+
+    pub(crate) fn add_required_types(&mut self, other: &Self) {
+        self.required_types.extend(&other.required_types);
+    }
+}
