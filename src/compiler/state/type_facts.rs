@@ -37,11 +37,7 @@ impl<'item> TypeFacts<'item> {
     pub(crate) fn is_type_contradicted(&self, declared_type: Type<'item>) -> bool {
         match declared_type {
             Type::Param(_) | Type::Wildcard(_) => self.has_contradiction(),
-            Type::Struct(declared_type) => self
-                .required_types
-                .iter()
-                .any(|required_type| required_type.id != declared_type.id),
-            Type::NoReturn | Type::Unknown => !self.required_types.is_empty(),
+            Type::Struct(_) | Type::NoReturn | Type::Unknown => !self.required_types.is_empty(),
         }
     }
 
