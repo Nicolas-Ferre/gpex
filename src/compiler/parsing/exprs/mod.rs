@@ -104,6 +104,19 @@ impl Expr {
         }
     }
 
+    pub(crate) fn unparenthesized(&self) -> &Self {
+        match self {
+            Self::Parenthesized(parenthesized) => parenthesized.value.unparenthesized(),
+            Self::F32Literal(_)
+            | Self::U32Literal(_)
+            | Self::I32Literal(_)
+            | Self::BoolLiteral(_)
+            | Self::Wildcard(_)
+            | Self::Call(_)
+            | Self::Ident(_) => self,
+        }
+    }
+
     fn parse_binary_right_part<'context>(
         context: &mut ParseContext<'context>,
         stop_excluded_parser: Parser<'context, ()>,

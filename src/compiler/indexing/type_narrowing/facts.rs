@@ -72,7 +72,6 @@ impl<'item> TypeFact<'item> {
         subjects: &[TypeFactSubject<'item>],
         state: &mut IndexState<'_, 'item>,
     ) {
-        // TODO: ensure this is ok
         let type_facts = Rc::make_mut(&mut state.type_fact_context);
         for other_facts in type_facts.values_mut() {
             if all_previous_facts

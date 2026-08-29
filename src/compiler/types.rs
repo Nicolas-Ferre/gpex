@@ -138,8 +138,7 @@ pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'it
         | ConstValue::Unknown
         | ConstValue::RuntimeValue => Type::Unknown,
     };
-    // TODO: missing case where the ident is surrounded by parentheses
-    if let Expr::Ident(ident) = expr {
+    if let Expr::Ident(ident) = expr.unparenthesized() {
         type_with_facts(type_, state.expr_type_facts(ident.id, type_))
     } else {
         type_
