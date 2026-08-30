@@ -1,17 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-is_fast=false
-if (($# > 1)); then
-    echo "Usage: $0 [--fast]" >&2
+if (($# != 0)); then
+    echo "Usage: $0" >&2
     exit 2
-fi
-if (($# == 1)); then
-    if [[ $1 != "--fast" ]]; then
-        echo "Usage: $0 [--fast]" >&2
-        exit 2
-    fi
-    is_fast=true
 fi
 
 pids=()
@@ -50,13 +42,10 @@ start bash .github/scripts/check_prelude_example_results.sh
 start bash .github/scripts/check_prelude_param_docs.sh
 start bash .github/scripts/check_validation_log_order.sh
 start bash .github/scripts/check_test_entrypoints.sh
-
-if [[ $is_fast == false ]]; then
-    start bash .github/scripts/check_line_endings.sh
-    start bash .github/scripts/check_todos.sh
-    start bash .github/scripts/check_file_paths.sh
-    start bash .github/scripts/check_identifiers.sh
-fi
+start bash .github/scripts/check_line_endings.sh
+start bash .github/scripts/check_todos.sh
+start bash .github/scripts/check_file_paths.sh
+start bash .github/scripts/check_identifiers.sh
 
 failed=0
 for i in "${!pids[@]}"; do
