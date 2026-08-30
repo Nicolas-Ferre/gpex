@@ -8,7 +8,7 @@ error: `__add__(i32, right_type)` item not found
 │    ¦         || left + right == 0;
 │    ¦            ^^^^^^^^^^^^
 ├─ info: similar candidate
-│  → <project>/prelude/operators.gpex:12:14
+│  → <prelude>/operators.gpex:12:14
 │    ¦ pub const fn __add__(
 │    ¦              ^^^^^^^^
 │    ¦     left: ? require typeof(left).is_numeric(),

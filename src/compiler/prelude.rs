@@ -52,9 +52,7 @@ pub(crate) fn is_prelude_file_index(file_index: usize) -> bool {
 fn file(name: &str, content: &str) -> ReadFile {
     ReadFile {
         content: content.into(),
-        fs_path: PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("prelude")
-            .join(format!("{name}.gpex")),
+        fs_path: PathBuf::from("<prelude>").join(format!("{name}.gpex")),
         dot_path: format!("prelude.{name}"),
     }
 }
