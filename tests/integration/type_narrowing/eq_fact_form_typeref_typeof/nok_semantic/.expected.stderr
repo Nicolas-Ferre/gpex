@@ -13,7 +13,7 @@ error: `__add__(i32, typeof(right))` item not found
 │    ¦         && value + right == 0;
 │    ¦            ^^^^^^^^^^^^^
 ├─ info: similar candidate
-│  → <project>/prelude/operators.gpex:12:14
+│  → <prelude>/operators.gpex:12:14
 │    ¦ pub const fn __add__(
 │    ¦              ^^^^^^^^
 │    ¦     left: ? require typeof(left).is_numeric(),

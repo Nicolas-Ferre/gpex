@@ -13,9 +13,9 @@ use itertools::Itertools;
 use libtest_mimic::{Arguments, Failed, Trial};
 use pretty_assertions::assert_eq;
 use std::error::Error;
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
-use std::{env, fs};
 use tokio::runtime::Runtime;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -124,7 +124,6 @@ fn run_nok_cases(path: &Path) -> Result<(), Failed> {
 
 fn replace_paths_in_logs(logs: &str, root_path: &Path) -> String {
     logs.replace(&root_path.display().to_string(), "<root>")
-        .replace(env!("CARGO_MANIFEST_DIR"), "<project>")
 }
 
 fn convert_gpex_result<T>(result: Result<T, Vec<Log>>) -> Result<T, Failed> {
