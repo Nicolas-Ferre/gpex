@@ -229,9 +229,9 @@ pub(crate) trait ItemNodeRef: NodeRef {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct SearchParams<'import, L: NodeRef> {
+pub(crate) struct SearchParams<'import, Location: NodeRef> {
     pub(crate) key: &'import str,
-    pub(crate) location: L,
+    pub(crate) location: Location,
     pub(crate) imports: &'import ImportIndex,
     pub(crate) config: SearchConfig,
 }

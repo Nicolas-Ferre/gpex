@@ -170,7 +170,7 @@ impl<'item> State<'item> {
             .insert(id, value);
     }
 
-    pub(crate) fn in_scope<O>(&self, callback: impl FnOnce(&Self) -> O) -> O {
+    pub(crate) fn in_scope<Output>(&self, callback: impl FnOnce(&Self) -> Output) -> Output {
         self.enter_scope();
         let output = callback(self);
         self.exit_scope();

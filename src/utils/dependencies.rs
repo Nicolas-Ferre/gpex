@@ -5,12 +5,12 @@ use std::hash::Hash;
 use std::mem;
 
 #[derive(Debug, Clone)]
-pub(crate) struct Dependencies<T> {
-    registered: HashSet<T>,
+pub(crate) struct Dependencies<Dependency> {
+    registered: HashSet<Dependency>,
     stack: Vec<Span>,
 }
 
-impl<T: Eq + Hash + Copy + Ord> Dependencies<T> {
+impl<Dependency: Eq + Hash + Copy + Ord> Dependencies<Dependency> {
     pub(crate) fn new() -> Self {
         Self {
             registered: HashSet::default(),
@@ -18,7 +18,11 @@ impl<T: Eq + Hash + Copy + Ord> Dependencies<T> {
         }
     }
 
-    pub(crate) fn enter_item(&mut self, span: Span, dependency: T) -> Result<(), Vec<Span>> {
+    pub(crate) fn enter_item(
+        &mut self,
+        span: Span,
+        dependency: Dependency,
+    ) -> Result<(), Vec<Span>> {
         if self.stack.contains(&span) {
             return Err(mem::take(&mut self.stack));
         }
@@ -31,7 +35,7 @@ impl<T: Eq + Hash + Copy + Ord> Dependencies<T> {
         self.stack.pop();
     }
 
-    pub(crate) fn iter(&self) -> impl Iterator<Item = T> {
+    pub(crate) fn iter(&self) -> impl Iterator<Item = Dependency> {
         self.registered.iter().copied().sorted_unstable()
     }
 }

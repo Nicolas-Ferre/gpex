@@ -11,7 +11,7 @@ LET_REGEX="let[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]"
 LET_MUT_REGEX="let[[:space:]]mut[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]"
 CONSTANT_REGEX="const[[:space:]]([A-Za-z_][A-Za-z0-9_]*):"
 STATIC_REGEX="static[[:space:]]([A-Za-z_][A-Za-z0-9_]*):"
-# Only lower case to avoid matching generic types, because one-letter generic types are allowed:
+# Only lower case to avoid matching generic types:
 PARAMETER_REGEX="[(,][[:space:]]?([a-z_][a-z0-9_]*):"
 FUNCTION_REGEX="fn[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[<(]"
 STRUCT_REGEX="struct[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]?[<;{(]"
@@ -25,7 +25,8 @@ TRAIT_REGEX="trait[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]?[<{]"
 TYPE_REGEX="type[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]?[=;]"
 MODULE_REGEX="mod[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]?[;{]"
 MACRO_REGEX="macro_rules![[:space:]]([A-Za-z_][A-Za-z0-9_]*)"
-# Only lower case to avoid matching generic types, because one-letter generic types are allowed:
+GENERIC_DEFINITION_REGEX="(struct|enum|union|trait|type|fn)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*<|impl[[:space:]]*<"
+# Only lower case to avoid matching generic types:
 BINDING_REGEX="[(,|{][[:space:]]?([a-z_][a-z0-9_]*)[[:space:]]?[),|}]"
 FOR_LOOP_VARIABLE_REGEX="for[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]"
 UPPERCASE_LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -101,6 +102,72 @@ check_identifier() {
     done
 }
 
+check_generic_type_param() {
+    local param="$1"
+    param="${param#"${param%%[![:space:]]*}"}"
+    if [[ $param =~ ^([A-Za-z_][A-Za-z0-9_]*) ]]; then
+        local identifier=${BASH_REMATCH[1]}
+        if [[ ${#identifier} -eq 1 && $identifier != "_" ]]; then
+            show_error "\`$identifier\` generic type has too short name"
+        fi
+    fi
+}
+
+check_generic_type_params() {
+    local params="$1"
+    local param=""
+    local depth=0
+    local character_index
+    for ((character_index = 0; character_index < ${#params}; character_index++)); do
+        local character="${params:character_index:1}"
+        case "$character" in
+        '<')
+            depth=$((depth + 1))
+            param+="$character"
+            ;;
+        '>')
+            depth=$((depth - 1))
+            param+="$character"
+            ;;
+        ',')
+            if ((depth == 0)); then
+                check_generic_type_param "$param"
+                param=""
+            else
+                param+=","
+            fi
+            ;;
+        *) param+="$character" ;;
+        esac
+    done
+    check_generic_type_param "$param"
+}
+
+read_generic_definition() {
+    local remaining="$1"
+    local character_index
+    for ((character_index = 0; character_index < ${#remaining}; character_index++)); do
+        local character="${remaining:character_index:1}"
+        case "$character" in
+        '<')
+            generic_definition_depth=$((generic_definition_depth + 1))
+            generic_definition_params+="$character"
+            ;;
+        '>')
+            generic_definition_depth=$((generic_definition_depth - 1))
+            if ((generic_definition_depth == 0)); then
+                check_generic_type_params "$generic_definition_params"
+                is_generic_definition=false
+                return
+            fi
+            generic_definition_params+="$character"
+            ;;
+        *) generic_definition_params+="$character" ;;
+        esac
+    done
+    generic_definition_params+=" "
+}
+
 show_error() {
     local message="$1"
     echo "$file:$line_number: $message"
@@ -114,11 +181,22 @@ while read -r -d '' file; do
     else
         check_single_letter=true
     fi
+    is_generic_definition=false
+    generic_definition_depth=0
+    generic_definition_params=""
     line_number=0
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         if is_comment_line; then
             continue
+        fi
+        if [[ $is_generic_definition == "true" ]]; then
+            read_generic_definition "$line"
+        elif [[ $line =~ $GENERIC_DEFINITION_REGEX ]]; then
+            is_generic_definition=true
+            generic_definition_depth=1
+            generic_definition_params=""
+            read_generic_definition "${line#*"${BASH_REMATCH[0]}"}"
         fi
         check_underscore_variables
         if [[ $line == *"'"* ]]; then

@@ -126,7 +126,7 @@ fn replace_paths_in_logs(logs: &str, root_path: &Path) -> String {
     logs.replace(&root_path.display().to_string(), "<root>")
 }
 
-fn convert_gpex_result<T>(result: Result<T, Vec<Log>>) -> Result<T, Failed> {
+fn convert_gpex_result<Output>(result: Result<Output, Vec<Log>>) -> Result<Output, Failed> {
     match result {
         Ok(output) => Ok(output),
         Err(logs) => Err((String::from("compilation failed:\n")

@@ -7,8 +7,9 @@ use crate::utils::parsing::span::{Span, SpanProps};
 use crate::utils::reading::ReadFile;
 use std::path::Path;
 
-pub(crate) type ParserResult<'context, T> = Result<T, ParseError<'context>>;
-pub(crate) type Parser<'context, T> = fn(&mut ParseContext<'context>) -> ParserResult<'context, T>;
+pub(crate) type ParserResult<'context, Item> = Result<Item, ParseError<'context>>;
+pub(crate) type Parser<'context, Item> =
+    fn(&mut ParseContext<'context>) -> ParserResult<'context, Item>;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ParseContext<'config> {
@@ -65,7 +66,10 @@ impl<'config> ParseContext<'config> {
         &self.scope
     }
 
-    pub(crate) fn define_scope<O>(&mut self, scoped: impl FnOnce(&mut Self, u64) -> O) -> O {
+    pub(crate) fn define_scope<Output>(
+        &mut self,
+        scoped: impl FnOnce(&mut Self, u64) -> Output,
+    ) -> Output {
         let id = self.next_id();
         self.scope.push(id);
         let output = scoped(self, id);
@@ -93,10 +97,10 @@ impl<'config> ParseContext<'config> {
     }
 
     #[expect(clippy::type_complexity, reason = "`dyn` closure is only used here")]
-    pub(crate) fn parse_any<T>(
+    pub(crate) fn parse_any<Item>(
         &mut self,
-        parsers: &[&dyn Fn(&mut Self) -> ParserResult<'config, T>],
-    ) -> Result<T, ParseError<'config>> {
+        parsers: &[&dyn Fn(&mut Self) -> ParserResult<'config, Item>],
+    ) -> Result<Item, ParseError<'config>> {
         debug_assert!(!parsers.is_empty());
         let mut errors = vec![];
         let initial_context = self.clone();
@@ -121,12 +125,12 @@ impl<'config> ParseContext<'config> {
         Err(ParseError::merge(&errors))
     }
 
-    pub(crate) fn parse_many<T>(
+    pub(crate) fn parse_many<Item>(
         &mut self,
-        item_parser: impl Fn(&mut Self) -> ParserResult<'config, T>,
+        item_parser: impl Fn(&mut Self) -> ParserResult<'config, Item>,
         separator_parser: SeparatorParser<'config>,
         stop_excluded_parser: impl Fn(&mut Self) -> ParserResult<'config, ()>,
-    ) -> Result<Vec<T>, ParseError<'config>> {
+    ) -> Result<Vec<Item>, ParseError<'config>> {
         many::parse(self, item_parser, separator_parser, stop_excluded_parser)
     }
 
