@@ -28,6 +28,8 @@ MACRO_REGEX="macro_rules![[:space:]]([A-Za-z_][A-Za-z0-9_]*)"
 # Only lower case to avoid matching generic types, because one-letter generic types are allowed:
 BINDING_REGEX="[(,|{][[:space:]]?([a-z_][a-z0-9_]*)[[:space:]]?[),|}]"
 FOR_LOOP_VARIABLE_REGEX="for[[:space:]]([A-Za-z_][A-Za-z0-9_]*)[[:space:]]"
+UPPERCASE_LETTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+LOWERCASE_LETTERS="abcdefghijklmnopqrstuvwxyz"
 
 is_comment_line() {
     [[ "$line" =~ ^[[:space:]]*// ]]
@@ -50,6 +52,32 @@ check_lifetime_plural() {
     done
 }
 
+split_identifier() {
+    local identifier="$1"
+    local split_identifier=" "
+    local previous_character=""
+    local character_index
+    for ((character_index = 0; character_index < ${#identifier}; character_index++)); do
+        local character="${identifier:character_index:1}"
+        if [[ $previous_character =~ [a-z] && $character =~ [A-Z] ]]; then
+            split_identifier+=" "
+        fi
+        case "$character" in
+        [_-]) split_identifier+=" " ;;
+        *)
+            if [[ $UPPERCASE_LETTERS == *"$character"* ]]; then
+                local uppercase_prefix="${UPPERCASE_LETTERS%%"$character"*}"
+                split_identifier+="${LOWERCASE_LETTERS:${#uppercase_prefix}:1}"
+            else
+                split_identifier+="$character"
+            fi
+            ;;
+        esac
+        previous_character="$character"
+    done
+    SPLIT_IDENTIFIER="$split_identifier "
+}
+
 check_identifier() {
     local name_regex="$1"
     local identifier_type="$2"
@@ -61,15 +89,12 @@ check_identifier() {
         if [[ $check_single_letter == "true" && ${#identifier} -eq 1 && $identifier != "_" ]]; then
             show_error "\`$identifier\` $identifier_type has too short name"
         fi
-        split_identifier=' '$(echo "$identifier" |
-            sed -E 's/([a-z])([A-Z])/\1 \2/g' |
-            tr '_-' ' ' |
-            tr '[:upper:]' '[:lower:]')' '
+        split_identifier "$identifier"
         for word in "${FORBIDDEN_WORDS[@]}"; do
-            if [[ $split_identifier =~ [[:space:]]"$word"[[:space:]] ]]; then
+            if [[ $SPLIT_IDENTIFIER =~ [[:space:]]"$word"[[:space:]] ]]; then
                 show_error "\`$identifier\` $identifier_type contains forbidden word '$word'"
             fi
-            if [[ $split_identifier =~ [[:space:]]"$word"s[[:space:]] ]]; then
+            if [[ $SPLIT_IDENTIFIER =~ [[:space:]]"$word"s[[:space:]] ]]; then
                 show_error "\`$identifier\` $identifier_type contains forbidden word '${word}s'"
             fi
         done
@@ -84,35 +109,73 @@ show_error() {
 
 exit_code=0
 while read -r -d '' file; do
+    if [[ $file == *.gpex ]]; then
+        check_single_letter=false
+    else
+        check_single_letter=true
+    fi
     line_number=0
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         if is_comment_line; then
             continue
         fi
-        check_single_letter=$([[ $file =~ gpex$ ]] && echo "false" || echo "true")
         check_underscore_variables
-        check_lifetime_plural
-        check_identifier "$LIFETIME_REGEX" "lifetime" "$check_single_letter"
-        check_identifier "$LET_REGEX" "variable" "$check_single_letter"
-        check_identifier "$LET_MUT_REGEX" "variable" "$check_single_letter"
-        check_identifier "$CONSTANT_REGEX" "constant" "$check_single_letter"
-        check_identifier "$STATIC_REGEX" "static variable" "$check_single_letter"
-        check_identifier "$PARAMETER_REGEX" "parameter" "$check_single_letter"
-        check_identifier "$FUNCTION_REGEX" "function" "$check_single_letter"
-        check_identifier "$STRUCT_REGEX" "struct" "$check_single_letter"
-        check_identifier "$FIELD_REGEX" "field" "$check_single_letter"
-        check_identifier "$PUB_FIELD_REGEX" "field" "$check_single_letter"
-        check_identifier "$PUB_MOD_FIELD_REGEX" "field" "$check_single_letter"
-        check_identifier "$ENUM_REGEX" "enum" "$check_single_letter"
-        check_identifier "$UNION_REGEX" "union" "$check_single_letter"
-        check_identifier "$VARIANT_REGEX" "variant" "$check_single_letter"
-        check_identifier "$TRAIT_REGEX" "trait" "$check_single_letter"
-        check_identifier "$TYPE_REGEX" "type alias" "$check_single_letter"
-        check_identifier "$MODULE_REGEX" "module" "$check_single_letter"
-        check_identifier "$MACRO_REGEX" "macro" "$check_single_letter"
-        check_identifier "$BINDING_REGEX" "binding variable" "$check_single_letter"
-        check_identifier "$FOR_LOOP_VARIABLE_REGEX" "for loop variable" "$check_single_letter"
+        if [[ $line == *"'"* ]]; then
+            check_lifetime_plural
+            check_identifier "$LIFETIME_REGEX" "lifetime" "$check_single_letter"
+        fi
+        if [[ $line == *"let"* ]]; then
+            check_identifier "$LET_REGEX" "variable" "$check_single_letter"
+            check_identifier "$LET_MUT_REGEX" "variable" "$check_single_letter"
+        fi
+        if [[ $line == *"const"* ]]; then
+            check_identifier "$CONSTANT_REGEX" "constant" "$check_single_letter"
+        fi
+        if [[ $line == *"static"* ]]; then
+            check_identifier "$STATIC_REGEX" "static variable" "$check_single_letter"
+        fi
+        if [[ $line == *"("* || $line == *","* ]]; then
+            check_identifier "$PARAMETER_REGEX" "parameter" "$check_single_letter"
+        fi
+        if [[ $line == *"fn"* ]]; then
+            check_identifier "$FUNCTION_REGEX" "function" "$check_single_letter"
+        fi
+        if [[ $line == *"struct"* ]]; then
+            check_identifier "$STRUCT_REGEX" "struct" "$check_single_letter"
+        fi
+        if [[ $line == *":"* ]]; then
+            check_identifier "$FIELD_REGEX" "field" "$check_single_letter"
+            check_identifier "$PUB_FIELD_REGEX" "field" "$check_single_letter"
+            check_identifier "$PUB_MOD_FIELD_REGEX" "field" "$check_single_letter"
+        fi
+        if [[ $line == *"enum"* ]]; then
+            check_identifier "$ENUM_REGEX" "enum" "$check_single_letter"
+        fi
+        if [[ $line == *"union"* ]]; then
+            check_identifier "$UNION_REGEX" "union" "$check_single_letter"
+        fi
+        if [[ $line == *, ]]; then
+            check_identifier "$VARIANT_REGEX" "variant" "$check_single_letter"
+        fi
+        if [[ $line == *"trait"* ]]; then
+            check_identifier "$TRAIT_REGEX" "trait" "$check_single_letter"
+        fi
+        if [[ $line == *"type"* ]]; then
+            check_identifier "$TYPE_REGEX" "type alias" "$check_single_letter"
+        fi
+        if [[ $line == *"mod"* ]]; then
+            check_identifier "$MODULE_REGEX" "module" "$check_single_letter"
+        fi
+        if [[ $line == *"macro_rules!"* ]]; then
+            check_identifier "$MACRO_REGEX" "macro" "$check_single_letter"
+        fi
+        if [[ $line == *"("* || $line == *","* || $line == *"|"* || $line == *"{"* ]]; then
+            check_identifier "$BINDING_REGEX" "binding variable" "$check_single_letter"
+        fi
+        if [[ $line == *"for"* ]]; then
+            check_identifier "$FOR_LOOP_VARIABLE_REGEX" "for loop variable" "$check_single_letter"
+        fi
     done <"$file"
 done < <(find src/ tests/ \( -name "*.rs" -o -name "*.gpex" \) -type f -print0)
 exit "$exit_code"

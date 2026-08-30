@@ -18,9 +18,7 @@ See `doc/testing.md`.
 - To run to validate implementations:
     - `cargo test --no-fail-fast`: run tests
     - `cargo clippy --all-targets --no-deps -- -D warnings`: run Clippy
-    - `bash .github/scripts/run_all_lints.sh --fast`: run the fast custom linters
-- To run at the end of a full task only:
-    - `bash .github/scripts/run_all_lints.sh`: run all custom linters, including slower ones
+    - `bash .github/scripts/run_all_lints.sh`: run all custom linters
 - To run when checking a specific GPEx program:
     - `cargo run -- compile <source-dir> <output-file>`: compile a GPEx program.
     - `cargo run -- run <source-dir>`: compile and continuously execute a program on the GPU.
