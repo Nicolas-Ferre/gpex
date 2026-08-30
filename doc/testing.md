@@ -79,6 +79,10 @@ The following test domains are defined:
     - optional sub-category:
         - `*_form_{left_operand}_{right_operand}` for tests related to a form of type fact
         - `*_operand_{type}` for tests related to a specific type of operand in a type fact
+  Test entrypoint filenames also identify the location of the narrowing condition immediately
+  after the `test_` prefix:
+    - `test_expr_*`: narrowing performed in a function body
+    - `test_require_*`: narrowing performed in a function `require` clause
 
 ### Test cases
 

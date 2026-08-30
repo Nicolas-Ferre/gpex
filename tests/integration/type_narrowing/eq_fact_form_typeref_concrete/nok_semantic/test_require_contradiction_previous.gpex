@@ -1,0 +1,4 @@
+fn _fn(
+    type_: const typeref require type_ == i32,
+    _other: ? require type_ == u32,
+) {}

@@ -1,14 +1,13 @@
 mod exprs;
+mod fns;
 mod type_narrowing;
 
-use self::type_narrowing::TypeNarrowingState;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::Item;
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::parsing::statements::Statement;
 use crate::compiler::prelude::PRELUDE_FILE_COUNT;
-use crate::compiler::state::{State, TypeFacts};
+use crate::compiler::state::State;
+use crate::compiler::state::type_facts::{TypeFactContext, TypeFactSubject, TypeFacts};
 use crate::utils::indexing::SearchConfig;
 use std::rc::Rc;
 
@@ -23,7 +22,7 @@ const IDENT_SEARCH_CONFIG: SearchConfig = SearchConfig {
 
 struct IndexState<'state, 'item> {
     inner: &'state mut State<'item>,
-    type_narrowing: TypeNarrowingState<'item>,
+    type_fact_context: Rc<TypeFactContext<'item>>,
     phase: IndexPhase,
     has_index_changed: bool,
 }
@@ -32,10 +31,17 @@ impl<'state, 'item> IndexState<'state, 'item> {
     fn new(state: &'state mut State<'item>) -> Self {
         Self {
             inner: state,
-            type_narrowing: TypeNarrowingState::default(),
+            type_fact_context: Rc::default(),
             phase: IndexPhase::Converging,
             has_index_changed: false,
         }
+    }
+
+    fn type_facts(&self, subject: TypeFactSubject<'item>) -> Rc<TypeFacts<'item>> {
+        self.type_fact_context
+            .get(&subject)
+            .cloned()
+            .unwrap_or_default()
     }
 
     fn set_expr_source(&mut self, node_id: u64, source: Option<ItemRef<'item>>) {
@@ -49,10 +55,6 @@ impl<'state, 'item> IndexState<'state, 'item> {
             self.inner.sources.remove(&node_id);
         }
         self.has_index_changed = true;
-    }
-
-    fn set_expr_type_facts(&mut self, node_id: u64, facts: Rc<TypeFacts<'item>>) {
-        self.has_index_changed |= self.inner.set_expr_type_facts(node_id, facts);
     }
 }
 
@@ -148,7 +150,7 @@ fn index_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'item>)
     for item in &module.items {
         match item {
             Item::Const(item) => exprs::index_expr(&item.value, state),
-            Item::Fn(item) => index_fn_const_parts(item, state),
+            Item::Fn(item) => fns::index_fn_const_parts(item, state),
             Item::Import(_) | Item::Var(_) | Item::Struct(_) | Item::Repeat(_) => (),
         }
     }
@@ -159,47 +161,8 @@ fn index_not_consts<'item>(module: &'item Module, state: &mut IndexState<'_, 'it
         match item {
             Item::Import(_) | Item::Struct(_) | Item::Const(_) => (),
             Item::Var(item) => exprs::index_expr(&item.default_value, state),
-            Item::Fn(item) => index_fn_not_const_parts(item, state),
+            Item::Fn(item) => fns::index_fn_not_const_parts(item, state),
             Item::Repeat(item) => exprs::index_call(&item.call, state),
-        }
-    }
-}
-
-fn index_fn_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    for param in &fn_.params.params {
-        exprs::index_expr(&param.type_, state);
-        if let Some(requirement) = &param.requirement {
-            exprs::index_expr(&requirement.condition, state);
-        }
-    }
-    if let Some(return_type) = &fn_.return_type {
-        exprs::index_expr(return_type, state);
-    }
-    if fn_.const_keyword_span.is_some()
-        && let FnBody::Statements(body) = &fn_.body
-    {
-        for statement in &body.statements {
-            index_statement_refs(statement, state);
-        }
-    }
-}
-
-fn index_fn_not_const_parts<'item>(fn_: &'item FnDefinition, state: &mut IndexState<'_, 'item>) {
-    if fn_.const_keyword_span.is_none()
-        && let FnBody::Statements(body) = &fn_.body
-    {
-        for statement in &body.statements {
-            index_statement_refs(statement, state);
-        }
-    }
-}
-
-fn index_statement_refs<'item>(statement: &'item Statement, state: &mut IndexState<'_, 'item>) {
-    match statement {
-        Statement::Return(return_) => exprs::index_expr(&return_.value, state),
-        Statement::Assignment(assignment) => {
-            exprs::index_expr(&assignment.assigned, state);
-            exprs::index_expr(&assignment.value, state);
         }
     }
 }

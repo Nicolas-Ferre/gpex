@@ -8,6 +8,7 @@ use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::state::State;
+use crate::compiler::state::type_facts::TypeFacts;
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 
@@ -126,7 +127,7 @@ pub(crate) fn expr_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item>
 }
 
 pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'item> {
-    match consts::expr_value(expr, state) {
+    let type_ = match consts::expr_value(expr, state) {
         ConstValue::TypeRef(type_) => Type::Struct(type_),
         ConstValue::Param(type_) => Type::Param(type_),
         ConstValue::WildcardType(type_) => Type::Wildcard(type_),
@@ -136,6 +137,11 @@ pub(crate) fn expr_as_type<'item>(expr: &Expr, state: &State<'item>) -> Type<'it
         | ConstValue::Bool(_)
         | ConstValue::Unknown
         | ConstValue::RuntimeValue => Type::Unknown,
+    };
+    if let Expr::Ident(ident) = expr.unparenthesized() {
+        type_with_facts(type_, state.expr_type_facts(ident.id, type_))
+    } else {
+        type_
     }
 }
 
@@ -156,15 +162,22 @@ fn param_ident_type<'item>(
     state: &State<'item>,
 ) -> Type<'item> {
     let declared_type = param_type(param, state);
-    let Some(facts) = state.expr_type_facts(ident.id) else {
-        return declared_type;
+    type_with_facts(
+        declared_type,
+        state.expr_type_facts(ident.id, declared_type),
+    )
+}
+
+fn type_with_facts<'item>(type_: Type<'item>, facts: Option<&TypeFacts<'item>>) -> Type<'item> {
+    let Some(facts) = facts else {
+        return type_;
     };
-    if facts.is_type_contradicted(declared_type) {
+    if facts.has_contradiction() {
         return Type::Unknown;
     }
-    match (declared_type, facts.required_type()) {
+    match (type_, facts.required_type()) {
         (Type::Param(_) | Type::Wildcard(_), Some(type_)) => Type::Struct(type_),
-        (Type::Struct(_) | Type::NoReturn | Type::Unknown, _) | (_, None) => declared_type,
+        (Type::Struct(_) | Type::NoReturn | Type::Unknown, _) | (_, None) => type_,
     }
 }
 

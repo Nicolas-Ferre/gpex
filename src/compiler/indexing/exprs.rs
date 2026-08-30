@@ -68,6 +68,7 @@ fn index_call_source<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>
 }
 
 fn index_ident<'item>(ident: &'item Ident, state: &mut IndexState<'_, 'item>) {
+    type_narrowing::index_ident(ident, state);
     let search_params = SearchParams {
         key: &ident.slice,
         location: ident,
@@ -75,7 +76,6 @@ fn index_ident<'item>(ident: &'item Ident, state: &mut IndexState<'_, 'item>) {
         config: IDENT_SEARCH_CONFIG,
     };
     if let Some(source) = search_accessible_ident_source(search_params, state.inner) {
-        type_narrowing::index_ident(ident, source, state);
         index_accessible_source(&ident, ident.span, source, state);
         state.set_expr_source(ident.id(), Some(source));
     } else {

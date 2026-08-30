@@ -1,0 +1,5 @@
+fn _fn(
+    left: ? require typeof(left) == i32,
+    right: ? require typeof(right) == u32,
+    _other: ? require typeof(left) == typeof(right),
+) {}

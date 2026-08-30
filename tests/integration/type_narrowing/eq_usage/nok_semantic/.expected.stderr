@@ -1,15 +1,62 @@
 error: type fact leaving `typeof(param)` with no possible value
-│  → <root>/test_invalid_expr_fact_contradiction.gpex:2:36
+│  → <root>/test_expr_invalid_expr_fact_contradiction.gpex:2:36
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && unknown();
 │    ¦                                    ^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `unknown()` item not found
-│  → <root>/test_invalid_expr_fact_contradiction.gpex:2:60
+│  → <root>/test_expr_invalid_expr_fact_contradiction.gpex:2:60
 │    ¦     return typeof(param) == i32 && typeof(param) == u32 && unknown();
 │    ¦                                                            ^^^^^^^^^
 ┴
+error: `__eq__(typeof(value), i32)` item not found
+│  → <root>/test_require_fact_after_usage_next_require.gpex:2:28
+│    ¦     value: const ? require value == 0,
+│    ¦                            ^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:104:14
+│    ¦ pub const fn __eq__(left: typeref, right: typeref) -> bool = intrinsic;
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:92:14
+│    ¦ pub const fn __eq__(
+│    ¦              ^^^^^^^
+│    ¦     left: ? require typeof(left).is_ordered(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> bool = intrinsic;
+│    ¦ ^^^^^^^^^
+┴
+error: `__eq__(typeof(value), i32)` item not found
+│  → <root>/test_require_fact_after_usage_same_require.gpex:1:31
+│    ¦ fn _fn(value: const ? require value == 0 && typeof(value) == i32) {}
+│    ¦                               ^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:104:14
+│    ¦ pub const fn __eq__(left: typeref, right: typeref) -> bool = intrinsic;
+│    ¦              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+├─ info: similar candidate
+│  → <project>/prelude/operators.gpex:92:14
+│    ¦ pub const fn __eq__(
+│    ¦              ^^^^^^^
+│    ¦     left: ? require typeof(left).is_ordered(),
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦     right: typeof(left)
+│    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
+│    ¦ ) -> bool = intrinsic;
+│    ¦ ^^^^^^^^^
+┴
 error: `invalid` item not found
-│  → <root>/test_invalid_expr_param_value.gpex:5:19
+│  → <root>/test_require_invalid_expr_param_value.gpex:5:19
 │    ¦ var _result = fn_(invalid);
 │    ¦                   ^^^^^^^
+┴
+error: expression with invalid type `typeof(value)`
+│  → <root>/test_require_or.gpex:2:12
+│    ¦     return value;
+│    ¦            ^^^^^
+├─ info: expected `i32` type
+│  → <root>/test_require_or.gpex:1:58
+│    ¦ fn _fn(value: ? require typeof(value) == i32 || true) -> i32 {
+│    ¦                                                          ^^^
 ┴

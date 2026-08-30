@@ -1,3 +1,5 @@
+pub(crate) mod type_facts;
+
 use crate::compiler::consts::ConstValue;
 use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::types::StructDefinition;
@@ -6,8 +8,9 @@ use crate::compiler::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::rc::Rc;
+use type_facts::{TypeFactContext, TypeFactSubject, TypeFacts};
 
 #[derive(Debug)]
 pub(crate) struct State<'item> {
@@ -17,7 +20,7 @@ pub(crate) struct State<'item> {
     pub(crate) candidate_sources: HashMap<u64, Vec<ItemRef<'item>>>,
     pub(crate) priv_sources: HashMap<u64, ItemRef<'item>>,
     pub(crate) item_first_refs: HashMap<u64, Span>,
-    type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
+    type_fact_contexts: HashMap<u64, Rc<TypeFactContext<'item>>>,
     contradicted_type_fact_subject_spans: HashMap<u64, Vec<Span>>,
     scopes: RefCell<Vec<Scope<'item>>>,
     intrinsic_types: HashMap<u64, IntrinsicType>,
@@ -32,7 +35,7 @@ impl<'item> State<'item> {
             candidate_sources: HashMap::default(),
             priv_sources: HashMap::default(),
             item_first_refs: HashMap::default(),
-            type_facts: HashMap::default(),
+            type_fact_contexts: HashMap::default(),
             contradicted_type_fact_subject_spans: HashMap::default(),
             scopes: RefCell::default(),
             intrinsic_types: HashMap::default(),
@@ -51,21 +54,27 @@ impl<'item> State<'item> {
         .into();
     }
 
-    pub(crate) fn set_expr_type_facts(
+    pub(crate) fn set_expr_type_fact_context(
         &mut self,
         node_id: u64,
-        facts: Rc<TypeFacts<'item>>,
-    ) -> bool {
-        let previous_facts = self.expr_type_facts(node_id);
-        if previous_facts == Some(facts.as_ref()) {
-            return false;
+        context: Rc<TypeFactContext<'item>>,
+    ) {
+        if context.is_empty() {
+            self.type_fact_contexts.remove(&node_id);
+        } else {
+            self.type_fact_contexts.insert(node_id, context);
         }
-        self.type_facts.insert(node_id, facts);
-        true
     }
 
-    pub(crate) fn expr_type_facts(&self, node_id: u64) -> Option<&TypeFacts<'item>> {
-        self.type_facts.get(&node_id).map(AsRef::as_ref)
+    pub(crate) fn expr_type_facts(
+        &self,
+        node_id: u64,
+        type_: Type<'item>,
+    ) -> Option<&TypeFacts<'item>> {
+        self.type_fact_contexts
+            .get(&node_id)?
+            .get(&TypeFactSubject::from_type(type_)?)
+            .map(AsRef::as_ref)
     }
 
     pub(crate) fn contradicted_type_fact_subject_spans(
@@ -174,42 +183,6 @@ impl<'item> State<'item> {
 
     pub(crate) fn exit_scope(&self) {
         self.scopes.borrow_mut().pop();
-    }
-}
-
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub(crate) struct TypeFacts<'item> {
-    required_types: HashSet<&'item StructDefinition>,
-}
-
-impl<'item> TypeFacts<'item> {
-    pub(crate) fn required_type(&self) -> Option<&'item StructDefinition> {
-        (self.required_types.len() == 1)
-            .then(|| self.required_types.iter().next().copied())
-            .flatten()
-    }
-
-    pub(crate) fn is_type_contradicted(&self, declared_type: Type<'item>) -> bool {
-        match declared_type {
-            Type::Param(_) | Type::Wildcard(_) => self.has_contradiction(),
-            Type::Struct(declared_type) => self
-                .required_types
-                .iter()
-                .any(|required_type| required_type.id != declared_type.id),
-            Type::NoReturn | Type::Unknown => !self.required_types.is_empty(),
-        }
-    }
-
-    pub(crate) fn has_contradiction(&self) -> bool {
-        self.required_types.len() > 1
-    }
-
-    pub(crate) fn add_required_type(&mut self, type_: &'item StructDefinition) {
-        self.required_types.insert(type_);
-    }
-
-    pub(crate) fn add_required_types(&mut self, other: &Self) {
-        self.required_types.extend(&other.required_types);
     }
 }
 

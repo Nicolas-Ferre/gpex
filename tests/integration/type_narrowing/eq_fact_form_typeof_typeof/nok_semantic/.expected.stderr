@@ -1,15 +1,15 @@
 error: type fact leaving `typeof(left)` and `typeof(right)` with no possible value
-│  → <root>/test_contradiction_declared.gpex:2:12
+│  → <root>/test_expr_contradiction_declared.gpex:2:12
 │    ¦     return typeof(left) == typeof(right) && true;
 │    ¦            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: type fact leaving `typeof(left)` and `typeof(right)` with no possible value
-│  → <root>/test_contradiction_previous.gpex:4:12
+│  → <root>/test_expr_contradiction_previous.gpex:4:12
 │    ¦         && typeof(left) == typeof(right)
 │    ¦            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴
 error: `__eq__(typeof(right), i32)` item not found
-│  → <root>/test_out_of_scope.gpex:4:12
+│  → <root>/test_expr_out_of_scope.gpex:4:12
 │    ¦         && right == 0;
 │    ¦            ^^^^^^^^^^
 ├─ info: similar candidate
@@ -26,4 +26,9 @@ error: `__eq__(typeof(right), i32)` item not found
 │    ¦ ^^^^^^^^^^^^^^^^^^^^^^^
 │    ¦ ) -> bool = intrinsic;
 │    ¦ ^^^^^^^^^
+┴
+error: type fact leaving `typeof(left)` and `typeof(right)` with no possible value
+│  → <root>/test_require_contradiction_previous.gpex:4:23
+│    ¦     _other: ? require typeof(left) == typeof(right),
+│    ¦                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ┴

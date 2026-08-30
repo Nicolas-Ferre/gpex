@@ -1,0 +1,6 @@
+fn increment(value: ? require typeof(value) == i32) -> i32 {
+    value = value + 1;
+    return value;
+}
+
+var _result_two = increment(1); // expected: 2

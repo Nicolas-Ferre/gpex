@@ -1,0 +1,5 @@
+fn fn_(type_: const typeref, value: type_, related: typeof(value)) -> bool {
+    return type_ == i32 && related == 1;
+}
+
+var _result = fn_(i32, 0, 1); // expected: true

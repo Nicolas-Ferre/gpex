@@ -1,5 +1,10 @@
 error: type fact leaving `type_` with no possible value
-│  → <root>/test_contradiction_previous.gpex:2:28
+│  → <root>/test_expr_contradiction_previous.gpex:2:28
 │    ¦     return type_ == i32 && type_ == u32 && true;
 │    ¦                            ^^^^^^^^^^^^
+┴
+error: type fact leaving `type_` with no possible value
+│  → <root>/test_require_contradiction_previous.gpex:3:23
+│    ¦     _other: ? require type_ == u32,
+│    ¦                       ^^^^^^^^^^^^
 ┴

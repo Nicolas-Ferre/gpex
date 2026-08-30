@@ -1,0 +1,5 @@
+fn fn_(type_: const ? require typeof(type_) == typeref, value: type_) -> type_ {
+    return value;
+}
+
+var _result = fn_(i32, 1); // expected: 1

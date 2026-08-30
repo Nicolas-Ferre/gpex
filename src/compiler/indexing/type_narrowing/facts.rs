@@ -1,31 +1,9 @@
+use super::operands::TypeFactOperand;
 use crate::compiler::indexing::IndexState;
-use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::state::{State, TypeFacts};
-use crate::compiler::types::{self, Type};
+use crate::compiler::state::type_facts::{TypeFactSubject, TypeFacts};
 use crate::utils::parsing::span::Span;
 use std::rc::Rc;
-
-#[derive(Clone, Copy)]
-pub(super) enum TypeFactOperand<'item> {
-    Concrete(&'item StructDefinition),
-    Param(&'item Param),
-}
-
-impl<'item> TypeFactOperand<'item> {
-    pub(super) fn from_param(param: &'item Param, state: &State<'item>) -> Self {
-        let type_ = types::param_type(param, state);
-        if let Some(type_param) = type_fact_param(type_) {
-            Self::Param(type_param)
-        } else {
-            match type_ {
-                Type::Struct(type_) => Self::Concrete(type_),
-                Type::NoReturn | Type::Unknown => Self::Param(param),
-                Type::Param(_) | Type::Wildcard(_) => unreachable!("parameter type handled above"),
-            }
-        }
-    }
-}
 
 pub(super) struct TypeFact<'item> {
     pub(super) operands: [TypeFactOperand<'item>; 2],
@@ -40,13 +18,13 @@ impl<'item> TypeFact<'item> {
     }
 
     fn add_fact_in_state(&self, state: &mut IndexState<'_, 'item>) -> bool {
-        use TypeFactOperand::{Concrete, Param};
+        use TypeFactOperand::{Concrete, Dynamic};
         match self.operands {
             [Concrete(left), Concrete(right)] => left.id != right.id,
-            [Param(param), Concrete(type_)] | [Concrete(type_), Param(param)] => {
-                Self::add_required_type(param, type_, state)
+            [Dynamic(subject), Concrete(type_)] | [Concrete(type_), Dynamic(subject)] => {
+                Self::add_required_type(subject, type_, state)
             }
-            [Param(left), Param(right)] => Self::merge_params([left, right], state),
+            [Dynamic(left), Dynamic(right)] => Self::merge_subjects([left, right], state),
         }
     }
 
@@ -63,35 +41,39 @@ impl<'item> TypeFact<'item> {
     }
 
     fn add_required_type(
-        param: &'item Param,
+        subject: TypeFactSubject<'item>,
         type_: &'item StructDefinition,
         state: &mut IndexState<'_, 'item>,
     ) -> bool {
-        let previous_facts = state.type_narrowing.type_facts(param);
+        let previous_facts = state.type_facts(subject);
         let mut facts = previous_facts.as_ref().clone();
         facts.add_required_type(type_);
         let is_new_contradiction = !previous_facts.has_contradiction() && facts.has_contradiction();
-        Self::merge_type_fact_groups(&[previous_facts], Rc::new(facts), &[param], state);
+        Self::merge_type_fact_groups(&[previous_facts], Rc::new(facts), &[subject], state);
         is_new_contradiction
     }
 
-    fn merge_params(params: [&'item Param; 2], state: &mut IndexState<'_, 'item>) -> bool {
-        let previous_facts = params.map(|param| state.type_narrowing.type_facts(param));
+    fn merge_subjects(
+        subjects: [TypeFactSubject<'item>; 2],
+        state: &mut IndexState<'_, 'item>,
+    ) -> bool {
+        let previous_facts = subjects.map(|subject| state.type_facts(subject));
         let mut facts = previous_facts[0].as_ref().clone();
         facts.add_required_types(&previous_facts[1]);
         let was_contradicted = previous_facts.iter().any(|facts| facts.has_contradiction());
         let is_new_contradiction = !was_contradicted && facts.has_contradiction();
-        Self::merge_type_fact_groups(&previous_facts, Rc::new(facts), &params, state);
+        Self::merge_type_fact_groups(&previous_facts, Rc::new(facts), &subjects, state);
         is_new_contradiction
     }
 
     fn merge_type_fact_groups(
         all_previous_facts: &[Rc<TypeFacts<'item>>],
         facts: Rc<TypeFacts<'item>>,
-        params: &[&Param],
+        subjects: &[TypeFactSubject<'item>],
         state: &mut IndexState<'_, 'item>,
     ) {
-        for other_facts in state.type_narrowing.type_facts.values_mut() {
+        let type_facts = Rc::make_mut(&mut state.type_fact_context);
+        for other_facts in type_facts.values_mut() {
             if all_previous_facts
                 .iter()
                 .any(|previous_facts| Rc::ptr_eq(other_facts, previous_facts))
@@ -99,18 +81,8 @@ impl<'item> TypeFact<'item> {
                 *other_facts = facts.clone();
             }
         }
-        for param in params {
-            state
-                .type_narrowing
-                .type_facts
-                .insert(param.id, facts.clone());
+        for subject in subjects {
+            type_facts.insert(*subject, facts.clone());
         }
-    }
-}
-
-pub(super) fn type_fact_param(type_: Type<'_>) -> Option<&Param> {
-    match type_ {
-        Type::Param(type_param) | Type::Wildcard(type_param) => Some(type_param),
-        Type::Struct(_) | Type::NoReturn | Type::Unknown => None,
     }
 }

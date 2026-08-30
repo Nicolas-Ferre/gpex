@@ -1,19 +1,15 @@
 mod facts;
+mod operands;
 
-use self::facts::{TypeFact, TypeFactOperand};
-use crate::compiler::consts::{self, ConstValue};
+use self::facts::TypeFact;
+use crate::compiler::indexing::type_narrowing::operands::ResolvedTypeFactOperand;
 use crate::compiler::indexing::{IndexState, exprs};
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
-use crate::compiler::parsing::items::params::Param;
+use crate::compiler::parsing::items::fns::BinaryIntrinsicFn;
 use crate::compiler::queries;
-use crate::compiler::state::{IntrinsicType, State, TypeFacts};
-use crate::compiler::types;
-use std::collections::HashMap;
-use std::rc::Rc;
+use crate::compiler::state::State;
 
 #[derive(Clone, Copy)]
 pub(super) enum LogicalTypeNarrowing {
@@ -37,49 +33,34 @@ impl LogicalTypeNarrowing {
     }
 }
 
-#[derive(Default)]
-pub(super) struct TypeNarrowingState<'item> {
-    type_facts: HashMap<u64, Rc<TypeFacts<'item>>>,
-}
-
-impl<'item> TypeNarrowingState<'item> {
-    fn type_facts(&self, param: &Param) -> Rc<TypeFacts<'item>> {
-        self.type_facts.get(&param.id).cloned().unwrap_or_default()
-    }
-}
-
-struct ResolvedTypeFactOperand<'item> {
-    operand: TypeFactOperand<'item>,
-    is_subject: bool,
-}
-
 pub(super) fn index_logical_operation_args<'item>(
     call: &'item Call,
     narrowing: LogicalTypeNarrowing,
     state: &mut IndexState<'_, 'item>,
 ) {
     exprs::index_expr(&call.args[0].value, state);
+    let previous_facts = state.type_fact_context.clone();
+    add_expr_type_facts(&call.args[0].value, narrowing, state);
+    exprs::index_expr(&call.args[1].value, state);
+    state.type_fact_context = previous_facts;
+}
+
+pub(super) fn add_expr_type_facts<'item>(
+    expr: &'item Expr,
+    narrowing: LogicalTypeNarrowing,
+    state: &mut IndexState<'_, 'item>,
+) {
     let mut facts = vec![];
-    collect_type_facts(&call.args[0].value, narrowing, state.inner, &mut facts);
-    let previous_facts = state.type_narrowing.type_facts.clone();
+    collect_type_facts(expr, narrowing, state.inner, &mut facts);
     for fact in facts {
         fact.add(state);
     }
-    exprs::index_expr(&call.args[1].value, state);
-    state.type_narrowing.type_facts = previous_facts;
 }
 
-pub(super) fn index_ident<'item>(
-    ident: &Ident,
-    source: ItemRef<'item>,
-    state: &mut IndexState<'_, 'item>,
-) {
-    if let ItemRef::Param(param) = source
-        && let Some(fact_param) = facts::type_fact_param(types::param_type(param, state.inner))
-        && let Some(facts) = state.type_narrowing.type_facts.get(&fact_param.id).cloned()
-    {
-        state.set_expr_type_facts(ident.id, facts);
-    }
+pub(super) fn index_ident(ident: &Ident, state: &mut IndexState<'_, '_>) {
+    state
+        .inner
+        .set_expr_type_fact_context(ident.id, state.type_fact_context.clone());
 }
 
 fn collect_type_facts<'item>(
@@ -121,8 +102,8 @@ fn is_comparison_operator(call: &Call, narrowing: LogicalTypeNarrowing, state: &
 fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Option<TypeFact<'item>> {
     let left_arg = &call.args[0].value;
     let right_arg = &call.args[1].value;
-    let left_operand = resolve_type_fact_operand(left_arg, state)?;
-    let right_operand = resolve_type_fact_operand(right_arg, state)?;
+    let left_operand = ResolvedTypeFactOperand::resolve(left_arg, state)?;
+    let right_operand = ResolvedTypeFactOperand::resolve(right_arg, state)?;
     if !left_operand.is_subject && !right_operand.is_subject {
         return None;
     }
@@ -134,64 +115,4 @@ fn comparison_type_fact<'item>(call: &'item Call, state: &State<'item>) -> Optio
             right_operand.is_subject.then(|| right_arg.span()),
         ],
     })
-}
-
-fn resolve_type_fact_operand<'item>(
-    operand: &Expr,
-    state: &State<'item>,
-) -> Option<ResolvedTypeFactOperand<'item>> {
-    if let Some(param) = typeof_param(operand, state) {
-        return Some(ResolvedTypeFactOperand {
-            operand: TypeFactOperand::from_param(param, state),
-            is_subject: true,
-        });
-    }
-    let resolved_operand = match consts::expr_value(operand, state) {
-        ConstValue::TypeRef(type_) => TypeFactOperand::Concrete(type_),
-        ConstValue::Param(param) | ConstValue::WildcardType(param) => TypeFactOperand::Param(param),
-        ConstValue::I32(_)
-        | ConstValue::U32(_)
-        | ConstValue::F32(_)
-        | ConstValue::Bool(_)
-        | ConstValue::Unknown
-        | ConstValue::RuntimeValue => return None,
-    };
-    Some(ResolvedTypeFactOperand {
-        operand: resolved_operand,
-        is_subject: !is_typeof_expr(operand, state)
-            && matches!(resolved_operand, TypeFactOperand::Param(_))
-            && state.is_intrinsic_type(types::expr_type(operand, state), IntrinsicType::Typeref),
-    })
-}
-
-fn is_typeof_expr(expr: &Expr, state: &State<'_>) -> bool {
-    let Expr::Call(call) = unwrap_parentheses(expr) else {
-        return false;
-    };
-    queries::calls::is_intrinsic(call, IntrinsicFn::Typeof, state)
-}
-
-fn typeof_param<'item>(expr: &Expr, state: &State<'item>) -> Option<&'item Param> {
-    if let Expr::Call(typeof_call) = unwrap_parentheses(expr)
-        && queries::calls::is_intrinsic(typeof_call, IntrinsicFn::Typeof, state)
-        && let Expr::Ident(ident) = unwrap_parentheses(&typeof_call.args[0].value)
-        && let Some(ItemRef::Param(param)) = state.sources.get(&ident.id).copied()
-    {
-        Some(param)
-    } else {
-        None
-    }
-}
-
-fn unwrap_parentheses(expr: &Expr) -> &Expr {
-    match expr {
-        Expr::Parenthesized(parenthesized) => unwrap_parentheses(&parenthesized.value),
-        Expr::F32Literal(_)
-        | Expr::U32Literal(_)
-        | Expr::I32Literal(_)
-        | Expr::BoolLiteral(_)
-        | Expr::Wildcard(_)
-        | Expr::Call(_)
-        | Expr::Ident(_) => expr,
-    }
 }
