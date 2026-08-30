@@ -27,3 +27,8 @@ error: `__eq__(typeof(right), i32)` item not found
 │    ¦ ) -> bool = intrinsic;
 │    ¦ ^^^^^^^^^
 ┴
+error: type fact leaving `typeof(left)` and `typeof(right)` with no possible value
+│  → <root>/test_require_contradiction_previous.gpex:4:23
+│    ¦     _other: ? require typeof(left) == typeof(right),
+│    ¦                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+┴
