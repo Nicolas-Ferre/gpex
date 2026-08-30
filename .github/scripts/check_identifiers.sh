@@ -121,27 +121,61 @@ while read -r -d '' file; do
             continue
         fi
         check_underscore_variables
-        check_lifetime_plural
-        check_identifier "$LIFETIME_REGEX" "lifetime" "$check_single_letter"
-        check_identifier "$LET_REGEX" "variable" "$check_single_letter"
-        check_identifier "$LET_MUT_REGEX" "variable" "$check_single_letter"
-        check_identifier "$CONSTANT_REGEX" "constant" "$check_single_letter"
-        check_identifier "$STATIC_REGEX" "static variable" "$check_single_letter"
-        check_identifier "$PARAMETER_REGEX" "parameter" "$check_single_letter"
-        check_identifier "$FUNCTION_REGEX" "function" "$check_single_letter"
-        check_identifier "$STRUCT_REGEX" "struct" "$check_single_letter"
-        check_identifier "$FIELD_REGEX" "field" "$check_single_letter"
-        check_identifier "$PUB_FIELD_REGEX" "field" "$check_single_letter"
-        check_identifier "$PUB_MOD_FIELD_REGEX" "field" "$check_single_letter"
-        check_identifier "$ENUM_REGEX" "enum" "$check_single_letter"
-        check_identifier "$UNION_REGEX" "union" "$check_single_letter"
-        check_identifier "$VARIANT_REGEX" "variant" "$check_single_letter"
-        check_identifier "$TRAIT_REGEX" "trait" "$check_single_letter"
-        check_identifier "$TYPE_REGEX" "type alias" "$check_single_letter"
-        check_identifier "$MODULE_REGEX" "module" "$check_single_letter"
-        check_identifier "$MACRO_REGEX" "macro" "$check_single_letter"
-        check_identifier "$BINDING_REGEX" "binding variable" "$check_single_letter"
-        check_identifier "$FOR_LOOP_VARIABLE_REGEX" "for loop variable" "$check_single_letter"
+        if [[ $line == *"'"* ]]; then
+            check_lifetime_plural
+            check_identifier "$LIFETIME_REGEX" "lifetime" "$check_single_letter"
+        fi
+        if [[ $line == *"let"* ]]; then
+            check_identifier "$LET_REGEX" "variable" "$check_single_letter"
+            check_identifier "$LET_MUT_REGEX" "variable" "$check_single_letter"
+        fi
+        if [[ $line == *"const"* ]]; then
+            check_identifier "$CONSTANT_REGEX" "constant" "$check_single_letter"
+        fi
+        if [[ $line == *"static"* ]]; then
+            check_identifier "$STATIC_REGEX" "static variable" "$check_single_letter"
+        fi
+        if [[ $line == *"("* || $line == *","* ]]; then
+            check_identifier "$PARAMETER_REGEX" "parameter" "$check_single_letter"
+        fi
+        if [[ $line == *"fn"* ]]; then
+            check_identifier "$FUNCTION_REGEX" "function" "$check_single_letter"
+        fi
+        if [[ $line == *"struct"* ]]; then
+            check_identifier "$STRUCT_REGEX" "struct" "$check_single_letter"
+        fi
+        if [[ $line == *":"* ]]; then
+            check_identifier "$FIELD_REGEX" "field" "$check_single_letter"
+            check_identifier "$PUB_FIELD_REGEX" "field" "$check_single_letter"
+            check_identifier "$PUB_MOD_FIELD_REGEX" "field" "$check_single_letter"
+        fi
+        if [[ $line == *"enum"* ]]; then
+            check_identifier "$ENUM_REGEX" "enum" "$check_single_letter"
+        fi
+        if [[ $line == *"union"* ]]; then
+            check_identifier "$UNION_REGEX" "union" "$check_single_letter"
+        fi
+        if [[ $line == *, ]]; then
+            check_identifier "$VARIANT_REGEX" "variant" "$check_single_letter"
+        fi
+        if [[ $line == *"trait"* ]]; then
+            check_identifier "$TRAIT_REGEX" "trait" "$check_single_letter"
+        fi
+        if [[ $line == *"type"* ]]; then
+            check_identifier "$TYPE_REGEX" "type alias" "$check_single_letter"
+        fi
+        if [[ $line == *"mod"* ]]; then
+            check_identifier "$MODULE_REGEX" "module" "$check_single_letter"
+        fi
+        if [[ $line == *"macro_rules!"* ]]; then
+            check_identifier "$MACRO_REGEX" "macro" "$check_single_letter"
+        fi
+        if [[ $line == *"("* || $line == *","* || $line == *"|"* || $line == *"{"* ]]; then
+            check_identifier "$BINDING_REGEX" "binding variable" "$check_single_letter"
+        fi
+        if [[ $line == *"for"* ]]; then
+            check_identifier "$FOR_LOOP_VARIABLE_REGEX" "for loop variable" "$check_single_letter"
+        fi
     done <"$file"
 done < <(find src/ tests/ \( -name "*.rs" -o -name "*.gpex" \) -type f -print0)
 exit "$exit_code"
