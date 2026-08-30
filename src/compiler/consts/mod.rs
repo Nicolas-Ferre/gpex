@@ -38,7 +38,7 @@ impl PartialEq for HashableF32 {
 impl Eq for HashableF32 {}
 
 impl Hash for HashableF32 {
-    fn hash<H: Hasher>(&self, state: &mut H) {
+    fn hash<HasherType: Hasher>(&self, state: &mut HasherType) {
         self.0.to_bits().hash(state);
     }
 }

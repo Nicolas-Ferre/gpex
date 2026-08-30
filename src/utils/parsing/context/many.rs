@@ -19,18 +19,18 @@ impl<'context> SeparatorParser<'context> {
     }
 }
 
-enum ParseManyStepResult<'config, T> {
-    Item(T),
+enum ParseManyStepResult<'config, Item> {
+    Item(Item),
     End,
     Error(ParseError<'config>),
 }
 
-pub(super) fn parse<'config, T>(
+pub(super) fn parse<'config, Item>(
     context: &mut ParseContext<'config>,
-    item_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, T>,
+    item_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, Item>,
     separator_parser: SeparatorParser<'config>,
     stop_excluded_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, ()>,
-) -> Result<Vec<T>, ParseError<'config>> {
+) -> Result<Vec<Item>, ParseError<'config>> {
     let initial_context = context.clone();
     let first_item = match parse_first_item(context, &item_parser, &stop_excluded_parser) {
         ParseManyStepResult::Item(item) => item,
@@ -47,14 +47,14 @@ pub(super) fn parse<'config, T>(
     )
 }
 
-fn parse_remaining_items<'config, T>(
+fn parse_remaining_items<'config, Item>(
     context: &mut ParseContext<'config>,
-    item_parser: &impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, T>,
+    item_parser: &impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, Item>,
     separator_parser: SeparatorParser<'config>,
     stop_excluded_parser: &impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, ()>,
     initial_context: &ParseContext<'config>,
-    mut items: Vec<T>,
-) -> Result<Vec<T>, ParseError<'config>> {
+    mut items: Vec<Item>,
+) -> Result<Vec<Item>, ParseError<'config>> {
     loop {
         match parse_separator(context, separator_parser, stop_excluded_parser) {
             ParseManyStepResult::Item(()) => {}
@@ -73,12 +73,12 @@ fn parse_remaining_items<'config, T>(
     }
 }
 
-fn parse_many_next_item<'config, T>(
+fn parse_many_next_item<'config, Item>(
     context: &mut ParseContext<'config>,
-    item_parser: &impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, T>,
+    item_parser: &impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, Item>,
     separator_parser: SeparatorParser<'config>,
     stop_excluded_parser: &impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, ()>,
-) -> ParseManyStepResult<'config, T> {
+) -> ParseManyStepResult<'config, Item> {
     let result = parse_next_item(context, item_parser, separator_parser, stop_excluded_parser);
     if matches!(result, ParseManyStepResult::Error(_))
         && matches!(separator_parser, SeparatorParser::MaybeTrailing(_))
@@ -90,20 +90,20 @@ fn parse_many_next_item<'config, T>(
     }
 }
 
-fn restore_error<'config, T>(
+fn restore_error<'config, Item>(
     context: &mut ParseContext<'config>,
     initial_context: ParseContext<'config>,
     error: ParseError<'config>,
-) -> Result<T, ParseError<'config>> {
+) -> Result<Item, ParseError<'config>> {
     *context = initial_context;
     Err(error)
 }
 
-fn parse_first_item<'config, T>(
+fn parse_first_item<'config, Item>(
     context: &mut ParseContext<'config>,
-    item_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, T>,
+    item_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, Item>,
     stop_excluded_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, ()>,
-) -> ParseManyStepResult<'config, T> {
+) -> ParseManyStepResult<'config, Item> {
     let previous_context = context.clone();
     let item_error = match item_parser(context) {
         Ok(item) => return ParseManyStepResult::Item(item),
@@ -136,12 +136,12 @@ fn parse_separator<'config>(
     }
 }
 
-fn parse_next_item<'config, T>(
+fn parse_next_item<'config, Item>(
     context: &mut ParseContext<'config>,
-    item_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, T>,
+    item_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, Item>,
     separator_parser: SeparatorParser<'config>,
     stop_excluded_parser: impl Fn(&mut ParseContext<'config>) -> ParserResult<'config, ()>,
-) -> ParseManyStepResult<'config, T> {
+) -> ParseManyStepResult<'config, Item> {
     let previous_context = context.clone();
     let item_error = match item_parser(context) {
         Ok(item) => return ParseManyStepResult::Item(item),

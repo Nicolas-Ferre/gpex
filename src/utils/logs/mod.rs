@@ -117,11 +117,11 @@ impl LogLevel {
     }
 }
 
-fn fmt_colored<C: Color>(formatter: &mut Formatter<'_>, string: &str) -> fmt::Result {
+fn fmt_colored<ColorType: Color>(formatter: &mut Formatter<'_>, string: &str) -> fmt::Result {
     write!(
         formatter,
         "{}",
-        string.if_supports_color(Stream::Stderr, |string| string.fg::<C>())
+        string.if_supports_color(Stream::Stderr, |string| string.fg::<ColorType>())
     )
 }
 

@@ -39,11 +39,11 @@ impl<'state, 'item> ValidateState<'state, 'item> {
         self.context.logs.push(log);
     }
 
-    fn with_param_constness<O>(
+    fn with_param_constness<Output>(
         &mut self,
         param_constness: ParamConstness,
-        callback: impl FnOnce(&mut Self) -> O,
-    ) -> O {
+        callback: impl FnOnce(&mut Self) -> Output,
+    ) -> Output {
         let previous_param_constness = self.param_constness;
         self.param_constness = param_constness;
         let output = callback(self);
@@ -51,11 +51,11 @@ impl<'state, 'item> ValidateState<'state, 'item> {
         output
     }
 
-    fn with_const_mark_span<O>(
+    fn with_const_mark_span<Output>(
         &mut self,
         span: Option<Span>,
-        callback: impl FnOnce(&mut Self) -> O,
-    ) -> O {
+        callback: impl FnOnce(&mut Self) -> Output,
+    ) -> Output {
         let previous_const_mark_span = self.const_mark_span;
         self.const_mark_span = span;
         let output = callback(self);
