@@ -15,7 +15,7 @@ publish = false
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
-convert_case = "0.11"
+convert_case = "0.12"
 derive-where = "1.6"
 itertools = "0.15"
 owo-colors = { version = "4.3", features = ["supports-colors"] }
