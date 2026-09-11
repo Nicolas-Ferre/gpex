@@ -1,5 +1,7 @@
 # High-level architecture
 
+## Compiler passes
+
 The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 
 1. **Read**: Reads `.gpex` files from a folder recursively
@@ -13,7 +15,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
    (`src/compiler/transpilation/`)
 6. **Run** (optional): Executes WGSL compute shaders on the GPU via wgpu (`src/runner/`)
 
-Key directories and files:
+## Key directories and files
 
 - `src/compiler/`: Compilation pipeline orchestration and definition of each pipeline stage:
     - `state/`: Shared post-parse compiler state used by indexing, validation, value resolution,
@@ -38,3 +40,19 @@ Key directories and files:
 - `src/runner/`: GPU execution using wgpu (device setup, shader dispatch, buffer readback).
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
 - `prelude/`: built-in types and functions available in all `GPEx` modules.
+
+## Module coupling
+
+Each graph shows coupling between direct sub-modules. An arrow `A --> B` means that at least one
+Rust file under `A` contains a `crate::B` path; nested modules are collapsed to their direct parent.
+Crate-root re-exports (`use crate::{Log, ...}`) and same-module paths are omitted.
+
+### `src/`
+
+```mermaid
+graph TD
+    compiler --> utils
+    runner --> compiler
+    runner --> utils
+    utils --> compiler
+```

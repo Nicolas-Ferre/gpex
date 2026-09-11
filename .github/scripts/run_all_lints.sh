@@ -46,6 +46,7 @@ start bash .github/scripts/check_line_endings.sh
 start bash .github/scripts/check_todos.sh
 start bash .github/scripts/check_file_paths.sh
 start bash .github/scripts/check_identifiers.sh
+start bash .github/scripts/check_module_coupling.sh
 
 failed=0
 for i in "${!pids[@]}"; do
