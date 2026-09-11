@@ -30,7 +30,8 @@ pub fn compile_program(
     root_path: &Path,
     is_warning_treated_as_error: bool,
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
-    let files = reading::read(root_path, EXT)?;
+    let mut files = Vec::from(prelude::files());
+    files.extend(reading::read(root_path, EXT)?);
     let modules = parsing::parse(root_path, &files)?;
     let mut state = State::new(files.len());
     indexing::index_modules(&modules, &mut state);

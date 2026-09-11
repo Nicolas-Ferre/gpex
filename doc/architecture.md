@@ -54,5 +54,4 @@ graph TD
     compiler --> utils
     runner --> compiler
     runner --> utils
-    utils --> compiler
 ```
