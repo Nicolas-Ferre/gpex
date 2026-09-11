@@ -7,7 +7,7 @@ set -euo pipefail
 source "$(dirname "$0")/utils.sh"
 
 ARCHITECTURE_DOC_PATH="doc/architecture.md"
-CRATE_ROOT_PATH_REGEX='crate::(compiler|runner|utils)([^a-zA-Z0-9_]|$)' # TODO: not generic enough
+CRATE_ROOT_PATH_REGEX='crate::([A-Za-z_][A-Za-z0-9_]*)([^a-zA-Z0-9_]|$)'
 MERMAID_EDGE_REGEX='^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)[[:space:]]+-->[[:space:]]+([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*$'
 COUPLING_HEADING_REGEX='^##[[:space:]]+Module[[:space:]]+coupling[[:space:]]*$'
 H2_REGEX='^##[[:space:]]'
@@ -17,6 +17,7 @@ SRC_HEADING="### \`src/\`"
 code_edges=()
 code_edge_files=()
 doc_edges=()
+src_modules=()
 exit_code=0
 has_coupling_heading=false
 has_src_heading=false
@@ -66,18 +67,25 @@ collect_file_code_edges() {
         while [[ $remaining =~ $CRATE_ROOT_PATH_REGEX ]]; do
             target="${BASH_REMATCH[1]}"
             remaining="${remaining#*"${BASH_REMATCH[0]}"}"
-            if [[ $target != "$source_module" ]]; then
+            if in_array "$target" "${src_modules[@]-}" && [[ $target != "$source_module" ]]; then
                 add_code_edge "$source_module --> $target" "$1"
             fi
         done
     done <"$file_path"
 }
 
+collect_src_modules() {
+    local dir
+    while IFS= read -r -d '' dir; do
+        src_modules+=("$(basename "$dir")")
+    done < <(find src -mindepth 1 -maxdepth 1 -type d -print0)
+}
+
 collect_code_edges() {
     local file_path
     while read -r -d '' file_path; do
         collect_file_code_edges "$file_path"
-    done < <(find src/compiler src/runner src/utils -type f -name "*.rs" -print0)
+    done < <(find src -mindepth 2 -type f -name "*.rs" -print0)
 }
 
 collect_doc_edges() {
@@ -160,6 +168,7 @@ compare_edges() {
     done
 }
 
+collect_src_modules
 collect_code_edges
 collect_doc_edges
 if [[ $has_mermaid_diagram == true ]]; then
