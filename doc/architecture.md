@@ -4,7 +4,8 @@
 
 The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 
-1. **Read**: Reads `.gpex` files from a folder recursively
+1. **Read**: Loads built-in prelude files and reads `.gpex` files from a folder recursively
+   (`src/compiler/prelude.rs`, `src/utils/reading.rs`)
 2. **Parse**: Parse read files to produce an AST per file (called a "module")
    (`src/compiler/parsing/`)
 3. **Index**: Builds symbol tables, e.g., to index imports and items for following stages
@@ -44,8 +45,9 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 ## Module coupling
 
 Each graph shows coupling between direct sub-modules. An arrow `A --> B` means that at least one
-Rust file under `A` contains a `crate::B` path; nested modules are collapsed to their direct parent.
-Crate-root re-exports (`use crate::{Log, ...}`) and same-module paths are omitted.
+Rust file under `A` refers to module `B` through a `crate::B` path or a crate-root re-export
+originating from `B` (`use crate::{Log, ...}`). Nested modules are collapsed to their direct parent.
+Same-module paths are omitted.
 
 ### `src/`
 
