@@ -183,6 +183,7 @@ collect_crate_group_targets() {
 
 collect_file_code_edges() {
     local file_path="$1"
+    local report_file="$1"
     local source_module="${file_path#src/}"
     local line
     local remaining
@@ -198,7 +199,7 @@ collect_file_code_edges() {
         while [[ $remaining =~ $CRATE_ROOT_PATH_REGEX ]]; do
             target="${BASH_REMATCH[1]}"
             remaining="${remaining#*"${BASH_REMATCH[0]}"}"
-            add_crate_target "$source_module" "$target" "$file_path"
+            add_crate_target "$source_module" "$target" "$report_file"
         done
         if [[ $is_in_use_crate_group == false && $line =~ $USE_CRATE_GROUP_START_REGEX ]]; then
             is_in_use_crate_group=true
@@ -207,7 +208,7 @@ collect_file_code_edges() {
             use_statement+=" $line"
         fi
         if [[ $is_in_use_crate_group == true && $line == *';' ]]; then
-            collect_crate_group_targets "$use_statement" "$file_path" "$source_module"
+            collect_crate_group_targets "$use_statement" "$report_file" "$source_module"
             is_in_use_crate_group=false
             use_statement=""
         fi
