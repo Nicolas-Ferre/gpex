@@ -1,7 +1,4 @@
-use crate::Runner;
 use convert_case::{Boundary, Case, Converter};
-
-type _A = Runner;
 
 pub(crate) fn convert(name: &str, case: Case<'_>) -> String {
     let trimmed_name = name.trim_start_matches('_');

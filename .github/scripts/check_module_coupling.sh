@@ -13,7 +13,7 @@ CRATE_ROOT_PATH_REGEX="crate::($IDENT)([^a-zA-Z0-9_]|$)"
 USE_CRATE_GROUP_START_REGEX="^[[:space:]]*(pub(\\([^)]*\\))?[[:space:]]+)?use[[:space:]]+crate::[[:space:]]*\\{"
 PUB_USE_START_REGEX="^[[:space:]]*pub(\\([^)]*\\))?[[:space:]]+use[[:space:]]+"
 REEXPORT_LEAF_REGEX="($IDENT)[[:space:]]*(as[[:space:]]+($IDENT))?[[:space:]]*(,|}|;)"
-MERMAID_EDGE_REGEX="^[[:space:]]*($IDENT)[[:space:]]+-->[[:space:]]+($IDENT)[[:space:]]*$"
+MERMAID_EDGE_REGEX="^[[:space:]]*($IDENT)[[:space:]]*-->[[:space:]]*(\\|[^|]*\\|[[:space:]]*)?($IDENT)[[:space:]]*(%%.*)?$"
 COUPLING_HEADING_REGEX='^##[[:space:]]+Module[[:space:]]+coupling[[:space:]]*$'
 H2_REGEX='^##[[:space:]]'
 H3_REGEX='^###[[:space:]]'
@@ -122,7 +122,7 @@ collect_crate_group_targets() {
     local remaining
     local ident
     local brace_depth=0
-    local is_expecting_path_start=true
+    local is_at_path_start=true
     if [[ ! $statement =~ crate::[[:space:]]*\{ ]]; then
         return
     fi
@@ -136,13 +136,13 @@ collect_crate_group_targets() {
         if [[ $remaining =~ ^\{ ]]; then
             brace_depth=$((brace_depth + 1))
             remaining="${remaining#\{}"
-            is_expecting_path_start=true
+            is_at_path_start=true
             continue
         fi
         if [[ $remaining =~ ^\} ]]; then
             brace_depth=$((brace_depth - 1))
             remaining="${remaining#\}}"
-            is_expecting_path_start=false
+            is_at_path_start=false
             if ((brace_depth == 0)); then
                 return
             fi
@@ -151,16 +151,16 @@ collect_crate_group_targets() {
         if [[ $remaining =~ ^, ]]; then
             remaining="${remaining#,}"
             if ((brace_depth == 1)); then
-                is_expecting_path_start=true
+                is_at_path_start=true
             fi
             continue
         fi
         if [[ $remaining =~ ^:: ]]; then
             remaining="${remaining#::}"
-            is_expecting_path_start=false
+            is_at_path_start=false
             continue
         fi
-        if [[ $is_expecting_path_start == false && $remaining =~ ^as[[:space:]]+ ]]; then
+        if [[ $is_at_path_start == false && $remaining =~ ^as[[:space:]]+ ]]; then
             remaining="${remaining#"${BASH_REMATCH[0]}"}"
             if [[ $remaining =~ ^$IDENT ]]; then
                 remaining="${remaining#"${BASH_REMATCH[0]}"}"
@@ -170,14 +170,14 @@ collect_crate_group_targets() {
         if [[ $remaining =~ ^$IDENT ]]; then
             ident="${BASH_REMATCH[0]}"
             remaining="${remaining#"$ident"}"
-            if ((brace_depth == 1)) && [[ $is_expecting_path_start == true ]]; then
+            if ((brace_depth == 1)) && [[ $is_at_path_start == true ]]; then
                 add_crate_target "$source_module" "$ident" "$file_path"
             fi
-            is_expecting_path_start=false
+            is_at_path_start=false
             continue
         fi
         remaining="${remaining:1}"
-        is_expecting_path_start=false
+        is_at_path_start=false
     done
 }
 
@@ -198,7 +198,7 @@ collect_file_code_edges() {
         while [[ $remaining =~ $CRATE_ROOT_PATH_REGEX ]]; do
             target="${BASH_REMATCH[1]}"
             remaining="${remaining#*"${BASH_REMATCH[0]}"}"
-            add_crate_target "$source_module" "$target" "$1"
+            add_crate_target "$source_module" "$target" "$file_path"
         done
         if [[ $is_in_use_crate_group == false && $line =~ $USE_CRATE_GROUP_START_REGEX ]]; then
             is_in_use_crate_group=true
@@ -207,7 +207,7 @@ collect_file_code_edges() {
             use_statement+=" $line"
         fi
         if [[ $is_in_use_crate_group == true && $line == *';' ]]; then
-            collect_crate_group_targets "$use_statement" "$1" "$source_module"
+            collect_crate_group_targets "$use_statement" "$file_path" "$source_module"
             is_in_use_crate_group=false
             use_statement=""
         fi
@@ -303,7 +303,7 @@ collect_doc_edges() {
         fi
         if [[ $is_in_mermaid == true && $line =~ $MERMAID_EDGE_REGEX ]]; then
             from="${BASH_REMATCH[1]}"
-            to="${BASH_REMATCH[2]}"
+            to="${BASH_REMATCH[3]}"
             add_doc_edge "$from --> $to"
         fi
     done <"$ARCHITECTURE_DOC_PATH"

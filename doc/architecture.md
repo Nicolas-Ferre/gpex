@@ -45,9 +45,10 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 ## Module coupling
 
 Each graph shows coupling between direct sub-modules. An arrow `A --> B` means that at least one
-Rust file under `A` refers to module `B` through a `crate::B` path or a crate-root re-export
-originating from `B` (`use crate::{Log, ...}`). Nested modules are collapsed to their direct parent.
-Same-module paths are omitted.
+Rust file under `A` refers to `B` via `crate::B` or via a crate-root re-exported name that originates
+from `B` (for example `use crate::Log` when `Log` is `pub use`d from `utils`). Nested paths are
+collapsed to the `src/` child that contains them (`crate::compiler::parsing::exprs` is treated as
+`compiler`). Same-module paths are omitted.
 
 ### `src/`
 
