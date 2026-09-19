@@ -29,7 +29,7 @@ wgpu = "30"
 libtest-mimic = "0.8"
 pretty_assertions = "1.4"
 regex = "1"
-wgsl-parse = "0.4"
+wgsl-parse = "0.5"
 
 [lints.rust]
 anonymous_parameters = "warn"
