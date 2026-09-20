@@ -39,19 +39,18 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
           permitted on the left-hand side of an assignment statement).
         - `consts/`: Constant value resolution.
         - `types.rs`: Type resolution.
-- `src/program.rs`: Compiled program representation (type paths, global buffer layout, WGSL
-  shaders).
-- `src/runner/`: GPU execution using wgpu (device setup, shader dispatch, buffer readback).
+- `src/program.rs`: Compiled program representation.
+- `src/runner/`: Execution of a compiled program on GPU using WGPU.
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
 - `prelude/`: built-in types and functions available in all `GPEx` modules.
 
 ## Module coupling
 
 The graph shows coupling between direct sub-modules. An arrow `A --> B` means that at least one
-Rust file under `A` refers to `B` via `crate::B` or via a crate-root re-exported name that originates
-from `B` (for example `use crate::Log` when `Log` is `pub use`d from `utils`). Nested paths are
-collapsed to the nearest documented module: `crate::compiler::transversal::consts` is `compiler` at
-crate-root level, `transversal` inside `subgraph compiler`, and `consts` inside
+Rust file under `A` refers to `B` via `crate::B` or via a crate-root re-exported name that
+originates from `B` (for example `use crate::Log` when `Log` is `pub use`d from `utils`). Nested
+paths are collapsed to the nearest documented module: `crate::compiler::transversal::consts` is
+`compiler` at crate-root level, `transversal` inside `subgraph compiler`, and `consts` inside
 `subgraph transversal`. Same-module paths are omitted.
 
 A mermaid subgraph expands that module into its own direct children. Edges that leave or enter an
