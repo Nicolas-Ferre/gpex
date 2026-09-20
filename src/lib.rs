@@ -1,14 +1,15 @@
 //! `GPEx` CLI library.
 
 mod compiler;
+mod program;
 mod runner;
 mod utils;
 
 pub use compiler::compile_program;
 pub use compiler::save_compiled;
-pub use compiler::transpilation::Buffer;
-pub use compiler::transpilation::BufferField;
-pub use compiler::transpilation::Program;
+pub use program::Buffer;
+pub use program::BufferField;
+pub use program::Program;
 pub use runner::GpuValue;
 pub use runner::Runner;
 pub use runner::load_compiled;

@@ -39,6 +39,8 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
           permitted on the left-hand side of an assignment statement).
         - `consts/`: Constant value resolution.
         - `types.rs`: Type resolution.
+- `src/program.rs`: Compiled program representation (type paths, global buffer layout, WGSL
+  shaders).
 - `src/runner/`: GPU execution using wgpu (device setup, shader dispatch, buffer readback).
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
 - `prelude/`: built-in types and functions available in all `GPEx` modules.
@@ -53,13 +55,14 @@ crate-root level, `transversal` inside `subgraph compiler`, and `consts` inside
 `subgraph transversal`. Same-module paths are omitted.
 
 A mermaid subgraph expands that module into its own direct children. Edges that leave or enter an
-expanded module stay on the subgraph rectangle (`runner --> compiler`, `compiler --> utils`,
+expanded module stay on the subgraph rectangle (`runner --> program`, `compiler --> program`,
 `indexing --> transversal`), not on inner nodes.
 
 ```mermaid
 graph TD
+    compiler --> program
     compiler --> utils
-    runner --> compiler
+    runner --> program
     runner --> utils
     subgraph compiler
         indexing --> parsing

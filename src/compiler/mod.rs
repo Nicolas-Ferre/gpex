@@ -4,9 +4,9 @@ pub(crate) mod transpilation;
 pub(crate) mod transversal;
 pub(crate) mod validation;
 
-use crate::compiler::transpilation::Program;
 use crate::compiler::transversal::prelude;
 use crate::compiler::transversal::state::State;
+use crate::program::Program;
 use crate::utils::logs::Log;
 use crate::utils::reading;
 use std::fs;
