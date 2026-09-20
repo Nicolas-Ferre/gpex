@@ -44,17 +44,78 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 
 ## Module coupling
 
-Each graph shows coupling between direct sub-modules. An arrow `A --> B` means that at least one
+The graph shows coupling between direct sub-modules. An arrow `A --> B` means that at least one
 Rust file under `A` refers to `B` via `crate::B` or via a crate-root re-exported name that originates
 from `B` (for example `use crate::Log` when `Log` is `pub use`d from `utils`). Nested paths are
-collapsed to the `src/` child that contains them (`crate::compiler::parsing::exprs` is treated as
-`compiler`). Same-module paths are omitted.
+collapsed to the nearest documented module: `crate::compiler::parsing::exprs` is `compiler` at
+crate-root level, and `parsing` inside `subgraph compiler`. Same-module paths are omitted.
 
-### `src/`
+A mermaid subgraph expands a crate-root module into its own direct children. Edges that leave or
+enter that module stay on the subgraph rectangle (`runner --> compiler`, `compiler --> utils`), not
+on inner nodes.
 
 ```mermaid
 graph TD
     compiler --> utils
     runner --> compiler
     runner --> utils
+    subgraph compiler
+        consts --> item_ref
+        consts --> parsing
+        consts --> state
+        consts --> types
+        dependencies --> item_ref
+        dependencies --> parsing
+        dependencies --> state
+        indexing --> consts
+        indexing --> item_ref
+        indexing --> parsing
+        indexing --> prelude
+        indexing --> queries
+        indexing --> state
+        indexing --> types
+        item_ref --> consts
+        item_ref --> key_rendering
+        item_ref --> parsing
+        item_ref --> state
+        item_ref --> types
+        key_rendering --> parsing
+        key_rendering --> state
+        key_rendering --> types
+        parsing --> prelude
+        queries --> consts
+        queries --> item_ref
+        queries --> parsing
+        queries --> state
+        queries --> types
+        refs --> item_ref
+        refs --> parsing
+        refs --> state
+        state --> consts
+        state --> item_ref
+        state --> parsing
+        state --> prelude
+        state --> types
+        transpilation --> consts
+        transpilation --> dependencies
+        transpilation --> item_ref
+        transpilation --> parsing
+        transpilation --> prelude
+        transpilation --> queries
+        transpilation --> state
+        transpilation --> types
+        types --> consts
+        types --> item_ref
+        types --> parsing
+        types --> state
+        validation --> dependencies
+        validation --> item_ref
+        validation --> key_rendering
+        validation --> parsing
+        validation --> prelude
+        validation --> queries
+        validation --> refs
+        validation --> state
+        validation --> types
+    end
 ```
