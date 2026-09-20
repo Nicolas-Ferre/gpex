@@ -1,8 +1,8 @@
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
-use crate::compiler::types;
-use crate::compiler::types::Type;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::types;
+use crate::compiler::transversal::types::Type;
 use crate::compiler::validation::{ValidateState, exprs, items, logs, naming};
 use crate::utils::validation::ValidateError;
 

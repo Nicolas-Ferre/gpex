@@ -3,10 +3,10 @@ use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{
     BinaryIntrinsicFn, FnDefinition, IntrinsicFn, UnaryIntrinsicFn,
 };
-use crate::compiler::queries;
-use crate::compiler::state::IntrinsicType;
 use crate::compiler::transpilation::{TranspileState, exprs};
-use crate::compiler::types;
+use crate::compiler::transversal::queries;
+use crate::compiler::transversal::state::IntrinsicType;
+use crate::compiler::transversal::types;
 use std::fmt::Write;
 
 pub(super) fn transpile_call(

@@ -1,5 +1,3 @@
-use crate::compiler::consts::{self, ConstValue};
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -7,8 +5,10 @@ use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::state::State;
-use crate::compiler::state::type_facts::TypeFacts;
+use crate::compiler::transversal::consts::{self, ConstValue};
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::state::type_facts::TypeFacts;
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 

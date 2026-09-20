@@ -3,7 +3,7 @@ use crate::compiler::parsing::symbols::{
     BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, EQUAL_SYMBOL, INTRINSIC_KEYWORD, PUB_KEYWORD,
     STRUCT_KEYWORD,
 };
-use crate::compiler::prelude::PRELUDE_TYPES_FILE_INDEX;
+use crate::compiler::transversal::prelude::PRELUDE_TYPES_FILE_INDEX;
 use crate::utils::parsing::context::ParseContext;
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};

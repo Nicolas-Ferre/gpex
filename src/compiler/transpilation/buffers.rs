@@ -2,7 +2,7 @@ use crate::BufferField;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::transpilation::TranspileState;
-use crate::compiler::types;
+use crate::compiler::transversal::types;
 use crate::utils::math;
 use crate::utils::reading::ReadFile;
 use std::collections::HashMap;

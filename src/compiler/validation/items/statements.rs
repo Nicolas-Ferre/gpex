@@ -1,7 +1,7 @@
 use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
-use crate::compiler::refs;
-use crate::compiler::types;
+use crate::compiler::transversal::refs;
+use crate::compiler::transversal::types;
 use crate::compiler::validation::{ValidateState, exprs, logs};
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;

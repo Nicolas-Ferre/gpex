@@ -1,13 +1,13 @@
-use crate::compiler::consts::{self, ConstValue};
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::fns::IntrinsicFn;
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::queries;
-use crate::compiler::state::type_facts::TypeFactSubject;
-use crate::compiler::state::{IntrinsicType, State};
-use crate::compiler::types::{self, Type};
+use crate::compiler::transversal::consts::{self, ConstValue};
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::queries;
+use crate::compiler::transversal::state::type_facts::TypeFactSubject;
+use crate::compiler::transversal::state::{IntrinsicType, State};
+use crate::compiler::transversal::types::{self, Type};
 
 pub(super) struct ResolvedTypeFactOperand<'item> {
     pub(super) operand: TypeFactOperand<'item>,

@@ -1,7 +1,7 @@
 use crate::compiler::parsing::items::fns::FnDefinition;
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::state::State;
-use crate::compiler::types::{self, Type};
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::types::{self, Type};
 
 pub(crate) fn are_same_signatures<'item>(
     fn_: &'item FnDefinition,

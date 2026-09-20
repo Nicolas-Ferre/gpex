@@ -1,7 +1,7 @@
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::state::State;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::state::State;
 
 pub(crate) fn is_expr_ref(expr: &Expr, state: &State<'_>) -> Option<bool> {
     match expr {

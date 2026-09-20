@@ -1,6 +1,6 @@
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::types::Type;
+use crate::compiler::transversal::types::Type;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 

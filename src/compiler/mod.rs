@@ -1,19 +1,12 @@
-pub(crate) mod consts;
-pub(crate) mod dependencies;
 pub(crate) mod indexing;
-pub(crate) mod item_ref;
-pub(crate) mod key_rendering;
 pub(crate) mod parsing;
-pub(crate) mod prelude;
-pub(crate) mod queries;
-pub(crate) mod refs;
-pub(crate) mod state;
 pub(crate) mod transpilation;
-pub(crate) mod types;
+pub(crate) mod transversal;
 pub(crate) mod validation;
 
-use crate::compiler::state::State;
 use crate::compiler::transpilation::Program;
+use crate::compiler::transversal::prelude;
+use crate::compiler::transversal::state::State;
 use crate::utils::logs::Log;
 use crate::utils::reading;
 use std::fs;

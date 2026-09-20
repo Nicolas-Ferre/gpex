@@ -1,4 +1,3 @@
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -6,7 +5,8 @@ use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::parsing::statements::Statement;
-use crate::compiler::state::State;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::state::State;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::span::Span;
 

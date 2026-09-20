@@ -1,6 +1,6 @@
-use crate::compiler::consts::{self, ConstValue};
 use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::state::State;
+use crate::compiler::transversal::consts::{self, ConstValue};
+use crate::compiler::transversal::state::State;
 
 pub(crate) fn is_zero_int(expr: &Expr, state: &State<'_>) -> bool {
     matches!(

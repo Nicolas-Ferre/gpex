@@ -1,5 +1,3 @@
-use crate::compiler::consts::ConstValue;
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -8,7 +6,9 @@ use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::transpilation::{MAIN_BUFFER_NAME, SpecializedFn, TranspileState, intrinsic};
-use crate::compiler::{consts, types};
+use crate::compiler::transversal::consts::ConstValue;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::{consts, types};
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;
 

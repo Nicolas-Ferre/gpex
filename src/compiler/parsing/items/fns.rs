@@ -11,7 +11,7 @@ use crate::compiler::parsing::symbols::{
     ARROW_SYMBOL, BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, CONST_KEYWORD, EQUAL_SYMBOL, FN_KEYWORD,
     INTRINSIC_KEYWORD, PUB_KEYWORD, SEMICOLON_SYMBOL,
 };
-use crate::compiler::prelude;
+use crate::compiler::transversal::prelude;
 use crate::utils::parsing::context::{ParseContext, SeparatorParser};
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};

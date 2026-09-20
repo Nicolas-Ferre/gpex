@@ -3,14 +3,14 @@ mod exprs;
 mod intrinsic;
 mod items;
 
-use crate::compiler::consts::ConstValue;
-use crate::compiler::dependencies;
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::fns::{FnDefinition, FnStatementsBody};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::state::State;
+use crate::compiler::transversal::consts::ConstValue;
+use crate::compiler::transversal::dependencies;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::state::State;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::math;
 use crate::utils::reading::ReadFile;

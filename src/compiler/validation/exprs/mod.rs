@@ -1,10 +1,10 @@
 pub(super) mod calls;
 
-use crate::compiler::item_ref::ItemRef;
-use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::types::Type;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::key_rendering;
+use crate::compiler::transversal::types::Type;
 use crate::compiler::validation::{ParamConstness, ValidateState, logs};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;

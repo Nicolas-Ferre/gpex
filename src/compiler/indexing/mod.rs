@@ -2,12 +2,14 @@ mod exprs;
 mod fns;
 mod type_narrowing;
 
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::modules::Module;
-use crate::compiler::prelude::PRELUDE_FILE_COUNT;
-use crate::compiler::state::State;
-use crate::compiler::state::type_facts::{TypeFactContext, TypeFactSubject, TypeFacts};
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::prelude::PRELUDE_FILE_COUNT;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::state::type_facts::{
+    TypeFactContext, TypeFactSubject, TypeFacts,
+};
 use crate::utils::indexing::SearchConfig;
 use std::rc::Rc;
 

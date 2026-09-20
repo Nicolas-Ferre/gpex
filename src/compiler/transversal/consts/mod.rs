@@ -1,6 +1,5 @@
 mod intrinsic;
 
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::Call;
 use crate::compiler::parsing::exprs::idents::Ident;
@@ -9,8 +8,9 @@ use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBod
 use crate::compiler::parsing::items::params::Param;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
-use crate::compiler::state::State;
-use crate::compiler::types::{self, Type};
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::types::{self, Type};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

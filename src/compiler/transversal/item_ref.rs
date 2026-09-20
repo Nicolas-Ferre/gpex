@@ -1,13 +1,13 @@
-use crate::compiler::consts;
-use crate::compiler::consts::ConstValue;
-use crate::compiler::key_rendering;
 use crate::compiler::parsing::exprs::calls::Arg;
 use crate::compiler::parsing::items::fns::{FnDefinition, IntrinsicFn};
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::state::State;
-use crate::compiler::types::{self, Type};
+use crate::compiler::transversal::consts;
+use crate::compiler::transversal::consts::ConstValue;
+use crate::compiler::transversal::key_rendering;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::types::{self, Type};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 

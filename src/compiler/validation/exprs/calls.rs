@@ -1,13 +1,13 @@
-use crate::compiler::item_ref::ItemRef;
-use crate::compiler::key_rendering;
 use crate::compiler::parsing::COMMENT_PREFIX;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::exprs::calls::{Arg, Call};
 use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::parsing::items::params::Param;
-use crate::compiler::state::IntrinsicType;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::key_rendering;
+use crate::compiler::transversal::state::IntrinsicType;
+use crate::compiler::transversal::{queries, types};
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
-use crate::compiler::{queries, types};
 use crate::utils::parsing::span::SpanProps;
 use crate::utils::validation::ValidateError;
 use itertools::Itertools;

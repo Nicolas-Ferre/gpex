@@ -2,14 +2,14 @@ mod fns;
 mod params;
 mod statements;
 
-use crate::compiler::dependencies;
-use crate::compiler::item_ref::ItemRef;
 use crate::compiler::parsing::exprs as parsing_exprs;
 use crate::compiler::parsing::items::Item;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::prelude;
+use crate::compiler::transversal::dependencies;
+use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::prelude;
 use crate::compiler::validation::exprs::calls;
 use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
 use crate::compiler::validation::{ValidateState, exprs, logs, naming};

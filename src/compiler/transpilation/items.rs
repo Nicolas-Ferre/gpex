@@ -1,15 +1,15 @@
-use crate::compiler::consts::ConstValue;
 use crate::compiler::parsing::exprs::Expr;
 use crate::compiler::parsing::items::actions::RepeatDefinition;
 use crate::compiler::parsing::items::params::{Param, ParamGroup};
 use crate::compiler::parsing::items::types::StructDefinition;
 use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::parsing::statements::{AssignmentStatement, ReturnStatement, Statement};
-use crate::compiler::prelude::PRELUDE_TYPES_FILE_INDEX;
 use crate::compiler::transpilation::exprs;
 use crate::compiler::transpilation::{SpecializedFn, TranspileState};
-use crate::compiler::types;
-use crate::compiler::types::Type;
+use crate::compiler::transversal::consts::ConstValue;
+use crate::compiler::transversal::prelude::PRELUDE_TYPES_FILE_INDEX;
+use crate::compiler::transversal::types;
+use crate::compiler::transversal::types::Type;
 use std::fmt::Write;
 
 pub(super) fn transpile_specialized_fn<'item>(
