@@ -46,16 +46,14 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 
 ## Module coupling
 
-The graph shows coupling between direct sub-modules. An arrow `A --> B` means that at least one
-Rust file under `A` refers to `B` via `crate::B` or via a crate-root re-exported name that
-originates from `B` (for example `use crate::Log` when `Log` is `pub use`d from `utils`). Nested
-paths are collapsed to the nearest documented module: `crate::compiler::transversal::consts` is
-`compiler` at crate-root level, `transversal` inside `subgraph compiler`, and `consts` inside
-`subgraph transversal`. Same-module paths are omitted.
+Each graph shows coupling between direct sub-modules of the heading's folder. An arrow `A --> B`
+means that at least one Rust file under `A` refers to `B` via `crate::B` or via a crate-root
+re-exported name that originates from `B` (for example `use crate::Log` when `Log` is `pub use`d
+from `utils`). Nested paths are collapsed to the nearest documented child of that folder:
+`crate::compiler::transversal::consts` is `compiler` under `src/`, `transversal` under
+`src/compiler/`, and `consts` under `src/compiler/transversal/`. Same-module paths are omitted.
 
-A mermaid subgraph expands that module into its own direct children. Edges that leave or enter an
-expanded module stay on the subgraph rectangle (`runner --> program`, `compiler --> program`,
-`indexing --> transversal`), not on inner nodes.
+### `src/`
 
 ```mermaid
 graph TD
@@ -63,40 +61,48 @@ graph TD
     compiler --> utils
     runner --> program
     runner --> utils
-    subgraph compiler
-        indexing --> parsing
-        indexing --> transversal
-        parsing --> transversal
-        transpilation --> parsing
-        transpilation --> transversal
-        transversal --> parsing
-        validation --> parsing
-        validation --> transversal
-        subgraph transversal
-            consts --> item_ref
-            consts --> state
-            consts --> types
-            dependencies --> item_ref
-            dependencies --> state
-            item_ref --> consts
-            item_ref --> key_rendering
-            item_ref --> state
-            item_ref --> types
-            key_rendering --> state
-            key_rendering --> types
-            queries --> consts
-            queries --> item_ref
-            queries --> state
-            queries --> types
-            refs --> item_ref
-            refs --> state
-            state --> consts
-            state --> item_ref
-            state --> prelude
-            state --> types
-            types --> consts
-            types --> item_ref
-            types --> state
-        end
-    end
+```
+
+### `src/compiler/`
+
+```mermaid
+graph TD
+    indexing --> parsing
+    indexing --> transversal
+    parsing --> transversal
+    transpilation --> parsing
+    transpilation --> transversal
+    transversal --> parsing
+    validation --> parsing
+    validation --> transversal
+```
+
+### `src/compiler/transversal/`
+
+```mermaid
+graph TD
+    consts --> item_ref
+    consts --> state
+    consts --> types
+    dependencies --> item_ref
+    dependencies --> state
+    item_ref --> consts
+    item_ref --> key_rendering
+    item_ref --> state
+    item_ref --> types
+    key_rendering --> state
+    key_rendering --> types
+    queries --> consts
+    queries --> item_ref
+    queries --> state
+    queries --> types
+    refs --> item_ref
+    refs --> state
+    state --> consts
+    state --> item_ref
+    state --> prelude
+    state --> types
+    types --> consts
+    types --> item_ref
+    types --> state
 ```

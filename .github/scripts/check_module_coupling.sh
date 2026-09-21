@@ -17,6 +17,8 @@ MERMAID_NODE_REGEX="^[[:space:]]*($IDENT)[[:space:]]*(%%.*)?$"
 MERMAID_SUBGRAPH_REGEX="^[[:space:]]*subgraph[[:space:]]+($IDENT)"
 COUPLING_HEADING_REGEX='^##[[:space:]]+Module[[:space:]]+coupling[[:space:]]*$'
 H2_REGEX='^##[[:space:]]'
+H3_REGEX='^###[[:space:]]'
+TRACKED_HEADING_REGEX="^###[[:space:]]+\`(src(/$IDENT)*)/\`[[:space:]]*$"
 
 code_edges=()
 code_edge_files=()
@@ -25,19 +27,34 @@ doc_nodes=()
 src_modules=()
 scope_module_keys=()
 expanded_scopes=()
+tracked_scopes=()
 reexport_names=()
 reexport_modules=()
 collected_modules=()
 tree_remaining=""
 current_file=""
+current_scope=""
+is_in_tracked_heading=false
+is_in_mermaid=false
+heading_has_mermaid=false
 exit_code=0
 has_coupling_heading=false
+has_src_heading=false
 has_mermaid_diagram=false
 
 edge_key() {
     local scope="$1"
     local edge="$2"
     printf '%s\t%s\n' "$scope" "$edge"
+}
+
+folder_display() {
+    local scope="$1"
+    if [[ -z $scope ]]; then
+        printf 'src/'
+    else
+        printf 'src/%s/' "$scope"
+    fi
 }
 
 display_edge() {
@@ -47,7 +64,7 @@ display_edge() {
     if [[ -z $scope ]]; then
         printf '%s\n' "$edge"
     else
-        printf '%s (subgraph %s)\n' "$edge" "$scope"
+        printf "%s (under \`%s\`)\n" "$edge" "$(folder_display "$scope")"
     fi
 }
 
@@ -185,7 +202,8 @@ scope_source() {
     local rest
     local child
     if [[ -z $scope ]]; then
-        printf '%s\n' "${rel%%/*}"
+        child="${rel%%/*}"
+        printf '%s\n' "${child%.rs}"
         return
     fi
     case "$rel" in
@@ -196,19 +214,6 @@ scope_source() {
         printf '%s\n' "${child%.rs}"
         ;;
     esac
-}
-
-current_scope() {
-    local scope=""
-    local part
-    for part in "$@"; do
-        if [[ -z $scope ]]; then
-            scope="$part"
-        else
-            scope="$scope/$part"
-        fi
-    done
-    printf '%s\n' "$scope"
 }
 
 skip_tree_space() {
@@ -394,21 +399,64 @@ collect_code_edges() {
     local file_path
     while read -r -d '' file_path; do
         collect_file_code_edges "$file_path"
-    done < <(find src -mindepth 2 -type f -name "*.rs" -print0)
+    done < <(find src -type f -name "*.rs" ! -name lib.rs ! -name main.rs -print0)
+}
+
+start_tracked_heading() {
+    local folder="$1"
+    local scope
+    local dir="$folder"
+    if [[ $folder == src ]]; then
+        scope=""
+        has_src_heading=true
+    else
+        scope="${folder#src/}"
+        if [[ ! -d $dir ]]; then
+            echo "$ARCHITECTURE_DOC_PATH: heading ### \`$folder/\` is not a directory"
+            exit_code=1
+            return 1
+        fi
+        if ! in_array "$scope" "${expanded_scopes[@]-}"; then
+            expanded_scopes+=("$scope")
+            register_scope_modules "$scope"
+        fi
+    fi
+    if ((${#tracked_scopes[@]} > 0)) && in_array "$scope" "${tracked_scopes[@]}"; then
+        echo "$ARCHITECTURE_DOC_PATH: duplicated coupling heading ### \`$folder/\`"
+        exit_code=1
+    else
+        tracked_scopes+=("$scope")
+    fi
+    current_scope="$scope"
+    is_in_tracked_heading=true
+    heading_has_mermaid=false
+}
+
+finish_tracked_heading() {
+    local folder
+    if [[ $is_in_tracked_heading != true ]]; then
+        return
+    fi
+    if [[ $heading_has_mermaid == false ]]; then
+        folder="$(folder_display "$current_scope")"
+        echo "$ARCHITECTURE_DOC_PATH: missing mermaid diagram under ### \`$folder\`"
+        exit_code=1
+    fi
+    is_in_tracked_heading=false
+    is_in_mermaid=false
+    heading_has_mermaid=false
 }
 
 collect_doc() {
     local line
     local is_in_coupling=false
-    local is_in_mermaid=false
     local from
     local to
-    local subgraph_stack=()
-    local new_stack
-    local stack_index
-    local scope
-    local parent_scope
-    local subgraph
+    local folder
+    current_scope=""
+    is_in_tracked_heading=false
+    is_in_mermaid=false
+    heading_has_mermaid=false
     if [[ ! -f $ARCHITECTURE_DOC_PATH ]]; then
         echo "$ARCHITECTURE_DOC_PATH: file not found"
         exit_code=1
@@ -416,81 +464,74 @@ collect_doc() {
     fi
     while IFS= read -r line || [[ -n $line ]]; do
         if [[ $line =~ $COUPLING_HEADING_REGEX ]]; then
+            finish_tracked_heading
             has_coupling_heading=true
             is_in_coupling=true
-            is_in_mermaid=false
-            subgraph_stack=()
             continue
         fi
         if [[ $is_in_coupling == true && $line =~ $H2_REGEX ]]; then
+            finish_tracked_heading
             is_in_coupling=false
-            is_in_mermaid=false
-            subgraph_stack=()
+            continue
+        fi
+        if [[ $is_in_coupling == true && $line =~ $H3_REGEX ]]; then
+            finish_tracked_heading
+            if [[ $line =~ $TRACKED_HEADING_REGEX ]]; then
+                folder="${BASH_REMATCH[1]}"
+                start_tracked_heading "$folder" || true
+            else
+                echo "$ARCHITECTURE_DOC_PATH: invalid coupling heading \`$line\`; expected ### \`src/.../\`"
+                exit_code=1
+            fi
             continue
         fi
         if [[ $is_in_coupling == true && $line == '```mermaid' ]]; then
+            if [[ $is_in_tracked_heading != true ]]; then
+                echo "$ARCHITECTURE_DOC_PATH: mermaid diagram is not under a ### \`src/.../\` heading"
+                exit_code=1
+                continue
+            fi
             has_mermaid_diagram=true
+            heading_has_mermaid=true
             is_in_mermaid=true
-            subgraph_stack=()
             continue
         fi
         if [[ $is_in_mermaid == true && $line == '```' ]]; then
             is_in_mermaid=false
-            subgraph_stack=()
             continue
         fi
         if [[ $is_in_mermaid != true ]]; then
             continue
         fi
         if [[ $line =~ $MERMAID_SUBGRAPH_REGEX ]]; then
-            subgraph="${BASH_REMATCH[1]}"
-            parent_scope="$(current_scope "${subgraph_stack[@]-}")"
-            if ! is_module_in_scope "$parent_scope" "$subgraph"; then
-                if [[ -z $parent_scope ]]; then
-                    echo "$ARCHITECTURE_DOC_PATH: subgraph \`$subgraph\` is not a crate-root module"
-                else
-                    echo "$ARCHITECTURE_DOC_PATH: subgraph \`$subgraph\` is not a child of \`$parent_scope\`"
-                fi
-                exit_code=1
-            else
-                add_doc_node "$parent_scope" "$subgraph"
-                subgraph_stack+=("$subgraph")
-                scope="$(current_scope "${subgraph_stack[@]}")"
-                if ! in_array "$scope" "${expanded_scopes[@]-}"; then
-                    expanded_scopes+=("$scope")
-                    register_scope_modules "$scope"
-                fi
-            fi
+            echo "$ARCHITECTURE_DOC_PATH: nested mermaid subgraphs are not supported; use a \`###\` heading"
+            exit_code=1
             continue
         fi
-        if [[ $line =~ ^[[:space:]]*end[[:space:]]*(%%.*)?$ ]]; then
-            if ((${#subgraph_stack[@]} > 0)); then
-                new_stack=()
-                for ((stack_index = 0; stack_index < ${#subgraph_stack[@]} - 1; stack_index++)); do
-                    new_stack+=("${subgraph_stack[stack_index]}")
-                done
-                subgraph_stack=("${new_stack[@]-}")
-            fi
-            continue
-        fi
-        scope="$(current_scope "${subgraph_stack[@]-}")"
         if [[ $line =~ $MERMAID_EDGE_REGEX ]]; then
             from="${BASH_REMATCH[1]}"
             to="${BASH_REMATCH[3]}"
-            add_doc_node "$scope" "$from"
-            add_doc_node "$scope" "$to"
-            add_doc_edge "$scope" "$from" "$to"
+            add_doc_node "$current_scope" "$from"
+            add_doc_node "$current_scope" "$to"
+            add_doc_edge "$current_scope" "$from" "$to"
             continue
         fi
         if [[ $line =~ ^[[:space:]]*(graph|flowchart)[[:space:]] ]]; then
             continue
         fi
+        if [[ $line =~ ^[[:space:]]*end[[:space:]]*(%%.*)?$ ]]; then
+            continue
+        fi
         if [[ $line =~ $MERMAID_NODE_REGEX ]]; then
-            add_doc_node "$scope" "${BASH_REMATCH[1]}"
+            add_doc_node "$current_scope" "${BASH_REMATCH[1]}"
         fi
     done <"$ARCHITECTURE_DOC_PATH"
+    finish_tracked_heading
     if [[ $has_coupling_heading == false ]]; then
         echo "$ARCHITECTURE_DOC_PATH: missing \`## Module coupling\` section"
+        exit_code=1
+    elif [[ $has_src_heading == false ]]; then
+        echo "$ARCHITECTURE_DOC_PATH: missing ### \`src/\` heading in the module coupling section"
         exit_code=1
     elif [[ $has_mermaid_diagram == false ]]; then
         echo "$ARCHITECTURE_DOC_PATH: missing mermaid diagram in the module coupling section"
@@ -502,7 +543,7 @@ compare_edges() {
     local edge
     for edge in "${code_edges[@]-}"; do
         if ! in_array "$edge" "${doc_edges[@]-}"; then
-            echo "$ARCHITECTURE_DOC_PATH: missing coupling edge \`$(display_edge "$edge")\` (e.g. $(code_edge_file "$edge"))"
+            echo "$ARCHITECTURE_DOC_PATH: unexpected coupling edge \`$(display_edge "$edge")\` (e.g. in $(code_edge_file "$edge"))"
             exit_code=1
         fi
     done
@@ -518,15 +559,13 @@ compare_nodes() {
     local key
     local scope
     local name
+    local folder
     for key in "${scope_module_keys[@]-}"; do
         if ! in_array "$key" "${doc_nodes[@]-}"; then
             scope="${key%%	*}"
             name="${key#*	}"
-            if [[ -z $scope ]]; then
-                echo "$ARCHITECTURE_DOC_PATH: missing coupling node \`$name\`"
-            else
-                echo "$ARCHITECTURE_DOC_PATH: missing coupling node \`$name\` (subgraph $scope)"
-            fi
+            folder="$(folder_display "$scope")"
+            echo "$ARCHITECTURE_DOC_PATH: missing coupling node \`$name\` (under \`$folder\`)"
             exit_code=1
         fi
     done
@@ -534,11 +573,8 @@ compare_nodes() {
         if ! in_array "$key" "${scope_module_keys[@]-}"; then
             scope="${key%%	*}"
             name="${key#*	}"
-            if [[ -z $scope ]]; then
-                echo "$ARCHITECTURE_DOC_PATH: extra coupling node \`$name\`"
-            else
-                echo "$ARCHITECTURE_DOC_PATH: extra coupling node \`$name\` (subgraph $scope)"
-            fi
+            folder="$(folder_display "$scope")"
+            echo "$ARCHITECTURE_DOC_PATH: extra coupling node \`$name\` (under \`$folder\`)"
             exit_code=1
         fi
     done
