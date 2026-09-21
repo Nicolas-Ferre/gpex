@@ -1,8 +1,8 @@
-use crate::compiler::parsing::COMMENT_PREFIX;
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::{Arg, Call};
-use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
-use crate::compiler::parsing::items::params::Param;
+use crate::compiler::transversal::ast::COMMENT_PREFIX;
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::{Arg, Call};
+use crate::compiler::transversal::ast::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
+use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::key_rendering;
 use crate::compiler::transversal::state::IntrinsicType;

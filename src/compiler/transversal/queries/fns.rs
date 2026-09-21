@@ -1,5 +1,5 @@
-use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::parsing::items::params::Param;
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
+use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::state::State;
 use crate::compiler::transversal::types::{self, Type};
 

@@ -1,5 +1,5 @@
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::items::params::{Param, ParamGroup};
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::items::params::{Param, ParamGroup};
 use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::types;
 use crate::compiler::transversal::types::Type;

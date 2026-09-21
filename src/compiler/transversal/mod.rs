@@ -1,3 +1,4 @@
+pub(crate) mod ast;
 pub(crate) mod consts;
 pub(crate) mod dependencies;
 pub(crate) mod item_ref;

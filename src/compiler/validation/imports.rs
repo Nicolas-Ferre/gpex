@@ -1,4 +1,4 @@
-use crate::compiler::parsing::items::imports::{Import, ImportSegment};
+use crate::compiler::transversal::ast::items::imports::{Import, ImportSegment};
 use crate::compiler::validation::{ValidateState, logs, naming};
 use crate::utils::parsing::span::SpanProps;
 use crate::utils::validation::ValidateError;

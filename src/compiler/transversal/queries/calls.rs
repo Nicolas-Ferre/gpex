@@ -1,5 +1,5 @@
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::transversal::consts::{self, ConstValue};
 use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::state::State;

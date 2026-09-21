@@ -3,10 +3,10 @@ mod exprs;
 mod intrinsic;
 mod items;
 
-use crate::compiler::parsing::items::fns::{FnDefinition, FnStatementsBody};
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::parsing::modules::Module;
+use crate::compiler::transversal::ast::items::fns::{FnDefinition, FnStatementsBody};
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::items::vars::VarDefinition;
+use crate::compiler::transversal::ast::modules::Module;
 use crate::compiler::transversal::consts::ConstValue;
 use crate::compiler::transversal::dependencies;
 use crate::compiler::transversal::item_ref::ItemRef;

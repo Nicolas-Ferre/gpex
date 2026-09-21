@@ -1,7 +1,9 @@
-use crate::compiler::parsing::exprs as parsing_exprs;
-use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
-use crate::compiler::parsing::exprs::{BINARY_AND_FN_NAME, BINARY_FN_NAMES, BINARY_OR_FN_NAME};
-use crate::compiler::parsing::items::fns::FnDefinition;
+use crate::compiler::transversal::ast::exprs as ast_exprs;
+use crate::compiler::transversal::ast::exprs::calls::UNARY_FN_NAMES;
+use crate::compiler::transversal::ast::exprs::{
+    BINARY_AND_FN_NAME, BINARY_FN_NAMES, BINARY_OR_FN_NAME,
+};
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::dependencies;
 use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::key_rendering;
@@ -58,7 +60,7 @@ fn validate_no_custom_logical_operator(
 }
 
 fn validate_fn_name(fn_: &FnDefinition, state: &mut ValidateState<'_, '_>) {
-    if parsing_exprs::is_operator_fn_name(&fn_.name) {
+    if ast_exprs::is_operator_fn_name(&fn_.name) {
         return;
     }
     let allowed_cases = naming::fn_cases(fn_, state);

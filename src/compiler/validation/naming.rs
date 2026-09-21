@@ -1,7 +1,7 @@
-use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::parsing::items::params::Param;
-use crate::compiler::parsing::items::vars::ConstDefinition;
-use crate::compiler::parsing::symbols::KEYWORDS;
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
+use crate::compiler::transversal::ast::items::params::Param;
+use crate::compiler::transversal::ast::items::vars::ConstDefinition;
+use crate::compiler::transversal::ast::symbols::KEYWORDS;
 use crate::compiler::transversal::state::IntrinsicType;
 use crate::compiler::transversal::types;
 use crate::compiler::transversal::types::Type;

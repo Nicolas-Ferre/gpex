@@ -7,7 +7,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 1. **Read**: Loads built-in prelude files and reads `.gpex` files from a folder recursively
    (`src/compiler/transversal/prelude.rs`, `src/utils/reading.rs`)
 2. **Parse**: Parse read files to produce an AST per file (called a "module")
-   (`src/compiler/parsing/`)
+   (`src/compiler/parsing/`, AST types in `src/compiler/transversal/ast/`)
 3. **Index**: Builds symbol tables, e.g., to index imports and items for following stages
    (`src/compiler/indexing/`)
 4. **Validate**: Semantic checks (type checking, circular dependency detection, naming
@@ -19,15 +19,16 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 ## Key directories and files
 
 - `src/compiler/`: Compilation pipeline orchestration and definition of each pipeline stage:
-    - `parsing/`: AST definitions and parsing: modules, imports, items (functions, variables,
-      structs, ...), expressions, statements. This layer also defines utility methods run on AST
-      nodes.
+    - `parsing/`: Parse functions that turn source files into AST nodes (modules, imports, items,
+      expressions, statements).
     - `indexing/`: Symbol table construction (imports, item references, type-fact inference, ...).
     - `validation/`: Semantic validation passes (type comparison, circular dependency
       detection, ...).
     - `validation/logs/`: Construction of user-facing compiler errors, warnings, and hints.
     - `transpilation/`: AST-to-WGSL conversion.
     - `transversal/`: Shared helpers used across compiler passes:
+        - `ast/`: AST types, non-parse methods on those types, and language constants (keywords,
+          symbols, operator names, ...).
         - `state/`: Shared post-parse compiler state used by indexing, validation, value
           resolution, dependency analysis, and transpilation.
         - `item_ref.rs`: Shared item-reference representation used across compiler passes.
@@ -67,13 +68,9 @@ graph TD
 
 ```mermaid
 graph TD
-    indexing --> parsing
     indexing --> transversal
     parsing --> transversal
-    transpilation --> parsing
     transpilation --> transversal
-    transversal --> parsing
-    validation --> parsing
     validation --> transversal
 ```
 
@@ -81,27 +78,36 @@ graph TD
 
 ```mermaid
 graph TD
+    ast --> prelude
+    consts --> ast
     consts --> item_ref
     consts --> state
     consts --> types
+    dependencies --> ast
     dependencies --> item_ref
     dependencies --> state
+    item_ref --> ast
     item_ref --> consts
     item_ref --> key_rendering
     item_ref --> state
     item_ref --> types
+    key_rendering --> ast
     key_rendering --> state
     key_rendering --> types
+    queries --> ast
     queries --> consts
     queries --> item_ref
     queries --> state
     queries --> types
+    refs --> ast
     refs --> item_ref
     refs --> state
+    state --> ast
     state --> consts
     state --> item_ref
     state --> prelude
     state --> types
+    types --> ast
     types --> consts
     types --> item_ref
     types --> state

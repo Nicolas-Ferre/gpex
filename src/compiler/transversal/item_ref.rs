@@ -1,8 +1,8 @@
-use crate::compiler::parsing::exprs::calls::Arg;
-use crate::compiler::parsing::items::fns::{FnDefinition, IntrinsicFn};
-use crate::compiler::parsing::items::params::{Param, ParamGroup};
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
+use crate::compiler::transversal::ast::exprs::calls::Arg;
+use crate::compiler::transversal::ast::items::fns::{FnDefinition, IntrinsicFn};
+use crate::compiler::transversal::ast::items::params::{Param, ParamGroup};
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::transversal::consts;
 use crate::compiler::transversal::consts::ConstValue;
 use crate::compiler::transversal::key_rendering;

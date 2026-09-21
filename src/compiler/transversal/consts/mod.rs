@@ -1,13 +1,13 @@
 mod intrinsic;
 
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
-use crate::compiler::parsing::items::params::Param;
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::exprs::idents::Ident;
+use crate::compiler::transversal::ast::exprs::literals::{F32Literal, I32Literal, U32Literal};
+use crate::compiler::transversal::ast::items::fns::{FnBody, FnDefinition, FnStatementsBody};
+use crate::compiler::transversal::ast::items::params::Param;
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::statements::{AssignmentStatement, Statement};
 use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::state::State;
 use crate::compiler::transversal::types::{self, Type};

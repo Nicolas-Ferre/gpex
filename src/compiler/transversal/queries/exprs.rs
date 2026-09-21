@@ -1,4 +1,4 @@
-use crate::compiler::parsing::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::consts::{self, ConstValue};
 use crate::compiler::transversal::state::State;
 

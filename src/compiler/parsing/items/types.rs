@@ -1,74 +1,33 @@
-use crate::compiler::parsing::patterns::IDENT_PATTERN;
-use crate::compiler::parsing::symbols::{
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::patterns::IDENT_PATTERN;
+use crate::compiler::transversal::ast::symbols::{
     BRACE_CLOSE_SYMBOL, BRACE_OPEN_SYMBOL, EQUAL_SYMBOL, INTRINSIC_KEYWORD, PUB_KEYWORD,
     STRUCT_KEYWORD,
 };
-use crate::compiler::transversal::prelude::PRELUDE_TYPES_FILE_INDEX;
 use crate::utils::parsing::context::ParseContext;
 use crate::utils::parsing::error::ParseError;
 use crate::utils::parsing::span::{Span, SpanProps};
 
-const TYPEREF_SIZE: u32 = 8;
-const F32_SIZE: u32 = 4;
-const I32_SIZE: u32 = 4;
-const U32_SIZE: u32 = 4;
-
-#[derive(Debug)]
-#[derive_where::derive_where(PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(crate) struct StructDefinition {
-    pub(crate) id: u64,
-    #[derive_where(skip)]
-    pub(crate) scope: Vec<u64>,
-    #[derive_where(skip)]
-    pub(crate) pub_keyword_span: Option<Span>,
-    #[derive_where(skip)]
-    pub(crate) name_span: Span,
-    #[derive_where(skip)]
-    pub(crate) name: String,
-    #[derive_where(skip)]
-    pub(crate) intrinsic_keyword_span: Span,
-}
-
-impl StructDefinition {
-    pub(crate) fn parse<'context>(
-        context: &mut ParseContext<'context>,
-    ) -> Result<Self, ParseError<'context>> {
-        let scope = context.scope().to_vec();
-        context.define_scope(move |context, id| {
-            let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
-            Span::parse_symbol(context, STRUCT_KEYWORD)?;
-            context.force_parse_any_error();
-            let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
-            Span::parse_symbol(context, EQUAL_SYMBOL)?;
-            let intrinsic_keyword_span = Span::parse_symbol(context, INTRINSIC_KEYWORD)?;
-            Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
-            Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
-            Ok(Self {
-                id,
-                scope,
-                pub_keyword_span,
-                name_span,
-                name: context.slice(name_span).into(),
-                intrinsic_keyword_span,
-            })
+pub(crate) fn parse<'context>(
+    context: &mut ParseContext<'context>,
+) -> Result<StructDefinition, ParseError<'context>> {
+    let scope = context.scope().to_vec();
+    context.define_scope(move |context, id| {
+        let pub_keyword_span = Span::parse_symbol(context, PUB_KEYWORD).ok();
+        Span::parse_symbol(context, STRUCT_KEYWORD)?;
+        context.force_parse_any_error();
+        let name_span = Span::parse_pattern(context, IDENT_PATTERN)?;
+        Span::parse_symbol(context, EQUAL_SYMBOL)?;
+        let intrinsic_keyword_span = Span::parse_symbol(context, INTRINSIC_KEYWORD)?;
+        Span::parse_symbol(context, BRACE_OPEN_SYMBOL)?;
+        Span::parse_symbol(context, BRACE_CLOSE_SYMBOL)?;
+        Ok(StructDefinition {
+            id,
+            scope,
+            pub_keyword_span,
+            name_span,
+            name: context.slice(name_span).into(),
+            intrinsic_keyword_span,
         })
-    }
-
-    pub(crate) fn dot_path(&self) -> String {
-        self.name.clone()
-    }
-
-    pub(crate) fn alignment(&self) -> u32 {
-        self.size()
-    }
-
-    pub(crate) fn size(&self) -> u32 {
-        match (self.name_span.file_index, self.name.as_str()) {
-            (PRELUDE_TYPES_FILE_INDEX, "typeref") => TYPEREF_SIZE,
-            (PRELUDE_TYPES_FILE_INDEX, "f32") => F32_SIZE,
-            (PRELUDE_TYPES_FILE_INDEX, "i32") => I32_SIZE,
-            (PRELUDE_TYPES_FILE_INDEX, "u32" | "bool") => U32_SIZE,
-            _ => unreachable!("not implemented `{}` GPU type", self.name),
-        }
-    }
+    })
 }

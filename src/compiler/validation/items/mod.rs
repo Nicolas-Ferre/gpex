@@ -2,11 +2,11 @@ mod fns;
 mod params;
 mod statements;
 
-use crate::compiler::parsing::exprs as parsing_exprs;
-use crate::compiler::parsing::items::Item;
-use crate::compiler::parsing::items::actions::RepeatDefinition;
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
+use crate::compiler::transversal::ast::exprs as ast_exprs;
+use crate::compiler::transversal::ast::items::Item;
+use crate::compiler::transversal::ast::items::actions::RepeatDefinition;
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::transversal::dependencies;
 use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::prelude;
@@ -130,7 +130,7 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
     let name_span = item.name_span();
     let name = state.context.slice(name_span);
     let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
-    let is_operator_fn = matches!(item, ItemRef::Fn(_)) && parsing_exprs::is_operator_fn_name(name);
+    let is_operator_fn = matches!(item, ItemRef::Fn(_)) && ast_exprs::is_operator_fn_name(name);
     let is_unused_lint_ignored = name.starts_with('_') && !is_operator_fn;
     let ignored_name_replacement = is_unused_lint_ignored
         .then(|| ignored_name_replacement(name))

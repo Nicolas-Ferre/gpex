@@ -1,5 +1,5 @@
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::idents::Ident;
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::idents::Ident;
 use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::state::State;
 

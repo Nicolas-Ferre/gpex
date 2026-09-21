@@ -2,9 +2,9 @@ use crate::compiler::indexing::type_narrowing::LogicalTypeNarrowing;
 use crate::compiler::indexing::{
     CallSource, FN_CALL_SEARCH_CONFIG, IDENT_SEARCH_CONFIG, IndexPhase, IndexState, type_narrowing,
 };
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::exprs::{BINARY_AND_FN_NAME, BINARY_OR_FN_NAME, Expr};
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::exprs::idents::Ident;
+use crate::compiler::transversal::ast::exprs::{BINARY_AND_FN_NAME, BINARY_OR_FN_NAME, Expr};
 use crate::compiler::transversal::item_ref::{ArgsMatch, ItemRef};
 use crate::compiler::transversal::state::State;
 use crate::utils::indexing::{NodeRef, SearchParams, Visibility};

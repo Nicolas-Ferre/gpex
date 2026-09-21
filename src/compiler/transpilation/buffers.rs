@@ -1,6 +1,6 @@
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::items::vars::VarDefinition;
 use crate::compiler::transpilation::TranspileState;
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::items::vars::VarDefinition;
 use crate::compiler::transversal::types;
 use crate::program::BufferField;
 use crate::utils::math;

@@ -1,4 +1,4 @@
-use crate::compiler::parsing::symbols::KEYWORDS;
+use crate::compiler::transversal::ast::symbols::KEYWORDS;
 use crate::utils::parsing::span::{Pattern, PatternPart};
 
 pub(crate) const IDENT_PATTERN: Pattern = Pattern {

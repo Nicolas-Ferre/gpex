@@ -1,7 +1,7 @@
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::parsing::symbols::QUESTION_MARK_SYMBOL;
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
+use crate::compiler::transversal::ast::symbols::QUESTION_MARK_SYMBOL;
 use crate::compiler::transversal::state::State;
 use crate::compiler::transversal::types;
 use crate::utils::validation::ValidateError;

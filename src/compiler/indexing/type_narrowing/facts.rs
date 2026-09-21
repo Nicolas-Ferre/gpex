@@ -1,6 +1,6 @@
 use super::operands::TypeFactOperand;
 use crate::compiler::indexing::IndexState;
-use crate::compiler::parsing::items::types::StructDefinition;
+use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::state::type_facts::{TypeFactSubject, TypeFacts};
 use crate::utils::parsing::span::Span;
 use std::rc::Rc;

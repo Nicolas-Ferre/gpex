@@ -1,9 +1,9 @@
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::{Arg, Call};
-use crate::compiler::parsing::items::fns::{
+use crate::compiler::transpilation::{TranspileState, exprs};
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::{Arg, Call};
+use crate::compiler::transversal::ast::items::fns::{
     BinaryIntrinsicFn, FnDefinition, IntrinsicFn, UnaryIntrinsicFn,
 };
-use crate::compiler::transpilation::{TranspileState, exprs};
 use crate::compiler::transversal::queries;
 use crate::compiler::transversal::state::IntrinsicType;
 use crate::compiler::transversal::types;
