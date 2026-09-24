@@ -3,7 +3,7 @@ pub(crate) mod args;
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::Arg;
 use crate::compiler::transversal::ast::exprs::idents::Ident;
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::ast::items::params::{Param, ParamGroup};
 use crate::compiler::transversal::ast::items::types::StructDefinition;

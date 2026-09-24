@@ -1,5 +1,5 @@
 use crate::compiler::transversal::ast::exprs::Expr;
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::IntrinsicFn;
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::ast::items::types::StructDefinition;

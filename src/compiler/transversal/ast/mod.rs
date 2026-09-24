@@ -1,5 +1,4 @@
 pub(crate) mod exprs;
-pub(crate) mod item_ref;
 pub(crate) mod items;
 pub(crate) mod modules;
 pub(crate) mod patterns;

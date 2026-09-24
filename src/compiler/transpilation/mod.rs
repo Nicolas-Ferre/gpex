@@ -3,7 +3,7 @@ mod exprs;
 mod intrinsic;
 mod items;
 
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::{FnDefinition, FnStatementsBody};
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;

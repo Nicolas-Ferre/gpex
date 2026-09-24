@@ -1,6 +1,6 @@
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::idents::Ident;
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::state::State;
 
 pub(crate) fn is_expr_ref(expr: &Expr, state: &State<'_>) -> Option<bool> {

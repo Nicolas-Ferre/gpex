@@ -3,8 +3,8 @@ mod params;
 mod statements;
 
 use crate::compiler::transversal::ast::exprs as ast_exprs;
-use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::Item;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::actions::RepeatDefinition;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};

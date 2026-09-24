@@ -1,6 +1,6 @@
 pub(crate) mod type_facts;
 
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::consts::ConstValue;
 use crate::compiler::transversal::prelude::PreludeTypesEndLocation;

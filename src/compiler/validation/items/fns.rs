@@ -3,7 +3,7 @@ use crate::compiler::transversal::ast::exprs::calls::UNARY_FN_NAMES;
 use crate::compiler::transversal::ast::exprs::{
     BINARY_AND_FN_NAME, BINARY_FN_NAMES, BINARY_OR_FN_NAME,
 };
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::dependencies;
 use crate::compiler::transversal::key_rendering;

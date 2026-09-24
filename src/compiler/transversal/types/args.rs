@@ -1,6 +1,6 @@
 use super::Type;
 use crate::compiler::transversal::ast::exprs::calls::Arg;
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::consts::{self, ConstValue};
 use crate::compiler::transversal::state::State;

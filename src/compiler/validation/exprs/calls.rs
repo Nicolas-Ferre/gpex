@@ -1,7 +1,7 @@
 use crate::compiler::transversal::ast::COMMENT_PREFIX;
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::{Arg, Call};
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::key_rendering;

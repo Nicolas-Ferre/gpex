@@ -1,6 +1,6 @@
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::Call;
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::ast::symbols::QUESTION_MARK_SYMBOL;
 use crate::compiler::transversal::state::State;

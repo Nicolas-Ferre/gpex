@@ -2,7 +2,7 @@ pub(super) mod calls;
 
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::idents::Ident;
-use crate::compiler::transversal::ast::item_ref::ItemRef;
+use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::key_rendering;
 use crate::compiler::transversal::types::Type;
 use crate::compiler::validation::{ParamConstness, ValidateState, logs};
