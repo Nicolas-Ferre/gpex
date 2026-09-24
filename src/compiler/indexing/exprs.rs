@@ -5,8 +5,9 @@ use crate::compiler::indexing::{
 use crate::compiler::transversal::ast::exprs::calls::Call;
 use crate::compiler::transversal::ast::exprs::idents::Ident;
 use crate::compiler::transversal::ast::exprs::{BINARY_AND_FN_NAME, BINARY_OR_FN_NAME, Expr};
-use crate::compiler::transversal::item_ref::{ArgsMatch, ItemRef};
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::types::args::{self, ArgsMatch};
 use crate::utils::indexing::{NodeRef, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 
@@ -92,7 +93,7 @@ fn search_accessible_call_source<'item>(
     state: &State<'item>,
 ) -> CallSource<'item> {
     for item in state.items.search(search_params, Visibility::Enforced) {
-        match item.args_match(&call.args, state) {
+        match args::args_match(item, &call.args, state) {
             ArgsMatch::Matching => return CallSource::Found(item),
             ArgsMatch::NotMatching => {}
             ArgsMatch::Unknown => return CallSource::Unknown,
@@ -120,7 +121,7 @@ fn search_not_accessible_call_source<'item>(
     state
         .items
         .search(search_params, Visibility::Ignored)
-        .find(|item| item.args_match(&call.args, state) == ArgsMatch::Matching)
+        .find(|item| args::args_match(*item, &call.args, state) == ArgsMatch::Matching)
 }
 
 fn search_accessible_ident_source<'item>(

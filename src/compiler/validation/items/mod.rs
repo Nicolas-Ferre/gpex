@@ -3,12 +3,13 @@ mod params;
 mod statements;
 
 use crate::compiler::transversal::ast::exprs as ast_exprs;
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::Item;
 use crate::compiler::transversal::ast::items::actions::RepeatDefinition;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::transversal::dependencies;
-use crate::compiler::transversal::item_ref::ItemRef;
+use crate::compiler::transversal::key_rendering;
 use crate::compiler::transversal::prelude;
 use crate::compiler::validation::exprs::calls;
 use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
@@ -159,7 +160,7 @@ fn log_unused<'item>(
     state: &mut ValidateState<'_, 'item>,
 ) {
     let name = state.context.slice(name_span);
-    let displayed_key = item.displayed_key(state.inner);
+    let displayed_key = key_rendering::item_key(item, state.inner);
     let replacement = (!is_operator_fn).then(|| format!("_{name}"));
     state.add_log(logs::items::unused(
         &displayed_key,
@@ -175,7 +176,7 @@ fn log_pub_with_ignored_name<'item>(
     name_span: Span,
     state: &mut ValidateState<'_, 'item>,
 ) {
-    let displayed_key = item.displayed_key(state.inner);
+    let displayed_key = key_rendering::item_key(item, state.inner);
     state.add_log(logs::items::pub_with_ignored_name(
         &displayed_key,
         replacement,
@@ -191,7 +192,7 @@ fn log_used_with_ignored_name<'item>(
     ref_span: Span,
     state: &mut ValidateState<'_, 'item>,
 ) {
-    let displayed_key = item.displayed_key(state.inner);
+    let displayed_key = key_rendering::item_key(item, state.inner);
     state.add_log(logs::items::used_with_ignored_name(
         &displayed_key,
         replacement,

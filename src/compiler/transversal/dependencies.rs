@@ -1,11 +1,11 @@
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::Call;
 use crate::compiler::transversal::ast::exprs::idents::Ident;
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::fns::{FnBody, FnDefinition};
 use crate::compiler::transversal::ast::items::params::{Param, ParamGroup};
 use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};
 use crate::compiler::transversal::ast::statements::Statement;
-use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::state::State;
 use crate::utils::dependencies::Dependencies;
 use crate::utils::parsing::span::Span;

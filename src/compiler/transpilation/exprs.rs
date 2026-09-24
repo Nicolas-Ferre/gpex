@@ -2,12 +2,12 @@ use crate::compiler::transpilation::{MAIN_BUFFER_NAME, SpecializedFn, TranspileS
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::Call;
 use crate::compiler::transversal::ast::exprs::idents::Ident;
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::fns::{FnBody, FnDefinition, FnStatementsBody};
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;
 use crate::compiler::transversal::consts::ConstValue;
-use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::{consts, types};
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;

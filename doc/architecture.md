@@ -27,11 +27,10 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
     - `validation/logs/`: Construction of user-facing compiler errors, warnings, and hints.
     - `transpilation/`: AST-to-WGSL conversion.
     - `transversal/`: Shared helpers used across compiler passes:
-        - `ast/`: AST types, non-parse methods on those types, and language constants (keywords,
+        - `ast/`: AST types, non-parse methods on those types, language constants (keywords,
           symbols, operator names, ...).
         - `state/`: Shared post-parse compiler state used by indexing, validation, value
           resolution, dependency analysis, and transpilation.
-        - `item_ref.rs`: Shared item-reference representation used across compiler passes.
         - `dependencies.rs`: Item dependency resolution.
         - `key_rendering.rs`: Rendering of item keys for compiler logs.
         - `prelude.rs`: Built-in types and functions.
@@ -39,7 +38,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
         - `refs.rs`: Reference checking (in this context, a reference is an expression that is
           permitted on the left-hand side of an assignment statement).
         - `consts/`: Constant value resolution.
-        - `types.rs`: Type resolution.
+        - `types/`: Type resolution.
 - `src/program.rs`: Compiled program representation.
 - `src/runner/`: Execution of a compiled program on GPU using WGPU.
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
@@ -80,35 +79,24 @@ graph TD
 graph TD
     ast --> prelude
     consts --> ast
-    consts --> item_ref
     consts --> state
     consts --> types
     dependencies --> ast
-    dependencies --> item_ref
     dependencies --> state
-    item_ref --> ast
-    item_ref --> consts
-    item_ref --> key_rendering
-    item_ref --> state
-    item_ref --> types
     key_rendering --> ast
     key_rendering --> state
     key_rendering --> types
     queries --> ast
     queries --> consts
-    queries --> item_ref
     queries --> state
     queries --> types
     refs --> ast
-    refs --> item_ref
     refs --> state
     state --> ast
     state --> consts
-    state --> item_ref
     state --> prelude
     state --> types
     types --> ast
     types --> consts
-    types --> item_ref
     types --> state
 ```

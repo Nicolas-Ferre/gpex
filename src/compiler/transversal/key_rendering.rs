@@ -1,10 +1,22 @@
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::ast::symbols::QUESTION_MARK_SYMBOL;
 use crate::compiler::transversal::state::State;
 use crate::compiler::transversal::types;
 use crate::utils::validation::ValidateError;
+
+pub(crate) fn item_key<'item>(item: ItemRef<'item>, state: &State<'item>) -> String {
+    match item {
+        ItemRef::Fn(fn_) => fn_key(fn_, state)
+            .unwrap_or_else(|_| unreachable!("function should be validated before")),
+        ItemRef::Var(var) => var.name.clone(),
+        ItemRef::Const(const_) => const_.name.clone(),
+        ItemRef::Param(param) => param.name.clone(),
+        ItemRef::Struct(_) => unreachable!("structs are not yet validated"),
+    }
+}
 
 pub(crate) fn call_key(call: &Call, state: &State<'_>) -> Result<String, ValidateError> {
     let fn_name = &call.name;

@@ -2,9 +2,9 @@ mod exprs;
 mod fns;
 mod type_narrowing;
 
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::Item;
 use crate::compiler::transversal::ast::modules::Module;
-use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::prelude::PRELUDE_FILE_COUNT;
 use crate::compiler::transversal::state::State;
 use crate::compiler::transversal::state::type_facts::{

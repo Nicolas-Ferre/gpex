@@ -3,13 +3,13 @@ mod exprs;
 mod intrinsic;
 mod items;
 
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::fns::{FnDefinition, FnStatementsBody};
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;
 use crate::compiler::transversal::ast::modules::Module;
 use crate::compiler::transversal::consts::ConstValue;
 use crate::compiler::transversal::dependencies;
-use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::state::State;
 use crate::program::{Buffer, Program};
 use crate::utils::dependencies::Dependencies;

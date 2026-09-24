@@ -1,9 +1,9 @@
 use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::item_ref::ItemRef;
 use crate::compiler::transversal::ast::items::fns::IntrinsicFn;
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::consts::{self, ConstValue};
-use crate::compiler::transversal::item_ref::ItemRef;
 use crate::compiler::transversal::queries;
 use crate::compiler::transversal::state::type_facts::TypeFactSubject;
 use crate::compiler::transversal::state::{IntrinsicType, State};
