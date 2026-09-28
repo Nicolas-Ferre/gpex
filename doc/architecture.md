@@ -40,7 +40,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
         - `values/`: Resolved values of expressions: constant-value resolution (`consts/`) and
           type resolution (`types/`, including argument matching).
 - `src/program.rs`: Compiled program representation.
-- `src/runner/`: Execution of a compiled program on GPU using WGPU.
+- `src/runner/`: Execution of a compiled program on GPU using wgpu.
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
 - `prelude/`: built-in types and functions available in all `GPEx` modules.
 
@@ -49,7 +49,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 Each graph shows coupling between direct sub-modules of the heading's folder. An arrow `A --> B`
 means that at least one Rust file under `A` refers to `B` via `crate::B` or via a crate-root
 re-exported name that originates from `B` (for example `use crate::Log` when `Log` is `pub use`d
-from `utils`). Nested paths are collapsed to the nearest documented child of that folder:
+from `utils`). Nested paths are collapsed to that folder's direct sub-module:
 `crate::compiler::transversal::values::consts` is `compiler` under `src/`, `transversal` under
 `src/compiler/`, and `values` under `src/compiler/transversal/`. Same-module paths are omitted.
 
