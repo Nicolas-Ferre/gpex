@@ -1,5 +1,4 @@
 use crate::compiler::parsing;
-use crate::compiler::parsing::exprs;
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::{
     Arg, Call, UNARY_NEG_FN_NAME, UNARY_NOT_FN_NAME,
@@ -125,7 +124,7 @@ fn parse_named<'context>(
     Ok(Arg {
         name: Some(context.slice(name_span).into()),
         name_span: Some(name_span),
-        value: exprs::parse(context, parsing::arg_stop_excluded_parser)?,
+        value: super::parse(context, parsing::arg_stop_excluded_parser)?,
     })
 }
 
@@ -135,7 +134,7 @@ fn parse_unnamed<'context>(
     Ok(Arg {
         name: None,
         name_span: None,
-        value: exprs::parse(context, parsing::arg_stop_excluded_parser)?,
+        value: super::parse(context, parsing::arg_stop_excluded_parser)?,
     })
 }
 

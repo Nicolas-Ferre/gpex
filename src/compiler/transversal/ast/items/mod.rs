@@ -5,14 +5,14 @@ pub(crate) mod params;
 pub(crate) mod types;
 pub(crate) mod vars;
 
-use crate::compiler::transversal::ast::items::fns::FnDefinition;
-use crate::compiler::transversal::ast::items::params::{Param, ParamGroup};
-use crate::compiler::transversal::ast::items::types::StructDefinition;
-use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};
 use crate::utils::indexing::{ItemNodeRef, NodeRef};
 use crate::utils::parsing::span::Span;
 use actions::RepeatDefinition;
+use fns::FnDefinition;
 use imports::Import;
+use params::{Param, ParamGroup};
+use types::StructDefinition;
+use vars::{ConstDefinition, VarDefinition};
 
 #[derive(Debug)]
 pub(crate) enum Item {

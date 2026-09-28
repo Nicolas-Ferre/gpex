@@ -33,7 +33,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
           resolution, dependency analysis, and transpilation.
         - `dependencies.rs`: Item dependency resolution.
         - `key_rendering.rs`: Rendering of item keys for compiler logs.
-        - `prelude/`: Logic related to prelude files.
+        - `prelude/`: Logic related to prelude files and items.
         - `queries/`: AST predicates that require the shared compiler state.
         - `refs.rs`: Reference checking (in this context, a reference is an expression that is
           permitted on the left-hand side of an assignment statement).
