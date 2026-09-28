@@ -41,13 +41,13 @@ See `doc/testing.md`.
     - Display them using the following template:
       ```
       ## Question: <the question>
-      
+
       ### 1. **<first answer>**
-      
+
       <brief details and snippets about first answer>
-      
+
       ### 2. **<second answer>**
-      
+
       <brief details and snippets about second answer>
       ...
 
