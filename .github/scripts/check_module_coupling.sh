@@ -36,7 +36,7 @@ current_file=""
 current_scope=""
 is_in_tracked_heading=false
 is_in_mermaid=false
-heading_has_mermaid=false
+has_heading_mermaid=false
 exit_code=0
 has_coupling_heading=false
 has_src_heading=false
@@ -429,7 +429,7 @@ start_tracked_heading() {
     fi
     current_scope="$scope"
     is_in_tracked_heading=true
-    heading_has_mermaid=false
+    has_heading_mermaid=false
 }
 
 finish_tracked_heading() {
@@ -437,14 +437,14 @@ finish_tracked_heading() {
     if [[ $is_in_tracked_heading != true ]]; then
         return
     fi
-    if [[ $heading_has_mermaid == false ]]; then
+    if [[ $has_heading_mermaid == false ]]; then
         folder="$(folder_display "$current_scope")"
         echo "$ARCHITECTURE_DOC_PATH: missing mermaid diagram under ### \`$folder\`"
         exit_code=1
     fi
     is_in_tracked_heading=false
     is_in_mermaid=false
-    heading_has_mermaid=false
+    has_heading_mermaid=false
 }
 
 collect_doc() {
@@ -456,7 +456,7 @@ collect_doc() {
     current_scope=""
     is_in_tracked_heading=false
     is_in_mermaid=false
-    heading_has_mermaid=false
+    has_heading_mermaid=false
     if [[ ! -f $ARCHITECTURE_DOC_PATH ]]; then
         echo "$ARCHITECTURE_DOC_PATH: file not found"
         exit_code=1
@@ -492,7 +492,7 @@ collect_doc() {
                 continue
             fi
             has_mermaid_diagram=true
-            heading_has_mermaid=true
+            has_heading_mermaid=true
             is_in_mermaid=true
             continue
         fi
