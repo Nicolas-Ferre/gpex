@@ -7,7 +7,7 @@ use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::dependencies;
 use crate::compiler::transversal::key_rendering;
-use crate::compiler::transversal::prelude;
+use crate::compiler::transversal::prelude::files;
 use crate::compiler::transversal::queries;
 use crate::compiler::transversal::types::{self, Type};
 use crate::compiler::validation::items::{params, statements};
@@ -47,7 +47,7 @@ fn validate_no_custom_logical_operator(
     fn_: &FnDefinition,
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    if prelude::is_prelude_file_index(fn_.name_span.file_index)
+    if files::is_prelude_file_index(fn_.name_span.file_index)
         || !matches!(fn_.name.as_str(), BINARY_AND_FN_NAME | BINARY_OR_FN_NAME)
     {
         return Ok(());

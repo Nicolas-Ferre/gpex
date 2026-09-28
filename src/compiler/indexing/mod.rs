@@ -5,7 +5,7 @@ mod type_narrowing;
 use crate::compiler::transversal::ast::items::Item;
 use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::modules::Module;
-use crate::compiler::transversal::prelude::PRELUDE_FILE_COUNT;
+use crate::compiler::transversal::prelude::files::PRELUDE_FILE_COUNT;
 use crate::compiler::transversal::state::State;
 use crate::compiler::transversal::state::type_facts::{
     TypeFactContext, TypeFactSubject, TypeFacts,

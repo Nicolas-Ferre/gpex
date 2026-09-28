@@ -2,9 +2,10 @@ use crate::compiler::transversal::ast::COMMENT_PREFIX;
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::{Arg, Call};
 use crate::compiler::transversal::ast::items::ItemRef;
-use crate::compiler::transversal::ast::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::transversal::ast::items::params::Param;
+use crate::compiler::transversal::consts;
 use crate::compiler::transversal::key_rendering;
+use crate::compiler::transversal::prelude::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::transversal::state::IntrinsicType;
 use crate::compiler::transversal::{queries, types};
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, logs};
@@ -30,7 +31,7 @@ fn validate_args(
     source: Option<ItemRef<'_>>,
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    let is_constness_ignored = source.is_some_and(ItemRef::is_param_constness_ignored);
+    let is_constness_ignored = source.is_some_and(consts::is_param_constness_ignored);
     let mut is_error_detected = false;
     for (index, arg) in call.args.iter().enumerate() {
         let param = source.map(|source| &source.params().params[index]);

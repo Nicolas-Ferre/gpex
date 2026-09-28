@@ -5,7 +5,7 @@ pub(crate) mod params;
 pub(crate) mod types;
 pub(crate) mod vars;
 
-use crate::compiler::transversal::ast::items::fns::{FnDefinition, IntrinsicFn};
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::ast::items::params::{Param, ParamGroup};
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};
@@ -115,10 +115,6 @@ impl<'item> ItemRef<'item> {
                 unreachable!("only functions can have parameters")
             }
         }
-    }
-
-    pub(crate) fn is_param_constness_ignored(self) -> bool {
-        matches!(self, ItemRef::Fn(fn_) if fn_.intrinsic() == Some(IntrinsicFn::Typeof))
     }
 
     pub(crate) fn is_const(self, are_params_const: bool) -> bool {

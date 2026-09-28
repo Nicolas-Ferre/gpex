@@ -4,7 +4,7 @@ pub(crate) mod transpilation;
 pub(crate) mod transversal;
 pub(crate) mod validation;
 
-use crate::compiler::transversal::prelude;
+use crate::compiler::transversal::prelude::files;
 use crate::compiler::transversal::state::State;
 use crate::program::Program;
 use crate::utils::logs::Log;
@@ -23,7 +23,7 @@ pub fn compile_program(
     root_path: &Path,
     is_warning_treated_as_error: bool,
 ) -> Result<(Program, Vec<Log>), Vec<Log>> {
-    let mut files = Vec::from(prelude::files());
+    let mut files = Vec::from(files::list());
     files.extend(reading::read(root_path, EXT)?);
     let modules = parsing::parse(root_path, &files)?;
     let mut state = State::new(files.len());

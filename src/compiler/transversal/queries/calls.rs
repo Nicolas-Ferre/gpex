@@ -1,20 +1,20 @@
 use crate::compiler::transversal::ast::exprs::calls::Call;
 use crate::compiler::transversal::ast::items::ItemRef;
-use crate::compiler::transversal::ast::items::fns::{BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::transversal::consts::{self, ConstValue};
+use crate::compiler::transversal::prelude::fns::{self, BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::transversal::state::State;
 
 pub(crate) fn is_intrinsic(call: &Call, fn_: IntrinsicFn, state: &State<'_>) -> bool {
     matches!(
         state.sources.get(&call.id),
-        Some(ItemRef::Fn(source)) if source.intrinsic() == Some(fn_)
+        Some(ItemRef::Fn(source)) if fns::intrinsic(source) == Some(fn_)
     )
 }
 
 pub(crate) fn is_binary_intrinsic(call: &Call, fn_: BinaryIntrinsicFn, state: &State<'_>) -> bool {
     matches!(
         state.sources.get(&call.id),
-        Some(ItemRef::Fn(source)) if source.intrinsic() == Some(IntrinsicFn::Binary(fn_))
+        Some(ItemRef::Fn(source)) if fns::intrinsic(source) == Some(IntrinsicFn::Binary(fn_))
     )
 }
 

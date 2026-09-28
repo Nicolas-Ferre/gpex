@@ -1,6 +1,7 @@
 use crate::compiler::transpilation::TranspileState;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;
+use crate::compiler::transversal::prelude::types as prelude_types;
 use crate::compiler::transversal::types;
 use crate::program::BufferField;
 use crate::utils::math;
@@ -24,7 +25,7 @@ pub(super) fn main_buffer_fields(
                 .unwrap_or_else(|| unreachable!("variable type should be validated before"));
             let field = BufferField {
                 type_id: type_.id,
-                size: type_.size(),
+                size: prelude_types::size(type_),
                 offset,
             };
             offset = main_buffer_next_field_offset(vars, index, offset, type_, state);
@@ -40,10 +41,11 @@ pub(super) fn main_buffer_alignment(
 ) -> u32 {
     vars.iter()
         .map(|var| {
-            types::var_type(var, state.inner)
-                .struct_ref()
-                .unwrap_or_else(|| unreachable!("variable type should be validated before"))
-                .alignment()
+            prelude_types::alignment(
+                types::var_type(var, state.inner)
+                    .struct_ref()
+                    .unwrap_or_else(|| unreachable!("variable type should be validated before")),
+            )
         })
         .max()
         .unwrap_or(0)
@@ -61,10 +63,10 @@ fn main_buffer_next_field_offset(
             .struct_ref()
             .unwrap_or_else(|| unreachable!("variable type should be validated before"));
         math::round_up(
-            next_var_type.alignment(),
-            current_field_offset + current_field_type.size(),
+            prelude_types::alignment(next_var_type),
+            current_field_offset + prelude_types::size(current_field_type),
         )
     } else {
-        current_field_offset + current_field_type.size()
+        current_field_offset + prelude_types::size(current_field_type)
     }
 }

@@ -3,7 +3,7 @@ pub(crate) mod type_facts;
 use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::consts::ConstValue;
-use crate::compiler::transversal::prelude::PreludeTypesEndLocation;
+use crate::compiler::transversal::prelude::files::PreludeTypesEndLocation;
 use crate::compiler::transversal::types::Type;
 use crate::utils::indexing::{ImportIndex, NodeIndex, SearchConfig, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;

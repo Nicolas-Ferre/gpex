@@ -22,7 +22,7 @@ impl NodeRef for PreludeTypesEndLocation {
     }
 }
 
-pub(crate) fn files() -> [ReadFile; PRELUDE_FILE_COUNT] {
+pub(crate) fn list() -> [ReadFile; PRELUDE_FILE_COUNT] {
     [
         file(
             "types",

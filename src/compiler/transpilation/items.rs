@@ -9,7 +9,7 @@ use crate::compiler::transversal::ast::statements::{
     AssignmentStatement, ReturnStatement, Statement,
 };
 use crate::compiler::transversal::consts::ConstValue;
-use crate::compiler::transversal::prelude::PRELUDE_TYPES_FILE_INDEX;
+use crate::compiler::transversal::prelude::files::PRELUDE_TYPES_FILE_INDEX;
 use crate::compiler::transversal::types;
 use crate::compiler::transversal::types::Type;
 use std::fmt::Write;

@@ -5,7 +5,7 @@
 The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
 
 1. **Read**: Loads built-in prelude files and reads `.gpex` files from a folder recursively
-   (`src/compiler/transversal/prelude.rs`, `src/utils/reading.rs`)
+   (`src/compiler/transversal/prelude/`, `src/utils/reading.rs`)
 2. **Parse**: Parse read files to produce an AST per file (called a "module")
    (`src/compiler/parsing/`, AST types in `src/compiler/transversal/ast/`)
 3. **Index**: Builds symbol tables, e.g., to index imports and items for following stages
@@ -33,7 +33,7 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
           resolution, dependency analysis, and transpilation.
         - `dependencies.rs`: Item dependency resolution.
         - `key_rendering.rs`: Rendering of item keys for compiler logs.
-        - `prelude.rs`: Built-in types and functions.
+        - `prelude/`: Logic related to prelude files.
         - `queries/`: AST predicates that require the shared compiler state.
         - `refs.rs`: Reference checking (in this context, a reference is an expression that is
           permitted on the left-hand side of an assignment statement).
@@ -77,8 +77,8 @@ graph TD
 
 ```mermaid
 graph TD
-    ast --> prelude
     consts --> ast
+    consts --> prelude
     consts --> state
     consts --> types
     dependencies --> ast
@@ -86,8 +86,10 @@ graph TD
     key_rendering --> ast
     key_rendering --> state
     key_rendering --> types
+    prelude --> ast
     queries --> ast
     queries --> consts
+    queries --> prelude
     queries --> state
     queries --> types
     refs --> ast

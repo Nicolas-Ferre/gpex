@@ -7,7 +7,7 @@ use crate::compiler::indexing::{IndexState, exprs};
 use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::exprs::calls::Call;
 use crate::compiler::transversal::ast::exprs::idents::Ident;
-use crate::compiler::transversal::ast::items::fns::BinaryIntrinsicFn;
+use crate::compiler::transversal::prelude::fns::BinaryIntrinsicFn;
 use crate::compiler::transversal::queries;
 use crate::compiler::transversal::state::State;
 
