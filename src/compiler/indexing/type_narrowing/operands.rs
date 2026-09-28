@@ -2,12 +2,12 @@ use crate::compiler::transversal::ast::exprs::Expr;
 use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
-use crate::compiler::transversal::consts::{self, ConstValue};
 use crate::compiler::transversal::prelude::fns::IntrinsicFn;
 use crate::compiler::transversal::queries;
 use crate::compiler::transversal::state::type_facts::TypeFactSubject;
 use crate::compiler::transversal::state::{IntrinsicType, State};
-use crate::compiler::transversal::types::{self, Type};
+use crate::compiler::transversal::values::consts::{self, ConstValue};
+use crate::compiler::transversal::values::types::{self, Type};
 
 pub(super) struct ResolvedTypeFactOperand<'item> {
     pub(super) operand: TypeFactOperand<'item>,

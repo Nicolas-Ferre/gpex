@@ -37,8 +37,8 @@ The compiler follows a multi-pass pipeline defined in `src/compiler/mod.rs`:
         - `queries/`: AST predicates that require the shared compiler state.
         - `refs.rs`: Reference checking (in this context, a reference is an expression that is
           permitted on the left-hand side of an assignment statement).
-        - `consts/`: Constant value resolution.
-        - `types/`: Type resolution.
+        - `values/`: Resolved values of expressions: constant-value resolution (`consts/`) and
+          type resolution (`types/`, including argument matching).
 - `src/program.rs`: Compiled program representation.
 - `src/runner/`: Execution of a compiled program on GPU using WGPU.
 - `src/utils/`: Reusable compilation utils, for file reading, parsing, logging, ...
@@ -50,8 +50,8 @@ Each graph shows coupling between direct sub-modules of the heading's folder. An
 means that at least one Rust file under `A` refers to `B` via `crate::B` or via a crate-root
 re-exported name that originates from `B` (for example `use crate::Log` when `Log` is `pub use`d
 from `utils`). Nested paths are collapsed to the nearest documented child of that folder:
-`crate::compiler::transversal::consts` is `compiler` under `src/`, `transversal` under
-`src/compiler/`, and `consts` under `src/compiler/transversal/`. Same-module paths are omitted.
+`crate::compiler::transversal::values::consts` is `compiler` under `src/`, `transversal` under
+`src/compiler/`, and `values` under `src/compiler/transversal/`. Same-module paths are omitted.
 
 ### `src/`
 
@@ -77,28 +77,22 @@ graph TD
 
 ```mermaid
 graph TD
-    consts --> ast
-    consts --> prelude
-    consts --> state
-    consts --> types
     dependencies --> ast
     dependencies --> state
     key_rendering --> ast
     key_rendering --> state
-    key_rendering --> types
+    key_rendering --> values
     prelude --> ast
     queries --> ast
-    queries --> consts
     queries --> prelude
     queries --> state
-    queries --> types
+    queries --> values
     refs --> ast
     refs --> state
     state --> ast
-    state --> consts
     state --> prelude
-    state --> types
-    types --> ast
-    types --> consts
-    types --> state
+    state --> values
+    values --> ast
+    values --> prelude
+    values --> state
 ```

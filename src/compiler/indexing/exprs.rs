@@ -7,7 +7,7 @@ use crate::compiler::transversal::ast::exprs::idents::Ident;
 use crate::compiler::transversal::ast::exprs::{BINARY_AND_FN_NAME, BINARY_OR_FN_NAME, Expr};
 use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::state::State;
-use crate::compiler::transversal::types::args::{self, ArgsMatch};
+use crate::compiler::transversal::values::types::args::{self, ArgsMatch};
 use crate::utils::indexing::{NodeRef, SearchParams, Visibility};
 use crate::utils::parsing::span::Span;
 

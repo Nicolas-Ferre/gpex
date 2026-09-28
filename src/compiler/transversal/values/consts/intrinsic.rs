@@ -3,14 +3,13 @@
 use crate::compiler::transversal::ast::exprs::calls::Call;
 use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
-use crate::compiler::transversal::consts::{ConstValue, HashableF32};
 use crate::compiler::transversal::prelude::fns::{
     self, BinaryIntrinsicFn, IntrinsicFn, UnaryIntrinsicFn,
 };
 use crate::compiler::transversal::prelude::types as prelude_types;
 use crate::compiler::transversal::state::State;
-use crate::compiler::transversal::types;
-use crate::compiler::transversal::types::Type;
+use crate::compiler::transversal::values::consts::{ConstValue, HashableF32};
+use crate::compiler::transversal::values::types::{self, Type};
 
 pub(super) fn call_value<'item>(
     call: &Call,

@@ -8,9 +8,9 @@ use crate::compiler::transversal::ast::items::fns::{FnDefinition, FnStatementsBo
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;
 use crate::compiler::transversal::ast::modules::Module;
-use crate::compiler::transversal::consts::ConstValue;
 use crate::compiler::transversal::dependencies;
 use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::values::consts::ConstValue;
 use crate::program::{Buffer, Program};
 use crate::utils::dependencies::Dependencies;
 use crate::utils::math;

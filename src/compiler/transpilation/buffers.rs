@@ -2,7 +2,7 @@ use crate::compiler::transpilation::TranspileState;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;
 use crate::compiler::transversal::prelude::types as prelude_types;
-use crate::compiler::transversal::types;
+use crate::compiler::transversal::values::types;
 use crate::program::BufferField;
 use crate::utils::math;
 use crate::utils::reading::ReadFile;

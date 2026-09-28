@@ -7,8 +7,8 @@ use crate::compiler::transversal::ast::items::fns::{FnBody, FnDefinition, FnStat
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;
-use crate::compiler::transversal::consts::ConstValue;
-use crate::compiler::transversal::{consts, types};
+use crate::compiler::transversal::values::consts::{self, ConstValue};
+use crate::compiler::transversal::values::types;
 use crate::utils::{endianness, formatting};
 use std::fmt::Write;
 

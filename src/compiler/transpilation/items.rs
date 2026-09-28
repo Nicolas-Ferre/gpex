@@ -8,10 +8,9 @@ use crate::compiler::transversal::ast::items::vars::VarDefinition;
 use crate::compiler::transversal::ast::statements::{
     AssignmentStatement, ReturnStatement, Statement,
 };
-use crate::compiler::transversal::consts::ConstValue;
 use crate::compiler::transversal::prelude::files::PRELUDE_TYPES_FILE_INDEX;
-use crate::compiler::transversal::types;
-use crate::compiler::transversal::types::Type;
+use crate::compiler::transversal::values::consts::ConstValue;
+use crate::compiler::transversal::values::types::{self, Type};
 use std::fmt::Write;
 
 pub(super) fn transpile_specialized_fn<'item>(

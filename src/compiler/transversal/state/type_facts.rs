@@ -1,6 +1,6 @@
 use crate::compiler::transversal::ast::items::params::Param;
 use crate::compiler::transversal::ast::items::types::StructDefinition;
-use crate::compiler::transversal::types::Type;
+use crate::compiler::transversal::values::types::Type;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 

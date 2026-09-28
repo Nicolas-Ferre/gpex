@@ -4,7 +4,7 @@ use crate::compiler::transversal::ast::items::ItemRef;
 use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::ast::symbols::QUESTION_MARK_SYMBOL;
 use crate::compiler::transversal::state::State;
-use crate::compiler::transversal::types;
+use crate::compiler::transversal::values::types;
 use crate::utils::validation::ValidateError;
 
 pub(crate) fn item_key<'item>(item: ItemRef<'item>, state: &State<'item>) -> String {

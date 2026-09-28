@@ -1,8 +1,8 @@
 use crate::compiler::transversal::ast::exprs::calls::Call;
 use crate::compiler::transversal::ast::items::ItemRef;
-use crate::compiler::transversal::consts::{self, ConstValue};
 use crate::compiler::transversal::prelude::fns::{self, BinaryIntrinsicFn, IntrinsicFn};
 use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::values::consts::{self, ConstValue};
 
 pub(crate) fn is_intrinsic(call: &Call, fn_: IntrinsicFn, state: &State<'_>) -> bool {
     matches!(

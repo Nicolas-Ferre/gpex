@@ -3,7 +3,7 @@ use crate::compiler::transversal::ast::statements::{
     AssignmentStatement, ReturnStatement, Statement,
 };
 use crate::compiler::transversal::refs;
-use crate::compiler::transversal::types;
+use crate::compiler::transversal::values::types;
 use crate::compiler::validation::{ValidateState, exprs, logs};
 use crate::utils::parsing::span::Span;
 use crate::utils::validation::ValidateError;

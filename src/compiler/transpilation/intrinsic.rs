@@ -7,7 +7,7 @@ use crate::compiler::transversal::prelude::fns::{
 };
 use crate::compiler::transversal::queries;
 use crate::compiler::transversal::state::IntrinsicType;
-use crate::compiler::transversal::types;
+use crate::compiler::transversal::values::types;
 use std::fmt::Write;
 
 pub(super) fn transpile_call(

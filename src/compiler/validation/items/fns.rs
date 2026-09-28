@@ -9,7 +9,7 @@ use crate::compiler::transversal::dependencies;
 use crate::compiler::transversal::key_rendering;
 use crate::compiler::transversal::prelude::files;
 use crate::compiler::transversal::queries;
-use crate::compiler::transversal::types::{self, Type};
+use crate::compiler::transversal::values::types::{self, Type};
 use crate::compiler::validation::items::{params, statements};
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, items, logs, naming};
 use crate::utils::dependencies::Dependencies;

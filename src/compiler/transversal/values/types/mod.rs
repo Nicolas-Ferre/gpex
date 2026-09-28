@@ -8,9 +8,9 @@ use crate::compiler::transversal::ast::items::fns::FnDefinition;
 use crate::compiler::transversal::ast::items::params::{Param, ParamGroup};
 use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::items::vars::VarDefinition;
-use crate::compiler::transversal::consts::{self, ConstValue};
 use crate::compiler::transversal::state::State;
 use crate::compiler::transversal::state::type_facts::TypeFacts;
+use crate::compiler::transversal::values::consts::{self, ConstValue};
 use crate::utils::validation::ValidateError;
 use derive_where::derive_where;
 

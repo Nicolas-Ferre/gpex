@@ -11,7 +11,7 @@ use crate::compiler::transversal::ast::items::types::StructDefinition;
 use crate::compiler::transversal::ast::statements::{AssignmentStatement, Statement};
 use crate::compiler::transversal::prelude::fns;
 use crate::compiler::transversal::state::State;
-use crate::compiler::transversal::types::{self, Type};
+use crate::compiler::transversal::values::types::{self, Type};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
