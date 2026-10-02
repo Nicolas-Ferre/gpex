@@ -1,8 +1,7 @@
 mod resources;
 mod utils;
 
-use crate::compiler::parsing::symbols::{FALSE_KEYWORD, TRUE_KEYWORD};
-use crate::compiler::transpilation::Program;
+use crate::program::Program;
 use crate::runner::resources::ComputeShader;
 use crate::utils::{endianness, formatting};
 use crate::{Log, LogLevel};
@@ -131,15 +130,7 @@ impl Display for GpuValue {
             Self::I32(value) => write!(formatter, "{value}"),
             Self::U32(value) => write!(formatter, "{value}u"),
             Self::F32(value) => write!(formatter, "{}", formatting::f32_to_string(*value)),
-            Self::Bool(value) => write!(
-                formatter,
-                "{}",
-                if *value {
-                    TRUE_KEYWORD.slice
-                } else {
-                    FALSE_KEYWORD.slice
-                }
-            ),
+            Self::Bool(value) => write!(formatter, "{}", if *value { "true" } else { "false" }),
         }
     }
 }

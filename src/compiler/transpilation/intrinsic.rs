@@ -1,12 +1,13 @@
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::{Arg, Call};
-use crate::compiler::parsing::items::fns::{
-    BinaryIntrinsicFn, FnDefinition, IntrinsicFn, UnaryIntrinsicFn,
-};
-use crate::compiler::queries;
-use crate::compiler::state::IntrinsicType;
 use crate::compiler::transpilation::{TranspileState, exprs};
-use crate::compiler::types;
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::{Arg, Call};
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
+use crate::compiler::transversal::prelude::fns::{
+    self, BinaryIntrinsicFn, IntrinsicFn, UnaryIntrinsicFn,
+};
+use crate::compiler::transversal::queries;
+use crate::compiler::transversal::state::IntrinsicType;
+use crate::compiler::transversal::values::types;
 use std::fmt::Write;
 
 pub(super) fn transpile_call(
@@ -14,7 +15,7 @@ pub(super) fn transpile_call(
     source: &FnDefinition,
     state: &mut TranspileState<'_, '_>,
 ) {
-    match source.intrinsic() {
+    match fns::intrinsic(source) {
         Some(IntrinsicFn::Binary(fn_)) => {
             transpile_fn_call_binary(call, fn_, state);
         }

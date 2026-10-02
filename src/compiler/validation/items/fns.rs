@@ -1,13 +1,15 @@
-use crate::compiler::dependencies;
-use crate::compiler::item_ref::ItemRef;
-use crate::compiler::key_rendering;
-use crate::compiler::parsing::exprs as parsing_exprs;
-use crate::compiler::parsing::exprs::calls::UNARY_FN_NAMES;
-use crate::compiler::parsing::exprs::{BINARY_AND_FN_NAME, BINARY_FN_NAMES, BINARY_OR_FN_NAME};
-use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::prelude;
-use crate::compiler::queries;
-use crate::compiler::types::{self, Type};
+use crate::compiler::transversal::ast::exprs as ast_exprs;
+use crate::compiler::transversal::ast::exprs::calls::UNARY_FN_NAMES;
+use crate::compiler::transversal::ast::exprs::{
+    BINARY_AND_FN_NAME, BINARY_FN_NAMES, BINARY_OR_FN_NAME,
+};
+use crate::compiler::transversal::ast::items::ItemRef;
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
+use crate::compiler::transversal::dependencies;
+use crate::compiler::transversal::key_rendering;
+use crate::compiler::transversal::prelude::files;
+use crate::compiler::transversal::queries;
+use crate::compiler::transversal::values::types::{self, Type};
 use crate::compiler::validation::items::{params, statements};
 use crate::compiler::validation::{ParamConstness, ValidateState, exprs, items, logs, naming};
 use crate::utils::dependencies::Dependencies;
@@ -45,7 +47,7 @@ fn validate_no_custom_logical_operator(
     fn_: &FnDefinition,
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
-    if prelude::is_prelude_file_index(fn_.name_span.file_index)
+    if files::is_prelude_file_index(fn_.name_span.file_index)
         || !matches!(fn_.name.as_str(), BINARY_AND_FN_NAME | BINARY_OR_FN_NAME)
     {
         return Ok(());
@@ -58,7 +60,7 @@ fn validate_no_custom_logical_operator(
 }
 
 fn validate_fn_name(fn_: &FnDefinition, state: &mut ValidateState<'_, '_>) {
-    if parsing_exprs::is_operator_fn_name(&fn_.name) {
+    if ast_exprs::is_operator_fn_name(&fn_.name) {
         return;
     }
     let allowed_cases = naming::fn_cases(fn_, state);

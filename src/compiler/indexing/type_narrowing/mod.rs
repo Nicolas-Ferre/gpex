@@ -4,12 +4,12 @@ mod operands;
 use self::facts::TypeFact;
 use crate::compiler::indexing::type_narrowing::operands::ResolvedTypeFactOperand;
 use crate::compiler::indexing::{IndexState, exprs};
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::items::fns::BinaryIntrinsicFn;
-use crate::compiler::queries;
-use crate::compiler::state::State;
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::exprs::idents::Ident;
+use crate::compiler::transversal::prelude::fns::BinaryIntrinsicFn;
+use crate::compiler::transversal::queries;
+use crate::compiler::transversal::state::State;
 
 #[derive(Clone, Copy)]
 pub(super) enum LogicalTypeNarrowing {

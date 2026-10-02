@@ -1,14 +1,15 @@
 #![expect(clippy::wildcard_enum_match_arm, reason = "opt-in is preferred here")]
 
-use crate::compiler::consts::{ConstValue, HashableF32};
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::items::fns::{
-    BinaryIntrinsicFn, FnDefinition, IntrinsicFn, UnaryIntrinsicFn,
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::prelude::fns::{
+    self, BinaryIntrinsicFn, IntrinsicFn, UnaryIntrinsicFn,
 };
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::state::State;
-use crate::compiler::types;
-use crate::compiler::types::Type;
+use crate::compiler::transversal::prelude::types as prelude_types;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::values::consts::{ConstValue, HashableF32};
+use crate::compiler::transversal::values::types::{self, Type};
 
 pub(super) fn call_value<'item>(
     call: &Call,
@@ -23,7 +24,7 @@ pub(super) fn call_value<'item>(
             return ConstValue::Unknown;
         }
     }
-    match source.intrinsic() {
+    match fns::intrinsic(source) {
         Some(IntrinsicFn::Binary(fn_)) => fn_binary_value(source, fn_, state),
         Some(IntrinsicFn::Unary(fn_)) => fn_unary_value(source, fn_, state),
         Some(IntrinsicFn::MulAdd) => mul_add_value(source, state),
@@ -38,7 +39,7 @@ pub(super) fn decisive_left_value<'item>(
     source: &FnDefinition,
     state: &State<'item>,
 ) -> Option<ConstValue<'item>> {
-    let intrinsic = source.intrinsic()?;
+    let intrinsic = fns::intrinsic(source)?;
     let left = super::expr_value(&call.args.first()?.value, state);
     match (intrinsic, left) {
         (IntrinsicFn::Binary(BinaryIntrinsicFn::And), ConstValue::Bool(false)) => {
@@ -210,7 +211,7 @@ fn typeof_value<'item>(call: &Call, state: &State<'item>) -> ConstValue<'item> {
 
 fn sizeof_value<'item>(source: &'item FnDefinition, state: &State<'item>) -> ConstValue<'item> {
     match state.const_value(source.params.params[0].id) {
-        ConstValue::TypeRef(type_) => ConstValue::U32(type_.size()),
+        ConstValue::TypeRef(type_) => ConstValue::U32(prelude_types::size(type_)),
         _ => unreachable!("not implemented `{}` constant GPU function", source.name),
     }
 }

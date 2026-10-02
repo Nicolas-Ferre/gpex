@@ -18,4 +18,4 @@ on the following:
 - Code organization
 - Test coverage and location
 
-Follow instructions from `AGENTS.md` for how questions are displayed and using which method.
+Ask in a short, conversational way, and still use the question format from `AGENTS.md`.

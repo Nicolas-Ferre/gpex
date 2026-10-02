@@ -1,16 +1,17 @@
 mod intrinsic;
 
-use crate::compiler::item_ref::ItemRef;
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::exprs::idents::Ident;
-use crate::compiler::parsing::exprs::literals::{F32Literal, I32Literal, U32Literal};
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition, FnStatementsBody};
-use crate::compiler::parsing::items::params::Param;
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::statements::{AssignmentStatement, Statement};
-use crate::compiler::state::State;
-use crate::compiler::types::{self, Type};
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::exprs::idents::Ident;
+use crate::compiler::transversal::ast::exprs::literals::{F32Literal, I32Literal, U32Literal};
+use crate::compiler::transversal::ast::items::ItemRef;
+use crate::compiler::transversal::ast::items::fns::{FnBody, FnDefinition, FnStatementsBody};
+use crate::compiler::transversal::ast::items::params::Param;
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::statements::{AssignmentStatement, Statement};
+use crate::compiler::transversal::prelude::fns;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::values::types::{self, Type};
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -66,6 +67,10 @@ pub(crate) fn call_value<'item>(call: &Call, state: &State<'item>) -> ConstValue
     }
 }
 
+pub(crate) fn is_param_constness_ignored(item: ItemRef<'_>) -> bool {
+    fns::is_typeof(item)
+}
+
 fn i32_literal_value(literal: &I32Literal) -> ConstValue<'static> {
     if let Some(value) = literal.value {
         ConstValue::I32(value)
@@ -117,7 +122,7 @@ fn fn_call_value<'item>(
     if let Some(value) = intrinsic::decisive_left_value(call, source, state) {
         return value;
     }
-    if ItemRef::Fn(source).is_param_constness_ignored() {
+    if is_param_constness_ignored(ItemRef::Fn(source)) {
         return intrinsic::call_value(call, source, state);
     }
     let param_args = call

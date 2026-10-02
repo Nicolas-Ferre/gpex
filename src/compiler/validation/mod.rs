@@ -4,9 +4,9 @@ mod items;
 mod logs;
 mod naming;
 
-use crate::compiler::parsing::items::Item;
-use crate::compiler::parsing::modules::Module;
-use crate::compiler::state::State;
+use crate::compiler::transversal::ast::items::Item;
+use crate::compiler::transversal::ast::modules::Module;
+use crate::compiler::transversal::state::State;
 use crate::utils::parsing::span::Span;
 use crate::utils::reading::ReadFile;
 use crate::utils::validation::{ValidateContext, ValidateError};

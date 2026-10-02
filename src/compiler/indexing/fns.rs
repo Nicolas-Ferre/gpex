@@ -1,8 +1,8 @@
 use crate::compiler::indexing::type_narrowing::LogicalTypeNarrowing;
 use crate::compiler::indexing::{IndexState, exprs, type_narrowing};
-use crate::compiler::parsing::items::fns::{FnBody, FnDefinition};
-use crate::compiler::parsing::items::params::ParamRequirement;
-use crate::compiler::parsing::statements::Statement;
+use crate::compiler::transversal::ast::items::fns::{FnBody, FnDefinition};
+use crate::compiler::transversal::ast::items::params::ParamRequirement;
+use crate::compiler::transversal::ast::statements::Statement;
 use std::rc::Rc;
 
 pub(super) fn index_fn_const_parts<'item>(

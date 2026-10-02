@@ -1,10 +1,22 @@
-use crate::compiler::parsing::exprs::Expr;
-use crate::compiler::parsing::exprs::calls::Call;
-use crate::compiler::parsing::items::fns::FnDefinition;
-use crate::compiler::parsing::symbols::QUESTION_MARK_SYMBOL;
-use crate::compiler::state::State;
-use crate::compiler::types;
+use crate::compiler::transversal::ast::exprs::Expr;
+use crate::compiler::transversal::ast::exprs::calls::Call;
+use crate::compiler::transversal::ast::items::ItemRef;
+use crate::compiler::transversal::ast::items::fns::FnDefinition;
+use crate::compiler::transversal::ast::symbols::QUESTION_MARK_SYMBOL;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::values::types;
 use crate::utils::validation::ValidateError;
+
+pub(crate) fn item_key<'item>(item: ItemRef<'item>, state: &State<'item>) -> String {
+    match item {
+        ItemRef::Fn(fn_) => fn_key(fn_, state)
+            .unwrap_or_else(|_| unreachable!("function should be validated before")),
+        ItemRef::Var(var) => var.name.clone(),
+        ItemRef::Const(const_) => const_.name.clone(),
+        ItemRef::Param(param) => param.name.clone(),
+        ItemRef::Struct(_) => unreachable!("structs are not yet validated"),
+    }
+}
 
 pub(crate) fn call_key(call: &Call, state: &State<'_>) -> Result<String, ValidateError> {
     let fn_name = &call.name;

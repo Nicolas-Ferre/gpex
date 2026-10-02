@@ -2,14 +2,15 @@ mod fns;
 mod params;
 mod statements;
 
-use crate::compiler::dependencies;
-use crate::compiler::item_ref::ItemRef;
-use crate::compiler::parsing::exprs as parsing_exprs;
-use crate::compiler::parsing::items::Item;
-use crate::compiler::parsing::items::actions::RepeatDefinition;
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::items::vars::{ConstDefinition, VarDefinition};
-use crate::compiler::prelude;
+use crate::compiler::transversal::ast::exprs as ast_exprs;
+use crate::compiler::transversal::ast::items::Item;
+use crate::compiler::transversal::ast::items::ItemRef;
+use crate::compiler::transversal::ast::items::actions::RepeatDefinition;
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::items::vars::{ConstDefinition, VarDefinition};
+use crate::compiler::transversal::dependencies;
+use crate::compiler::transversal::key_rendering;
+use crate::compiler::transversal::prelude::files;
 use crate::compiler::validation::exprs::calls;
 use crate::compiler::validation::naming::VAR_ALLOWED_CASES;
 use crate::compiler::validation::{ValidateState, exprs, logs, naming};
@@ -114,7 +115,7 @@ fn validate_intrinsic_location(
     state: &mut ValidateState<'_, '_>,
 ) -> Result<(), ValidateError> {
     if let Some(intrinsic_keyword_span) = intrinsic_keyword_span
-        && !prelude::is_prelude_file_index(item.file_index())
+        && !files::is_prelude_file_index(item.file_index())
     {
         state.add_log(logs::items::forbidden_intrinsic(
             intrinsic_keyword_span,
@@ -130,7 +131,7 @@ fn validate_usage<'item>(item: ItemRef<'item>, state: &mut ValidateState<'_, 'it
     let name_span = item.name_span();
     let name = state.context.slice(name_span);
     let ref_span = state.inner.item_first_refs.get(&item.id()).copied();
-    let is_operator_fn = matches!(item, ItemRef::Fn(_)) && parsing_exprs::is_operator_fn_name(name);
+    let is_operator_fn = matches!(item, ItemRef::Fn(_)) && ast_exprs::is_operator_fn_name(name);
     let is_unused_lint_ignored = name.starts_with('_') && !is_operator_fn;
     let ignored_name_replacement = is_unused_lint_ignored
         .then(|| ignored_name_replacement(name))
@@ -159,7 +160,7 @@ fn log_unused<'item>(
     state: &mut ValidateState<'_, 'item>,
 ) {
     let name = state.context.slice(name_span);
-    let displayed_key = item.displayed_key(state.inner);
+    let displayed_key = key_rendering::item_key(item, state.inner);
     let replacement = (!is_operator_fn).then(|| format!("_{name}"));
     state.add_log(logs::items::unused(
         &displayed_key,
@@ -175,7 +176,7 @@ fn log_pub_with_ignored_name<'item>(
     name_span: Span,
     state: &mut ValidateState<'_, 'item>,
 ) {
-    let displayed_key = item.displayed_key(state.inner);
+    let displayed_key = key_rendering::item_key(item, state.inner);
     state.add_log(logs::items::pub_with_ignored_name(
         &displayed_key,
         replacement,
@@ -191,7 +192,7 @@ fn log_used_with_ignored_name<'item>(
     ref_span: Span,
     state: &mut ValidateState<'_, 'item>,
 ) {
-    let displayed_key = item.displayed_key(state.inner);
+    let displayed_key = key_rendering::item_key(item, state.inner);
     state.add_log(logs::items::used_with_ignored_name(
         &displayed_key,
         replacement,

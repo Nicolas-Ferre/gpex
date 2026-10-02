@@ -3,60 +3,24 @@ mod exprs;
 mod intrinsic;
 mod items;
 
-use crate::compiler::consts::ConstValue;
-use crate::compiler::dependencies;
-use crate::compiler::item_ref::ItemRef;
-use crate::compiler::parsing::items::fns::{FnDefinition, FnStatementsBody};
-use crate::compiler::parsing::items::types::StructDefinition;
-use crate::compiler::parsing::items::vars::VarDefinition;
-use crate::compiler::parsing::modules::Module;
-use crate::compiler::state::State;
+use crate::compiler::transversal::ast::items::ItemRef;
+use crate::compiler::transversal::ast::items::fns::{FnDefinition, FnStatementsBody};
+use crate::compiler::transversal::ast::items::types::StructDefinition;
+use crate::compiler::transversal::ast::items::vars::VarDefinition;
+use crate::compiler::transversal::ast::modules::Module;
+use crate::compiler::transversal::dependencies;
+use crate::compiler::transversal::state::State;
+use crate::compiler::transversal::values::consts::ConstValue;
+use crate::program::{Buffer, Program};
 use crate::utils::dependencies::Dependencies;
 use crate::utils::math;
 use crate::utils::reading::ReadFile;
 use itertools::Itertools;
 use petgraph::graphmap::DiGraphMap;
-use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::mem;
 
 const MAIN_BUFFER_NAME: &str = "b";
-
-/// A compiled `GPEx` program.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[non_exhaustive]
-pub struct Program {
-    /// For each type ID, the dot path of the type.
-    pub type_paths: HashMap<u64, String>,
-    /// The buffer storing all global variables.
-    pub buffer: Buffer,
-    /// The shader used to initialize all global variables.
-    pub init_shader: String,
-    /// The shader used to update application at each frame.
-    pub update_shader: String,
-}
-
-/// A buffer in a `GPEx` program.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[non_exhaustive]
-pub struct Buffer {
-    /// The size of the buffer in bytes.
-    pub size: u32,
-    /// The fields of the buffer.
-    pub fields: HashMap<String, BufferField>,
-}
-
-/// A buffer field in a `GPEx` program.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[non_exhaustive]
-pub struct BufferField {
-    /// The field type ID.
-    pub type_id: u64,
-    /// The size of the field in bytes.
-    pub size: u32,
-    /// The offset in bytes of the field inside its buffer.
-    pub offset: u32,
-}
 
 #[derive(Debug, Clone)]
 #[derive_where::derive_where(PartialEq, Eq, Hash)]
