@@ -1,5 +1,10 @@
 error: forbidden `intrinsic` item outside prelude
-│  → <root>/test_intrinsic.gpex:3:19
+│  → <root>/test_intrinsic_const.gpex:5:31
+│    ¦ const fn type_() -> typeref = intrinsic;
+│    ¦                               ^^^^^^^^^
+┴
+error: forbidden `intrinsic` item outside prelude
+│  → <root>/test_intrinsic_not_const.gpex:3:19
 │    ¦ fn fn_() -> i32 = intrinsic;
 │    ¦                   ^^^^^^^^^
 ┴

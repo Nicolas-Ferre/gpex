@@ -30,7 +30,7 @@ pub(super) fn call_value<'item>(
         Some(IntrinsicFn::MulAdd) => mul_add_value(source, state),
         Some(IntrinsicFn::Sizeof) => sizeof_value(source, state),
         Some(IntrinsicFn::Typeof) => typeof_value(call, state),
-        None => unreachable!("not implemented `{}` constant GPU function", source.name),
+        None => ConstValue::Unknown,
     }
 }
 
