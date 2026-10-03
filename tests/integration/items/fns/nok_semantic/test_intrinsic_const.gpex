@@ -1,0 +1,5 @@
+const fn type_() -> typeref = intrinsic;
+
+fn item(value: type_()) -> i32 {
+    return 0;
+}
