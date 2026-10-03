@@ -46,15 +46,14 @@ fn compile(args: &CompileArgs) {
     if let Err(errors) = gpex::save_compiled(&program, &args.output) {
         display_log(&errors);
         std::process::exit(1);
-    } else {
-        let log = Log {
-            level: LogLevel::Info,
-            msg: format!("program saved in \"{}\"", args.output.display()),
-            location: None,
-            inner: vec![],
-        };
-        eprint!("{log}");
     }
+    let log = Log {
+        level: LogLevel::Info,
+        msg: format!("program saved in \"{}\"", args.output.display()),
+        location: None,
+        inner: vec![],
+    };
+    eprint!("{log}");
 }
 
 async fn run(args: &RunArgs) {

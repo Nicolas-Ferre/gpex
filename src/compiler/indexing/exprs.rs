@@ -47,20 +47,16 @@ fn index_call_source<'item>(call: &'item Call, state: &mut IndexState<'_, 'item>
     match search_accessible_call_source(call, search_params, state.inner) {
         CallSource::Found(source) => {
             index_accessible_source(&call, call.span, source, state);
-            state.set_expr_source(call.id(), Some(source));
+            state.set_expr_source(call.id, Some(source));
         }
-        CallSource::NotFound => {
+        CallSource::NotFound
             if let Some(source) =
-                search_not_accessible_call_source(call, search_params, state.inner)
-            {
-                index_not_accessible_source(call.id, source, state);
-            } else {
-                let candidates = search_candidate_call_sources(search_params, state.inner);
-                index_call_candidates(call.id, candidates, state);
-            }
+                search_not_accessible_call_source(call, search_params, state.inner) =>
+        {
+            index_not_accessible_source(call.id, source, state);
             state.set_expr_source(call.id, None);
         }
-        CallSource::Unknown => {
+        CallSource::NotFound | CallSource::Unknown => {
             let candidates = search_candidate_call_sources(search_params, state.inner);
             index_call_candidates(call.id, candidates, state);
             state.set_expr_source(call.id, None);

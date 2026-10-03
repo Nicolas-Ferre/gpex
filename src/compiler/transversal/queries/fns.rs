@@ -8,8 +8,8 @@ pub(crate) fn are_same_signatures<'item>(
     other_fn: &'item FnDefinition,
     state: &State<'item>,
 ) -> bool {
-    debug_assert!(fn_.name == other_fn.name);
-    debug_assert!(fn_.params.params.len() == other_fn.params.params.len());
+    debug_assert_eq!(fn_.name, other_fn.name);
+    debug_assert_eq!(fn_.params.params.len(), other_fn.params.params.len());
     if fn_.has_requirement() || other_fn.has_requirement() {
         return false;
     }
