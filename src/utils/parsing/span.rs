@@ -1,7 +1,7 @@
 use crate::utils::parsing::context::ParseContext;
 use crate::utils::parsing::error::ParseError;
-use std::ops::Range;
 use std::path::Path;
+use std::range::Range;
 
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct Symbol {
@@ -45,9 +45,12 @@ impl Span {
     ) -> Result<Self, ParseError<'context>> {
         context.parse_whitespaces_and_comments();
         if context.remaining_code().starts_with(symbol.slice) {
-            let range = context.offset..context.offset + symbol.slice.len();
+            let range = Range {
+                start: context.offset,
+                end: context.offset + symbol.slice.len(),
+            };
             let is_keyword = symbol.slice.chars().all(Self::is_char_keyword);
-            let is_next_char_keyword = Self::is_next_char_keyword(context, range.clone());
+            let is_next_char_keyword = Self::is_next_char_keyword(context, range);
             if !is_keyword || !is_next_char_keyword {
                 context.offset = range.end;
                 return Ok(Self {
@@ -75,11 +78,14 @@ impl Span {
             expected_tokens: vec![pattern.name],
         };
         let len = Self::pattern_len(context, pattern).map_err(|()| error())?;
-        let range = context.offset..context.offset + len;
+        let range = Range {
+            start: context.offset,
+            end: context.offset + len,
+        };
         let is_token_excluded = pattern
             .excluded_tokens
-            .contains(&&context.file.content[range.clone()]);
-        if is_token_excluded || Self::is_next_char_keyword(context, range.clone()) {
+            .contains(&&context.file.content[range]);
+        if is_token_excluded || Self::is_next_char_keyword(context, range) {
             Err(error())
         } else {
             context.offset = range.end;

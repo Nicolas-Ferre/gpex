@@ -8,7 +8,7 @@ pub(crate) fn circular_dependencies(
     dependency_spans: &[Span],
     state: &ValidateState<'_, '_>,
 ) -> Log {
-    debug_assert!(!dependency_spans.is_empty());
+    debug_assert_ne!(dependency_spans, []);
     Log {
         level: LogLevel::Error,
         msg: format!("`{item_name}` item has circular dependencies"),
