@@ -45,10 +45,7 @@ impl Span {
     ) -> Result<Self, ParseError<'context>> {
         context.parse_whitespaces_and_comments();
         if context.remaining_code().starts_with(symbol.slice) {
-            let range = Range {
-                start: context.offset,
-                end: context.offset + symbol.slice.len(),
-            };
+            let range = Range::from(context.offset..context.offset + symbol.slice.len());
             let is_keyword = symbol.slice.chars().all(Self::is_char_keyword);
             let is_next_char_keyword = Self::is_next_char_keyword(context, range);
             if !is_keyword || !is_next_char_keyword {
@@ -78,10 +75,7 @@ impl Span {
             expected_tokens: vec![pattern.name],
         };
         let len = Self::pattern_len(context, pattern).map_err(|()| error())?;
-        let range = Range {
-            start: context.offset,
-            end: context.offset + len,
-        };
+        let range = Range::from(context.offset..context.offset + len);
         let is_token_excluded = pattern
             .excluded_tokens
             .contains(&&context.file.content[range]);
