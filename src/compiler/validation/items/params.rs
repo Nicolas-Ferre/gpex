@@ -53,6 +53,9 @@ fn validate_param_type<'item>(
     let actual_type = types::expr_type(&param.type_, state.inner);
     let expected_type = Type::Struct(state.inner.search_prelude_type("typeref"));
     exprs::validate_type_match(param.type_.span(), actual_type, None, expected_type, state)?;
+    if !types::expr_as_type(&param.type_, state.inner).is_comparable() {
+        return Err(ValidateError);
+    }
     Ok(())
 }
 
