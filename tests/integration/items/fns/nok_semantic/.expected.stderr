@@ -3,6 +3,11 @@ error: forbidden `intrinsic` item outside prelude
 │    ¦ fn fn_() -> i32 = intrinsic;
 │    ¦                   ^^^^^^^^^
 ┴
+error: forbidden `intrinsic` item outside prelude
+│  → <root>/test_intrinsic_const_param_type.gpex:1:31
+│    ¦ const fn type_() -> typeref = intrinsic;
+│    ¦                               ^^^^^^^^^
+┴
 error: `__add__(i32, i32, i32)` binary operator function must have exactly two parameters
 │  → <root>/test_operator_binary_param_count_extra.gpex:1:4
 │    ¦ fn __add__(_param1: i32, _param2: i32, _param3: i32) -> i32 {
